@@ -14,12 +14,12 @@ class DataMap(object):
         self.span_latitude = span_latitude
         self.span_longitude = span_longitude
         self.arcsec_resolution = arcsec_resolution
-        self.latitude_max = float("{0:.5f}".format(((self.span_latitude-1 *
-                                        self.arcsec_resolution) /
+        self.latitude_max = float("{0:.5f}".format(((((self.span_latitude-1) *
+                                        self.arcsec_resolution)) /
                                         ARCSEC_DEG) + self.latitude))
 
-        self.longitude_max = float("{0:.5f}".format(((self.span_longitude-1 *
-                                        self.arcsec_resolution) /
+        self.longitude_max = float("{0:.5f}".format(((((self.span_longitude-1) *
+                                        self.arcsec_resolution)) /
                                        ARCSEC_DEG) + self.longitude))
 
     def elevation(self, latitude, longitude):
