@@ -3,7 +3,15 @@ import gdal
 import numpy
 from lib.geodatamap import DataMap
 
-class SRTMLoader(object):
+
+class _BaseLoader(object):
+    def __init__(self, filename):
+        """
+        Base class for data loaders.
+        """
+        self.filename = os.path.expanduser(filename)
+
+class SRTMLoader(_BaseLoader):
     def __init__(self, filename,
                  arcsec_resolution=1,
                  span_latitude=3601,
@@ -14,10 +22,11 @@ class SRTMLoader(object):
         :param span_latitude: source datamap point span along latitude
         :param span_longitude: source datamap point span along longitude
         """
+        super(SRTMLoader, self).__init__(filename)
         self.span_latitude = span_latitude
         self.span_longitude = span_longitude
         self.arcsec_resolution = arcsec_resolution
-        self.filename = os.path.expanduser(filename)
+
         self.latitude = self.longitude = None
         self.latlong()
         with open(self.filename) as hgt_data:
@@ -50,7 +59,7 @@ class SRTMLoader(object):
         if longitude[0] == 'W':
             self.longitude = -int(longitude[1:])
 
-class ADFLoader(object):
+class ADFLoader(_BaseLoader):
     """
     Arc/Info Binary Grid (.adf)
     latitude/longitude should be from the Lower Left corner of the map. see 
@@ -59,10 +68,11 @@ class ADFLoader(object):
     def __init__(self, filename,
                  latitude, longitude,
                  arcsec_resolution=1):
+        super(ADFLoader, self).__init__(filename)
         self.latitude = latitude
         self.longitude = longitude
         self.arcsec_resolution = arcsec_resolution
-        self.filename = os.path.expanduser(filename)
+
 
         gdal_raster = gdal.Open(self.filename)
         self.elevations = numpy.array(gdal_raster.GetRasterBand(1).ReadAsArray())

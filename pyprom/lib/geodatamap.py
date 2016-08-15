@@ -14,11 +14,11 @@ class DataMap(object):
         self.span_latitude = span_latitude
         self.span_longitude = span_longitude
         self.arcsec_resolution = arcsec_resolution
-        self.latitude_max = float("{0:.5f}".format(((((self.span_latitude-1) *
+        self.latitude_max = float("{0:.10f}".format(((((self.span_latitude-1) *
                                         self.arcsec_resolution)) /
                                         ARCSEC_DEG) + self.latitude))
 
-        self.longitude_max = float("{0:.5f}".format(((((self.span_longitude-1) *
+        self.longitude_max = float("{0:.10f}".format(((((self.span_longitude-1) *
                                         self.arcsec_resolution)) /
                                        ARCSEC_DEG) + self.longitude))
 
@@ -80,7 +80,7 @@ class DataMap(object):
         minutes = int(minutes)
         return hours, minutes, seconds
 
-    def _x_position_latitude(self, x):
+    def x_position_latitude(self, x):
         """
         :param x: x location in `numpy_map`
         :return: position in dotted decimal latitude
@@ -89,7 +89,7 @@ class DataMap(object):
         return self.latitude_max - degreesToDottedDecimal(*hms)
 
 
-    def _y_position_longitude(self, y):
+    def y_position_longitude(self, y):
         """
         :param y: y location in `numpy_map`
         :return: position in dotted decimal longitude

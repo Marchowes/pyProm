@@ -10,7 +10,7 @@ def degreesToDottedDecimal(deg, mnt=0, sec=0):
     """
     Accepts dms and converts to dd
     """
-    return float("{0:.5f}".format(deg + (mnt / 60) + (sec / 3600)))
+    return float("{0:.10f}".format(deg + (mnt / 60) + (sec / 3600)))
 
 def longitudeArcSec(longitude):
     """
