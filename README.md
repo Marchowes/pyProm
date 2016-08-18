@@ -20,9 +20,9 @@ which make use of similiarly derived data, such as [LoJ](listsofjohn.com) and [p
 More About Prominence and Surface Network Analysis
 --------------------------------------------------
 
-[http://www.surgent.net/highpoints/prominence.html](http://www.surgent.net/highpoints/prominence.html)
-[http://www.peaklist.org/theory/theory.html](http://www.peaklist.org/theory/theory.html)
-[https://en.m.wikipedia.org/wiki/Topographic_prominence](https://en.m.wikipedia.org/wiki/Topographic_prominence#Wet_prominence_and_dry_prominence)
+* [http://www.surgent.net/highpoints/prominence.html](http://www.surgent.net/highpoints/prominence.html)
+* [http://www.peaklist.org/theory/theory.html](http://www.peaklist.org/theory/theory.html)
+* [https://en.m.wikipedia.org/wiki/Topographic_prominence](https://en.m.wikipedia.org/wiki/Topographic_prominence#Wet_prominence_and_dry_prominence)
 
 Datasources
 -----------
