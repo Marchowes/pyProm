@@ -31,6 +31,12 @@ class Summit(SpotElevation):
     def __str__(self):
         return "Summit El {} lat {} long {}".format(self.feet, self.latitude, self.longitude)
 
+class GridPoint(object):
+    def __init__(self, x, y, elevation):
+        self.x = x
+        self.y = y
+        self.elevation = elevation
+
 class MultiPoint(object):
     """
     Multipoint objects contain a list of raster coordinates as
