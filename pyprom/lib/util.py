@@ -18,3 +18,10 @@ def longitudeArcSec(longitude):
     Arcsecond distance in meters.
     """
     return math.cos(math.radians(longitude))*30.87
+
+def coordinateHashToList(coordianteHash):
+    """
+    :param coordianteHash: a hash using {x1:[y1,y2..],x1:[y1,y2..]} format
+    :return: list coordinates [[x1,y1],[x1,y2]....]
+    """
+    return [[x,y] for x, _y in coordianteHash.items() for y in _y]

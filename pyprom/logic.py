@@ -1,8 +1,9 @@
 from __future__ import division
 
-import numpy
+from collections import defaultdict
 from locations import *
-
+from lib.util import coordinateHashToList
+import numpy
 
 
 class AnalyzeData(object):
@@ -12,12 +13,11 @@ class AnalyzeData(object):
         """
         self.datamap = datamap
         self.data = self.datamap.numpy_map
-        self.size = self.data.size
         self.edge = False
-        self.equalNeighbor = False        
         self.span_longitude = self.datamap.span_longitude
         self.span_latitude = self.datamap.span_latitude
         self.cardinalGrid = dict()
+        self.skipSummitAnalysis = defaultdict(list)
         # Relative Grid Hash -- in case we ever want to use this feature...
         for cardinality in ['N','S','E','W']:
             self.cardinalGrid[cardinality] = candidateGridHash(cardinality, 3)
@@ -31,7 +31,7 @@ class AnalyzeData(object):
         FUTURE: Analysis for Cols, as well as capability of chasing equal height neighbors.
         """
         iterator = numpy.nditer(self.data, flags=['multi_index'])
-        locationObjects = list()
+        featureObjects = list()
         index = 0
         #Iterate through numpy grid, and keep track of gridpoint coordinates.
         while not iterator.finished:
@@ -39,18 +39,18 @@ class AnalyzeData(object):
             self.elevation = iterator[0]
 
             #Quick Progress Meter. Needs refinement,
-             index += 1
+            index += 1
             if not index%100000:
-                print "{}/{} - {}%".format(index, self.size, index/self.size)
+                print "{}/{} - {}%".format(index, self.data.size, (index/self.data.size)*100)
             
             #Check for summit
             feature = self._summit(x, y)
             #Add summit object to list if it exists
             if feature:
-                featureObjects.append(location)
+                featureObjects.append(feature)
             #Reset variables, and go to next gridpoint.
             self.edge = False
-            self.equalNeighbor = False
+            self.blob = None
             iterator.iternext()
         return featureObjects        
 
@@ -58,48 +58,67 @@ class AnalyzeData(object):
 
     def _summit(self, x, y):
         """
-        Summit Scanning Function. This recieves an x,y grid point coordinate and
-        determines if it is a summit coordinate or not.
+        Summit Scanning Function. Determines if point is a summit.
+        :param x: x coordinate
+        :param y: y coordinate
+        :return: Summit Object
         """
 
         def analyze_summit():
             """
-            Helper for Summit Analysis. Returns True or False.
+            Negative analysis for summit. Returns False if not a summit, True if it is.
             """
             neighbor = self.iterateDiagonal(x,y)
-            for degree, elevation in neighbor:
+            for _x, _y, elevation in neighbor:
                 if elevation > self.elevation:
+                    return False #Higher Neighbor? Not a summit.
+
+                #If the elevation of a neighbor is equal, Determine
+                #  entire blob of equal height neighbors.
+                elif elevation == self.elevation and _y not in self.skipSummitAnalysis[_x]:
+                    self.blob = self.equalHeightBlob(_x, _y, elevation)
+
+                    #Iterate through all the points in the equalHeight Blob.
+                    for point in self.blob.points:
+                        pointNeighbor = self.iterateDiagonal(point[0],point[1])
+
+                        #iterate through all point neighbors, if a neighbor is
+                        #  higher, then we know this is not a summit
+                        for px, py, ele in pointNeighbor:
+                            if ele > self.elevation:
+
+                                #Blob not a summit? well, exempt all points
+                                #from further analysis.
+                                for exemptPoint in self.blob.points:
+                                    self.skipSummitAnalysis[exemptPoint[0]].append(exemptPoint[1])
+                                return False
+
+                    #No higher neighbors? Implicitly a summit. Exempt points
+                    #from further analysis.
+                    for exemptPoint in self.blob.points:
+                        self.skipSummitAnalysis[exemptPoint[0]].append(exemptPoint[1])
+
+                #equal neighbor and exempt? not a summit.
+                elif elevation == self.elevation and _y in self.skipSummitAnalysis[_x]:
                     return False
-                if elevation == self.elevation:
-                    self.equalNeighbor = True
-            return True              
+
+            #None of the above? Must be a summit.
+            return True
 
         #Returns nothing if the summit analysis is negative.
         if not analyze_summit():
             return
-     
 
-        # avg_elevation_hash = dict()
-        # for cardinality in ['N','S','E','W']:
-        #     elevationStore=[]
-        #     for shift in self.cardinalGrid[cardinality]:
-        #         try:
-        #             elevationStore.append(self.data[x+shift[0]][y+shift[1]])
-        #         except:
-        #             pass
-        #     #avg_elevation_hash[cardinality] = numpy.mean(elevationStore)
-        #     if numpy.mean(elevationStore) > self.elevation:
-        #         return
-        ####print "FOUND SUFFICIENT: {}, {}, {}".format(self.datamap.x_position_latitude(x), self.datamap.y_position_longitude(y), self.elevation)  
-        ####print "Neighbors are:{} - {}".format(self.elevation, [y1 for x1,y1 in self.iterateDiagonal(x,y)])     
-
-        #Implicitly returns summit object if nothign fails.
-        return Summit(self.datamap.x_position_latitude(x), self.datamap.y_position_longitude(y),
-                      self.elevation, edge=self.edge, equalNeighbor=self.equalNeighbor)  
+        #Made it this far? Must be a summit. Return Object
+        return Summit(self.datamap.x_position_latitude(x),
+                      self.datamap.y_position_longitude(y),
+                      self.elevation,
+                      edge=self.edge,
+                      multiPoint=self.blob)
      
     def iterateDiagonal(self, x,y):
         """
-        generator returns 8 closest neighbors to a raster grid location, that is,
+        Generator returns 8 closest neighbors to a raster grid location, that is,
         all points touching including the diagonals.
         """
         degreeMap = {'_0': [0,-1], 
@@ -113,10 +132,10 @@ class AnalyzeData(object):
         for degree, shift in degreeMap.items():
             _x = x+shift[0]
             _y = y+shift[1]
-            if 0 < _x < self.span_latitude-1 and 0 < _y < self.span_longitude-1:
-                yield degree, self.data[_x,_y]
+            if 0 <= _x < self.span_latitude-1 and 0 <= _y < self.span_longitude-1:
+                yield _x, _y, self.data[_x,_y]
             else:
-                yield degree, None                    
+                yield _x, _y, None
 
                 
     def iterateOrthogonal(self,x,y):
@@ -131,16 +150,66 @@ class AnalyzeData(object):
         for degree, shift in degreeMap.items():
             _x = x+shift[0]
             _y = y+shift[1]
-            if 0 < _x < self.span_latitude-1 and 0 < _y < self.span_longitude-1:
-                yield degree, self.data[_x,_y]
+            if 0 <= _x < self.span_latitude-1 and 0 <= _y < self.span_longitude-1:
+                yield _x, _y, self.data[_x,_y]
             else:
-                yield degree, None  
+                yield _x, _y, None
+
+    def equalHeightBlob(self, x, y, elevation):
+        """
+        This function generates a list of coordinates that involve equal height
+        :param x: x coordinate
+        :param y: y coordinate
+        :param elevation: elevation
+        :return: Multipoint Object containing all x,y coordinates and elevation
+        """
+
+        masterGridPoint = GridPoint(x, y, elevation)
+        equalHeightHash = defaultdict(list)
+        equalHeightHash[x].append(y)
+        toBeAnalyzed = [masterGridPoint]
+
+        #Loop until pool of equalheight neighbors has been exhausted.
+        while toBeAnalyzed:
+            gridPoint = toBeAnalyzed.pop()
+            neighbors = self.iterateDiagonal(gridPoint.x, gridPoint.y)
+            for _x, _y, elevation in neighbors:
+                if elevation == masterGridPoint.elevation and _y not in equalHeightHash[_x]:
+                    branch = GridPoint(_x, _y, elevation)
+                    equalHeightHash[_x].append(_y)
+                    toBeAnalyzed.append(branch)
+        return MultiPoint(coordinateHashToList(equalHeightHash), masterGridPoint.elevation)
+
+# class EqualHeightBlob(object):
+#     """
+#     """
+#     def __init__(self, x, y, elevation, analysis):
+#         self.analysis = analysis
+#         self.gridPoint = GridPoint(x, y, elevation)
+#         self.equalHeightBlob = list() #[[x,y]]
+#         self.equalHeightHash = defaultdict(list)
+#         self.equalHeightHash[x].append(y)
+#         self.buildBlob([self.gridPoint])
+#
+#     def buildBlob(self, toBeAnalyzed):
+#         while toBeAnalyzed:
+#             gridPoint = toBeAnalyzed.pop()
+#             neighbors = self.analysis.iterateDiagonal(gridPoint.x, gridPoint.y)
+#             for _x, _y, elevation in neighbors:
+#                 if elevation == self.gridPoint.elevation and _y not in self.equalHeightHash[_x]:
+#                     branch = GridPoint(_x, _y, elevation)
+#                     #self.equalHeightBlob.append([_x,_y])
+#                     self.equalHeightHash[_x].append(_y)
+#                     toBeAnalyzed.append(branch)
+#         self.equalHeightBlob = coordinateHashToList(self.equalHeightHash)
+
 
 
 def candidateGridHash(cardinality,resolution=1):
     """
-    Returns a resolution x resolution relative grid based on cardinality.
-    This is a helper and may be scrapped later on.
+    :param cardinality: [N,S,E,W]
+    :param resolution: size of cardinal grid (resolution x resolution)
+    :return: Returns a resolution x resolution relative grid based on cardinality.
     """
     if not resolution%2:
         resolution+=1 #has to be odd.
@@ -152,4 +221,4 @@ def candidateGridHash(cardinality,resolution=1):
     if cardinality.upper() == "S":
         return [[x,y] for x in range(-offset, offset+1) for y in range(1, resolution+1)]
     if cardinality.upper() == "W":
-        return [[x,y] for x in range(-resolution, 0) for y in range(-offset, offset+1)]        
+        return [[x,y] for x in range(-resolution, 0) for y in range(-offset, offset+1)]
