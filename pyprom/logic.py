@@ -1,8 +1,8 @@
 from __future__ import division
 
 from collections import defaultdict
-from locations import *
-from lib.util import coordinateHashToList
+from lib.locations import *
+from lib.util import coordinateHashToGridPointList
 import numpy
 
 
@@ -80,7 +80,7 @@ class AnalyzeData(object):
 
                     #Iterate through all the points in the equalHeight Blob.
                     for point in self.blob.points:
-                        pointNeighbor = self.iterateDiagonal(point[0],point[1])
+                        pointNeighbor = self.iterateDiagonal(point.x,point.y)
 
                         #iterate through all point neighbors, if a neighbor is
                         #  higher, then we know this is not a summit
@@ -90,13 +90,13 @@ class AnalyzeData(object):
                                 #Blob not a summit? well, exempt all points
                                 #from further analysis.
                                 for exemptPoint in self.blob.points:
-                                    self.skipSummitAnalysis[exemptPoint[0]].append(exemptPoint[1])
+                                    self.skipSummitAnalysis[exemptPoint.x].append(exemptPoint.y)
                                 return False
 
                     #No higher neighbors? Implicitly a summit. Exempt points
                     #from further analysis.
                     for exemptPoint in self.blob.points:
-                        self.skipSummitAnalysis[exemptPoint[0]].append(exemptPoint[1])
+                        self.skipSummitAnalysis[exemptPoint.x].append(exemptPoint.y)
 
                 #equal neighbor and exempt? not a summit.
                 elif elevation == self.elevation and _y in self.skipSummitAnalysis[_x]:
@@ -178,30 +178,32 @@ class AnalyzeData(object):
                     branch = GridPoint(_x, _y, elevation)
                     equalHeightHash[_x].append(_y)
                     toBeAnalyzed.append(branch)
-        return MultiPoint(coordinateHashToList(equalHeightHash), masterGridPoint.elevation)
+        return MultiPoint(coordinateHashToGridPointList(equalHeightHash), masterGridPoint.elevation, self)
 
-# class EqualHeightBlob(object):
-#     """
-#     """
-#     def __init__(self, x, y, elevation, analysis):
-#         self.analysis = analysis
-#         self.gridPoint = GridPoint(x, y, elevation)
-#         self.equalHeightBlob = list() #[[x,y]]
-#         self.equalHeightHash = defaultdict(list)
-#         self.equalHeightHash[x].append(y)
-#         self.buildBlob([self.gridPoint])
-#
-#     def buildBlob(self, toBeAnalyzed):
-#         while toBeAnalyzed:
-#             gridPoint = toBeAnalyzed.pop()
-#             neighbors = self.analysis.iterateDiagonal(gridPoint.x, gridPoint.y)
-#             for _x, _y, elevation in neighbors:
-#                 if elevation == self.gridPoint.elevation and _y not in self.equalHeightHash[_x]:
-#                     branch = GridPoint(_x, _y, elevation)
-#                     #self.equalHeightBlob.append([_x,_y])
-#                     self.equalHeightHash[_x].append(_y)
-#                     toBeAnalyzed.append(branch)
-#         self.equalHeightBlob = coordinateHashToList(self.equalHeightHash)
+class EqualHeightBlob(object):
+    """
+    I'm really just keeping this around for testing.
+    """
+    def __init__(self, x, y, elevation, analysis):
+        self.analysis = analysis
+        self.gridPoint = GridPoint(x, y, elevation)
+        self.equalHeightBlob = list() #[[x,y]]
+        self.equalHeightHash = defaultdict(list)
+        self.equalHeightHash[x].append(y)
+        self.buildBlob([self.gridPoint])
+
+    def buildBlob(self, toBeAnalyzed):
+        while toBeAnalyzed:
+            gridPoint = toBeAnalyzed.pop()
+            neighbors = self.analysis.iterateDiagonal(gridPoint.x, gridPoint.y)
+            for _x, _y, elevation in neighbors:
+                if elevation == self.gridPoint.elevation and _y not in self.equalHeightHash[_x]:
+                    branch = GridPoint(_x, _y, elevation)
+                    #self.equalHeightBlob.append([_x,_y])
+                    self.equalHeightHash[_x].append(_y)
+                    toBeAnalyzed.append(branch)
+        self.equalHeightBlob = MultiPoint(coordinateHashToGridPointList(self.equalHeightHash), self.gridPoint.elevation, self.analysis)
+        #self.equalHeightBlob = coordinateHashToGridPointList(self.equalHeightHash)
 
 
 
