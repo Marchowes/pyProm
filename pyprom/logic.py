@@ -31,7 +31,7 @@ class AnalyzeData(object):
         FUTURE: Analysis for Cols, as well as capability of chasing equal height neighbors.
         """
         iterator = numpy.nditer(self.data, flags=['multi_index'])
-        featureObjects = list()
+        featureObjects = SpotElevationContainer([])
         index = 0
         #Iterate through numpy grid, and keep track of gridpoint coordinates.
         while not iterator.finished:
@@ -41,13 +41,14 @@ class AnalyzeData(object):
             #Quick Progress Meter. Needs refinement,
             index += 1
             if not index%100000:
-                print "{}/{} - {}%".format(index, self.data.size, (index/self.data.size)*100)
+                print ("{}/{} - {}%".format(index, self.data.size,
+                                            (index/self.data.size)*100))
             
             #Check for summit
             feature = self._summit(x, y)
             #Add summit object to list if it exists
             if feature:
-                featureObjects.append(feature)
+                featureObjects.points.append(feature)
             #Reset variables, and go to next gridpoint.
             self.edge = False
             self.blob = None
