@@ -3,8 +3,6 @@ This lib contains objects for storing various geographic data.
 """
 
 
-############## Lat, Long Coordinate-like objects
-
 class BaseCoordinate(object):
     """
     Base Coordinate, intended to be inherited from. This contains
@@ -13,6 +11,7 @@ class BaseCoordinate(object):
     def __init__(self, latitude, longitude, *args, **kwargs):
         self.latitude = latitude
         self.longitude = longitude
+
 
 class SpotElevation(BaseCoordinate):
     """
@@ -27,18 +26,60 @@ class SpotElevation(BaseCoordinate):
     def feet(self):
         return self.elevation * 3.2808
 
+
 class Summit(SpotElevation):
     """
     Summit object stores relevant summit data.
     """
     def __init__(self, latitude, longitude, elevation, *args, **kwargs):
-        super(Summit, self).__init__(latitude, longitude, elevation, *args, **kwargs)
-        self.multiPoint=kwargs.get('multiPoint', None)
+        super(Summit, self).__init__(latitude, longitude,
+                                     elevation, *args, **kwargs)
+        self.multiPoint = kwargs.get('multiPoint', None)
 
     def __str__(self):
-        return "Summit El {} lat {} long {}".format(self.feet, self.latitude, self.longitude)
+        return "Summit El {} lat {} long {}".format(self.feet,
+                                                    self.latitude,
+                                                    self.longitude)
 
-################## X,Y Grid Point-like objects. ###################
+
+class SpotElevationContainer(object):
+    def __init__(self, spotElevationList):
+        self.points = spotElevationList
+
+    def rectangle(self, lat1, long1, lat2, long2):
+        """
+        For the purpose of gathering all points in a rectangle of
+        (lat1, long1) - (lat2, long2)
+        :param lat1:  latitude of point 1
+        :param long1: longitude of point 1
+        :param lat2:  latitude of point 2
+        :param long2: longitude of point 2
+        :return: list of all points in that between
+        (lat1, long1) - (lat2, long2)
+        """
+        upperlat = max(lat1, lat2)
+        upperlong = max(long1, long2)
+        lowerlat = min(lat1, lat2)
+        lowerlong = min(long1, long2)
+        return [x for x in self.points if lowerlat < x.latitude < upperlat and
+                lowerlong < x.longitude < upperlong]
+
+    def elevationRange(self, lower=None, upper=100000):
+        """
+        :param lower: lower limit in feet
+        :param upper: upper limit in feet
+        :return: list of all points in range between lower and upper
+        """
+        return [x for x in self.points if x.feet > lower and x.feet < upper]
+
+    def elevationRangeMetric(self, lower=None, upper=100000):
+        """
+        :param lower: lower limit in Meters
+        :param upper: upper limit in Meters
+        :return: list of all points in range between lower and upper
+        """
+        return [x for x in self.points if x.elevation > lower and
+                x.elevation < upper]
 
 
 class BaseGridPoint(object):
@@ -46,10 +87,11 @@ class BaseGridPoint(object):
         """
         Basic Gridpoint.
         :param x: x coordinate
-        :param y: y coordiante
+        :param y: y coordinate
         """
         self.x = x
         self.y = y
+
 
 class GridPoint(BaseGridPoint):
     def __init__(self, x, y, elevation):
@@ -62,6 +104,7 @@ class GridPoint(BaseGridPoint):
         super(GridPoint, self).__init__(x, y)
         self.elevation = elevation
 
+
 class MultiPoint(object):
     """
     :param points: list of BaseGridPoint objects
@@ -69,9 +112,9 @@ class MultiPoint(object):
     :param analyzeData: AnalyzeData object.
     """
     def __init__(self, points, elevation, analyzeData):
-        self.points = points # BaseGridPoint Object.
+        self.points = points  # BaseGridPoint Object.
         self.elevation = elevation
-        self.analyzeData = analyzeData # data analysis object.
+        self.analyzeData = analyzeData  # data analysis object.
 
     def findEdge(self):
         """
@@ -80,7 +123,8 @@ class MultiPoint(object):
         """
         edgeObjectList = list()
         for gridpoint in self.points:
-            neighbors = self.analyzeData.iterateDiagonal(gridpoint.x, gridpoint.y)
+            neighbors = self.analyzeData.iterateDiagonal(gridpoint.x,
+                                                         gridpoint.y)
             edgeList = list()
             for _x, _y, elevation in neighbors:
                 if elevation != self.elevation:
@@ -97,10 +141,10 @@ class MultiPoint(object):
         """
         :return: List of All blob points with lat/long instead of x/y
         """
-        return [BaseCoordinate(self.analyzeData.datamap.x_position_latitude(coord.x),
-                 self.analyzeData.datamap.y_position_longitude(coord.y))
+        return [BaseCoordinate(
+                self.analyzeData.datamap.x_position_latitude(coord.x),
+                self.analyzeData.datamap.y_position_longitude(coord.y))
                 for coord in self.points]
-
 
 
 class EdgePoint(GridPoint):
@@ -116,10 +160,3 @@ class EdgePoint(GridPoint):
     def __init__(self, x, y, elevation, nonEqualNeighbors):
         super(EdgePoint, self).__init__(x, y, elevation)
         self.nonEqualNeighbors = nonEqualNeighbors
-
-
-
-
-
-
-

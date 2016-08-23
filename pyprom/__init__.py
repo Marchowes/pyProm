@@ -1,4 +1,4 @@
-"""PyProm: This library includes tools for surface network analysis. 
+"""PyProm: This library includes tools for surface network analysis.
 """
 version_info = (0, 0, 1)
 __name__ = 'pyProm'

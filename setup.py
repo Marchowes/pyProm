@@ -15,7 +15,7 @@ setup(
     author='Marc Howes',
     author_email='marc.h.howes@gmail.com',
     url='https://github.com/marchowes/pyProm',
-    packages=['pyprom', 'pyprom/util'],
+    packages=['pyprom'],
     classifiers=[
         'Programming Language :: Python :: 2',
         'Programming Language :: Python :: 3',
