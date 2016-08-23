@@ -1,26 +1,29 @@
 from __future__ import division
 
-from util import *
+from util import dottedDecimaltoDegrees, degreesToDottedDecimal
 
 ARCSEC_DEG = 3600
 ARCMIN_DEG = 60
+
 
 class DataMap(object):
     def __init__(self, numpy_map, latitude, longitude,
                  span_latitude, span_longitude, arcsec_resolution):
         self.numpy_map = numpy_map
-        self.latitude = latitude # SW Corner
-        self.longitude = longitude #SW Corner
+        self.latitude = latitude  # SW Corner
+        self.longitude = longitude  # SW Corner
         self.span_latitude = span_latitude
         self.span_longitude = span_longitude
         self.arcsec_resolution = arcsec_resolution
-        self.latitude_max = float("{0:.10f}".format(((((self.span_latitude-1) *
+        self.latitude_max = float("{0:.10f}".format(((((
+                                        self.span_latitude-1) *
                                         self.arcsec_resolution)) /
                                         ARCSEC_DEG) + self.latitude))
 
-        self.longitude_max = float("{0:.10f}".format(((((self.span_longitude-1) *
+        self.longitude_max = float("{0:.10f}".format(((((
+                                        self.span_longitude-1) *
                                         self.arcsec_resolution)) /
-                                       ARCSEC_DEG) + self.longitude))
+                                        ARCSEC_DEG) + self.longitude))
 
     def elevation(self, latitude, longitude):
         """
@@ -43,13 +46,13 @@ class DataMap(object):
         if not self.longitude <= longitude <= self.longitude_max:
             raise ValueError('Invalid Value! must be in the range of'
                              ' {} to {}'.format(self.longitude,
-                                               self.longitude_max))
+                                                self.longitude_max))
         hms_longitude = dottedDecimaltoDegrees(longitude)
-        return  int(abs((hms_longitude[2] +
-                        (hms_longitude[1] * ARCMIN_DEG) +
-                        (hms_longitude[0] * ARCSEC_DEG)) -
-                        (self.longitude) * ARCSEC_DEG) /
-                        self.arcsec_resolution)
+        return int(abs((hms_longitude[2] +
+                       (hms_longitude[1] * ARCMIN_DEG) +
+                       (hms_longitude[0] * ARCSEC_DEG)) -
+                       (self.longitude) * ARCSEC_DEG) /
+                   self.arcsec_resolution)
 
     def _relative_position_latitude(self, latitude):
         """
@@ -59,13 +62,13 @@ class DataMap(object):
         if not self.latitude <= latitude <= self.latitude_max:
             raise ValueError('Invalid Value! must be in the range of'
                              ' {} to {}'.format(self.latitude,
-                                               self.latitude_max))
+                                                self.latitude_max))
         hms_latitude = dottedDecimaltoDegrees(latitude)
         return int(abs((hms_latitude[2] +
-                      (hms_latitude[1] * ARCMIN_DEG) +
-                      (hms_latitude[0] * ARCSEC_DEG)) -
-                      (self.latitude_max) * ARCSEC_DEG) /
-                       self.arcsec_resolution)
+                       (hms_latitude[1] * ARCMIN_DEG) +
+                       (hms_latitude[0] * ARCSEC_DEG)) -
+                       (self.latitude_max) * ARCSEC_DEG) /
+                   self.arcsec_resolution)
 
     def _position_formula(self, x):
         """
@@ -87,7 +90,6 @@ class DataMap(object):
         """
         hms = self._position_formula(x)
         return self.latitude_max - degreesToDottedDecimal(*hms)
-
 
     def y_position_longitude(self, y):
         """
