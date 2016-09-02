@@ -1,7 +1,8 @@
 """
 This lib contains objects for storing various geographic data.
 """
-from collections import defaultdict
+from collections import defaultdict, Counter
+from location_util import findExtremities
 
 
 class BaseCoordinate(object):
@@ -81,6 +82,10 @@ class Summit(SpotElevation):
 
 
 class SpotElevationContainer(object):
+    """
+    Container for Spot Elevation type lists.
+    Allows for various list transformations.
+    """
     def __init__(self, spotElevationList):
         self.points = spotElevationList
 
@@ -155,6 +160,11 @@ class GridPoint(BaseGridPoint):
         super(GridPoint, self).__init__(x, y)
         self.elevation = elevation
 
+    def toSpotElevation(self, analysis):
+        return SpotElevation(analysis.datamap.x_position_latitude(self.x),
+                             analysis.datamap.y_position_longitude(self.y),
+                             self.elevation)
+
     def __eq__(self, other):
         return [self.x, self.y, self.elevation] ==\
                [other.x, other.y, other.elevation]
@@ -172,6 +182,94 @@ class GridPoint(BaseGridPoint):
     __unicode__ = __str__ = __repr__
 
 
+class BaseGridPointContainer(object):
+    """
+    Base Grid Point Container.
+    """
+    def __init__(self, gridPointList):
+        self.points = gridPointList
+
+    def __hash__(self):
+        return hash(tuple(sorted([x.x for x in self.points])))
+
+    def __eq__(self, other):
+        return sorted([x.x for x in self.points]) == \
+               sorted([x.x for x in other.points])
+
+    def __ne__(self, other):
+        return sorted([x.x for x in self.points]) == \
+               sorted([x.x for x in other.points])
+
+    def __repr__(self):
+        return "<BaseGridPointContainer> {} Objects".format(len(self.points))
+
+    __unicode__ = __str__ = __repr__
+
+
+class GridPointContainer(BaseGridPointContainer):
+    """
+    Container for GridPoint type lists.
+    Allows for various list transformations and functions.
+    """
+
+    def __init__(self, gridPointList):
+        super(GridPointContainer, self).__init__(gridPointList)
+
+    def findExtremities(self):
+        return findExtremities(self.points)
+
+    def __repr__(self):
+        return "<GridPointContainer> {} Objects".format(len(self.points))
+
+    __unicode__ = __str__ = __repr__
+
+
+class Island(BaseGridPointContainer):
+    """
+    Island Object accepts a list of shore points, and a MultiPoint object
+    which is a Pond-type object. points are calculated in fillIn()
+    """
+    def __init__(self, shoreGridPointList, pond, edge=[]):
+        super(Island, self).__init__(shoreGridPointList)
+        self.shoreGridPointList = self.points[:]
+        self.pond = pond
+        self.edge = edge
+        self.fillIn()
+
+    def fillIn(self):
+        """
+        Function uses shore GridPoints and water body elevation to find all
+        points on island. Object "points" are then replaced with Gridpoints
+        found.
+        """
+
+        # Grabs first point (which is a shore) and pres fills in hashes
+        toBeAnalyzed = [self.points[0]]
+        islandHash = defaultdict(list)
+        islandHash[toBeAnalyzed[0].x].append(toBeAnalyzed[0].x)
+        islandGridPoints = toBeAnalyzed[:]
+
+        # Find all points not at pond-level.
+        while toBeAnalyzed:
+            gridPoint = toBeAnalyzed.pop()
+            neighbors = self.pond.analyzeData.iterateDiagonal(gridPoint.x,
+                                                              gridPoint.y)
+            for _x, _y, elevation in neighbors:
+
+                if elevation != self.pond.elevation and _y not in\
+                                islandHash[_x]:
+                    branch = GridPoint(_x, _y, elevation)
+                    islandHash[_x].append(_y)
+                    toBeAnalyzed.append(branch)
+                    islandGridPoints.append(branch)
+        self.points = islandGridPoints
+
+    def __repr__(self):
+        return "<Island> {} Point Objects".format(len(self.points))
+
+    __unicode__ = __str__ = __repr__
+
+
 class MultiPoint(object):
     """
     :param points: list of BaseGridPoint objects
@@ -182,6 +280,10 @@ class MultiPoint(object):
         self.points = points  # BaseGridPoint Object.
         self.elevation = elevation
         self.analyzeData = analyzeData  # data analysis object.
+        self.edge = []
+
+    def findExtremities(self):
+        return findExtremities(self.findShores().points)
 
     def findEdge(self):
         """
@@ -206,19 +308,22 @@ class MultiPoint(object):
                                                 self.elevation,
                                                 nonEqualNeighborList,
                                                 equalNeighborList))
-        return edgeObjectList
+        return GridPointContainer(edgeObjectList)
 
-    def findShores(self):
+    def findShores(self, edge=None):
         """
         Function will find all shores along pond-like blob. and add all
         discontigous shore points as lists within the returned list.
         This is needed for finding Islands.
+        :param: edge - A list of edges (can reduce redundant edge finds
+         in certain cases.)
         :return: List of lists of `GridPoint` representing a Shore
         """
-        edge = self.findEdge()
+        if not edge:
+            edge = self.findEdge()
         # Flatten list and find unique members.
         shorePoints = list(set([val for sublist in
-                           [x.nonEqualNeighbors for x in edge]
+                           [x.nonEqualNeighbors for x in edge.points]
                            for val in sublist]))
 
         # For Optimized Lookups on larger lists.
@@ -271,7 +376,100 @@ class MultiPoint(object):
                 candidate = GridPoint(_x, _y, elevation)
                 if candidate.y in shoreIndex[candidate.x]:
                     toBeAnalyzed.append(candidate)
-        return shoreList
+        return [GridPointContainer(x) for x in shoreList]
+
+    def findIslands(self):
+        """
+        findIslands runs through a list of shore lists and finds the
+        extremities of each shorelist. The list with the most maximum
+        relative extremity is considered the main pond shore. Everything
+        else is implicity an island in the pond.
+        :return: List of Islands.
+        """
+
+        def shoreMapEdgeFinder(extremityContainer, flatList):
+            """
+            Helper function for determining if a edgeList contains map edges
+            :param extremityContainer: Container of GridPoints along a "shore"
+            :param flatList: flattened list of max extremities found in a pond
+            and island object scheme.
+            :return: list of Spot Elevations for points along a map edge.
+            """
+            edge = list()
+            if extremityContainer not in flatList:
+                return edge
+            extremities = extremityContainer.findExtremities()
+
+            if extremities['N'][0].x == 0:
+                edge += [x.toSpotElevation(self.analyzeData)
+                         for x in extremities['N']]
+            if extremities['S'][0].x == self.analyzeData.span_latitude - 1:
+                edge += [x.toSpotElevation(self.analyzeData)
+                         for x in extremities['S']]
+            if extremities['W'][0].y == 0:
+                edge += [x.toSpotElevation(self.analyzeData)
+                         for x in extremities['W']]
+            if extremities['E'][0].y == self.analyzeData.span_longitude - 1:
+                edge += [x.toSpotElevation(self.analyzeData)
+                         for x in extremities['E']]
+            return edge
+
+        # First lets find the shores.
+        shoreList = self.findShores()
+        N = S = E = W = None
+
+        # Next, we find all the furthest extremities among all shore lists.
+        # In theory, the only extremities that can occur for shorelines that
+        # Don't belong to the main pond body are along the map edge.
+        for index, shore in enumerate(shoreList):
+            extremityHash = shore.findExtremities()
+            if index == 0:
+                N = S = E = W = [shore]
+                continue
+            if extremityHash['N'][0].x < N[0].findExtremities()['N'][0].x:
+                N = [shore]
+            elif extremityHash['N'][0].x == N[0].findExtremities()['N'][0].x:
+                N.append(shore)
+            if extremityHash['S'][0].x > S[0].findExtremities()['S'][0].x:
+                S = [shore]
+            elif extremityHash['S'][0].x == S[0].findExtremities()['S'][0].x:
+                S.append(shore)
+            if extremityHash['E'][0].y > E[0].findExtremities()['E'][0].y:
+                E = [shore]
+            elif extremityHash['E'][0].y == E[0].findExtremities()['E'][0].y:
+                E.append(shore)
+            if extremityHash['W'][0].y < W[0].findExtremities()['W'][0].y:
+                W = [shore]
+            elif extremityHash['W'][0].y == W[0].findExtremities()['W'][0].y:
+                W.append(shore)
+
+        # Now, lets flatten the list of cardinal extremities
+        flatList = [val for sublist in [N, S, E, W] for val in sublist]
+        counter = Counter(flatList)
+
+        # In theory, the main pond shore should have the most extremities
+        probablyPond = counter.most_common(1)
+
+        # Wow, what a piece of crap. I feel ashamed of the next 6 lines.
+        if probablyPond[0][0] < 4:
+            raise Exception("Largest Pond does not have 4 max points."
+                            " Something is horribly Wrong.")
+        if len(probablyPond) != 1:
+            raise Exception("Equal number of extremities in pond?"
+                            " How can that be?")
+
+        probablyPond = probablyPond[0][0]
+
+        # Find any map edges and add them to the Blob Object.
+        self.edge = shoreMapEdgeFinder(probablyPond, flatList)
+        shoreList.remove(probablyPond)
+
+        # Find any map edges for the island, and create Island Objects.
+        islands = list()
+        for island in shoreList:
+            edge = shoreMapEdgeFinder(island, flatList)
+            islands.append(Island(island.points, self, edge=edge))
+        return islands
 
     @property
     def pointsLatLong(self):

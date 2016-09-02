@@ -32,13 +32,13 @@ class DataMap(object):
         :return: elevation of coordinate in meters.
         """
         hms_relative_position_long =\
-            self._relative_position_longitude(longitude)
+            self.relative_position_longitude(longitude)
         hms_relative_position_lat =\
-            self._relative_position_latitude(latitude)
+            self.relative_position_latitude(latitude)
         return self.numpy_map[hms_relative_position_lat,
                               hms_relative_position_long]
 
-    def _relative_position_longitude(self, longitude):
+    def relative_position_longitude(self, longitude):
         """
         :param longitude: longitude in dotted decimal notation.
         :return: relative Y position for coordinate in numpy map
@@ -54,7 +54,7 @@ class DataMap(object):
                        (self.longitude) * ARCSEC_DEG) /
                    self.arcsec_resolution)
 
-    def _relative_position_latitude(self, latitude):
+    def relative_position_latitude(self, latitude):
         """
         :param latitude: latitude in dotted decimal notation
         :return: relative X position for coordinate in numpy map.
