@@ -1,5 +1,6 @@
 from __future__ import division
 from locations import BaseGridPoint
+import re
 import math
 
 
@@ -39,3 +40,15 @@ def coordinateHashToGridPointList(coordianteHash):
     """
     return [BaseGridPoint(x, y)
             for x, _y in coordianteHash.items() for y in _y]
+
+
+def compressRepetetiveChars(string):
+    """
+    Accepts String like "HHLHHHLL" and removes continuous redundant chars
+    "HLHL"
+    :param string:
+    :return:
+    """
+    pattern = r'(.)\1{2,}'
+    repl = r'\1'
+    return re.sub(pattern, repl, string)
