@@ -13,7 +13,9 @@ class DataMap(object):
         self.latitude = latitude  # SW Corner
         self.longitude = longitude  # SW Corner
         self.span_latitude = span_latitude
+        self.max_x = span_latitude - 1
         self.span_longitude = span_longitude
+        self.max_y = span_longitude - 1
         self.arcsec_resolution = arcsec_resolution
         self.latitude_max = float("{0:.10f}".format(((((
                                         self.span_latitude-1) *

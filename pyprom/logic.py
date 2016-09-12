@@ -17,9 +17,9 @@ class AnalyzeData(object):
         self.datamap = datamap
         self.data = self.datamap.numpy_map
         self.edge = False
-        self.max_y = self.datamap.self.max_y
+        self.max_y = self.datamap.max_y
         self.span_longitude = self.datamap.span_longitude
-        self.max_x = self.datamap.self.max_x
+        self.max_x = self.datamap.max_x
         self.span_latitude = self.datamap.span_latitude
         self.cardinalGrid = dict()
         self.skipSummitAnalysis = defaultdict(list)
