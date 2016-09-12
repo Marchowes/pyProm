@@ -43,7 +43,10 @@ class SpotElevation(BaseCoordinate):
 
     @property
     def feet(self):
-        return self.elevation * 3.2808
+        try:
+            return self.elevation * 3.2808
+        except:
+            return None
 
     def __eq__(self, other):
         return [self.latitude, self.longitude, self.elevation] ==\
@@ -229,21 +232,34 @@ class Island(BaseGridPointContainer):
     Island Object accepts a list of shore points, and a MultiPoint object
     which is a Pond-type object. points are calculated in fillIn()
     """
-    def __init__(self, shoreGridPointList, pond, edge=[]):
+    def __init__(self, shoreGridPointList, analyzeData, pondElevation):
         super(Island, self).__init__(shoreGridPointList)
         self.shoreGridPointList = self.points[:]
-        self.pond = pond
-        self.edge = edge
+        self.pondElevation = pondElevation
+        self.analyzeData = analyzeData
         self.fillIn()
+        self.mapEdge = self.findMapEdge()
+
+    def findMapEdge(self):
+        """
+        :return: list of SpotElevation Points along the map Edge.
+        """
+        mapEdge = list()
+        for point in self.points:
+            if point.x == 0 or point.x == self.analyzeData.span_latitude - 1:
+                mapEdge.append(point.toSpotElevation(self.analyzeData))
+            if point.y == 0 or point.y == self.analyzeData.span_longitude - 1:
+                mapEdge.append(point.toSpotElevation(self.analyzeData))
+        return mapEdge
 
     def fillIn(self):
         """
         Function uses shore GridPoints and water body elevation to find all
-        points on island. Object "points" are then replaced with Gridpoints
+        points on island. Object "points" are then replaced with GridPoints
         found.
         """
 
-        # Grabs first point (which is a shore) and pres fills in hashes
+        # Grabs first point (which is a shore) and prefills in hashes
         toBeAnalyzed = [self.points[0]]
         islandHash = defaultdict(list)
         islandHash[toBeAnalyzed[0].x].append(toBeAnalyzed[0].x)
@@ -252,11 +268,11 @@ class Island(BaseGridPointContainer):
         # Find all points not at pond-level.
         while toBeAnalyzed:
             gridPoint = toBeAnalyzed.pop()
-            neighbors = self.pond.analyzeData.iterateDiagonal(gridPoint.x,
-                                                              gridPoint.y)
+            neighbors = self.analyzeData.iterateDiagonal(gridPoint.x,
+                                                         gridPoint.y)
             for _x, _y, elevation in neighbors:
 
-                if elevation != self.pond.elevation and _y not in\
+                if elevation != self.pondElevation and _y not in\
                                 islandHash[_x]:
                     branch = GridPoint(_x, _y, elevation)
                     islandHash[_x].append(_y)
@@ -280,10 +296,24 @@ class MultiPoint(object):
         self.points = points  # BaseGridPoint Object.
         self.elevation = elevation
         self.analyzeData = analyzeData  # data analysis object.
-        self.edge = []
+        self.mapEdge = []
 
     def findExtremities(self):
         return findExtremities(self.findShores().points)
+
+    def findMapEdge(self):
+        """
+        :return: list of SpotElevation Points along the map Edge.
+        """
+        mapEdge = list()
+        for point in self.points:
+            if point.x == 0 or point.x == self.analyzeData.span_latitude - 1:
+                newPoint = GridPoint(point.x, point.y, self.elevation)
+                mapEdge.append(newPoint.toSpotElevation(self.analyzeData))
+            if point.y == 0 or point.y == self.analyzeData.span_longitude - 1:
+                newPoint = GridPoint(point.x, point.y, self.elevation)
+                mapEdge.append(newPoint.toSpotElevation(self.analyzeData))
+        return mapEdge
 
     def findEdge(self):
         """
@@ -387,36 +417,11 @@ class MultiPoint(object):
         :return: List of Islands.
         """
 
-        def shoreMapEdgeFinder(extremityContainer, flatList):
-            """
-            Helper function for determining if a edgeList contains map edges
-            :param extremityContainer: Container of GridPoints along a "shore"
-            :param flatList: flattened list of max extremities found in a pond
-            and island object scheme.
-            :return: list of Spot Elevations for points along a map edge.
-            """
-            edge = list()
-            if extremityContainer not in flatList:
-                return edge
-            extremities = extremityContainer.findExtremities()
-
-            if extremities['N'][0].x == 0:
-                edge += [x.toSpotElevation(self.analyzeData)
-                         for x in extremities['N']]
-            if extremities['S'][0].x == self.analyzeData.span_latitude - 1:
-                edge += [x.toSpotElevation(self.analyzeData)
-                         for x in extremities['S']]
-            if extremities['W'][0].y == 0:
-                edge += [x.toSpotElevation(self.analyzeData)
-                         for x in extremities['W']]
-            if extremities['E'][0].y == self.analyzeData.span_longitude - 1:
-                edge += [x.toSpotElevation(self.analyzeData)
-                         for x in extremities['E']]
-            return edge
-
         # First lets find the shores.
         shoreList = self.findShores()
-        N = S = E = W = None
+
+        # Initialize Blank Values.
+        N, S, E, W = (None for i in range(4))
 
         # Next, we find all the furthest extremities among all shore lists.
         # In theory, the only extremities that can occur for shorelines that
@@ -424,7 +429,7 @@ class MultiPoint(object):
         for index, shore in enumerate(shoreList):
             extremityHash = shore.findExtremities()
             if index == 0:
-                N = S = E = W = [shore]
+                N, S, E, W = ([shore] for i in range(4))
                 continue
             if extremityHash['N'][0].x < N[0].findExtremities()['N'][0].x:
                 N = [shore]
@@ -460,15 +465,18 @@ class MultiPoint(object):
 
         probablyPond = probablyPond[0][0]
 
-        # Find any map edges and add them to the Blob Object.
-        self.edge = shoreMapEdgeFinder(probablyPond, flatList)
+        # Find any map edges and add them to the Plain Blob Object mapEdge.
+        self.mapEdge = self.findMapEdge()
+
+        # Well, this probably isn't an island, so drop it from the list.
         shoreList.remove(probablyPond)
 
         # Find any map edges for the island, and create Island Objects.
         islands = list()
         for island in shoreList:
-            edge = shoreMapEdgeFinder(island, flatList)
-            islands.append(Island(island.points, self, edge=edge))
+            islands.append(Island(island.points,
+                                  self.analyzeData,
+                                  self.elevation))
         return islands
 
     @property
@@ -507,9 +515,12 @@ class EdgePoint(GridPoint):
         self.equalNeighbors = equalNeighbors
 
     def __repr__(self):
-        return "<EdgePoint> ele(m): {}, #Eq Points {}, #NonEq Points {}".\
-            format(self.elevation,
-                   len(self.equalNeighbors),
-                   len(self.nonEqualNeighbors))
+        return ("<EdgePoint> x: {}, y: {}, ele(m): {},"
+                "#Eq Points {}, #NonEq Points {}".
+                format(self.x,
+                       self.y,
+                       self.elevation,
+                       len(self.equalNeighbors),
+                       len(self.nonEqualNeighbors)))
 
     __unicode__ = __str__ = __repr__

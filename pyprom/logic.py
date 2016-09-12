@@ -138,11 +138,11 @@ class AnalyzeData(object):
         for degree, shift in degreeMap.items():
             _x = x+shift[0]
             _y = y+shift[1]
-            if 0 <= _x < self.span_latitude-1 and \
-               0 <= _y < self.span_longitude-1:
+            if 0 <= _x <= self.span_latitude-1 and \
+               0 <= _y <= self.span_longitude-1:
                 yield _x, _y, self.data[_x, _y]
             else:
-                yield _x, _y, None
+                continue
 
     def iterateOrthogonal(self, x, y):
         """
@@ -156,11 +156,11 @@ class AnalyzeData(object):
         for degree, shift in degreeMap.items():
             _x = x+shift[0]
             _y = y+shift[1]
-            if 0 <= _x < self.span_latitude-1 and\
-               0 <= _y < self.span_longitude-1:
+            if 0 <= _x <= self.span_latitude-1 and\
+               0 <= _y <= self.span_longitude-1:
                 yield _x, _y, self.data[_x, _y]
             else:
-                yield _x, _y, None
+                continue
 
     def equalHeightBlob(self, x, y, elevation):
         """
