@@ -246,9 +246,9 @@ class Island(BaseGridPointContainer):
         """
         mapEdge = list()
         for point in self.points:
-            if point.x == 0 or point.x == self.analyzeData.span_latitude - 1:
+            if point.x == 0 or point.x == self.analyzeData.self.analyzeData.max_x:
                 mapEdge.append(point.toSpotElevation(self.analyzeData))
-            if point.y == 0 or point.y == self.analyzeData.span_longitude - 1:
+            if point.y == 0 or point.y == self.analyzeData.self.analyzeData.max_y:
                 mapEdge.append(point.toSpotElevation(self.analyzeData))
         return mapEdge
 
@@ -307,10 +307,10 @@ class MultiPoint(object):
         """
         mapEdge = list()
         for point in self.points:
-            if point.x == 0 or point.x == self.analyzeData.span_latitude - 1:
+            if point.x == 0 or point.x == self.analyzeData.max_x:
                 newPoint = GridPoint(point.x, point.y, self.elevation)
                 mapEdge.append(newPoint.toSpotElevation(self.analyzeData))
-            if point.y == 0 or point.y == self.analyzeData.span_longitude - 1:
+            if point.y == 0 or point.y == self.analyzeData.max_y:
                 newPoint = GridPoint(point.x, point.y, self.elevation)
                 mapEdge.append(newPoint.toSpotElevation(self.analyzeData))
         return mapEdge

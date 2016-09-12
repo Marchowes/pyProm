@@ -17,7 +17,9 @@ class AnalyzeData(object):
         self.datamap = datamap
         self.data = self.datamap.numpy_map
         self.edge = False
+        self.max_y = self.datamap.self.max_y
         self.span_longitude = self.datamap.span_longitude
+        self.max_x = self.datamap.self.max_x
         self.span_latitude = self.datamap.span_latitude
         self.cardinalGrid = dict()
         self.skipSummitAnalysis = defaultdict(list)
@@ -138,8 +140,8 @@ class AnalyzeData(object):
         for degree, shift in degreeMap.items():
             _x = x+shift[0]
             _y = y+shift[1]
-            if 0 <= _x <= self.span_latitude-1 and \
-               0 <= _y <= self.span_longitude-1:
+            if 0 <= _x <= self.max_x and \
+               0 <= _y <= self.max_y:
                 yield _x, _y, self.data[_x, _y]
             else:
                 continue
@@ -156,8 +158,8 @@ class AnalyzeData(object):
         for degree, shift in degreeMap.items():
             _x = x+shift[0]
             _y = y+shift[1]
-            if 0 <= _x <= self.span_latitude-1 and\
-               0 <= _y <= self.span_longitude-1:
+            if 0 <= _x <= self.max_x and\
+               0 <= _y <= self.max_y:
                 yield _x, _y, self.data[_x, _y]
             else:
                 continue
