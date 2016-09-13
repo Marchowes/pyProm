@@ -25,9 +25,7 @@ class SRTMLoader(_BaseLoader):
         """
         super(SRTMLoader, self).__init__(filename)
         self.span_latitude = span_latitude
-        self.max_x = span_latitude - 1
         self.span_longitude = span_longitude
-        self.max_y = span_longitude - 1
         self.arcsec_resolution = arcsec_resolution
         self.latitude = self.longitude = None
         self.latlong()
