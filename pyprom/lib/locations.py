@@ -288,6 +288,10 @@ class Island(BaseGridPointContainer):
 
 class MultiPoint(object):
     """
+    This is an "equal height" Multipoint storage container that
+    provides a number of functions for analysis of these blob like
+    locations. An Example of this would be a pond. This object in
+    contains a list of all the points of this pond.
     :param points: list of BaseGridPoint objects
     :param elevation: elevation in meters
     :param analyzeData: AnalyzeData object.
@@ -299,11 +303,17 @@ class MultiPoint(object):
         self.mapEdge = []
 
     def findExtremities(self):
+        """
+        Function will find all the points furthest N, S, E, W and
+        return their X or Y values.
+        :return: dict: {'N': x, 'S': x, 'E': y, 'W': y}
+        """
         return findExtremities(self.findShores().points)
 
     def findMapEdge(self):
         """
         :return: list of SpotElevation Points along the map Edge.
+        That is, the edge of the dataset map.
         """
         mapEdge = list()
         for point in self.points:
@@ -317,7 +327,9 @@ class MultiPoint(object):
 
     def findEdge(self):
         """
-        Finds all points in a blob that have non-equal neighbors.
+        Finds all points in a Equal Height Multipoint that have non-equal
+        neighbors. Using the pond example, these are all the water points
+        that border the shore
         :return: list of EdgePoint objects.
         """
         edgeObjectList = list()
@@ -342,15 +354,16 @@ class MultiPoint(object):
 
     def findShores(self, edge=None):
         """
-        Function will find all shores along pond-like blob. and add all
-        discontigous shore points as lists within the returned list.
-        This is needed for finding Islands.
+        Function will find all shores along pond-like multipoint. and add all
+        discontiguous shore points as lists within the returned list.
+        This is needed for finding "Islands".
         :param: edge - A list of edges (can reduce redundant edge finds
          in certain cases.)
         :return: List of lists of `GridPoint` representing a Shore
         """
         if not edge:
             edge = self.findEdge()
+
         # Flatten list and find unique members.
         shorePoints = list(set([val for sublist in
                            [x.nonEqualNeighbors for x in edge.points]
@@ -372,7 +385,7 @@ class MultiPoint(object):
         toBeAnalyzed = [masterGridPoint]
 
         # toBeAnalyzed preloaded with the first point in the shorePoints list.
-        # First Act is to pop a point from toBeAnalyzed, and analyze it's
+        # First act is to pop a point from toBeAnalyzed, and analyze it's
         # orthogonal neighbors for shorePoint members and add them to the
         # toBeAnalyzed list. These points are also added to a purgedIndex,
         # as well as dropped from shoreIndex.
@@ -413,7 +426,7 @@ class MultiPoint(object):
         findIslands runs through a list of shore lists and finds the
         extremities of each shorelist. The list with the most maximum
         relative extremity is considered the main pond shore. Everything
-        else is implicity an island in the pond.
+        else is implicity an Island .
         :return: List of Islands.
         """
 
@@ -453,23 +466,23 @@ class MultiPoint(object):
         counter = Counter(flatList)
 
         # In theory, the main pond shore should have the most extremities
-        probablyPond = counter.most_common(1)
+        pondLike = counter.most_common(1)
 
         # Wow, what a piece of crap. I feel ashamed of the next 6 lines.
-        if probablyPond[0][0] < 4:
+        if pondLike[0][0] < 4:
             raise Exception("Largest Pond does not have 4 max points."
                             " Something is horribly Wrong.")
-        if len(probablyPond) != 1:
+        if len(pondLike) != 1:
             raise Exception("Equal number of extremities in pond?"
                             " How can that be?")
 
-        probablyPond = probablyPond[0][0]
+            pondLike = pondLike[0][0]
 
         # Find any map edges and add them to the Plain Blob Object mapEdge.
         self.mapEdge = self.findMapEdge()
 
         # Well, this probably isn't an island, so drop it from the list.
-        shoreList.remove(probablyPond)
+        shoreList.remove(pondLike)
 
         # Find any map edges for the island, and create Island Objects.
         islands = list()
