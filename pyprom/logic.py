@@ -2,10 +2,10 @@ from __future__ import division
 
 from collections import defaultdict
 from lib.locations import (SpotElevationContainer,
-                           Summit,
-                           GridPoint,
-                           MultiPoint)
-from lib.util import coordinateHashToGridPointList
+                           Summit, Saddle,
+                           GridPoint, MultiPoint)
+from lib.util import (coordinateHashToGridPointList,
+                      compressRepetetiveChars)
 import numpy
 
 
@@ -49,7 +49,7 @@ class AnalyzeData(object):
                                            (index/self.data.size)*100))
 
             # Check for summit
-            feature = self._summit(x, y)
+            feature = self._summit_and_saddle(x, y)
             # Add summit object to list if it exists
             if feature:
                 featureObjects.points.append(feature)
@@ -58,6 +58,102 @@ class AnalyzeData(object):
             self.blob = None
             iterator.iternext()
         return featureObjects
+
+    def _summit_and_saddle(self, x, y):
+        """
+        :param x:
+        :param y:
+        :return: Summit, Saddle, or None
+        """
+
+        # Exempt! bail out!
+        if y in self.skipSummitAnalysis[x]:
+            return
+
+        saddleProfile = ["HLHL", "LHLH"]
+        summitProfile = "L"
+
+        def _analyze_multipoint(x, y, ptElevation):
+            self.blob = self.equalHeightBlob(x, y, ptElevation)
+            pseudoShore = self.blob.findShores()
+            shoreProfile = ""
+
+            # Go find the shore of each blob, and assign a "H"
+            # for points higher than the equalHeightBlob, and "L"
+            # for points lower.
+            for shoreSet in pseudoShore:
+                for shorePoint in shoreSet.points:
+
+                    if shorePoint.elevation > ptElevation:
+                        shoreProfile += "H"
+                    if shorePoint.elevation < ptElevation:
+                        shoreProfile += "L"
+                reducedNeighborProfile = compressRepetetiveChars(shoreProfile)
+
+                # Does it reduce to all points lower? Must be a summit!
+                if reducedNeighborProfile == summitProfile:
+                    for exemptPoint in self.blob.points:
+                        self.skipSummitAnalysis[exemptPoint.x] \
+                            .append(exemptPoint.y)
+                    return Summit(self.datamap.x_position_latitude(x),
+                                  self.datamap.y_position_longitude(y),
+                                  self.elevation,
+                                  edge=self.edge,
+                                  multiPoint=self.blob)
+
+                for profile in saddleProfile:
+                    if profile in reducedNeighborProfile:
+                        for exemptPoint in self.blob.points:
+                            self.skipSummitAnalysis[exemptPoint.x] \
+                                .append(exemptPoint.y)
+                        return Saddle(self.datamap.x_position_latitude(x),
+                                      self.datamap.y_position_longitude(y),
+                                      self.elevation,
+                                      edge=self.edge,
+                                      multiPoint=self.blob)
+            # Nothing There? Exempt.
+            for exemptPoint in self.blob.points:
+                self.skipSummitAnalysis[exemptPoint.x] \
+                    .append(exemptPoint.y)
+            return None
+
+        # Begin the ardous task of analyzing points and multipoints
+        neighbor = self.iterateDiagonal(x, y)
+        neighborProfile = ""
+        for _x, _y, elevation in neighbor:
+
+            # If we have equal neighbors, we need to kick off analysis to
+            # a special MultiPoint analysis function.
+            if elevation == self.elevation and _y not in\
+                            self.skipSummitAnalysis[_x]:
+                feature = _analyze_multipoint(_x, _y, elevation)
+                return feature
+            if elevation > self.elevation:
+                neighborProfile += "H"
+            if elevation < self.elevation:
+                neighborProfile += "L"
+
+        reducedNeighborProfile = compressRepetetiveChars(neighborProfile)
+        if reducedNeighborProfile == summitProfile:
+            return Summit(self.datamap.x_position_latitude(x),
+                          self.datamap.y_position_longitude(y),
+                          self.elevation,
+                          edge=self.edge)
+
+        for profile in saddleProfile:
+            if profile in reducedNeighborProfile:
+                return Saddle(self.datamap.x_position_latitude(x),
+                              self.datamap.y_position_longitude(y),
+                              self.elevation,
+                              edge=self.edge)
+        return None
+
+
+
+
+
+
+
 
     def _summit(self, x, y):
         """

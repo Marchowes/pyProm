@@ -84,6 +84,23 @@ class Summit(SpotElevation):
     __unicode__ = __str__ = __repr__
 
 
+class Saddle(SpotElevation):
+    """
+    Saddle object stores relevant saddle data.
+    """
+    def __init__(self, latitude, longitude, elevation, *args, **kwargs):
+        super(Saddle, self).__init__(latitude, longitude,
+                                     elevation, *args, **kwargs)
+        self.multiPoint = kwargs.get('multiPoint', None)
+
+    def __repr__(self):
+        return "<Saddle> lat {} long {} El {}".format(self.feet,
+                                                      self.latitude,
+                                                      self.longitude)
+
+    __unicode__ = __str__ = __repr__
+
+
 class SpotElevationContainer(object):
     """
     Container for Spot Elevation type lists.
