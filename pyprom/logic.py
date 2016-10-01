@@ -23,6 +23,7 @@ class AnalyzeData(object):
         self.span_latitude = self.datamap.span_latitude
         self.cardinalGrid = dict()
         self.skipSummitAnalysis = defaultdict(list)
+        self.kludge = list()
         # Relative Grid Hash -- in case we ever want to use this feature...
         for cardinality in ['N', 'S', 'E', 'W']:
             self.cardinalGrid[cardinality] = candidateGridHash(cardinality, 3)
@@ -57,7 +58,7 @@ class AnalyzeData(object):
             self.edge = False
             self.blob = None
             iterator.iternext()
-        return featureObjects
+        return featureObjects, self.kludge
 
     def _summit_and_saddle(self, x, y):
         """
@@ -75,6 +76,7 @@ class AnalyzeData(object):
 
         def _analyze_multipoint(x, y, ptElevation):
             self.blob = self.equalHeightBlob(x, y, ptElevation)
+            self.kludge.append(self.blob)
             pseudoShore = self.blob.findShores()
             shoreProfile = ""
 
@@ -178,7 +180,6 @@ class AnalyzeData(object):
                 elif elevation == self.elevation and _y not in\
                  self.skipSummitAnalysis[_x]:
                     self.blob = self.equalHeightBlob(_x, _y, elevation)
-
                     # Iterate through all the points in the equalHeight Blob.
                     for point in self.blob.points:
                         pointNeighbor = self.iterateDiagonal(point.x, point.y)
