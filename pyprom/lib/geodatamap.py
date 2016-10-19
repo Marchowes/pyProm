@@ -1,5 +1,7 @@
 from __future__ import division
 
+import logging
+
 from util import dottedDecimaltoDegrees, degreesToDottedDecimal
 
 ARCSEC_DEG = 3600
@@ -9,6 +11,8 @@ ARCMIN_DEG = 60
 class DataMap(object):
     def __init__(self, numpy_map, latitude, longitude,
                  span_latitude, span_longitude, arcsec_resolution):
+        self.logger = logging.getLogger('pyProm.{}'.format(__name__))
+        self.logger.info("Datamap Object Created.")
         self.numpy_map = numpy_map
         self.latitude = latitude  # SW Corner
         self.longitude = longitude  # SW Corner

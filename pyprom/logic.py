@@ -1,12 +1,14 @@
 from __future__ import division
 
+import numpy
+import logging
+
 from collections import defaultdict
 from lib.locations import (SpotElevationContainer,
                            Summit, Saddle,
                            GridPoint, MultiPoint)
 from lib.util import (coordinateHashToGridPointList,
                       compressRepetetiveChars)
-import numpy
 
 
 class AnalyzeData(object):
@@ -14,6 +16,7 @@ class AnalyzeData(object):
         """
         :param datamap: `DataMap` object.
         """
+        self.logger = logging.getLogger('pyProm.{}'.format(__name__))
         self.datamap = datamap
         self.data = self.datamap.numpy_map
         self.edge = False
@@ -23,7 +26,6 @@ class AnalyzeData(object):
         self.span_latitude = self.datamap.span_latitude
         self.cardinalGrid = dict()
         self.skipSummitAnalysis = defaultdict(list)
-        self.kludge = list()
         # Relative Grid Hash -- in case we ever want to use this feature...
         for cardinality in ['N', 'S', 'E', 'W']:
             self.cardinalGrid[cardinality] = candidateGridHash(cardinality, 3)
@@ -35,6 +37,7 @@ class AnalyzeData(object):
         FUTURE: Analysis for Cols, as well as capability of chasing equal
         height neighbors.
         """
+        self.logger.info("Initiating Analysis")
         iterator = numpy.nditer(self.data, flags=['multi_index'])
         featureObjects = SpotElevationContainer([])
         index = 0
@@ -46,8 +49,9 @@ class AnalyzeData(object):
             # Quick Progress Meter. Needs refinement,
             index += 1
             if not index % 100000:
-                print("{}/{} - {}%".format(index, self.data.size,
+                self.logger.info("{}/{} - {}%".format(index, self.data.size,
                                            (index/self.data.size)*100))
+
 
             # Check for summit
             feature = self._summit_and_saddle(x, y)
@@ -58,7 +62,7 @@ class AnalyzeData(object):
             self.edge = False
             self.blob = None
             iterator.iternext()
-        return featureObjects, self.kludge
+        return featureObjects
 
     def _summit_and_saddle(self, x, y):
         """
@@ -76,7 +80,6 @@ class AnalyzeData(object):
 
         def _analyze_multipoint(x, y, ptElevation):
             self.blob = self.equalHeightBlob(x, y, ptElevation)
-            self.kludge.append(self.blob)
             pseudoShore = self.blob.findShores()
             shoreProfile = ""
 

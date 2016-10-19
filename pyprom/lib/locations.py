@@ -1,16 +1,24 @@
 """
 This lib contains objects for storing various geographic data.
 """
+import logging
+
 from collections import defaultdict, Counter
 from location_util import findExtremities
 
 
-class BaseCoordinate(object):
+class _Base(object):
+    def __init__(self):
+        self.logger = logging.getLogger('pyProm.{}'.format(__name__))
+
+
+class BaseCoordinate(_Base):
     """
     Base Coordinate, intended to be inherited from. This contains
     basic lat/long
     """
     def __init__(self, latitude, longitude, *args, **kwargs):
+        super(BaseCoordinate, self).__init__()
         self.latitude = latitude
         self.longitude = longitude
 
@@ -101,12 +109,13 @@ class Saddle(SpotElevation):
     __unicode__ = __str__ = __repr__
 
 
-class SpotElevationContainer(object):
+class SpotElevationContainer(_Base):
     """
     Container for Spot Elevation type lists.
     Allows for various list transformations.
     """
     def __init__(self, spotElevationList):
+        super(SpotElevationContainer, self).__init__()
         self.points = spotElevationList
 
     def rectangle(self, lat1, long1, lat2, long2):
@@ -150,13 +159,14 @@ class SpotElevationContainer(object):
     __unicode__ = __str__ = __repr__
 
 
-class BaseGridPoint(object):
+class BaseGridPoint(_Base):
     def __init__(self, x, y):
         """
         Basic Gridpoint.
         :param x: x coordinate
         :param y: y coordinate
         """
+        super(BaseGridPoint, self).__init__()
         self.x = x
         self.y = y
 
@@ -202,11 +212,12 @@ class GridPoint(BaseGridPoint):
     __unicode__ = __str__ = __repr__
 
 
-class BaseGridPointContainer(object):
+class BaseGridPointContainer(_Base):
     """
     Base Grid Point Container.
     """
     def __init__(self, gridPointList):
+        super(BaseGridPointContainer, self).__init__()
         self.points = gridPointList
 
     def __hash__(self):
@@ -303,7 +314,7 @@ class Island(BaseGridPointContainer):
     __unicode__ = __str__ = __repr__
 
 
-class MultiPoint(object):
+class MultiPoint(_Base):
     """
     This is an "equal height" Multipoint storage container that
     provides a number of functions for analysis of these blob like
@@ -314,6 +325,7 @@ class MultiPoint(object):
     :param analyzeData: AnalyzeData object.
     """
     def __init__(self, points, elevation, analyzeData):
+        super(MultiPoint, self).__init__()
         self.points = points  # BaseGridPoint Object.
         self.elevation = elevation
         self.analyzeData = analyzeData  # data analysis object.

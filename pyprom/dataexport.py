@@ -1,11 +1,15 @@
+import logging
+import os
 from pykml.factory import KML_ElementMaker as KML
 from lxml import etree
 
 
 class KMLfileWriter(object):
     def __init__(self, kmlList, outputFile):
+        self.logger = logging.getLogger('pyProm.{}'.format(__name__))
+        self.logger.info("KML Output: {}, {} points".format(outputFile, len(kmlList)))
         self.kml = kmlList
-        self.outputFile = outputFile
+        self.outputFile = os.path.expanduser(outputFile)
         self.kmlPoints = list()
         for spotElevation in kmlList:
             self.kmlPoints.append(self.generateKMLPlacemark(spotElevation))
@@ -27,3 +31,4 @@ class KMLfileWriter(object):
         output.write(etree.tostring(KML.kml(KML.Document(self.kmlFolder)),
                                     pretty_print=True))
         output.close()
+        self.logger.info("KML File Written: {}".format(self.outputFile))
