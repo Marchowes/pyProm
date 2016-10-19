@@ -85,9 +85,9 @@ class Summit(SpotElevation):
         self.multiPoint = kwargs.get('multiPoint', None)
 
     def __repr__(self):
-        return "<Summit> lat {} long {} El {}".format(self.feet,
-                                                      self.latitude,
-                                                      self.longitude)
+        return "<Summit> lat {} long {} El {}".format(self.latitude,
+                                                      self.longitude,
+                                                      self.feet)
 
     __unicode__ = __str__ = __repr__
 
@@ -102,9 +102,9 @@ class Saddle(SpotElevation):
         self.multiPoint = kwargs.get('multiPoint', None)
 
     def __repr__(self):
-        return "<Saddle> lat {} long {} El {}".format(self.feet,
-                                                      self.latitude,
-                                                      self.longitude)
+        return "<Saddle> lat {} long {} El {}".format(self.latitude,
+                                                      self.longitude,
+                                                      self.feet)
 
     __unicode__ = __str__ = __repr__
 
