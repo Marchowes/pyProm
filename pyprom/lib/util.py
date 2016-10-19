@@ -1,6 +1,6 @@
 from __future__ import division
 from locations import BaseGridPoint
-import re
+import itertools
 import math
 
 
@@ -49,6 +49,4 @@ def compressRepetetiveChars(string):
     :param string:
     :return:
     """
-    pattern = r'(.)\1{2,}'
-    repl = r'\1'
-    return re.sub(pattern, repl, string)
+    return ''.join(ch for ch, _ in itertools.groupby(string))

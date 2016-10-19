@@ -106,16 +106,15 @@ class AnalyzeData(object):
                                   edge=self.edge,
                                   multiPoint=self.blob)
 
-                for profile in saddleProfile:
-                    if profile in reducedNeighborProfile:
-                        for exemptPoint in self.blob.points:
-                            self.skipSummitAnalysis[exemptPoint.x] \
-                                .append(exemptPoint.y)
-                        return Saddle(self.datamap.x_position_latitude(x),
-                                      self.datamap.y_position_longitude(y),
-                                      self.elevation,
-                                      edge=self.edge,
-                                      multiPoint=self.blob)
+                if any(x in reducedNeighborProfile for x in saddleProfile):
+                    for exemptPoint in self.blob.points:
+                        self.skipSummitAnalysis[exemptPoint.x] \
+                            .append(exemptPoint.y)
+                    return Saddle(self.datamap.x_position_latitude(x),
+                                  self.datamap.y_position_longitude(y),
+                                  self.elevation,
+                                  edge=self.edge,
+                                  multiPoint=self.blob)
             # Nothing There? Exempt.
             for exemptPoint in self.blob.points:
                 self.skipSummitAnalysis[exemptPoint.x] \
@@ -145,20 +144,12 @@ class AnalyzeData(object):
                           self.elevation,
                           edge=self.edge)
 
-        for profile in saddleProfile:
-            if profile in reducedNeighborProfile:
-                return Saddle(self.datamap.x_position_latitude(x),
-                              self.datamap.y_position_longitude(y),
-                              self.elevation,
-                              edge=self.edge)
+        if any(x in reducedNeighborProfile for x in saddleProfile):
+            return Saddle(self.datamap.x_position_latitude(x),
+                          self.datamap.y_position_longitude(y),
+                          self.elevation,
+                          edge=self.edge)
         return None
-
-
-
-
-
-
-
 
     def _summit(self, x, y):
         """
@@ -229,15 +220,10 @@ class AnalyzeData(object):
         Generator returns 8 closest neighbors to a raster grid location,
         that is, all points touching including the diagonals.
         """
-        degreeMap = {'_0': [0, -1],
-                     '_45': [1, -1],
-                     '_90': [1, 0],
-                     '_135': [1, 1],
-                     '_180': [0, 1],
-                     '_225': [-1, 1],
-                     '_270': [-1, 0],
-                     '_315': [-1, -1]}
-        for degree, shift in degreeMap.items():
+        shiftList = [[-1,0],[-1,1],[0,1],[1,1],[1,0],[1,-1],[0,-1],[-1,-1]]
+        # 0, 45, 90, 135, 180, 225, 270, 315
+
+        for shift in shiftList:
             _x = x+shift[0]
             _y = y+shift[1]
             if 0 <= _x <= self.max_x and \
@@ -251,11 +237,10 @@ class AnalyzeData(object):
         generator returns 4 closest neighbors to a raster grid location,
         that is, all points touching excluding the diagonals.
         """
-        degreeMap = {'_0': [0, -1],
-                     '_90': [1, 0],
-                     '_180': [0, 1],
-                     '_270': [-1, 0]}
-        for degree, shift in degreeMap.items():
+        shiftList = [[-1,0],[0,1],[1,0],[0,-1]]
+        # 0, 90, 180, 270
+
+        for shift in shiftList:
             _x = x+shift[0]
             _y = y+shift[1]
             if 0 <= _x <= self.max_x and\
