@@ -85,9 +85,11 @@ class Summit(SpotElevation):
         self.multiPoint = kwargs.get('multiPoint', None)
 
     def __repr__(self):
-        return "<Summit> lat {} long {} El {}".format(self.latitude,
-                                                      self.longitude,
-                                                      self.feet)
+        return "<Summit> lat {} long {} El {} MultiPoint {}".format(
+            self.latitude,
+            self.longitude,
+            self.feet,
+            bool(self.multiPoint))
 
     __unicode__ = __str__ = __repr__
 
@@ -102,9 +104,11 @@ class Saddle(SpotElevation):
         self.multiPoint = kwargs.get('multiPoint', None)
 
     def __repr__(self):
-        return "<Saddle> lat {} long {} El {}".format(self.latitude,
-                                                      self.longitude,
-                                                      self.feet)
+        return "<Saddle> lat {} long {} El {} MultiPoint {}".format(
+            self.latitude,
+            self.longitude,
+            self.feet,
+            bool(self.multiPoint))
 
     __unicode__ = __str__ = __repr__
 
@@ -135,6 +139,15 @@ class SpotElevationContainer(_Base):
         lowerlong = min(long1, long2)
         return [x for x in self.points if lowerlat < x.latitude < upperlat and
                 lowerlong < x.longitude < upperlong]
+
+    def byType(self, string):
+        """
+        :param string: Object type (as String). ex: Saddle, Summit
+        :return: SpotElevationContainer of objects by type.
+        """
+        name = string.upper()
+        return SpotElevationContainer([x for x in self.points
+                                       if type(x).__name__.upper() == name])
 
     def elevationRange(self, lower=None, upper=100000):
         """
