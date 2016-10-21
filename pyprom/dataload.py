@@ -1,6 +1,8 @@
 import os
 import gdal
 import numpy
+import logging
+
 from lib.geodatamap import DataMap
 
 
@@ -10,6 +12,7 @@ class _BaseLoader(object):
         Base class for data loaders.
         """
         self.filename = os.path.expanduser(filename)
+        self.logger = logging.getLogger('pyProm.{}'.format(__name__))
 
 
 class SRTMLoader(_BaseLoader):
@@ -24,6 +27,11 @@ class SRTMLoader(_BaseLoader):
         :param span_longitude: source datamap point span along longitude
         """
         super(SRTMLoader, self).__init__(filename)
+        self.logger.info("Loading: {} Latitude span: {}, Longitude span: {}"
+                         ", Resolution: {}"
+                         " ArcSec/point.".format(filename, span_latitude,
+                                                 span_longitude,
+                                                 arcsec_resolution))
         self.span_latitude = span_latitude
         self.span_longitude = span_longitude
         self.arcsec_resolution = arcsec_resolution
@@ -79,6 +87,12 @@ class ADFLoader(_BaseLoader):
                                       ReadAsArray())
         self.span_latitude = int(self.elevations.shape[0])
         self.span_longitude = int(self.elevations.shape[1])
+        self.logger.info("Loading: {} Latitude span: {}, Longitude span: {}"
+                         ", Resolution: {}"
+                         " ArcSec/point.".format(filename,
+                                                 self.span_latitude,
+                                                 self.span_longitude,
+                                                 arcsec_resolution))
 
         self.geodatamap = DataMap(self.elevations,
                                   self.latitude,

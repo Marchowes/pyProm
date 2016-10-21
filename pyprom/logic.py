@@ -1,12 +1,14 @@
 from __future__ import division
 
+import numpy
+import logging
+
 from collections import defaultdict
 from lib.locations import (SpotElevationContainer,
-                           Summit,
-                           GridPoint,
-                           MultiPoint)
-from lib.util import coordinateHashToGridPointList
-import numpy
+                           Summit, Saddle,
+                           GridPoint, MultiPoint)
+from lib.util import (coordinateHashToGridPointList,
+                      compressRepetetiveChars)
 
 
 class AnalyzeData(object):
@@ -14,6 +16,7 @@ class AnalyzeData(object):
         """
         :param datamap: `DataMap` object.
         """
+        self.logger = logging.getLogger('pyProm.{}'.format(__name__))
         self.datamap = datamap
         self.data = self.datamap.numpy_map
         self.edge = False
@@ -34,6 +37,7 @@ class AnalyzeData(object):
         FUTURE: Analysis for Cols, as well as capability of chasing equal
         height neighbors.
         """
+        self.logger.info("Initiating Analysis")
         iterator = numpy.nditer(self.data, flags=['multi_index'])
         featureObjects = SpotElevationContainer([])
         index = 0
@@ -45,11 +49,12 @@ class AnalyzeData(object):
             # Quick Progress Meter. Needs refinement,
             index += 1
             if not index % 100000:
-                print("{}/{} - {}%".format(index, self.data.size,
+                self.logger.info("{}/{} - {}%".format(index, self.data.size,
                                            (index/self.data.size)*100))
 
+
             # Check for summit
-            feature = self._summit(x, y)
+            feature = self._summit_and_saddle(x, y)
             # Add summit object to list if it exists
             if feature:
                 featureObjects.points.append(feature)
@@ -58,6 +63,93 @@ class AnalyzeData(object):
             self.blob = None
             iterator.iternext()
         return featureObjects
+
+    def _summit_and_saddle(self, x, y):
+        """
+        :param x:
+        :param y:
+        :return: Summit, Saddle, or None
+        """
+
+        # Exempt! bail out!
+        if y in self.skipSummitAnalysis[x]:
+            return
+
+        saddleProfile = ["HLHL", "LHLH"]
+        summitProfile = "L"
+
+        def _analyze_multipoint(x, y, ptElevation):
+            self.blob = self.equalHeightBlob(x, y, ptElevation)
+            pseudoShore = self.blob.findShores()
+            shoreProfile = ""
+
+            # Go find the shore of each blob, and assign a "H"
+            # for points higher than the equalHeightBlob, and "L"
+            # for points lower.
+            for shoreSet in pseudoShore:
+                for shorePoint in shoreSet.points:
+
+                    if shorePoint.elevation > ptElevation:
+                        shoreProfile += "H"
+                    if shorePoint.elevation < ptElevation:
+                        shoreProfile += "L"
+                reducedNeighborProfile = compressRepetetiveChars(shoreProfile)
+
+                # Does it reduce to all points lower? Must be a summit!
+                if reducedNeighborProfile == summitProfile:
+                    for exemptPoint in self.blob.points:
+                        self.skipSummitAnalysis[exemptPoint.x] \
+                            .append(exemptPoint.y)
+                    return Summit(self.datamap.x_position_latitude(x),
+                                  self.datamap.y_position_longitude(y),
+                                  self.elevation,
+                                  edge=self.edge,
+                                  multiPoint=self.blob)
+
+                if any(x in reducedNeighborProfile for x in saddleProfile):
+                    for exemptPoint in self.blob.points:
+                        self.skipSummitAnalysis[exemptPoint.x] \
+                            .append(exemptPoint.y)
+                    return Saddle(self.datamap.x_position_latitude(x),
+                                  self.datamap.y_position_longitude(y),
+                                  self.elevation,
+                                  edge=self.edge,
+                                  multiPoint=self.blob)
+            # Nothing There? Exempt.
+            for exemptPoint in self.blob.points:
+                self.skipSummitAnalysis[exemptPoint.x] \
+                    .append(exemptPoint.y)
+            return None
+
+        # Begin the ardous task of analyzing points and multipoints
+        neighbor = self.iterateDiagonal(x, y)
+        neighborProfile = ""
+        for _x, _y, elevation in neighbor:
+
+            # If we have equal neighbors, we need to kick off analysis to
+            # a special MultiPoint analysis function.
+            if elevation == self.elevation and _y not in\
+                            self.skipSummitAnalysis[_x]:
+                feature = _analyze_multipoint(_x, _y, elevation)
+                return feature
+            if elevation > self.elevation:
+                neighborProfile += "H"
+            if elevation < self.elevation:
+                neighborProfile += "L"
+
+        reducedNeighborProfile = compressRepetetiveChars(neighborProfile)
+        if reducedNeighborProfile == summitProfile:
+            return Summit(self.datamap.x_position_latitude(x),
+                          self.datamap.y_position_longitude(y),
+                          self.elevation,
+                          edge=self.edge)
+
+        if any(x in reducedNeighborProfile for x in saddleProfile):
+            return Saddle(self.datamap.x_position_latitude(x),
+                          self.datamap.y_position_longitude(y),
+                          self.elevation,
+                          edge=self.edge)
+        return None
 
     def _summit(self, x, y):
         """
@@ -82,7 +174,6 @@ class AnalyzeData(object):
                 elif elevation == self.elevation and _y not in\
                  self.skipSummitAnalysis[_x]:
                     self.blob = self.equalHeightBlob(_x, _y, elevation)
-
                     # Iterate through all the points in the equalHeight Blob.
                     for point in self.blob.points:
                         pointNeighbor = self.iterateDiagonal(point.x, point.y)
@@ -129,15 +220,10 @@ class AnalyzeData(object):
         Generator returns 8 closest neighbors to a raster grid location,
         that is, all points touching including the diagonals.
         """
-        degreeMap = {'_0': [0, -1],
-                     '_45': [1, -1],
-                     '_90': [1, 0],
-                     '_135': [1, 1],
-                     '_180': [0, 1],
-                     '_225': [-1, 1],
-                     '_270': [-1, 0],
-                     '_315': [-1, -1]}
-        for degree, shift in degreeMap.items():
+        shiftList = [[-1,0],[-1,1],[0,1],[1,1],[1,0],[1,-1],[0,-1],[-1,-1]]
+        # 0, 45, 90, 135, 180, 225, 270, 315
+
+        for shift in shiftList:
             _x = x+shift[0]
             _y = y+shift[1]
             if 0 <= _x <= self.max_x and \
@@ -151,11 +237,10 @@ class AnalyzeData(object):
         generator returns 4 closest neighbors to a raster grid location,
         that is, all points touching excluding the diagonals.
         """
-        degreeMap = {'_0': [0, -1],
-                     '_90': [1, 0],
-                     '_180': [0, 1],
-                     '_270': [-1, 0]}
-        for degree, shift in degreeMap.items():
+        shiftList = [[-1,0],[0,1],[1,0],[0,-1]]
+        # 0, 90, 180, 270
+
+        for shift in shiftList:
             _x = x+shift[0]
             _y = y+shift[1]
             if 0 <= _x <= self.max_x and\
