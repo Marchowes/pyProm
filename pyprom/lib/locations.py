@@ -337,11 +337,14 @@ class MultiPoint(_Base):
     :param elevation: elevation in meters
     :param analyzeData: AnalyzeData object.
     """
-    def __init__(self, points, elevation, analyzeData):
+    def __init__(self, points, elevation, analyzeData,
+                 edgePoints = None, inverseEdgePoints = None):
         super(MultiPoint, self).__init__()
         self.points = points  # BaseGridPoint Object.
         self.elevation = elevation
         self.analyzeData = analyzeData  # data analysis object.
+        self.edgePoints = edgePoints
+        self.inverseEdgePoints = inverseEdgePoints
         self.mapEdge = []
 
     def findExtremities(self):
@@ -374,25 +377,7 @@ class MultiPoint(_Base):
         that border the shore
         :return: list of EdgePoint objects.
         """
-        edgeObjectList = list()
-        for gridpoint in self.points:
-            neighbors = self.analyzeData.iterateDiagonal(gridpoint.x,
-                                                         gridpoint.y)
-            nonEqualNeighborList = list()
-            equalNeighborList = list()
-            for _x, _y, elevation in neighbors:
-                if elevation != self.elevation:
-                    nonEqualNeighborList.append(GridPoint(_x, _y, elevation))
-                elif elevation == self.elevation:
-                    equalNeighborList.append(GridPoint(_x, _y, elevation))
-
-            if nonEqualNeighborList:
-                edgeObjectList.append(EdgePoint(gridpoint.x,
-                                                gridpoint.y,
-                                                self.elevation,
-                                                nonEqualNeighborList,
-                                                equalNeighborList))
-        return GridPointContainer(edgeObjectList)
+        return self.edgePoints
 
     def findShores(self, edge=None):
         """
@@ -571,11 +556,172 @@ class EdgePoint(GridPoint):
 
     def __repr__(self):
         return ("<EdgePoint> x: {}, y: {}, ele(m): {},"
-                "#Eq Points {}, #NonEq Points {}".
+                " #Eq Points {}, #NonEq Points {}".
                 format(self.x,
                        self.y,
                        self.elevation,
                        len(self.equalNeighbors),
                        len(self.nonEqualNeighbors)))
+
+    __unicode__ = __str__ = __repr__
+
+
+class InverseEdgePoint(GridPoint):
+    """
+    A Shore point, to be used in conjunction with EdgePoints.
+    This keeps track shorePoints and their neighboring EdgePoints.
+    :param x: x coordinate
+    :param y: y coordinate
+    :param elevation: elevation in meters
+    :param edgePoints: list of EdgePoints.
+    """
+    def __init__(self, x, y, elevation, edgePoints):
+        super(InverseEdgePoint, self).__init__(x, y, elevation)
+        self.edgePoints = edgePoints
+
+    def addEdge(self, edgepoint):
+        self.edgePoints.append(edgepoint)
+
+    def __repr__(self):
+        return ("<InverseEdgePoint> x: {}, y: {}, ele(m): {},"
+                " #EdgePoints {}".
+                format(self.x,
+                       self.y,
+                       self.elevation,
+                       len(self.edgePoints)))
+
+    __unicode__ = __str__ = __repr__
+
+
+class EdgePointContainer(_Base):
+    """
+    Container for EdgePoint type lists.
+    Allows for various list transformations.
+    :param edgePointList: list of EdgePoints to self.points
+    :param edgePointIndex: {X: { Y: :class:`EdgePoint`}} passing this will
+    automatically generate self.points
+
+    """
+    def __init__(self, edgePointList = None,
+                 edgePointIndex = None,
+                 analyzeData = None):
+        super(EdgePointContainer, self).__init__()
+        if edgePointIndex:
+            self.edgePointIndex = edgePointIndex
+            self.points = [v[1] for x, y in self.edgePointIndex.items()
+                           for v in y.items()]
+        if edgePointList:
+            self.points = edgePointList
+        self.analyzeData = analyzeData
+
+    def edgeLinkedList(self):
+        pass
+
+
+    def __repr__(self):
+        return "<EdgePointContainer> {} Objects".format(len(self.points))
+
+    def __iter__(self):
+        for edgePoint in self.points:
+            yield edgePoint
+
+    __unicode__ = __str__ = __repr__
+
+
+class InverseEdgePointContainer(_Base):
+    """
+    Container for InverseEdgePoint type lists.
+    Allows for various list transformations.
+    :param inverseEdgePointList: list of EdgePoints to self.points
+    :param inverseEdgePointIndex: {X: { Y: :class:`InverseEdgePoint`}} passing
+    this will automatically generate self.points
+    """
+    def __init__(self, inverseEdgePointList = None,
+                 inverseEdgePointIndex = None,
+                 analyzeData = None):
+        super(InverseEdgePointContainer, self).__init__()
+        if inverseEdgePointIndex:
+            self.inverseEdgePointIndex = inverseEdgePointIndex
+            self.points = [v[1] for x, y in self.inverseEdgePointIndex.items()
+                                 for v in y.items()]
+        if inverseEdgePointList:
+            self.points = inverseEdgePointList
+        self.analyzeData = analyzeData
+
+    def linkedList(self):
+        pass
+
+    def findExternalLinear(self):
+        """
+         Function will find all shores along pond-like multipoint. and add all
+         discontiguous shore points as lists within the returned list.
+         This is needed for finding "Islands".
+         :return: List of lists of `GridPoint` representing a Shore
+         """
+        shorePoints = self.points[:]
+        # For Optimized Lookups on larger lists.
+        shoreIndex = defaultdict(list)
+        for shorePoint in shorePoints:
+            shoreIndex[shorePoint.x].append(shorePoint.y)
+        purgedIndex = defaultdict(list)
+
+        # initialize the shoreList and its index.
+        shoreList = list()
+        shoreList.append(list())
+        listIndex = 0
+
+        # Grab some shorePoint to start with.
+        masterGridPoint = shorePoints[0]
+        toBeAnalyzed = [masterGridPoint]
+
+        # toBeAnalyzed preloaded with the first point in the shorePoints list.
+        # First act is to pop a point from toBeAnalyzed, and analyze it's
+        # orthogonal neighbors for shorePoint members and add them to the
+        # toBeAnalyzed list. These points are also added to a purgedIndex,
+        # as well as dropped from shoreIndex.
+        # Once neighbors are depleted, a new point is pulled from the
+        # shorePoints list the list index is incremented and its neighbors are
+        # analyzed until shorePoints is depleted.
+
+        while True:
+            if not toBeAnalyzed:
+                if shorePoints:
+                    listIndex += 1
+                    shoreList.append(list())
+                    toBeAnalyzed = [shorePoints[0]]
+            if not toBeAnalyzed:
+                break
+            try:
+                gridPoint = toBeAnalyzed.pop()
+            except:
+                return shoreList
+
+            if gridPoint.y not in purgedIndex[gridPoint.x]:
+                shorePoints.remove(gridPoint)
+                shoreIndex[gridPoint.x].remove(gridPoint.y)
+                purgedIndex[gridPoint.x].append(gridPoint.y)
+                shoreList[listIndex].append(gridPoint)
+            else:
+                continue
+            neighbors = self.analyzeData.iterateOrthogonal(gridPoint.x,
+                                                           gridPoint.y)
+            for _x, _y, elevation in neighbors:
+                candidate = GridPoint(_x, _y, elevation)
+                if candidate.y in shoreIndex[candidate.x]:
+                    toBeAnalyzed.append(candidate)
+        return [GridPointContainer(x) for x in shoreList]
+
+
+
+
+
+
+
+    def __repr__(self):
+        return "<InverseEdgePointContainer> {} Objects".format(len(self.points))
+
+    def __iter__(self):
+        for inverseEdgePoint in self.points:
+            yield inverseEdgePoint
 
     __unicode__ = __str__ = __repr__
