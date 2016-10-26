@@ -1,4 +1,4 @@
-### pyProm v0.0.2
+### pyProm v0.1.0
 
 
 This library is still under development. Do not expect full functionality, or documentation until release 1.0.0
@@ -26,7 +26,7 @@ More About Prominence and Surface Network Analysis
 
 Datasources
 -----------
-* 1 ArcSecond SRTM Data [#1](https://dds.cr.usgs.gov/srtm/version1/United_States_1arcsec/1arcsec/) [#2](https://dds.cr.usgs.gov/srtm/version2_1/SRTM1/)
+* 1 ArcSecond SRTM Data [#1](https://dds.cr.usgs.gov/srtm/version1/United_States_1arcsec/1arcsec/), [#2](https://dds.cr.usgs.gov/srtm/version2_1/SRTM1/)
 * [DEM type data] (http://viewer.nationalmap.gov/basic/#productGroupSearch) Start with Elevation Products (3DEP) - 1/3 arc-second DEM [More info](http://www.digitalpreservation.gov/formats/fdd/fdd000281.shtml)
 
 Installation
@@ -34,7 +34,7 @@ Installation
 Why?? Why are you installing this??? It's nowhere near done.
 
 Download zip from github, or clone.
-Go to extraction directory and run `*pip install -e .`
+Go to extraction directory and run `pip install -e .`
 
 
 Trouble Getting GDAL installed?
@@ -47,9 +47,9 @@ and thus may need manual intervention.
 [First try this](http://www.sarasafavi.com/installing-gdalogr-on-ubuntu.html)
 Gdal still giving you trouble? [Try this](http://gis.stackexchange.com/questions/9553/installing-gdal-and-ogr-for-pythonround)
 More resources:
-https://pypi.python.org/pypi/GDAL/
-https://github.com/OSGeo/gdal
-http://www.gdal.org/formats_list.html
+* https://pypi.python.org/pypi/GDAL/
+* https://github.com/OSGeo/gdal
+* http://www.gdal.org/formats_list.html
 
 
 
