@@ -574,21 +574,26 @@ class InverseEdgePoint(GridPoint):
     :param y: y coordinate
     :param elevation: elevation in meters
     :param edgePoints: list of EdgePoints.
+    :param inverseEdgePointNeighbors: list of neighboring
+     :class:`InverseEdgePoint`
     """
-    def __init__(self, x, y, elevation, edgePoints):
+    def __init__(self, x, y, elevation, edgePoints,
+                 inverseEdgePointNeighbors = []):
         super(InverseEdgePoint, self).__init__(x, y, elevation)
         self.edgePoints = edgePoints
+        self.inverseEdgePointNeighbors = inverseEdgePointNeighbors
 
     def addEdge(self, edgepoint):
         self.edgePoints.append(edgepoint)
 
     def __repr__(self):
         return ("<InverseEdgePoint> x: {}, y: {}, ele(m): {},"
-                " #EdgePoints {}".
+                " #EdgePoints {}, #InverseEdgePointNeighbors {}".
                 format(self.x,
                        self.y,
                        self.elevation,
-                       len(self.edgePoints)))
+                       len(self.edgePoints),
+                       len(self.inverseEdgePointNeighbors)))
 
     __unicode__ = __str__ = __repr__
 
@@ -647,75 +652,176 @@ class InverseEdgePointContainer(_Base):
         if inverseEdgePointList:
             self.points = inverseEdgePointList
         self.analyzeData = analyzeData
+        self.exemptPoints = defaultdict(list)
 
-    def linkedList(self):
-        pass
+    def iterNeighborDiagonal(self, inverseEdgePoint):
 
-    def findExternalLinear(self):
-        """
-         Function will find all shores along pond-like multipoint. and add all
-         discontiguous shore points as lists within the returned list.
-         This is needed for finding "Islands".
-         :return: List of lists of `GridPoint` representing a Shore
-         """
-        shorePoints = self.points[:]
-        # For Optimized Lookups on larger lists.
-        shoreIndex = defaultdict(list)
-        for shorePoint in shorePoints:
-            shoreIndex[shorePoint.x].append(shorePoint.y)
-        purgedIndex = defaultdict(list)
-
-        # initialize the shoreList and its index.
-        shoreList = list()
-        shoreList.append(list())
-        listIndex = 0
-
-        # Grab some shorePoint to start with.
-        masterGridPoint = shorePoints[0]
-        toBeAnalyzed = [masterGridPoint]
-
-        # toBeAnalyzed preloaded with the first point in the shorePoints list.
-        # First act is to pop a point from toBeAnalyzed, and analyze it's
-        # orthogonal neighbors for shorePoint members and add them to the
-        # toBeAnalyzed list. These points are also added to a purgedIndex,
-        # as well as dropped from shoreIndex.
-        # Once neighbors are depleted, a new point is pulled from the
-        # shorePoints list the list index is incremented and its neighbors are
-        # analyzed until shorePoints is depleted.
-
-        while True:
-            if not toBeAnalyzed:
-                if shorePoints:
-                    listIndex += 1
-                    shoreList.append(list())
-                    toBeAnalyzed = [shorePoints[0]]
-            if not toBeAnalyzed:
-                break
-            try:
-                gridPoint = toBeAnalyzed.pop()
-            except:
-                return shoreList
-
-            if gridPoint.y not in purgedIndex[gridPoint.x]:
-                shorePoints.remove(gridPoint)
-                shoreIndex[gridPoint.x].remove(gridPoint.y)
-                purgedIndex[gridPoint.x].append(gridPoint.y)
-                shoreList[listIndex].append(gridPoint)
+        shiftList = [[-1,0],[-1,1],[0,1],[1,1],[1,0],[1,-1],[0,-1],[-1,-1]]
+        for shift in shiftList:
+            x = inverseEdgePoint.x+shift[0]
+            y = inverseEdgePoint.y+shift[1]
+            if self.inverseEdgePointIndex[x][y]:
+                if 0 <= x <= self.analyzeData.max_x\
+                        and 0 <= y <= self.analyzeData.max_y:
+                    yield self.inverseEdgePointIndex[x][y]
             else:
                 continue
-            neighbors = self.analyzeData.iterateOrthogonal(gridPoint.x,
-                                                           gridPoint.y)
-            for _x, _y, elevation in neighbors:
-                candidate = GridPoint(_x, _y, elevation)
-                if candidate.y in shoreIndex[candidate.x]:
-                    toBeAnalyzed.append(candidate)
-        return [GridPointContainer(x) for x in shoreList]
+
+    def iterNeighborOrthogonal(self, inverseEdgePoint):
+
+        shiftList = [[-1,0],[0,1],[1,0],[0,-1]]
+        for shift in shiftList:
+            x = inverseEdgePoint.x + shift[0]
+            y = inverseEdgePoint.y + shift[1]
+            if self.inverseEdgePointIndex[x][y]:
+                if 0 <= x <= self.analyzeData.max_x \
+                        and 0 <= y <= self.analyzeData.max_y:
+                    yield self.inverseEdgePointIndex[x][y]
+            else:
+                continue
+
+    def findLinear(self):
+        """
+        Returns a list of InverseEdgePoints in order.
+        :return:
+        """
+
+        shoreContainers = list()
+        self.exemptPoints = defaultdict(list)
+
+        rounds = 0
+        edge = list()
+        two = list()
+
+        # Find points with exactly one neighbor. These are edgepoints.
+        # Subdivide these into two groups, edges and stubs.
+
+        for point in (pt for pt in self.points):
+            neighbors = [x for x in self.iterNeighborOrthogonal(point)]
+            if len(neighbors) == 1:
+                if point.x in [self.analyzeData.max_x, 0] or\
+                                point.y in [self.analyzeData.max_y, 0]:
+                    edge.append(point)
+            if len(neighbors) == 2:
+                two.append(point)
+
+        # order the points
+        scanOrder = edge + two + self.points
+
+        # Find a starting point with exactly 2 neighbors.
+        while True:
+            rounds+=1
+            for point in (pt for pt in scanOrder
+                          if pt.y not in self.exemptPoints[pt.x]):
+                neighbors = [x for x in self.iterNeighborOrthogonal(point)]
+                masterPoint = point
+
+                if not len(neighbors):
+                    shoreContainers.append(GridPointContainer([point]))
+                    self.exemptPoints[point.x].append(point.y)
+                    break
+
+                firstPoint = neighbors[0]
+                shoreContainers.append(GridPointContainer(
+                    self.branchChaser(masterPoint,
+                                      masterPoint,
+                                      firstPoint)))
+                break
+
+            if not len([pt for pt in self.points if pt.y not in
+                    self.exemptPoints[pt.x]]):
+                return shoreContainers
+            if rounds > 100:
+                self.logger.info('fuck, something broke in {}'.format(self))
+                return shoreContainers
 
 
+    def branchChaser(self, masterPoint, originalPoint, firstPoint):
+        """
+        Recursive function for chasing down inverse edge Branches
+        :param masterPoint: Master point for this segment. This is
+         passed all the way through.
+        :param originalPoint: Original Point Branch under analysis.
+        :param firstPoint: First point, this is a neighbor of the
+         OriginalPoint and determines the direction of analysis travel.
+        :return: ordered List of points.
+        """
 
+        lookbackPoint = originalPoint
+        currentPoint = firstPoint
 
+        orderedList = [originalPoint]
 
+        while True:
+            # First, we find all neighbors who are not the original point,
+            # a lookback point, the master point, or an already analyzed point.
 
+            neighbors = [pt for pt in self.iterNeighborOrthogonal(currentPoint)
+                         if pt not in [lookbackPoint,
+                                       originalPoint,
+                                       masterPoint]]
+            neighbors = [pt for pt in neighbors
+                         if pt.y not in self.exemptPoints[pt.x]]
+
+            # More than one neighbor? We'll need to look back at the last
+            # point and find how common neighbors we have.
+            commonEdgeHash = defaultdict(list)
+            if len(neighbors) > 1:
+                for neighbor in neighbors:
+                    commonEdgePoints =\
+                        len(set(neighbor.edgePoints).\
+                            intersection(lookbackPoint.edgePoints))
+                    commonEdgeHash[commonEdgePoints].append(neighbor)
+
+                # Look for the neighbors with the most EdgePoints in common
+                if len(commonEdgeHash[max(commonEdgeHash.keys())]) != 1:
+                    level1CommonEdgeHash = defaultdict(list)
+                    # a bunch of neighbors with no common EdgePoints? Lets
+                    # look for common edges with the neighbors
+                    if max(commonEdgeHash.keys()) == 0:
+                        for nei in commonEdgeHash[0]:
+                            level1CommonEdgePoints = len(nei.edgePoints)
+                            level1CommonEdgeHash[level1CommonEdgePoints].\
+                                append(nei)
+
+                        if len(level1CommonEdgeHash[max(
+                                level1CommonEdgeHash.keys())]) != 1:
+                            # Fucking hell, they're equal. Guess we'll just
+                            # choose the first one anyways.
+                            self.logger.debug("Highly unusual Branch "
+                                              "Exception! on {}".format(self))
+                            self.logger.debug(
+                                "TroubleMakers {}".format(currentPoint))
+
+                        orderedList += self.branchChaser(masterPoint,
+                                                         currentPoint,
+                                    level1CommonEdgeHash[max(
+                                        level1CommonEdgeHash.keys())][0])
+                        continue
+                else:
+                    # Follow the branch with the most common neighbors.
+                    orderedList += self.branchChaser(masterPoint,
+                                                     currentPoint,
+                                                     commonEdgeHash[max(
+                                                     commonEdgeHash.keys())]
+                                                     [0])
+                    continue
+
+            # Not exempt? Add to the ordered list.
+            if currentPoint.y not in self.exemptPoints[currentPoint.x]:
+                #Last modification in PR, delete this comment someday.
+                self.exemptPoints[currentPoint.x].append(currentPoint.y)
+                orderedList.append(currentPoint)
+
+            if len(neighbors) == 0:
+                # End of the line? return the ordered list.
+                for point in orderedList:
+                    self.exemptPoints[point.x].append(point.y)
+                return orderedList
+
+            # Just one neighbor? Okay, do this...
+            lookbackPoint = currentPoint
+            currentPoint = neighbors[0]
 
     def __repr__(self):
         return "<InverseEdgePointContainer> {} Objects".format(len(self.points))
