@@ -1,6 +1,13 @@
 Release History
 --------------
 
+0.1.1 (November 3, 2016)
+++++++++++++++++++++++++
+*Improved EdgePoint collection
+*Improved Shore tracing
+*Added Edgepoints and InverseEdgePoints
+
+
 0.1.0 (October 21, 2016)
 ++++++++++++++++++++++++
 *Island/Pond Like Analysis
