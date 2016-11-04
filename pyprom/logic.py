@@ -6,7 +6,10 @@ import logging
 from collections import defaultdict
 from lib.locations import (SpotElevationContainer,
                            Summit, Saddle,
-                           GridPoint, MultiPoint)
+                           GridPoint, MultiPoint,
+                           EdgePoint, InverseEdgePoint,
+                           EdgePointContainer,
+                           InverseEdgePointContainer)
 from lib.util import (coordinateHashToGridPointList,
                       compressRepetetiveChars)
 
@@ -50,8 +53,7 @@ class AnalyzeData(object):
             index += 1
             if not index % 100000:
                 self.logger.info("{}/{} - {}%".format(index, self.data.size,
-                                           (index/self.data.size)*100))
-
+                                (index/self.data.size)*100))
 
             # Check for summit
             feature = self._summit_and_saddle(x, y)
@@ -80,7 +82,7 @@ class AnalyzeData(object):
 
         def _analyze_multipoint(x, y, ptElevation):
             self.blob = self.equalHeightBlob(x, y, ptElevation)
-            pseudoShore = self.blob.findShores()
+            pseudoShore = self.blob.inverseEdgePoints.findLinear()
             shoreProfile = ""
 
             # Go find the shore of each blob, and assign a "H"
@@ -172,7 +174,7 @@ class AnalyzeData(object):
                 # If the elevation of a neighbor is equal, Determine
                 #  entire blob of equal height neighbors.
                 elif elevation == self.elevation and _y not in\
-                 self.skipSummitAnalysis[_x]:
+                    self.skipSummitAnalysis[_x]:
                     self.blob = self.equalHeightBlob(_x, _y, elevation)
                     # Iterate through all the points in the equalHeight Blob.
                     for point in self.blob.points:
@@ -220,7 +222,8 @@ class AnalyzeData(object):
         Generator returns 8 closest neighbors to a raster grid location,
         that is, all points touching including the diagonals.
         """
-        shiftList = [[-1,0],[-1,1],[0,1],[1,1],[1,0],[1,-1],[0,-1],[-1,-1]]
+        shiftList = [[-1, 0], [-1, 1], [0, 1], [1, 1], [1, 0], [1, -1],
+                     [0, -1], [-1, -1]]
         # 0, 45, 90, 135, 180, 225, 270, 315
 
         for shift in shiftList:
@@ -237,7 +240,7 @@ class AnalyzeData(object):
         generator returns 4 closest neighbors to a raster grid location,
         that is, all points touching excluding the diagonals.
         """
-        shiftList = [[-1,0],[0,1],[1,0],[0,-1]]
+        shiftList = [[-1, 0], [0, 1], [1, 0], [0, -1]]
         # 0, 90, 180, 270
 
         for shift in shiftList:
@@ -261,9 +264,24 @@ class AnalyzeData(object):
         masterGridPoint = GridPoint(x, y, elevation)
         equalHeightHash = defaultdict(list)
         equalHeightHash[x].append(y)
+        nesteddict = lambda: defaultdict(nesteddict)
+        edgeHash = nesteddict()  # {X : { Y : EdgePoint}}
+        inverseEdgeHash = nesteddict()  # Inverse Edgepoint (shore).
         toBeAnalyzed = [masterGridPoint]
 
-        # Loop until pool of equalheight neighbors has been exhausted.
+        # Helper function for equal neighbors.
+        def addEqual():
+            if edgeHash[gridPoint.x][gridPoint.y]:
+                    edgeHash[gridPoint.x][gridPoint.y]. \
+                         equalNeighbors.append(branch)
+            # Does not exist? Create.
+            else:
+                edgeHash[gridPoint.x][gridPoint.y] = \
+                    EdgePoint(gridPoint.x, gridPoint.y,
+                              gridPoint.elevation,
+                              [], [branch])
+
+        # Loop until pool of equalHeight neighbors has been exhausted.
         while toBeAnalyzed:
             gridPoint = toBeAnalyzed.pop()
             neighbors = self.iterateDiagonal(gridPoint.x, gridPoint.y)
@@ -273,8 +291,41 @@ class AnalyzeData(object):
                     branch = GridPoint(_x, _y, elevation)
                     equalHeightHash[_x].append(_y)
                     toBeAnalyzed.append(branch)
+                    addEqual()
+                # Equal and exempt? add to equal neighbor list.
+                elif elevation == gridPoint.elevation:
+                    addEqual()
+                elif elevation != gridPoint.elevation:
+                    # EdgePoint Object Exists? append nonEqual
+                    if edgeHash[gridPoint.x][gridPoint.y]:
+                        edgeHash[gridPoint.x][gridPoint.y]. \
+                            nonEqualNeighbors.append(GridPoint(
+                                 _x, _y, elevation))
+                    # Does not exist? Create.
+                    else:
+                        edgeHash[gridPoint.x][gridPoint.y] = \
+                            EdgePoint(gridPoint.x, gridPoint.y,
+                                      gridPoint.elevation,
+                                      [GridPoint(_x, _y, elevation)], [])
+
+                    # Add inverse EdgePoints (aka shores).
+                    if inverseEdgeHash[_x][_y]:
+                        inverseEdgeHash[_x][_y].addEdge(
+                            edgeHash[gridPoint.x][gridPoint.y])
+                    else:
+                        inverseEdgeHash[_x][_y] = \
+                            InverseEdgePoint(_x, _y, elevation,
+                                             [edgeHash[gridPoint.x]
+                                              [gridPoint.y]])
+
         return MultiPoint(coordinateHashToGridPointList(equalHeightHash),
-                          masterGridPoint.elevation, self)
+                          masterGridPoint.elevation, self,
+                          edgePoints=EdgePointContainer(
+                              edgePointIndex=edgeHash),
+                          inverseEdgePoints=InverseEdgePointContainer(
+                              inverseEdgePointIndex=inverseEdgeHash,
+                              analyzeData=self)
+                          )
 
 
 class EqualHeightBlob(object):
@@ -287,22 +338,73 @@ class EqualHeightBlob(object):
         self.equalHeightBlob = list()  # [[x,y]]
         self.equalHeightHash = defaultdict(list)
         self.equalHeightHash[x].append(y)
+
+        nesteddict = lambda: defaultdict(nesteddict)
+        self.edgeHash = nesteddict()  # {X : { Y : EdgePoint}}
+        self.inverseEdgeHash = nesteddict()  # Inverse Edgepoint (shore).
+
         self.buildBlob([self.gridPoint])
 
     def buildBlob(self, toBeAnalyzed):
+
+        def addEqual(branch):
+            if self.edgeHash[gridPoint.x][gridPoint.y]:
+                self.edgeHash[gridPoint.x][gridPoint.y]. \
+                    equalNeighbors.append(branch)
+            # Does not exist? Create.
+            else:
+                self.edgeHash[gridPoint.x][gridPoint.y] = \
+                    EdgePoint(gridPoint.x, gridPoint.y,
+                              gridPoint.elevation,
+                              [], [branch])
+
         while toBeAnalyzed:
             gridPoint = toBeAnalyzed.pop()
             neighbors = self.analysis.iterateDiagonal(gridPoint.x, gridPoint.y)
             for _x, _y, elevation in neighbors:
+                branch = GridPoint(_x, _y, elevation)
                 if elevation == self.gridPoint.elevation and _y not in\
-                                self.equalHeightHash[_x]:
-                    branch = GridPoint(_x, _y, elevation)
+                                    self.equalHeightHash[_x]:
                     self.equalHeightHash[_x].append(_y)
                     toBeAnalyzed.append(branch)
-        self.equalHeightBlob = MultiPoint(coordinateHashToGridPointList(
-                                          self.equalHeightHash),
-                                          self.gridPoint.elevation,
-                                          self.analysis)
+                    addEqual(branch)
+                elif elevation == self.gridPoint.elevation:
+                    addEqual(branch)
+                # Non Equal?
+                elif elevation != self.gridPoint.elevation:
+                    # EdgePoint Object Exists? append nonEqual
+                    if self.edgeHash[gridPoint.x][gridPoint.y]:
+                        self.edgeHash[gridPoint.x][gridPoint.y].\
+                            nonEqualNeighbors.append(branch)
+                    # Does not exist? Create.
+                    else:
+                        self.edgeHash[gridPoint.x][gridPoint.y] = \
+                            EdgePoint(gridPoint.x, gridPoint.y,
+                                      gridPoint.elevation,
+                                      [branch], [])
+
+                    # Add inverse EdgePoints (aka shores).
+                    if self.inverseEdgeHash[_x][_y]:
+                        self.inverseEdgeHash[_x][_y].addEdge(
+                            self.edgeHash[gridPoint.x][gridPoint.y])
+                    else:
+                        self.inverseEdgeHash[_x][_y] = \
+                            InverseEdgePoint(_x, _y, elevation,
+                                  [self.edgeHash[gridPoint.x][gridPoint.y]])
+
+        self.equalHeightBlob =\
+            MultiPoint(coordinateHashToGridPointList(
+                       self.equalHeightHash),
+                       self.gridPoint.elevation,
+                       self.analysis,
+                       edgePoints=
+                       EdgePointContainer(edgePointIndex=
+                                          self.edgeHash),
+                       inverseEdgePoints=
+                       InverseEdgePointContainer(inverseEdgePointIndex=
+                                                 self.inverseEdgeHash,
+                                                 analyzeData=self.analysis)
+                       )
 
 
 def candidateGridHash(cardinality, resolution=1):
