@@ -53,8 +53,7 @@ class AnalyzeData(object):
             index += 1
             if not index % 100000:
                 self.logger.info("{}/{} - {}%".format(index, self.data.size,
-                                           (index/self.data.size)*100))
-
+                                (index/self.data.size)*100))
 
             # Check for summit
             feature = self._summit_and_saddle(x, y)
@@ -175,7 +174,7 @@ class AnalyzeData(object):
                 # If the elevation of a neighbor is equal, Determine
                 #  entire blob of equal height neighbors.
                 elif elevation == self.elevation and _y not in\
-                 self.skipSummitAnalysis[_x]:
+                    self.skipSummitAnalysis[_x]:
                     self.blob = self.equalHeightBlob(_x, _y, elevation)
                     # Iterate through all the points in the equalHeight Blob.
                     for point in self.blob.points:
@@ -223,7 +222,8 @@ class AnalyzeData(object):
         Generator returns 8 closest neighbors to a raster grid location,
         that is, all points touching including the diagonals.
         """
-        shiftList = [[-1,0],[-1,1],[0,1],[1,1],[1,0],[1,-1],[0,-1],[-1,-1]]
+        shiftList = [[-1, 0], [-1, 1], [0, 1], [1, 1], [1, 0], [1, -1],
+                     [0, -1], [-1, -1]]
         # 0, 45, 90, 135, 180, 225, 270, 315
 
         for shift in shiftList:
@@ -240,7 +240,7 @@ class AnalyzeData(object):
         generator returns 4 closest neighbors to a raster grid location,
         that is, all points touching excluding the diagonals.
         """
-        shiftList = [[-1,0],[0,1],[1,0],[0,-1]]
+        shiftList = [[-1, 0], [0, 1], [1, 0], [0, -1]]
         # 0, 90, 180, 270
 
         for shift in shiftList:
@@ -265,15 +265,15 @@ class AnalyzeData(object):
         equalHeightHash = defaultdict(list)
         equalHeightHash[x].append(y)
         nesteddict = lambda: defaultdict(nesteddict)
-        edgeHash = nesteddict() # {X : { Y : EdgePoint}}
-        inverseEdgeHash = nesteddict() # Inverse Edgepoint (shore).
+        edgeHash = nesteddict()  # {X : { Y : EdgePoint}}
+        inverseEdgeHash = nesteddict()  # Inverse Edgepoint (shore).
         toBeAnalyzed = [masterGridPoint]
 
         # Helper function for equal neighbors.
         def addEqual():
             if edgeHash[gridPoint.x][gridPoint.y]:
                     edgeHash[gridPoint.x][gridPoint.y]. \
-                    equalNeighbors.append(branch)
+                         equalNeighbors.append(branch)
             # Does not exist? Create.
             else:
                 edgeHash[gridPoint.x][gridPoint.y] = \
@@ -296,11 +296,11 @@ class AnalyzeData(object):
                 elif elevation == gridPoint.elevation:
                     addEqual()
                 elif elevation != gridPoint.elevation:
-                # EdgePoint Object Exists? append nonEqual
+                    # EdgePoint Object Exists? append nonEqual
                     if edgeHash[gridPoint.x][gridPoint.y]:
                         edgeHash[gridPoint.x][gridPoint.y]. \
                             nonEqualNeighbors.append(GridPoint(
-                            _x, _y, elevation))
+                                 _x, _y, elevation))
                     # Does not exist? Create.
                     else:
                         edgeHash[gridPoint.x][gridPoint.y] = \
@@ -320,9 +320,9 @@ class AnalyzeData(object):
 
         return MultiPoint(coordinateHashToGridPointList(equalHeightHash),
                           masterGridPoint.elevation, self,
-                          edgePoints = EdgePointContainer(
-                              edgePointIndex = edgeHash),
-                          inverseEdgePoints = InverseEdgePointContainer(
+                          edgePoints=EdgePointContainer(
+                              edgePointIndex=edgeHash),
+                          inverseEdgePoints=InverseEdgePointContainer(
                               inverseEdgePointIndex=inverseEdgeHash,
                               analyzeData=self)
                           )
@@ -340,8 +340,8 @@ class EqualHeightBlob(object):
         self.equalHeightHash[x].append(y)
 
         nesteddict = lambda: defaultdict(nesteddict)
-        self.edgeHash = nesteddict() # {X : { Y : EdgePoint}}
-        self.inverseEdgeHash = nesteddict() # Inverse Edgepoint (shore).
+        self.edgeHash = nesteddict()  # {X : { Y : EdgePoint}}
+        self.inverseEdgeHash = nesteddict()  # Inverse Edgepoint (shore).
 
         self.buildBlob([self.gridPoint])
 
@@ -364,7 +364,7 @@ class EqualHeightBlob(object):
             for _x, _y, elevation in neighbors:
                 branch = GridPoint(_x, _y, elevation)
                 if elevation == self.gridPoint.elevation and _y not in\
-                                self.equalHeightHash[_x]:
+                                    self.equalHeightHash[_x]:
                     self.equalHeightHash[_x].append(_y)
                     toBeAnalyzed.append(branch)
                     addEqual(branch)
@@ -390,18 +390,18 @@ class EqualHeightBlob(object):
                     else:
                         self.inverseEdgeHash[_x][_y] = \
                             InverseEdgePoint(_x, _y, elevation,
-                                [self.edgeHash[gridPoint.x][gridPoint.y]])
+                                  [self.edgeHash[gridPoint.x][gridPoint.y]])
 
         self.equalHeightBlob =\
             MultiPoint(coordinateHashToGridPointList(
                        self.equalHeightHash),
                        self.gridPoint.elevation,
                        self.analysis,
-                       edgePoints =
-                       EdgePointContainer(edgePointIndex =
+                       edgePoints=
+                       EdgePointContainer(edgePointIndex=
                                           self.edgeHash),
-                       inverseEdgePoints =
-                       InverseEdgePointContainer(inverseEdgePointIndex =
+                       inverseEdgePoints=
+                       InverseEdgePointContainer(inverseEdgePointIndex=
                                                  self.inverseEdgeHash,
                                                  analyzeData=self.analysis)
                        )

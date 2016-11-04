@@ -287,9 +287,11 @@ class Island(BaseGridPointContainer):
         """
         mapEdge = list()
         for point in self.points:
-            if point.x == 0 or point.x == self.analyzeData.self.analyzeData.max_x:
+            if point.x == 0 or point.x ==\
+                    self.analyzeData.self.analyzeData.max_x:
                 mapEdge.append(point.toSpotElevation(self.analyzeData))
-            if point.y == 0 or point.y == self.analyzeData.self.analyzeData.max_y:
+            if point.y == 0 or point.y ==\
+                    self.analyzeData.self.analyzeData.max_y:
                 mapEdge.append(point.toSpotElevation(self.analyzeData))
         return mapEdge
 
@@ -338,7 +340,7 @@ class MultiPoint(_Base):
     :param analyzeData: AnalyzeData object.
     """
     def __init__(self, points, elevation, analyzeData,
-                 edgePoints = None, inverseEdgePoints = None):
+                 edgePoints=None, inverseEdgePoints=None):
         super(MultiPoint, self).__init__()
         self.points = points  # BaseGridPoint Object.
         self.elevation = elevation
@@ -357,7 +359,7 @@ class MultiPoint(_Base):
 
     def findMapEdge(self):
         """
-        :return: list of SpotElevation Points along the map Edge.
+        :return: list of :class:`SpotElevation` Points along the map Edge.
         That is, the edge of the dataset map.
         """
         mapEdge = list()
@@ -379,6 +381,7 @@ class MultiPoint(_Base):
         """
         return self.edgePoints
 
+    # Obsolete. Kept for debugging.
     def findShores(self, edge=None):
         """
         Function will find all shores along pond-like multipoint. and add all
@@ -544,10 +547,10 @@ class EdgePoint(GridPoint):
     :param x: x coordinate
     :param y: y coordinate
     :param elevation: elevation in meters
-    :param nonEqualNeighbors: list of GridPoints that are non equal in height
-           in comparison to the EdgePoint.
-    :param equalNeighbors: list of GridPoints that are equal in height
-           in comparison to the EdgePoint.
+    :param nonEqualNeighbors: list of :class:`GridPoints` that are non equal
+           in height in comparison to the :class:`EdgePoint`.
+    :param equalNeighbors: list of :class:`GridPoint`s that are equal in
+           height in comparison to the EdgePoint.
     """
     def __init__(self, x, y, elevation, nonEqualNeighbors, equalNeighbors):
         super(EdgePoint, self).__init__(x, y, elevation)
@@ -568,8 +571,8 @@ class EdgePoint(GridPoint):
 
 class InverseEdgePoint(GridPoint):
     """
-    A Shore point, to be used in conjunction with EdgePoints.
-    This keeps track shorePoints and their neighboring EdgePoints.
+    A Shore point, to be used in conjunction with :class:`EdgePoint`.
+    This keeps track shorePoints and their neighboring :class:`EdgePoint`s.
     :param x: x coordinate
     :param y: y coordinate
     :param elevation: elevation in meters
@@ -578,7 +581,7 @@ class InverseEdgePoint(GridPoint):
      :class:`InverseEdgePoint`
     """
     def __init__(self, x, y, elevation, edgePoints,
-                 inverseEdgePointNeighbors = []):
+                 inverseEdgePointNeighbors=[]):
         super(InverseEdgePoint, self).__init__(x, y, elevation)
         self.edgePoints = edgePoints
         self.inverseEdgePointNeighbors = inverseEdgePointNeighbors
@@ -600,16 +603,16 @@ class InverseEdgePoint(GridPoint):
 
 class EdgePointContainer(_Base):
     """
-    Container for EdgePoint type lists.
+    Container for :class:`EdgePoint` type lists.
     Allows for various list transformations.
-    :param edgePointList: list of EdgePoints to self.points
+    :param edgePointList: list of :class:`EdgePoint` to self.points
     :param edgePointIndex: {X: { Y: :class:`EdgePoint`}} passing this will
     automatically generate self.points
 
     """
-    def __init__(self, edgePointList = None,
-                 edgePointIndex = None,
-                 analyzeData = None):
+    def __init__(self, edgePointList=None,
+                 edgePointIndex=None,
+                 analyzeData=None):
         super(EdgePointContainer, self).__init__()
         if edgePointIndex:
             self.edgePointIndex = edgePointIndex
@@ -618,10 +621,6 @@ class EdgePointContainer(_Base):
         if edgePointList:
             self.points = edgePointList
         self.analyzeData = analyzeData
-
-    def edgeLinkedList(self):
-        pass
-
 
     def __repr__(self):
         return "<EdgePointContainer> {} Objects".format(len(self.points))
@@ -635,28 +634,34 @@ class EdgePointContainer(_Base):
 
 class InverseEdgePointContainer(_Base):
     """
-    Container for InverseEdgePoint type lists.
+    Container for :class:`InverseEdgePoint` type lists.
     Allows for various list transformations.
-    :param inverseEdgePointList: list of EdgePoints to self.points
+    :param inverseEdgePointList: list of :class:`InverseEdgePoint` to
+     self.points
     :param inverseEdgePointIndex: {X: { Y: :class:`InverseEdgePoint`}} passing
     this will automatically generate self.points
     """
-    def __init__(self, inverseEdgePointList = None,
-                 inverseEdgePointIndex = None,
-                 analyzeData = None):
+    def __init__(self, inverseEdgePointList=None,
+                 inverseEdgePointIndex=None,
+                 analyzeData=None):
         super(InverseEdgePointContainer, self).__init__()
         if inverseEdgePointIndex:
             self.inverseEdgePointIndex = inverseEdgePointIndex
             self.points = [v[1] for x, y in self.inverseEdgePointIndex.items()
-                                 for v in y.items()]
+                           for v in y.items()]
         if inverseEdgePointList:
             self.points = inverseEdgePointList
         self.analyzeData = analyzeData
         self.exemptPoints = defaultdict(list)
 
     def iterNeighborDiagonal(self, inverseEdgePoint):
-
-        shiftList = [[-1,0],[-1,1],[0,1],[1,1],[1,0],[1,-1],[0,-1],[-1,-1]]
+        """
+        Iterate through existing diagonal :class:`InverseEdgePoint`
+        neighbors.
+        :param inverseEdgePoint:
+        """
+        shiftList = [[-1, 0], [-1, 1], [0, 1], [1, 1], [1, 0], [1, -1],
+                     [0, -1], [-1, -1]]
         for shift in shiftList:
             x = inverseEdgePoint.x+shift[0]
             y = inverseEdgePoint.y+shift[1]
@@ -668,8 +673,13 @@ class InverseEdgePointContainer(_Base):
                 continue
 
     def iterNeighborOrthogonal(self, inverseEdgePoint):
+        """
+        Iterate through existing orthogonal :class:`InverseEdgePoint`
+        neighbors.
+        :param inverseEdgePoint:
+        """
 
-        shiftList = [[-1,0],[0,1],[1,0],[0,-1]]
+        shiftList = [[-1, 0], [0, 1], [1, 0], [0, -1]]
         for shift in shiftList:
             x = inverseEdgePoint.x + shift[0]
             y = inverseEdgePoint.y + shift[1]
@@ -682,7 +692,7 @@ class InverseEdgePointContainer(_Base):
 
     def findLinear(self):
         """
-        Returns a list of InverseEdgePoints in order.
+        Returns a list of :class:`InverseEdgePoint`s in order.
         :return:
         """
 
@@ -708,9 +718,8 @@ class InverseEdgePointContainer(_Base):
         # order the points
         scanOrder = edge + two + self.points
 
-        # Find a starting point with exactly 2 neighbors.
         while True:
-            rounds+=1
+            rounds += 1
             for point in (pt for pt in scanOrder
                           if pt.y not in self.exemptPoints[pt.x]):
                 neighbors = [x for x in self.iterNeighborOrthogonal(point)]
@@ -729,12 +738,11 @@ class InverseEdgePointContainer(_Base):
                 break
 
             if not len([pt for pt in self.points if pt.y not in
-                    self.exemptPoints[pt.x]]):
+                        self.exemptPoints[pt.x]]):
                 return shoreContainers
             if rounds > 100:
-                self.logger.info('fuck, something broke in {}'.format(self))
+                self.logger.info('Something broke in {}'.format(self))
                 return shoreContainers
-
 
     def branchChaser(self, masterPoint, originalPoint, firstPoint):
         """
@@ -769,7 +777,7 @@ class InverseEdgePointContainer(_Base):
             if len(neighbors) > 1:
                 for neighbor in neighbors:
                     commonEdgePoints =\
-                        len(set(neighbor.edgePoints).\
+                        len(set(neighbor.edgePoints).
                             intersection(lookbackPoint.edgePoints))
                     commonEdgeHash[commonEdgePoints].append(neighbor)
 
@@ -795,21 +803,21 @@ class InverseEdgePointContainer(_Base):
 
                         orderedList += self.branchChaser(masterPoint,
                                                          currentPoint,
-                                    level1CommonEdgeHash[max(
-                                        level1CommonEdgeHash.keys())][0])
+                                       level1CommonEdgeHash[max(
+                                            level1CommonEdgeHash.keys())][0])
                         continue
                 else:
                     # Follow the branch with the most common neighbors.
                     orderedList += self.branchChaser(masterPoint,
                                                      currentPoint,
                                                      commonEdgeHash[max(
-                                                     commonEdgeHash.keys())]
-                                                     [0])
+                                                       commonEdgeHash.keys())]
+                                                          [0])
                     continue
 
             # Not exempt? Add to the ordered list.
             if currentPoint.y not in self.exemptPoints[currentPoint.x]:
-                #Last modification in PR, delete this comment someday.
+                # Last modification in PR, delete this comment someday.
                 self.exemptPoints[currentPoint.x].append(currentPoint.y)
                 orderedList.append(currentPoint)
 
@@ -824,7 +832,8 @@ class InverseEdgePointContainer(_Base):
             currentPoint = neighbors[0]
 
     def __repr__(self):
-        return "<InverseEdgePointContainer> {} Objects".format(len(self.points))
+        return "<InverseEdgePointContainer>" \
+               " {} Objects".format(len(self.points))
 
     def __iter__(self):
         for inverseEdgePoint in self.points:
