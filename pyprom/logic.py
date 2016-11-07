@@ -91,6 +91,8 @@ class AnalyzeData(object):
             for shoreSet in pseudoShore:
                 for shorePoint in shoreSet.points:
 
+                    if not shorePoint.orthogonalEdgePoints():
+                        continue
                     if shorePoint.elevation > ptElevation:
                         shoreProfile += "H"
                     if shorePoint.elevation < ptElevation:

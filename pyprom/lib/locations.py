@@ -589,6 +589,27 @@ class InverseEdgePoint(GridPoint):
     def addEdge(self, edgepoint):
         self.edgePoints.append(edgepoint)
 
+    def orthogonalEdgePoints(self):
+        """
+        Returns all orthogonal edgePoints.
+        :return:
+        """
+        return [x for x in self.iterateOrthogonalEdgePoint()]
+
+
+    def iterateOrthogonalEdgePoint(self):
+        """
+        Iterate through all orthogonal Edgepoint Neighbors. these are UNORDERED
+        :return:
+        """
+        shiftList = [[-1, 0], [0, 1], [1, 0], [0, -1]]
+        for point in self.edgePoints:
+            if [sh for sh in shiftList if self.x + sh[0] == point.x and
+                self.y + sh[1] == point.y]:
+                yield point
+            else:
+                continue
+
     def __repr__(self):
         return ("<InverseEdgePoint> x: {}, y: {}, ele(m): {},"
                 " #EdgePoints {}, #InverseEdgePointNeighbors {}".
