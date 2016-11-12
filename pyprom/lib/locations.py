@@ -728,7 +728,7 @@ class InverseEdgePointContainer(_Base):
         # Subdivide these into two groups, edges and stubs.
 
         for point in (pt for pt in self.points):
-            neighbors = [x for x in self.iterNeighborOrthogonal(point)]
+            neighbors = [x for x in self.iterNeighborDiagonal(point)]
             if len(neighbors) == 1:
                 if point.x in [self.analyzeData.max_x, 0] or\
                                 point.y in [self.analyzeData.max_y, 0]:
@@ -743,7 +743,7 @@ class InverseEdgePointContainer(_Base):
             rounds += 1
             for point in (pt for pt in scanOrder
                           if pt.y not in self.exemptPoints[pt.x]):
-                neighbors = [x for x in self.iterNeighborOrthogonal(point)]
+                neighbors = [x for x in self.iterNeighborDiagonal(point)]
                 masterPoint = point
 
                 if not len(neighbors):
