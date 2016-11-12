@@ -219,10 +219,13 @@ class AnalyzeData(object):
                       edge=self.edge,
                       multiPoint=self.blob)
 
-    def iterateDiagonal(self, x, y):
+    def iterateDiagonal(self, x, y, orthoFlag = False):
         """
         Generator returns 8 closest neighbors to a raster grid location,
         that is, all points touching including the diagonals.
+        :param x: X
+        :param y: Y
+        :param orthoFlag: lets caller know if this is an orthogonal neighbor.
         """
         shiftList = [[-1, 0], [-1, 1], [0, 1], [1, 1], [1, 0], [1, -1],
                      [0, -1], [-1, -1]]
@@ -233,7 +236,14 @@ class AnalyzeData(object):
             _y = y+shift[1]
             if 0 <= _x <= self.max_x and \
                0 <= _y <= self.max_y:
-                yield _x, _y, self.data[_x, _y]
+                if orthoFlag:
+                    if 0 in shift:
+                        orthogonal = True
+                    else:
+                        orthogonal = False
+                    yield _x, _y, self.data[_x, _y], orthogonal
+                else:
+                    yield _x, _y, self.data[_x, _y]
             else:
                 continue
 
@@ -286,7 +296,7 @@ class AnalyzeData(object):
         # Loop until pool of equalHeight neighbors has been exhausted.
         while toBeAnalyzed:
             gridPoint = toBeAnalyzed.pop()
-            neighbors = self.iterateDiagonal(gridPoint.x, gridPoint.y)
+            neighbors = self.iterateOrthogonal(gridPoint.x, gridPoint.y)
             for _x, _y, elevation in neighbors:
                 if elevation == masterGridPoint.elevation and\
                                 _y not in equalHeightHash[_x]:
@@ -310,7 +320,8 @@ class AnalyzeData(object):
                                       gridPoint.elevation,
                                       [GridPoint(_x, _y, elevation)], [])
 
-                    # Add inverse EdgePoints (aka shores).
+                    # Add inverse EdgePoints (aka shores). We do this even if
+                    #  not orthogonal
                     if inverseEdgeHash[_x][_y]:
                         inverseEdgeHash[_x][_y].addEdge(
                             edgeHash[gridPoint.x][gridPoint.y])
@@ -319,6 +330,13 @@ class AnalyzeData(object):
                             InverseEdgePoint(_x, _y, elevation,
                                              [edgeHash[gridPoint.x]
                                               [gridPoint.y]])
+
+        # Foricibly populate inverse edgepoints with diagonal edgepoints.
+        for inverseEdgePoint in (v[1] for x, y in inverseEdgeHash.items() for v in y.items()):
+            neighbors = self.iterateDiagonal(inverseEdgePoint.x, inverseEdgePoint.y)
+            for _x, _y, elevation in neighbors:
+                if edgeHash[_x][_y] and edgeHash[_x][_y] not in inverseEdgePoint.edgePoints:
+                    inverseEdgePoint.addEdge(edgeHash[_x][_y])
 
         return MultiPoint(coordinateHashToGridPointList(equalHeightHash),
                           masterGridPoint.elevation, self,
@@ -362,8 +380,8 @@ class EqualHeightBlob(object):
 
         while toBeAnalyzed:
             gridPoint = toBeAnalyzed.pop()
-            neighbors = self.analysis.iterateDiagonal(gridPoint.x, gridPoint.y)
-            for _x, _y, elevation in neighbors:
+            neighbors = self.analysis.iterateOrthogonal(gridPoint.x, gridPoint.y)
+            for _x, _y, elevation, in neighbors:
                 branch = GridPoint(_x, _y, elevation)
                 if elevation == self.gridPoint.elevation and _y not in\
                                     self.equalHeightHash[_x]:
@@ -393,6 +411,13 @@ class EqualHeightBlob(object):
                         self.inverseEdgeHash[_x][_y] = \
                             InverseEdgePoint(_x, _y, elevation,
                                   [self.edgeHash[gridPoint.x][gridPoint.y]])
+
+        # Foricibly populate inverse edgepoints with diagonal edgepoints.
+        for inverseEdgePoint in (v[1] for x, y in self.inverseEdgeHash.items() for v in y.items()):
+            neighbors = self.analysis.iterateDiagonal(inverseEdgePoint.x, inverseEdgePoint.y)
+            for _x, _y, elevation in neighbors:
+                if self.edgeHash[_x][_y] and self.edgeHash[_x][_y] not in inverseEdgePoint.edgePoints:
+                    inverseEdgePoint.addEdge(self.edgeHash[_x][_y])
 
         self.equalHeightBlob =\
             MultiPoint(coordinateHashToGridPointList(
