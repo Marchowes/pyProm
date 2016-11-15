@@ -12,7 +12,7 @@ class _Base(object):
         self.logger = logging.getLogger('pyProm.{}'.format(__name__))
 
 
-class BaseCoordinate(_Base):
+class BaseCoordinate(object):
     """
     Base Coordinate, intended to be inherited from. This contains
     basic lat/long
@@ -172,7 +172,7 @@ class SpotElevationContainer(_Base):
     __unicode__ = __str__ = __repr__
 
 
-class BaseGridPoint(_Base):
+class BaseGridPoint(object):
     def __init__(self, x, y):
         """
         Basic Gridpoint.
