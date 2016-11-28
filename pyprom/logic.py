@@ -29,6 +29,8 @@ class AnalyzeData(object):
         self.span_latitude = self.datamap.span_latitude
         self.cardinalGrid = dict()
         self.skipSummitAnalysis = defaultdict(list)
+        self.summitObjects = SpotElevationContainer([])
+        self.saddleObjects = SpotElevationContainer([])
         # Relative Grid Hash -- in case we ever want to use this feature...
         for cardinality in ['N', 'S', 'E', 'W']:
             self.cardinalGrid[cardinality] = candidateGridHash(cardinality, 3)
@@ -56,15 +58,12 @@ class AnalyzeData(object):
                                 (index/self.data.size)*100))
 
             # Check for summit
-            feature = self._summit_and_saddle(x, y)
-            # Add summit object to list if it exists
-            if feature:
-                featureObjects.points.append(feature)
+            self._summit_and_saddle(x, y)
             # Reset variables, and go to next gridpoint.
             self.edge = False
             self.blob = None
             iterator.iternext()
-        return featureObjects
+        return self.summitObjects, self.saddleObjects
 
     def _summit_and_saddle(self, x, y):
         """
@@ -102,26 +101,31 @@ class AnalyzeData(object):
                     for exemptPoint in self.blob.points:
                         self.skipSummitAnalysis[exemptPoint.x] \
                             .append(exemptPoint.y)
-                    return Summit(self.datamap.x_position_latitude(x),
-                                  self.datamap.y_position_longitude(y),
-                                  self.elevation,
-                                  edge=self.edge,
-                                  multiPoint=self.blob)
+                    summit = Summit(self.datamap.x_position_latitude(x),
+                                    self.datamap.y_position_longitude(y),
+                                    self.elevation,
+                                    edge=self.edge,
+                                    multiPoint=self.blob)
+                    self.summitObjects.points.append(summit)
+                    return
 
-                if any(x in reducedNeighborProfile for x in saddleProfile):
+                elif any(x in reducedNeighborProfile for x in saddleProfile):
                     for exemptPoint in self.blob.points:
                         self.skipSummitAnalysis[exemptPoint.x] \
                             .append(exemptPoint.y)
-                    return Saddle(self.datamap.x_position_latitude(x),
-                                  self.datamap.y_position_longitude(y),
-                                  self.elevation,
-                                  edge=self.edge,
-                                  multiPoint=self.blob)
-            # Nothing There? Exempt.
+                    saddle = Saddle(self.datamap.x_position_latitude(x),
+                                    self.datamap.y_position_longitude(y),
+                                    self.elevation,
+                                    edge=self.edge,
+                                    multiPoint=self.blob)
+                    self.saddleObjects.points.append(saddle)
+                    return
+
+            # Nothing? Exempt points anyways.
             for exemptPoint in self.blob.points:
                 self.skipSummitAnalysis[exemptPoint.x] \
                     .append(exemptPoint.y)
-            return None
+            return
 
         # Begin the ardous task of analyzing points and multipoints
         neighbor = self.iterateDiagonal(x, y)
@@ -141,17 +145,19 @@ class AnalyzeData(object):
 
         reducedNeighborProfile = compressRepetetiveChars(neighborProfile)
         if reducedNeighborProfile == summitProfile:
-            return Summit(self.datamap.x_position_latitude(x),
-                          self.datamap.y_position_longitude(y),
-                          self.elevation,
-                          edge=self.edge)
+            summit = Summit(self.datamap.x_position_latitude(x),
+                            self.datamap.y_position_longitude(y),
+                            self.elevation,
+                            edge=self.edge)
+            self.summitObjects.points.append(summit)
 
-        if any(x in reducedNeighborProfile for x in saddleProfile):
-            return Saddle(self.datamap.x_position_latitude(x),
-                          self.datamap.y_position_longitude(y),
-                          self.elevation,
-                          edge=self.edge)
-        return None
+        elif any(x in reducedNeighborProfile for x in saddleProfile):
+            saddle =  Saddle(self.datamap.x_position_latitude(x),
+                             self.datamap.y_position_longitude(y),
+                             self.elevation,
+                             edge=self.edge)
+            self.saddleObjects.points.append(saddle)
+        return
 
     def _summit(self, x, y):
         """
