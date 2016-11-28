@@ -589,6 +589,27 @@ class InverseEdgePoint(GridPoint):
     def addEdge(self, edgepoint):
         self.edgePoints.append(edgepoint)
 
+    def orthogonalEdgePoints(self):
+        """
+        Returns all orthogonal edgePoints.
+        :return:
+        """
+        return [x for x in self.iterateOrthogonalEdgePoint()]
+
+
+    def iterateOrthogonalEdgePoint(self):
+        """
+        Iterate through all orthogonal Edgepoint Neighbors. these are UNORDERED
+        :return:
+        """
+        shiftList = [[-1, 0], [0, 1], [1, 0], [0, -1]]
+        for point in self.edgePoints:
+            if [sh for sh in shiftList if self.x + sh[0] == point.x and
+                self.y + sh[1] == point.y]:
+                yield point
+            else:
+                continue
+
     def __repr__(self):
         return ("<InverseEdgePoint> x: {}, y: {}, ele(m): {},"
                 " #EdgePoints {}, #InverseEdgePointNeighbors {}".
@@ -707,7 +728,7 @@ class InverseEdgePointContainer(_Base):
         # Subdivide these into two groups, edges and stubs.
 
         for point in (pt for pt in self.points):
-            neighbors = [x for x in self.iterNeighborOrthogonal(point)]
+            neighbors = [x for x in self.iterNeighborDiagonal(point)]
             if len(neighbors) == 1:
                 if point.x in [self.analyzeData.max_x, 0] or\
                                 point.y in [self.analyzeData.max_y, 0]:
@@ -722,7 +743,7 @@ class InverseEdgePointContainer(_Base):
             rounds += 1
             for point in (pt for pt in scanOrder
                           if pt.y not in self.exemptPoints[pt.x]):
-                neighbors = [x for x in self.iterNeighborOrthogonal(point)]
+                neighbors = [x for x in self.iterNeighborDiagonal(point)]
                 masterPoint = point
 
                 if not len(neighbors):
@@ -764,7 +785,7 @@ class InverseEdgePointContainer(_Base):
             # First, we find all neighbors who are not the original point,
             # a lookback point, the master point, or an already analyzed point.
 
-            neighbors = [pt for pt in self.iterNeighborOrthogonal(currentPoint)
+            neighbors = [pt for pt in self.iterNeighborDiagonal(currentPoint)
                          if pt not in [lookbackPoint,
                                        originalPoint,
                                        masterPoint]]
@@ -778,36 +799,42 @@ class InverseEdgePointContainer(_Base):
                 for neighbor in neighbors:
                     commonEdgePoints =\
                         len(set(neighbor.edgePoints).
-                            intersection(lookbackPoint.edgePoints))
+                            intersection(currentPoint.edgePoints))
                     commonEdgeHash[commonEdgePoints].append(neighbor)
 
                 # Look for the neighbors with the most EdgePoints in common
                 if len(commonEdgeHash[max(commonEdgeHash.keys())]) != 1:
                     level1CommonEdgeHash = defaultdict(list)
+                    self.logger.debug("Highly unusual Branch "
+                                               "Exception! on {}".format(self))
                     # a bunch of neighbors with no common EdgePoints? Lets
                     # look for common edges with the neighbors
-                    if max(commonEdgeHash.keys()) == 0:
-                        for nei in commonEdgeHash[0]:
-                            level1CommonEdgePoints = len(nei.edgePoints)
-                            level1CommonEdgeHash[level1CommonEdgePoints].\
-                                append(nei)
 
-                        if len(level1CommonEdgeHash[max(
-                                level1CommonEdgeHash.keys())]) != 1:
-                            # Fucking hell, they're equal. Guess we'll just
-                            # choose the first one anyways.
-                            self.logger.debug("Highly unusual Branch "
-                                              "Exception! on {}".format(self))
-                            self.logger.debug(
-                                "TroubleMakers {}".format(currentPoint))
 
-                        orderedList += self.branchChaser(masterPoint,
-                                                         currentPoint,
-                                       level1CommonEdgeHash[max(
-                                            level1CommonEdgeHash.keys())][0])
-                        continue
+                    # if max(commonEdgeHash.keys()) == 0:
+                    #     for nei in commonEdgeHash[0]:
+                    #         level1CommonEdgePoints = len(nei.edgePoints)
+                    #         level1CommonEdgeHash[level1CommonEdgePoints].\
+                    #             append(nei)
+                    #
+                    #     if len(level1CommonEdgeHash[max(
+                    #             level1CommonEdgeHash.keys())]) != 1:
+                    #         # Fucking hell, they're equal. Guess we'll just
+                    #         # choose the first one anyways.
+                    #         self.logger.debug("Highly unusual Branch "
+                    #                           "Exception! on {}".format(self))
+                    #         self.logger.debug(
+                    #             "TroubleMakers {}".format(currentPoint))
+                    #
+                    orderedList += self.branchChaser(masterPoint,
+                                                  currentPoint,
+                                                  commonEdgeHash[max(
+                                                  commonEdgeHash.keys())][0])
+                    continue
                 else:
                     # Follow the branch with the most common neighbors.
+                    if currentPoint.y not in self.exemptPoints[currentPoint.x]:
+                        self.exemptPoints[currentPoint.x].append(currentPoint.y)
                     orderedList += self.branchChaser(masterPoint,
                                                      currentPoint,
                                                      commonEdgeHash[max(
