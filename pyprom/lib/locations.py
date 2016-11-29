@@ -225,7 +225,7 @@ class GridPoint(BaseGridPoint):
     __unicode__ = __str__ = __repr__
 
 
-class BaseGridPointContainer(_Base):
+class BaseGridPointContainer(object):
     """
     Base Grid Point Container.
     """
@@ -631,6 +631,21 @@ class EdgePointContainer(_Base):
 
     __unicode__ = __str__ = __repr__
 
+class HighEdgeContainer(object):
+    """
+    Container for High Inverse Edges around MultiPoint Blobs.
+    """
+    def __init__(self, points):
+        self.points = points
+
+class ShoreContainer(BaseGridPointContainer):
+    """
+    Container for Shore Segments.
+    """
+    def __init__(self, gridPointList, mapEdge = False):
+        super(ShoreContainer, self).__init__(gridPointList)
+        self.mapEdge = mapEdge
+
 
 class InverseEdgePointContainer(_Base):
     """
@@ -643,7 +658,7 @@ class InverseEdgePointContainer(_Base):
     """
     def __init__(self, inverseEdgePointList=None,
                  inverseEdgePointIndex=None,
-                 analyzeData=None):
+                 analyzeData=None, mapEdge = False):
         super(InverseEdgePointContainer, self).__init__()
         if inverseEdgePointIndex:
             self.inverseEdgePointIndex = inverseEdgePointIndex
@@ -653,6 +668,8 @@ class InverseEdgePointContainer(_Base):
             self.points = inverseEdgePointList
         self.analyzeData = analyzeData
         self.exemptPoints = defaultdict(list)
+        self.mapEdge = mapEdge
+        self.branchMapEdge = False
 
     def iterNeighborDiagonal(self, inverseEdgePoint):
         """
@@ -690,17 +707,38 @@ class InverseEdgePointContainer(_Base):
             else:
                 continue
 
+    def findHighEdges(self):
+        shoreContainers = self.findLinear()
+        if self.mapEdge:
+            for shore in shoreContainers:
+
+                pass
+            #containersWithEdges = [x for x in shoreContainers if x.]
+
+        # Look for Map Edges
+
+        # Fill in Map Edges with filler points
+
+        # Connect all edge loops
+
+        # Generate linear string. Set a flag if we know this is not a summit.
+        # Return as "outside loop" object
+
+        # look at all internal edges and return these as some sort of "inside edge" object
+
+
+
+
     def findLinear(self):
         """
-        Returns a list of :class:`InverseEdgePoint`s in order.
-        :return:
+        :return: list of GridPoint containers representing individual edges
         """
 
         shoreContainers = list()
         self.exemptPoints = defaultdict(list)
 
         rounds = 0
-        edge = list()
+        self.edge = list()
         two = list()
 
         # Find points with exactly one neighbor. These are edgepoints.
@@ -711,12 +749,12 @@ class InverseEdgePointContainer(_Base):
             if len(neighbors) == 1:
                 if point.x in [self.analyzeData.max_x, 0] or\
                                 point.y in [self.analyzeData.max_y, 0]:
-                    edge.append(point)
+                    self.edge.append(point)
             if len(neighbors) == 2:
                 two.append(point)
 
         # order the points
-        scanOrder = edge + two + self.points
+        scanOrder = self.edge + two + self.points
 
         while True:
             rounds += 1
@@ -726,15 +764,20 @@ class InverseEdgePointContainer(_Base):
                 masterPoint = point
 
                 if not len(neighbors):
-                    shoreContainers.append(GridPointContainer([point]))
                     self.exemptPoints[point.x].append(point.y)
+                    if point.x in (0, self.analyzeData.max_x) or \
+                                    point.y in (0, self.analyzeData.max_y):
+                        shoreContainers.append(ShoreContainer([point], True))
+                    else:
+                        shoreContainers.append(ShoreContainer([point]))
                     break
 
                 firstPoint = neighbors[0]
-                shoreContainers.append(GridPointContainer(
+                shoreContainers.append(ShoreContainer(
                     self.branchChaser(masterPoint,
                                       masterPoint,
-                                      firstPoint)))
+                                      firstPoint), self.branchMapEdge))
+                self.branchMapEdge = False
                 break
 
             if not len([pt for pt in self.points if pt.y not in
@@ -774,6 +817,9 @@ class InverseEdgePointContainer(_Base):
             # More than one neighbor? We'll need to look back at the last
             # point and find how common neighbors we have.
             commonEdgeHash = defaultdict(list)
+            if currentPoint.x in (0, self.analyzeData.max_x) or\
+                            currentPoint.y in (0, self.analyzeData.max_y):
+                self.branchMapEdge = True
             if len(neighbors) > 1:
                 for neighbor in neighbors:
                     commonEdgePoints =\

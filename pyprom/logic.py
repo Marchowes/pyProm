@@ -7,6 +7,7 @@ from collections import defaultdict
 from lib.locations import (SpotElevationContainer,
                            Summit, Saddle,
                            GridPoint, MultiPoint,
+                           GridPoint, MultiPoint,
                            EdgePoint, InverseEdgePoint,
                            EdgePointContainer,
                            InverseEdgePointContainer)
@@ -136,8 +137,10 @@ class AnalyzeData(object):
             # a special MultiPoint analysis function.
             if elevation == self.elevation and _y not in\
                             self.skipSummitAnalysis[_x]:
-                feature = _analyze_multipoint(_x, _y, elevation)
-                return feature
+                _analyze_multipoint(_x, _y, elevation)
+                return
+            if _x in (self.max_x, 0) or _y in (self.max_y, 0):
+                self.edge = True
             if elevation > self.elevation:
                 neighborProfile += "H"
             if elevation < self.elevation:
@@ -158,70 +161,6 @@ class AnalyzeData(object):
                              edge=self.edge)
             self.saddleObjects.points.append(saddle)
         return
-
-    def _summit(self, x, y):
-        """
-        Summit Scanning Function. Determines if point is a summit.
-        :param x: x coordinate
-        :param y: y coordinate
-        :return: Summit Object
-        """
-
-        def analyze_summit():
-            """
-            Negative analysis for summit. Returns False
-            if not a summit, True if it is.
-            """
-            neighbor = self.iterateDiagonal(x, y)
-            for _x, _y, elevation in neighbor:
-                if elevation > self.elevation:
-                    return False  # Higher Neighbor? Not a summit.
-
-                # If the elevation of a neighbor is equal, Determine
-                #  entire blob of equal height neighbors.
-                elif elevation == self.elevation and _y not in\
-                    self.skipSummitAnalysis[_x]:
-                    self.blob = self.equalHeightBlob(_x, _y, elevation)
-                    # Iterate through all the points in the equalHeight Blob.
-                    for point in self.blob.points:
-                        pointNeighbor = self.iterateDiagonal(point.x, point.y)
-
-                        # iterate through all point neighbors, if a neighbor
-                        # is higher, then we know this is not a summit
-                        for px, py, ele in pointNeighbor:
-                            if ele > self.elevation:
-
-                                # Blob not a summit? well, exempt all points
-                                # from further analysis.
-                                for exemptPoint in self.blob.points:
-                                    self.skipSummitAnalysis[exemptPoint.x]\
-                                        .append(exemptPoint.y)
-                                return False
-
-                    # No higher neighbors? Implicitly a summit. Exempt points
-                    # from further analysis.
-                    for exemptPoint in self.blob.points:
-                        self.skipSummitAnalysis[exemptPoint.x].\
-                            append(exemptPoint.y)
-
-                # equal neighbor and exempt? not a summit.
-                elif elevation == self.elevation and _y in\
-                        self.skipSummitAnalysis[_x]:
-                    return False
-
-            # None of the above? Must be a summit.
-            return True
-
-        # Returns nothing if the summit analysis is negative.
-        if not analyze_summit():
-            return
-
-        # Made it this far? Must be a summit. Return Object
-        return Summit(self.datamap.x_position_latitude(x),
-                      self.datamap.y_position_longitude(y),
-                      self.elevation,
-                      edge=self.edge,
-                      multiPoint=self.blob)
 
     def iterateDiagonal(self, x, y):
         """
@@ -297,6 +236,8 @@ class AnalyzeData(object):
                     branch = GridPoint(_x, _y, elevation)
                     equalHeightHash[_x].append(_y)
                     toBeAnalyzed.append(branch)
+                    if _x in (self.max_x,0) or _y in (self.max_y,0):
+                        self.edge = True
                     addEqual()
                 # Equal and exempt? add to equal neighbor list.
                 elif elevation == gridPoint.elevation:
@@ -330,7 +271,7 @@ class AnalyzeData(object):
                               edgePointIndex=edgeHash),
                           inverseEdgePoints=InverseEdgePointContainer(
                               inverseEdgePointIndex=inverseEdgeHash,
-                              analyzeData=self)
+                              analyzeData=self, mapEdge = self.edge)
                           )
 
 
@@ -348,7 +289,7 @@ class EqualHeightBlob(object):
         nesteddict = lambda: defaultdict(nesteddict)
         self.edgeHash = nesteddict()  # {X : { Y : EdgePoint}}
         self.inverseEdgeHash = nesteddict()  # Inverse Edgepoint (shore).
-
+        self.edge = False
         self.buildBlob([self.gridPoint])
 
     def buildBlob(self, toBeAnalyzed):
@@ -373,6 +314,9 @@ class EqualHeightBlob(object):
                                     self.equalHeightHash[_x]:
                     self.equalHeightHash[_x].append(_y)
                     toBeAnalyzed.append(branch)
+                    if _x in (self.analysis.max_x,0) or _y in\
+                            (self.analysis.max_y,0):
+                        self.edge = True
                     addEqual(branch)
                 elif elevation == self.gridPoint.elevation:
                     addEqual(branch)
@@ -409,7 +353,8 @@ class EqualHeightBlob(object):
                        inverseEdgePoints=
                        InverseEdgePointContainer(inverseEdgePointIndex=
                                                  self.inverseEdgeHash,
-                                                 analyzeData=self.analysis)
+                                                 analyzeData=self.analysis,
+                                                 mapEdge = self.edge)
                        )
 
 
