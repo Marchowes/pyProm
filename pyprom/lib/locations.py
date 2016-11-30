@@ -683,8 +683,8 @@ class InverseEdgePointContainer(_Base):
             x = inverseEdgePoint.x+shift[0]
             y = inverseEdgePoint.y+shift[1]
             if self.inverseEdgePointIndex[x][y]:
-                if 0 <= x <= self.analyzeData.max_x\
-                        and 0 <= y <= self.analyzeData.max_y:
+                if -1 <= x <= self.analyzeData.max_x + 1\
+                        and -1 <= y <= self.analyzeData.max_y + 1:
                     yield self.inverseEdgePointIndex[x][y]
             else:
                 continue
@@ -701,8 +701,8 @@ class InverseEdgePointContainer(_Base):
             x = inverseEdgePoint.x + shift[0]
             y = inverseEdgePoint.y + shift[1]
             if self.inverseEdgePointIndex[x][y]:
-                if 0 <= x <= self.analyzeData.max_x \
-                        and 0 <= y <= self.analyzeData.max_y:
+                if -1 <= x <= self.analyzeData.max_x + 1 \
+                        and -1 <= y <= self.analyzeData.max_y + 1:
                     yield self.inverseEdgePointIndex[x][y]
             else:
                 continue

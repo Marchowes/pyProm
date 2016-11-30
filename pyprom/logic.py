@@ -128,6 +128,10 @@ class AnalyzeData(object):
                     .append(exemptPoint.y)
             return
 
+        # Label this as an mapEdge under the following condition
+        if x in (self.max_x, 0) or y in (self.max_y, 0):
+            self.edge = True
+
         # Begin the ardous task of analyzing points and multipoints
         neighbor = self.iterateDiagonal(x, y)
         neighborProfile = ""
@@ -139,8 +143,6 @@ class AnalyzeData(object):
                             self.skipSummitAnalysis[_x]:
                 _analyze_multipoint(_x, _y, elevation)
                 return
-            if _x in (self.max_x, 0) or _y in (self.max_y, 0):
-                self.edge = True
             if elevation > self.elevation:
                 neighborProfile += "H"
             if elevation < self.elevation:
@@ -178,7 +180,7 @@ class AnalyzeData(object):
                0 <= _y <= self.max_y:
                 yield _x, _y, self.data[_x, _y]
             else:
-                continue
+                yield _x, _y, None
 
     def iterateOrthogonal(self, x, y):
         """
@@ -195,7 +197,7 @@ class AnalyzeData(object):
                0 <= _y <= self.max_y:
                 yield _x, _y, self.data[_x, _y]
             else:
-                continue
+                yield _x, _y, None
 
     def equalHeightBlob(self, x, y, elevation):
         """
@@ -211,7 +213,7 @@ class AnalyzeData(object):
         equalHeightHash[x].append(y)
         nesteddict = lambda: defaultdict(nesteddict)
         edgeHash = nesteddict()  # {X : { Y : EdgePoint}}
-        inverseEdgeHash = nesteddict()  # Inverse Edgepoint (shore).
+        inverseEdgeHash = nesteddict()  # InverseEdgepoint (shore).
         toBeAnalyzed = [masterGridPoint]
 
         # Helper function for equal neighbors.
@@ -230,14 +232,15 @@ class AnalyzeData(object):
         while toBeAnalyzed:
             gridPoint = toBeAnalyzed.pop()
             neighbors = self.iterateDiagonal(gridPoint.x, gridPoint.y)
+            if gridPoint.x in (self.max_x, 0) or gridPoint.y in\
+                    (self.max_y, 0):
+                self.edge = True
             for _x, _y, elevation in neighbors:
                 if elevation == masterGridPoint.elevation and\
                                 _y not in equalHeightHash[_x]:
                     branch = GridPoint(_x, _y, elevation)
                     equalHeightHash[_x].append(_y)
                     toBeAnalyzed.append(branch)
-                    if _x in (self.max_x,0) or _y in (self.max_y,0):
-                        self.edge = True
                     addEqual()
                 # Equal and exempt? add to equal neighbor list.
                 elif elevation == gridPoint.elevation:
