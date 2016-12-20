@@ -5,6 +5,7 @@ import logging
 
 from collections import defaultdict, Counter
 from location_util import findExtremities
+import json
 
 
 class _Base(object):
@@ -57,15 +58,29 @@ class SpotElevation(BaseCoordinate):
             return None
 
     def __eq__(self, other):
-        return [self.latitude, self.longitude, self.elevation] ==\
-               [other.latitude, other.longitude, other.elevation]
+        latitude = longitude = olatitude = olongitude = None
+        if self.latitude:
+            latitude = round(self.latitude,6)
+        if self.longitude:
+            longitude = round(self.longitude,6)
+        if other.latitude:
+            olatitude = round(other.latitude,6)
+        if other.longitude:
+            olongitude = round(other.longitude,6)
+
+
+        return [latitude, longitude, self.elevation] ==\
+               [olatitude, olongitude, other.elevation]
 
     def __ne__(self, other):
-        return [self.latitude, self.longitude, self.elevation] != \
-               [other.latitude, other.longitude, other.elevation]
+        return ['.6f' % self.latitude, '.6f' % self.longitude,
+                self.elevation] != \
+               ['.6f' % other.latitude, '.6f' % other.longitude,
+                other.elevation]
 
     def __hash__(self):
-        return hash((self.latitude, self.longitude, self.elevation))
+        return hash(('.6f' % self.latitude, '.6f' % self.longitude,
+                     self.elevation))
 
     def __repr__(self):
         return "<SpotElevation> lat {} long {} El {}".format(self.latitude,
@@ -83,6 +98,12 @@ class Summit(SpotElevation):
         super(Summit, self).__init__(latitude, longitude,
                                      elevation, *args, **kwargs)
         self.multiPoint = kwargs.get('multiPoint', None)
+
+    def to_json(self):
+        to_json = {'latitude': self.latitude,
+                   'longitude': self.longitude,
+                   'elevation': self.elevation}
+        return json.dumps(to_json)
 
     def __repr__(self):
         return "<Summit> lat {} long {} El {} MultiPoint {}".format(
@@ -102,6 +123,13 @@ class Saddle(SpotElevation):
         super(Saddle, self).__init__(latitude, longitude,
                                      elevation, *args, **kwargs)
         self.multiPoint = kwargs.get('multiPoint', None)
+        self.highShores = kwargs.get('highShores', None)
+
+    def to_json(self):
+        to_json = {'latitude': self.latitude,
+                   'longitude': self.longitude,
+                   'elevation': self.elevation}
+        return json.dumps(to_json)
 
     def __repr__(self):
         return "<Saddle> lat {} long {} El {} MultiPoint {}".format(
@@ -633,10 +661,42 @@ class EdgePointContainer(_Base):
 
 class HighEdgeContainer(object):
     """
-    Container for High Inverse Edges around MultiPoint Blobs.
+    Container for High Edge Lists -- Specifically for the purpose of storing
+     high edge sections around Saddles.
+    :param shore: ordered list of GridPoint type objects
+    :param blobElevation: elevation (m) of blob.
     """
-    def __init__(self, points):
-        self.points = points
+    def __init__(self, shore , blobElevation):
+        # list of list of high edges.
+        self.highPoints = list()
+        highEdgePoints = list()
+        first = True
+        firstPoint = shore.points[0]
+        for shorePoint in shore.points:
+            if shorePoint.elevation > blobElevation:
+                highEdgePoints.append(shorePoint)
+                self.summitLike = False
+            elif shorePoint.elevation < blobElevation:
+                if first: first = False
+                if highEdgePoints:
+                    self.highPoints.append(highEdgePoints)
+                    highEdgePoints = list()
+            # If its elevation = None (map edge) and we're
+            # on a string of highs...
+            if not shorePoint.elevation and highEdgePoints:
+                highEdgePoints.append(shorePoint)
+        if first:
+            return
+        else:
+            # Do we have a queue of highpoints and was the first one
+            # also high? but we're not on the initial high string?
+            # then we need to string them together.
+            if highEdgePoints\
+                    and firstPoint.elevation > blobElevation\
+                    and not first:
+                 self.highPoints[0] = \
+                     highEdgePoints + self.highPoints[0]
+
 
 class ShoreContainer(BaseGridPointContainer):
     """
@@ -706,28 +766,6 @@ class InverseEdgePointContainer(_Base):
                     yield self.inverseEdgePointIndex[x][y]
             else:
                 continue
-
-    def findHighEdges(self):
-        shoreContainers = self.findLinear()
-        if self.mapEdge:
-            for shore in shoreContainers:
-
-                pass
-            #containersWithEdges = [x for x in shoreContainers if x.]
-
-        # Look for Map Edges
-
-        # Fill in Map Edges with filler points
-
-        # Connect all edge loops
-
-        # Generate linear string. Set a flag if we know this is not a summit.
-        # Return as "outside loop" object
-
-        # look at all internal edges and return these as some sort of "inside edge" object
-
-
-
 
     def findLinear(self):
         """
