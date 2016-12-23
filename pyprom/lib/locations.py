@@ -231,9 +231,13 @@ class GridPoint(BaseGridPoint):
         super(GridPoint, self).__init__(x, y)
         self.elevation = elevation
 
-    def toSpotElevation(self, analysis):
-        return SpotElevation(analysis.datamap.x_position_latitude(self.x),
-                             analysis.datamap.y_position_longitude(self.y),
+    def toSpotElevation(self, datamap):
+        """
+        :param datamap: Datamap object
+        :return: SpotElevation object
+        """
+        return SpotElevation(datamap.x_position_latitude(self.x),
+                             datamap.y_position_longitude(self.y),
                              self.elevation)
 
     def __eq__(self, other):
@@ -301,11 +305,11 @@ class Island(BaseGridPointContainer):
     Island Object accepts a list of shore points, and a MultiPoint object
     which is a Pond-type object. points are calculated in fillIn()
     """
-    def __init__(self, shoreGridPointList, analyzeData, pondElevation):
+    def __init__(self, shoreGridPointList, datamap, pondElevation):
         super(Island, self).__init__(shoreGridPointList)
         self.shoreGridPointList = self.points[:]
         self.pondElevation = pondElevation
-        self.analyzeData = analyzeData
+        self.datamap = datamap
         self.fillIn()
         self.mapEdge = self.findMapEdge()
 
@@ -315,12 +319,12 @@ class Island(BaseGridPointContainer):
         """
         mapEdge = list()
         for point in self.points:
-            if point.x == 0 or point.x ==\
-                    self.analyzeData.self.analyzeData.max_x:
-                mapEdge.append(point.toSpotElevation(self.analyzeData))
+            if point.x == 0 or point.x == \
+                    self.datamap.max_x:
+                mapEdge.append(point.toSpotElevation(self.datamap))
             if point.y == 0 or point.y ==\
-                    self.analyzeData.self.analyzeData.max_y:
-                mapEdge.append(point.toSpotElevation(self.analyzeData))
+                    self.datamap.max_y:
+                mapEdge.append(point.toSpotElevation(self.datamap))
         return mapEdge
 
     def fillIn(self):
@@ -339,8 +343,8 @@ class Island(BaseGridPointContainer):
         # Find all points not at pond-level.
         while toBeAnalyzed:
             gridPoint = toBeAnalyzed.pop()
-            neighbors = self.analyzeData.iterateDiagonal(gridPoint.x,
-                                                         gridPoint.y)
+            neighbors = self.datamap.iterateDiagonal(gridPoint.x,
+                                                     gridPoint.y)
             for _x, _y, elevation in neighbors:
 
                 if elevation != self.pondElevation and _y not in\
@@ -365,14 +369,14 @@ class MultiPoint(_Base):
     contains a list of all the points of this pond.
     :param points: list of BaseGridPoint objects
     :param elevation: elevation in meters
-    :param analyzeData: AnalyzeData object.
+    :param datamap: Datamap object.
     """
-    def __init__(self, points, elevation, analyzeData,
+    def __init__(self, points, elevation, datamap,
                  edgePoints=None, inverseEdgePoints=None):
         super(MultiPoint, self).__init__()
         self.points = points  # BaseGridPoint Object.
         self.elevation = elevation
-        self.analyzeData = analyzeData  # data analysis object.
+        self.datamap = datamap  # data analysis object.
         self.edgePoints = edgePoints
         self.inverseEdgePoints = inverseEdgePoints
         self.mapEdge = []
@@ -392,12 +396,12 @@ class MultiPoint(_Base):
         """
         mapEdge = list()
         for point in self.points:
-            if point.x == 0 or point.x == self.analyzeData.max_x:
+            if point.x == 0 or point.x == self.datamap.max_x:
                 newPoint = GridPoint(point.x, point.y, self.elevation)
-                mapEdge.append(newPoint.toSpotElevation(self.analyzeData))
-            if point.y == 0 or point.y == self.analyzeData.max_y:
+                mapEdge.append(newPoint.toSpotElevation(self.datamap))
+            if point.y == 0 or point.y == self.datamap.max_y:
                 newPoint = GridPoint(point.x, point.y, self.elevation)
-                mapEdge.append(newPoint.toSpotElevation(self.analyzeData))
+                mapEdge.append(newPoint.toSpotElevation(self.datamap))
         return mapEdge
 
     def findEdge(self):
@@ -471,7 +475,7 @@ class MultiPoint(_Base):
                 shoreList[listIndex].append(gridPoint)
             else:
                 continue
-            neighbors = self.analyzeData.iterateOrthogonal(gridPoint.x,
+            neighbors = self.datamap.iterateOrthogonal(gridPoint.x,
                                                            gridPoint.y)
             for _x, _y, elevation in neighbors:
                 candidate = GridPoint(_x, _y, elevation)
@@ -546,7 +550,7 @@ class MultiPoint(_Base):
         islands = list()
         for island in shoreList:
             islands.append(Island(island.points,
-                                  self.analyzeData,
+                                  self.datamap,
                                   self.elevation))
         return islands
 
@@ -556,8 +560,8 @@ class MultiPoint(_Base):
         :return: List of All blob points with lat/long instead of x/y
         """
         return [BaseCoordinate(
-                self.analyzeData.datamap.x_position_latitude(coord.x),
-                self.analyzeData.datamap.y_position_longitude(coord.y))
+                self.datamap.x_position_latitude(coord.x),
+                self.datamap.y_position_longitude(coord.y))
                 for coord in self.points]
 
     def __repr__(self):
@@ -640,7 +644,7 @@ class EdgePointContainer(_Base):
     """
     def __init__(self, edgePointList=None,
                  edgePointIndex=None,
-                 analyzeData=None):
+                 datamap=None):
         super(EdgePointContainer, self).__init__()
         if edgePointIndex:
             self.edgePointIndex = edgePointIndex
@@ -648,7 +652,7 @@ class EdgePointContainer(_Base):
                            for v in y.items()]
         if edgePointList:
             self.points = edgePointList
-        self.analyzeData = analyzeData
+        self.datamap = datamap
 
     def __repr__(self):
         return "<EdgePointContainer> {} Objects".format(len(self.points))
@@ -718,7 +722,7 @@ class InverseEdgePointContainer(_Base):
     """
     def __init__(self, inverseEdgePointList=None,
                  inverseEdgePointIndex=None,
-                 analyzeData=None, mapEdge = False):
+                 datamap=None, mapEdge = False):
         super(InverseEdgePointContainer, self).__init__()
         if inverseEdgePointIndex:
             self.inverseEdgePointIndex = inverseEdgePointIndex
@@ -726,7 +730,7 @@ class InverseEdgePointContainer(_Base):
                            for v in y.items()]
         if inverseEdgePointList:
             self.points = inverseEdgePointList
-        self.analyzeData = analyzeData
+        self.datamap = datamap
         self.exemptPoints = defaultdict(list)
         self.mapEdge = mapEdge
         self.branchMapEdge = False
@@ -743,8 +747,8 @@ class InverseEdgePointContainer(_Base):
             x = inverseEdgePoint.x+shift[0]
             y = inverseEdgePoint.y+shift[1]
             if self.inverseEdgePointIndex[x][y]:
-                if -1 <= x <= self.analyzeData.max_x + 1\
-                        and -1 <= y <= self.analyzeData.max_y + 1:
+                if -1 <= x <= self.datamap.max_x + 1\
+                        and -1 <= y <= self.datamap.max_y + 1:
                     yield self.inverseEdgePointIndex[x][y]
             else:
                 continue
@@ -761,8 +765,8 @@ class InverseEdgePointContainer(_Base):
             x = inverseEdgePoint.x + shift[0]
             y = inverseEdgePoint.y + shift[1]
             if self.inverseEdgePointIndex[x][y]:
-                if -1 <= x <= self.analyzeData.max_x + 1 \
-                        and -1 <= y <= self.analyzeData.max_y + 1:
+                if -1 <= x <= self.datamap.max_x + 1 \
+                        and -1 <= y <= self.datamap.max_y + 1:
                     yield self.inverseEdgePointIndex[x][y]
             else:
                 continue
@@ -785,8 +789,8 @@ class InverseEdgePointContainer(_Base):
         for point in (pt for pt in self.points):
             neighbors = [x for x in self.iterNeighborOrthogonal(point)]
             if len(neighbors) == 1:
-                if point.x in [self.analyzeData.max_x, 0] or\
-                                point.y in [self.analyzeData.max_y, 0]:
+                if point.x in [self.datamap.max_x, 0] or\
+                                point.y in [self.datamap.max_y, 0]:
                     self.edge.append(point)
             if len(neighbors) == 2:
                 two.append(point)
@@ -803,8 +807,8 @@ class InverseEdgePointContainer(_Base):
 
                 if not len(neighbors):
                     self.exemptPoints[point.x].append(point.y)
-                    if point.x in (0, self.analyzeData.max_x) or \
-                                    point.y in (0, self.analyzeData.max_y):
+                    if point.x in (0, self.datamap.max_x) or \
+                                    point.y in (0, self.datamap.max_y):
                         shoreContainers.append(ShoreContainer([point], True))
                     else:
                         shoreContainers.append(ShoreContainer([point]))
@@ -855,8 +859,8 @@ class InverseEdgePointContainer(_Base):
             # More than one neighbor? We'll need to look back at the last
             # point and find how common neighbors we have.
             commonEdgeHash = defaultdict(list)
-            if currentPoint.x in (0, self.analyzeData.max_x) or\
-                            currentPoint.y in (0, self.analyzeData.max_y):
+            if currentPoint.x in (0, self.datamap.max_x) or\
+                            currentPoint.y in (0, self.datamap.max_y):
                 self.branchMapEdge = True
             if len(neighbors) > 1:
                 for neighbor in neighbors:

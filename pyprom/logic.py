@@ -50,7 +50,7 @@ class AnalyzeData(object):
         # Iterate through numpy grid, and keep track of gridpoint coordinates.
         while not iterator.finished:
             x, y = iterator.multi_index
-            self.elevation = int(iterator[0])
+            self.elevation = float(iterator[0])
 
             # Quick Progress Meter. Needs refinement,
             index += 1
@@ -116,7 +116,6 @@ class AnalyzeData(object):
                 elif reducedNeighborProfile == summitProfile:
                     summitLike = True
                 else:
-                    #self.logger.info('REJECTED SUMMIT! {}, {}, {}'.format(x,y,ptElevation))
                     summitLike = False
                     break
                 outside = False
@@ -145,7 +144,7 @@ class AnalyzeData(object):
             self.edge = True
 
         # Begin the ardous task of analyzing points and multipoints
-        neighbor = self.iterateDiagonal(x, y)
+        neighbor = self.datamap.iterateDiagonal(x, y)
         shoreSet = GridPointContainer([])
         neighborProfile = ""
         for _x, _y, elevation in neighbor:
@@ -182,41 +181,6 @@ class AnalyzeData(object):
             self.saddleObjects.points.append(saddle)
         return
 
-    def iterateDiagonal(self, x, y):
-        """
-        Generator returns 8 closest neighbors to a raster grid location,
-        that is, all points touching including the diagonals.
-        """
-        shiftList = [[-1, 0], [-1, 1], [0, 1], [1, 1], [1, 0], [1, -1],
-                     [0, -1], [-1, -1]]
-        # 0, 45, 90, 135, 180, 225, 270, 315
-
-        for shift in shiftList:
-            _x = x+shift[0]
-            _y = y+shift[1]
-            if 0 <= _x <= self.max_x and \
-               0 <= _y <= self.max_y:
-                yield _x, _y, int(self.data[_x, _y])
-            else:
-                yield _x, _y, None
-
-    def iterateOrthogonal(self, x, y):
-        """
-        generator returns 4 closest neighbors to a raster grid location,
-        that is, all points touching excluding the diagonals.
-        """
-        shiftList = [[-1, 0], [0, 1], [1, 0], [0, -1]]
-        # 0, 90, 180, 270
-
-        for shift in shiftList:
-            _x = x+shift[0]
-            _y = y+shift[1]
-            if 0 <= _x <= self.max_x and\
-               0 <= _y <= self.max_y:
-                yield _x, _y, int(self.data[_x, _y])
-            else:
-                yield _x, _y, None
-
     def equalHeightBlob(self, x, y, elevation):
         """
         This function generates a list of coordinates that involve equal height
@@ -249,7 +213,7 @@ class AnalyzeData(object):
         # Loop until pool of equalHeight neighbors has been exhausted.
         while toBeAnalyzed:
             gridPoint = toBeAnalyzed.pop()
-            neighbors = self.iterateDiagonal(gridPoint.x, gridPoint.y)
+            neighbors = self.datamap.iterateDiagonal(gridPoint.x, gridPoint.y)
             if gridPoint.x in (self.max_x, 0) or gridPoint.y in\
                     (self.max_y, 0):
                 self.edge = True
@@ -287,12 +251,12 @@ class AnalyzeData(object):
                                               [gridPoint.y]])
 
         return MultiPoint(coordinateHashToGridPointList(equalHeightHash),
-                          masterGridPoint.elevation, self,
+                          masterGridPoint.elevation, self.datamap,
                           edgePoints=EdgePointContainer(
                               edgePointIndex=edgeHash),
                           inverseEdgePoints=InverseEdgePointContainer(
                               inverseEdgePointIndex=inverseEdgeHash,
-                              analyzeData=self, mapEdge = self.edge)
+                              datamap=self.datamap, mapEdge = self.edge)
                           )
 
 
@@ -300,8 +264,8 @@ class EqualHeightBlob(object):
     """
     I'm really just keeping this around for testing.
     """
-    def __init__(self, x, y, elevation, analysis):
-        self.analysis = analysis
+    def __init__(self, x, y, elevation, datamap):
+        self.datamap = datamap
         self.gridPoint = GridPoint(x, y, elevation)
         self.equalHeightBlob = list()  # [[x,y]]
         self.equalHeightHash = defaultdict(list)
@@ -328,15 +292,15 @@ class EqualHeightBlob(object):
 
         while toBeAnalyzed:
             gridPoint = toBeAnalyzed.pop()
-            neighbors = self.analysis.iterateDiagonal(gridPoint.x, gridPoint.y)
+            neighbors = self.datamap.iterateDiagonal(gridPoint.x, gridPoint.y)
             for _x, _y, elevation in neighbors:
                 branch = GridPoint(_x, _y, elevation)
                 if elevation == self.gridPoint.elevation and _y not in\
                                     self.equalHeightHash[_x]:
                     self.equalHeightHash[_x].append(_y)
                     toBeAnalyzed.append(branch)
-                    if _x in (self.analysis.max_x,0) or _y in\
-                            (self.analysis.max_y,0):
+                    if _x in (self.datamap.max_x,0) or _y in\
+                            (self.datamap.max_y,0):
                         self.edge = True
                     addEqual(branch)
                 elif elevation == self.gridPoint.elevation:
@@ -367,14 +331,14 @@ class EqualHeightBlob(object):
             MultiPoint(coordinateHashToGridPointList(
                        self.equalHeightHash),
                        self.gridPoint.elevation,
-                       self.analysis,
+                       self.datamap,
                        edgePoints=
                        EdgePointContainer(edgePointIndex=
                                           self.edgeHash),
                        inverseEdgePoints=
                        InverseEdgePointContainer(inverseEdgePointIndex=
                                                  self.inverseEdgeHash,
-                                                 analyzeData=self.analysis,
+                                                 datamap=self.datamap,
                                                  mapEdge = self.edge)
                        )
 
