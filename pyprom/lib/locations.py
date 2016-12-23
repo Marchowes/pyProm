@@ -23,6 +23,13 @@ class BaseCoordinate(object):
         self.latitude = latitude
         self.longitude = longitude
 
+    def to_dict(self):
+        return {'latitude': self.latitude,
+                'longitude': self.longitude}
+
+    def to_json(self, recurse=False):
+        return json.dumps(self.to_dict())
+
     def __eq__(self, other):
         return [self.latitude, self.longitude] ==\
                [other.latitude, other.longitude]
@@ -48,7 +55,26 @@ class SpotElevation(BaseCoordinate):
     def __init__(self, latitude, longitude, elevation, *args, **kwargs):
         super(SpotElevation, self).__init__(latitude, longitude)
         self.elevation = elevation
-        self.candidate = kwargs.get('edge', None)
+        self.edgeEffect = kwargs.get('edge', None)
+
+    def to_dict(self):
+        return {'latitude': self.latitude,
+                'longitude': self.longitude,
+                'elevation': self.elevation}
+
+    def to_json(self, recurse=False):
+        to_json = self.to_dict()
+        return json.dumps(to_json)
+
+    def toGridPoint(self, datamap):
+        """
+        :param datamap: Datamap object
+        :return: GridPoint object
+        """
+        return GridPoint(datamap.relative_position_latitude(self.latitude),
+                             datamap.relative_position_longitude(
+                                 self.longitude),
+                             self.elevation)
 
     @property
     def feet(self):
@@ -60,32 +86,33 @@ class SpotElevation(BaseCoordinate):
     def __eq__(self, other):
         latitude = longitude = olatitude = olongitude = None
         if self.latitude:
-            latitude = round(self.latitude,6)
+            latitude = round(self.latitude, 6)
         if self.longitude:
-            longitude = round(self.longitude,6)
+            longitude = round(self.longitude, 6)
         if other.latitude:
-            olatitude = round(other.latitude,6)
+            olatitude = round(other.latitude, 6)
         if other.longitude:
-            olongitude = round(other.longitude,6)
+            olongitude = round(other.longitude, 6)
 
 
         return [latitude, longitude, self.elevation] ==\
                [olatitude, olongitude, other.elevation]
 
     def __ne__(self, other):
-        return ['.6f' % self.latitude, '.6f' % self.longitude,
+        return [round(self.latitude, 6), round(self.longitude, 6),
                 self.elevation] != \
-               ['.6f' % other.latitude, '.6f' % other.longitude,
+               [round(other.latitude, 6), round(other.longitude, 6),
                 other.elevation]
 
     def __hash__(self):
-        return hash(('.6f' % self.latitude, '.6f' % self.longitude,
+        return hash((round(self.latitude, 6), round(self.longitude, 6),
                      self.elevation))
 
     def __repr__(self):
-        return "<SpotElevation> lat {} long {} El {}".format(self.latitude,
+        return "<SpotElevation> lat {} long {} {}ft, {}m".format(self.latitude,
                                                              self.longitude,
-                                                             self.feet)
+                                                             self.feet,
+                                                             self.elevation)
 
     __unicode__ = __str__ = __repr__
 
@@ -99,17 +126,24 @@ class Summit(SpotElevation):
                                      elevation, *args, **kwargs)
         self.multiPoint = kwargs.get('multiPoint', None)
 
-    def to_json(self):
-        to_json = {'latitude': self.latitude,
+    def to_dict(self, recurse=False):
+        to_dict = {'latitude': self.latitude,
                    'longitude': self.longitude,
                    'elevation': self.elevation}
+        if self.multiPoint and recurse:
+            to_dict['multipoint'] = self.multiPoint.to_dict()
+        return to_dict
+
+    def to_json(self, recurse=False):
+        to_json = self.to_dict(recurse=recurse)
         return json.dumps(to_json)
 
     def __repr__(self):
-        return "<Summit> lat {} long {} El {} MultiPoint {}".format(
+        return "<Summit> lat {} long {} {}ft {}m MultiPoint {}".format(
             self.latitude,
             self.longitude,
             self.feet,
+            self.elevation,
             bool(self.multiPoint))
 
     __unicode__ = __str__ = __repr__
@@ -125,17 +159,24 @@ class Saddle(SpotElevation):
         self.multiPoint = kwargs.get('multiPoint', None)
         self.highShores = kwargs.get('highShores', None)
 
-    def to_json(self):
-        to_json = {'latitude': self.latitude,
+    def to_dict(self, recurse=False):
+        to_dict = {'latitude': self.latitude,
                    'longitude': self.longitude,
                    'elevation': self.elevation}
+        if self.multiPoint and recurse:
+            to_dict['multipoint'] = self.multiPoint.to_dict()
+        return to_dict
+
+    def to_json(self, recurse=False):
+        to_json = self.to_dict(recurse=recurse)
         return json.dumps(to_json)
 
     def __repr__(self):
-        return "<Saddle> lat {} long {} El {} MultiPoint {}".format(
+        return "<Saddle> lat {} long {} {}ft {}m MultiPoint {}".format(
             self.latitude,
             self.longitude,
             self.feet,
+            self.elevation,
             bool(self.multiPoint))
 
     __unicode__ = __str__ = __repr__
@@ -211,6 +252,15 @@ class BaseGridPoint(object):
         self.x = x
         self.y = y
 
+    def to_dict(self):
+        return {'x': self.x,
+                'y': self.y}
+
+    def to_json(self):
+        to_json = self.to_dict()
+        return json.dumps(to_json)
+
+
     def __hash__(self):
         return hash((self.x, self.y))
 
@@ -230,6 +280,15 @@ class GridPoint(BaseGridPoint):
         """
         super(GridPoint, self).__init__(x, y)
         self.elevation = elevation
+
+    def to_dict(self):
+        return {'x': self.x,
+                'y': self.y,
+                'elevation': self.elevation}
+
+    def to_json(self):
+        to_json = self.to_dict()
+        return json.dumps(to_json)
 
     def toSpotElevation(self, datamap):
         """
@@ -380,6 +439,21 @@ class MultiPoint(_Base):
         self.edgePoints = edgePoints
         self.inverseEdgePoints = inverseEdgePoints
         self.mapEdge = []
+
+    def to_dict(self, verbose=True):
+        plist = list()
+        for point in self.points:
+            pdict = dict()
+            pdict['gridpoint'] = point.to_dict()
+            pdict['coordinate'] = \
+                BaseCoordinate(self.datamap.x_position_latitude(point.x),
+                               self.datamap.y_position_longitude(point.y)
+                              ).to_dict()
+            plist.append(pdict)
+        return plist
+
+    def to_json(self, verbose=False):
+        return json.dumps(self.to_dict(verbose=verbose))
 
     def findExtremities(self):
         """
@@ -672,7 +746,7 @@ class HighEdgeContainer(object):
     """
     def __init__(self, shore , blobElevation):
         # list of list of high edges.
-        self.highPoints = list()
+        self._highPoints = list()
         highEdgePoints = list()
         first = True
         firstPoint = shore.points[0]
@@ -683,7 +757,7 @@ class HighEdgeContainer(object):
             elif shorePoint.elevation < blobElevation:
                 if first: first = False
                 if highEdgePoints:
-                    self.highPoints.append(highEdgePoints)
+                    self._highPoints.append(highEdgePoints)
                     highEdgePoints = list()
             # If its elevation = None (map edge) and we're
             # on a string of highs...
@@ -698,8 +772,16 @@ class HighEdgeContainer(object):
             if highEdgePoints\
                     and firstPoint.elevation > blobElevation\
                     and not first:
-                 self.highPoints[0] = \
-                     highEdgePoints + self.highPoints[0]
+                 self._highPoints[0] = \
+                     highEdgePoints + self._highPoints[0]
+
+    @property
+    def highPoints(self):
+        return self._highPoints
+
+    def __repr__(self):
+        return "<HighEdgeContainer> {} Lists".format(len(self.highPoints))
+
 
 
 class ShoreContainer(BaseGridPointContainer):

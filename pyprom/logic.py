@@ -45,7 +45,6 @@ class AnalyzeData(object):
         """
         self.logger.info("Initiating Analysis")
         iterator = numpy.nditer(self.data, flags=['multi_index'])
-        featureObjects = SpotElevationContainer([])
         index = 0
         # Iterate through numpy grid, and keep track of gridpoint coordinates.
         while not iterator.finished:
