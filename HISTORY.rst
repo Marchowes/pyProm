@@ -1,7 +1,7 @@
 Release History
 --------------
 
-0.2.0 ()
+0.2.0 (November 23, 2016)
 +++++++++++++++++++++++
 *Fixed Edge Locator
 *100% accurate summit scan
