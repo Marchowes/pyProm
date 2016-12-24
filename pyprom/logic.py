@@ -32,16 +32,12 @@ class AnalyzeData(object):
         self.skipSummitAnalysis = defaultdict(list)
         self.summitObjects = SpotElevationContainer([])
         self.saddleObjects = SpotElevationContainer([])
-        # Relative Grid Hash -- in case we ever want to use this feature...
-        for cardinality in ['N', 'S', 'E', 'W']:
-            self.cardinalGrid[cardinality] = candidateGridHash(cardinality, 3)
 
     def analyze(self):
         """
         Analyze Routine.
-        Looks for summits, and returns a list of summits
-        FUTURE: Analysis for Cols, as well as capability of chasing equal
-        height neighbors.
+        Looks for :class:`Summit`s, and :class:`Saddle`s
+        return: (:class:`SpotElevationContainer`,SpotElevationContainer)
         """
         self.logger.info("Initiating Analysis")
         iterator = numpy.nditer(self.data, flags=['multi_index'])
@@ -55,7 +51,7 @@ class AnalyzeData(object):
             index += 1
             if not index % 100000:
                 self.logger.info("{}/{} - {}%".format(index, self.data.size,
-                                (index/self.data.size)*100))
+                                 (index/self.data.size)*100))
 
             # Check for summit
             self._summit_and_saddle(x, y)
@@ -83,7 +79,6 @@ class AnalyzeData(object):
             self.blob = self.equalHeightBlob(x, y, ptElevation)
             pseudoShores = self.blob.inverseEdgePoints.findLinear()
             summitLike = False
-            outside = True
 
             # Go find the shore of each blob, and assign a "H"
             # for points higher than the equalHeightBlob, and "L"
@@ -99,7 +94,8 @@ class AnalyzeData(object):
                         shoreProfile += "L"
                 reducedNeighborProfile = compressRepetetiveChars(shoreProfile)
 
-                if any(x in reducedNeighborProfile for x in saddleProfile) and not summitLike:
+                if any(x in reducedNeighborProfile for x in saddleProfile)\
+                        and not summitLike:
                     for exemptPoint in self.blob.points:
                         self.skipSummitAnalysis[exemptPoint.x] \
                             .append(exemptPoint.y)
@@ -117,8 +113,6 @@ class AnalyzeData(object):
                 else:
                     summitLike = False
                     break
-                outside = False
-
 
             if summitLike:
                 for exemptPoint in self.blob.points:
@@ -173,10 +167,10 @@ class AnalyzeData(object):
         elif any(x in reducedNeighborProfile for x in saddleProfile):
             shores = HighEdgeContainer(shoreSet, self.elevation)
             saddle = Saddle(self.datamap.x_position_latitude(x),
-                             self.datamap.y_position_longitude(y),
-                             self.elevation,
-                             edge=self.edge,
-                             highShores=shores)
+                            self.datamap.y_position_longitude(y),
+                            self.elevation,
+                            edge=self.edge,
+                            highShores=shores)
             self.saddleObjects.points.append(saddle)
         return
 
@@ -255,7 +249,7 @@ class AnalyzeData(object):
                               edgePointIndex=edgeHash),
                           inverseEdgePoints=InverseEdgePointContainer(
                               inverseEdgePointIndex=inverseEdgeHash,
-                              datamap=self.datamap, mapEdge = self.edge)
+                              datamap=self.datamap, mapEdge=self.edge)
                           )
 
 
@@ -298,8 +292,8 @@ class EqualHeightBlob(object):
                                     self.equalHeightHash[_x]:
                     self.equalHeightHash[_x].append(_y)
                     toBeAnalyzed.append(branch)
-                    if _x in (self.datamap.max_x,0) or _y in\
-                            (self.datamap.max_y,0):
+                    if _x in (self.datamap.max_x, 0) or _y in\
+                            (self.datamap.max_y, 0):
                         self.edge = True
                     addEqual(branch)
                 elif elevation == self.gridPoint.elevation:
@@ -324,7 +318,7 @@ class EqualHeightBlob(object):
                     else:
                         self.inverseEdgeHash[_x][_y] = \
                             InverseEdgePoint(_x, _y, elevation,
-                                  [self.edgeHash[gridPoint.x][gridPoint.y]])
+                                [self.edgeHash[gridPoint.x][gridPoint.y]])
 
         self.equalHeightBlob =\
             MultiPoint(coordinateHashToGridPointList(
@@ -332,35 +326,10 @@ class EqualHeightBlob(object):
                        self.gridPoint.elevation,
                        self.datamap,
                        edgePoints=
-                       EdgePointContainer(edgePointIndex=
-                                          self.edgeHash),
+                       EdgePointContainer(edgePointIndex=self.edgeHash),
                        inverseEdgePoints=
                        InverseEdgePointContainer(inverseEdgePointIndex=
                                                  self.inverseEdgeHash,
                                                  datamap=self.datamap,
-                                                 mapEdge = self.edge)
+                                                 mapEdge=self.edge)
                        )
-
-
-def candidateGridHash(cardinality, resolution=1):
-    """
-    :param cardinality: [N,S,E,W]
-    :param resolution: size of cardinal grid (resolution x resolution)
-    :return: Returns a resolution x resolution relative grid
-     based on cardinality.
-    """
-    if not resolution % 2:
-        resolution += 1  # has to be odd.
-    offset = int(numpy.median(range(resolution)))
-    if cardinality.upper() == "N":
-        return [[x, y] for x in range(-offset, offset+1)
-                for y in range(-resolution, 0)]
-    if cardinality.upper() == "E":
-        return [[x, y] for x in range(1, resolution+1)
-                for y in range(-offset, offset+1)]
-    if cardinality.upper() == "S":
-        return [[x, y] for x in range(-offset, offset+1)
-                for y in range(1, resolution+1)]
-    if cardinality.upper() == "W":
-        return [[x, y] for x in range(-resolution, 0)
-                for y in range(-offset, offset+1)]

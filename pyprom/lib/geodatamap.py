@@ -105,7 +105,6 @@ class DataMap(object):
         hms = self._position_formula(y)
         return self.longitude + degreesToDottedDecimal(*hms)
 
-
     def iterateDiagonal(self, x, y):
         """
         Generator returns 8 closest neighbors to a raster grid location,
@@ -119,11 +118,10 @@ class DataMap(object):
             _x = x + shift[0]
             _y = y + shift[1]
             if 0 <= _x <= self.max_x and \
-                                    0 <= _y <= self.max_y:
+               0 <= _y <= self.max_y:
                 yield _x, _y, float(self.numpy_map[_x, _y])
             else:
                 yield _x, _y, None
-
 
     def iterateOrthogonal(self, x, y):
         """
@@ -137,7 +135,7 @@ class DataMap(object):
             _x = x + shift[0]
             _y = y + shift[1]
             if 0 <= _x <= self.max_x and \
-                                    0 <= _y <= self.max_y:
+               0 <= _y <= self.max_y:
                 yield _x, _y, float(self.numpy_map[_x, _y])
             else:
                 yield _x, _y, None

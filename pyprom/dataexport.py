@@ -7,7 +7,8 @@ from lxml import etree
 class KMLfileWriter(object):
     def __init__(self, kmlList, outputFile):
         self.logger = logging.getLogger('pyProm.{}'.format(__name__))
-        self.logger.info("KML Output: {}, {} points".format(outputFile, len(kmlList)))
+        self.logger.info("KML Output: {}, {} points".format(outputFile,
+                                                            len(kmlList)))
         self.kml = kmlList
         self.outputFile = os.path.expanduser(outputFile)
         self.kmlPoints = list()

@@ -1,6 +1,19 @@
 Release History
 --------------
 
+0.2.0 ()
++++++++++++++++++++++++
+*Fixed Edge Locator
+*100% accurate summit scan
+*to_json for objects
+*InverseEdgePoints used to calculate edge vectors
+*iterator moved from analyze to datamap
+*Saddles differentiate high/low edges (HighEdgeContainer)
+*No longer return array types with numpy.
+*Round comparisons
+*Outside map bounds NoneType return supported
+*Better roundings for internal types.
+
 0.1.1 (November 3, 2016)
 ++++++++++++++++++++++++
 *Improved EdgePoint collection
