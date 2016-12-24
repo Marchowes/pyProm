@@ -5,9 +5,13 @@ import logging
 
 from collections import defaultdict, Counter
 from location_util import findExtremities
+import json
 
 
 class _Base(object):
+    """
+    Very Base object, which contains just a logger.
+    """
     def __init__(self):
         self.logger = logging.getLogger('pyProm.{}'.format(__name__))
 
@@ -18,20 +22,46 @@ class BaseCoordinate(object):
     basic lat/long
     """
     def __init__(self, latitude, longitude, *args, **kwargs):
+        """
+        :param latitude: latitude in dotted decimal
+        :param longitude: longitude in dotted decimal
+        """
         super(BaseCoordinate, self).__init__()
         self.latitude = latitude
         self.longitude = longitude
 
+    def to_dict(self):
+        """
+        :return: dict of :class:`BaseCoordinate`
+        """
+        return {'latitude': self.latitude,
+                'longitude': self.longitude}
+
+    def to_json(self):
+        """
+        :return: json string of :class:`BaseCoordinate`
+        """
+        return json.dumps(self.to_dict())
+
     def __eq__(self, other):
-        return [self.latitude, self.longitude] ==\
-               [other.latitude, other.longitude]
+        latitude = longitude = olatitude = olongitude = None
+        if self.latitude:
+            latitude = round(self.latitude, 6)
+        if self.longitude:
+            longitude = round(self.longitude, 6)
+        if other.latitude:
+            olatitude = round(other.latitude, 6)
+        if other.longitude:
+            olongitude = round(other.longitude, 6)
+        return [latitude, longitude] ==\
+               [olatitude, olongitude]
 
     def __ne__(self, other):
-        return [self.latitude, self.longitude] !=\
-               [other.latitude, other.longitude]
+        return [round(self.latitude, 6), round(self.longitude, 6)] != \
+               [round(other.latitude, 6), round(other.longitude, 6)]
 
     def __hash__(self):
-        return hash((self.latitude, self.longitude))
+        return hash((round(self.latitude, 6), round(self.longitude, 6)))
 
     def __repr__(self):
         return "<BaseCoordinate> lat {} long {}".format(self.latitude,
@@ -45,32 +75,83 @@ class SpotElevation(BaseCoordinate):
     SpotElevation -- Intended to be inherited from. lat/long/elevation
     """
     def __init__(self, latitude, longitude, elevation, *args, **kwargs):
+        """
+        :param latitude: latitude in dotted decimal
+        :param longitude: longitude in dotted decimal
+        :param elevation: elevation in meters
+        :param edge: (bool) does this :class:`SpotElevation` have an edge
+         Effect?
+        """
         super(SpotElevation, self).__init__(latitude, longitude)
         self.elevation = elevation
-        self.candidate = kwargs.get('edge', None)
+        self.edgeEffect = kwargs.get('edge', None)
+
+    def to_dict(self):
+        """
+        :return: dict of :class:`SpotElevation`
+        """
+        return {'latitude': self.latitude,
+                'longitude': self.longitude,
+                'elevation': self.elevation}
+
+    def to_json(self):
+        """
+        :return: json string of :class:`SpotElevation`
+        """
+        to_json = self.to_dict()
+        return json.dumps(to_json)
+
+    def toGridPoint(self, datamap):
+        """
+        return this :class:`SpotElevation object` as
+         a :class:`GridPoint object`
+        :param datamap: :class:`Datamap` object
+        :return: :class:`GridPoint object`
+        """
+        return GridPoint(datamap.relative_position_latitude(self.latitude),
+                         datamap.relative_position_longitude(
+                            self.longitude),
+                         self.elevation)
 
     @property
     def feet(self):
+        """
+        :return: elevation in feet
+        """
         try:
             return self.elevation * 3.2808
         except:
             return None
 
     def __eq__(self, other):
-        return [self.latitude, self.longitude, self.elevation] ==\
-               [other.latitude, other.longitude, other.elevation]
+        latitude = longitude = olatitude = olongitude = None
+        if self.latitude:
+            latitude = round(self.latitude, 6)
+        if self.longitude:
+            longitude = round(self.longitude, 6)
+        if other.latitude:
+            olatitude = round(other.latitude, 6)
+        if other.longitude:
+            olongitude = round(other.longitude, 6)
+        return [latitude, longitude, self.elevation] ==\
+               [olatitude, olongitude, other.elevation]
 
     def __ne__(self, other):
-        return [self.latitude, self.longitude, self.elevation] != \
-               [other.latitude, other.longitude, other.elevation]
+        return [round(self.latitude, 6), round(self.longitude, 6),
+                self.elevation] != \
+               [round(other.latitude, 6), round(other.longitude, 6),
+                other.elevation]
 
     def __hash__(self):
-        return hash((self.latitude, self.longitude, self.elevation))
+        return hash((round(self.latitude, 6), round(self.longitude, 6),
+                     self.elevation))
 
     def __repr__(self):
-        return "<SpotElevation> lat {} long {} El {}".format(self.latitude,
-                                                             self.longitude,
-                                                             self.feet)
+        return "<SpotElevation> lat {} long" \
+               " {} {}ft, {}m".format(self.latitude,
+                                      self.longitude,
+                                      self.feet,
+                                      self.elevation)
 
     __unicode__ = __str__ = __repr__
 
@@ -80,15 +161,42 @@ class Summit(SpotElevation):
     Summit object stores relevant summit data.
     """
     def __init__(self, latitude, longitude, elevation, *args, **kwargs):
+        """
+        :param latitude: latitude in dotted decimal
+        :param longitude: longitude in dotted decimal
+        :param elevation: elevation in meters
+        :param multiPoint: :class:`MultiPoint` object
+        """
         super(Summit, self).__init__(latitude, longitude,
                                      elevation, *args, **kwargs)
         self.multiPoint = kwargs.get('multiPoint', None)
 
+    def to_dict(self, recurse=False):
+        """
+        :param recurse: include multipoint
+        :return: dict of :class:`Summit`
+        """
+        to_dict = {'latitude': self.latitude,
+                   'longitude': self.longitude,
+                   'elevation': self.elevation}
+        if self.multiPoint and recurse:
+            to_dict['multipoint'] = self.multiPoint.to_dict()
+        return to_dict
+
+    def to_json(self, recurse=False):
+        """
+        :param recurse: include multipoint
+        :return: json string of :class:`Summit`
+        """
+        to_json = self.to_dict(recurse=recurse)
+        return json.dumps(to_json)
+
     def __repr__(self):
-        return "<Summit> lat {} long {} El {} MultiPoint {}".format(
+        return "<Summit> lat {} long {} {}ft {}m MultiPoint {}".format(
             self.latitude,
             self.longitude,
             self.feet,
+            self.elevation,
             bool(self.multiPoint))
 
     __unicode__ = __str__ = __repr__
@@ -99,15 +207,44 @@ class Saddle(SpotElevation):
     Saddle object stores relevant saddle data.
     """
     def __init__(self, latitude, longitude, elevation, *args, **kwargs):
+        """
+        :param latitude: latitude in dotted decimal
+        :param longitude: longitude in dotted decimal
+        :param elevation: elevation in meters
+        :param multiPoint: :class:`MultiPoint` object
+        :param highShores: :class:`HighEdgeContainer` object
+        """
         super(Saddle, self).__init__(latitude, longitude,
                                      elevation, *args, **kwargs)
         self.multiPoint = kwargs.get('multiPoint', None)
+        self.highShores = kwargs.get('highShores', None)
+
+    def to_dict(self, recurse=False):
+        """
+        :param recurse: include multipoint
+        :return: dict of :class:`Saddle`
+        """
+        to_dict = {'latitude': self.latitude,
+                   'longitude': self.longitude,
+                   'elevation': self.elevation}
+        if self.multiPoint and recurse:
+            to_dict['multipoint'] = self.multiPoint.to_dict()
+        return to_dict
+
+    def to_json(self, recurse=False):
+        """
+        :param recurse: include multipoint
+        :return: json string of :class:`Saddle`
+        """
+        to_json = self.to_dict(recurse=recurse)
+        return json.dumps(to_json)
 
     def __repr__(self):
-        return "<Saddle> lat {} long {} El {} MultiPoint {}".format(
+        return "<Saddle> lat {} long {} {}ft {}m MultiPoint {}".format(
             self.latitude,
             self.longitude,
             self.feet,
+            self.elevation,
             bool(self.multiPoint))
 
     __unicode__ = __str__ = __repr__
@@ -119,6 +256,9 @@ class SpotElevationContainer(_Base):
     Allows for various list transformations.
     """
     def __init__(self, spotElevationList):
+        """
+        :param spotElevationList: list of :class:`SpotElevation`s
+        """
         super(SpotElevationContainer, self).__init__()
         self.points = spotElevationList
 
@@ -183,6 +323,20 @@ class BaseGridPoint(object):
         self.x = x
         self.y = y
 
+    def to_dict(self):
+        """
+        :return: dict of :class:`BaseGridPoint`)
+        """
+        return {'x': self.x,
+                'y': self.y}
+
+    def to_json(self):
+        """
+        :return: json string of :class:`BaseGridPoint`
+        """
+        to_json = self.to_dict()
+        return json.dumps(to_json)
+
     def __hash__(self):
         return hash((self.x, self.y))
 
@@ -195,7 +349,7 @@ class BaseGridPoint(object):
 class GridPoint(BaseGridPoint):
     def __init__(self, x, y, elevation):
         """
-        A basic gridpoint. This maps an elevation to an X,Y coordinate.
+        A basic grid point. This maps an elevation to an X,Y coordinate.
         :param x: x coordinate
         :param y: y coordinate
         :param elevation: elevation in meters
@@ -203,9 +357,28 @@ class GridPoint(BaseGridPoint):
         super(GridPoint, self).__init__(x, y)
         self.elevation = elevation
 
-    def toSpotElevation(self, analysis):
-        return SpotElevation(analysis.datamap.x_position_latitude(self.x),
-                             analysis.datamap.y_position_longitude(self.y),
+    def to_dict(self):
+        """
+        :return: dict of :class:`GridPoint`
+        """
+        return {'x': self.x,
+                'y': self.y,
+                'elevation': self.elevation}
+
+    def to_json(self):
+        """
+        :return: json string of :class:`GridPoint`
+        """
+        to_json = self.to_dict()
+        return json.dumps(to_json)
+
+    def toSpotElevation(self, datamap):
+        """
+        :param datamap: :class:`Datamap` object
+        :return: SpotElevation object
+        """
+        return SpotElevation(datamap.x_position_latitude(self.x),
+                             datamap.y_position_longitude(self.y),
                              self.elevation)
 
     def __eq__(self, other):
@@ -225,11 +398,14 @@ class GridPoint(BaseGridPoint):
     __unicode__ = __str__ = __repr__
 
 
-class BaseGridPointContainer(_Base):
+class BaseGridPointContainer(object):
     """
     Base Grid Point Container.
     """
     def __init__(self, gridPointList):
+        """
+        :param gridPointList: list of :class:`GridPoints`
+        """
         super(BaseGridPointContainer, self).__init__()
         self.points = gridPointList
 
@@ -255,7 +431,6 @@ class GridPointContainer(BaseGridPointContainer):
     Container for GridPoint type lists.
     Allows for various list transformations and functions.
     """
-
     def __init__(self, gridPointList):
         super(GridPointContainer, self).__init__(gridPointList)
 
@@ -273,11 +448,11 @@ class Island(BaseGridPointContainer):
     Island Object accepts a list of shore points, and a MultiPoint object
     which is a Pond-type object. points are calculated in fillIn()
     """
-    def __init__(self, shoreGridPointList, analyzeData, pondElevation):
+    def __init__(self, shoreGridPointList, datamap, pondElevation):
         super(Island, self).__init__(shoreGridPointList)
         self.shoreGridPointList = self.points[:]
         self.pondElevation = pondElevation
-        self.analyzeData = analyzeData
+        self.datamap = datamap
         self.fillIn()
         self.mapEdge = self.findMapEdge()
 
@@ -287,12 +462,12 @@ class Island(BaseGridPointContainer):
         """
         mapEdge = list()
         for point in self.points:
-            if point.x == 0 or point.x ==\
-                    self.analyzeData.self.analyzeData.max_x:
-                mapEdge.append(point.toSpotElevation(self.analyzeData))
+            if point.x == 0 or point.x == \
+                    self.datamap.max_x:
+                mapEdge.append(point.toSpotElevation(self.datamap))
             if point.y == 0 or point.y ==\
-                    self.analyzeData.self.analyzeData.max_y:
-                mapEdge.append(point.toSpotElevation(self.analyzeData))
+                    self.datamap.max_y:
+                mapEdge.append(point.toSpotElevation(self.datamap))
         return mapEdge
 
     def fillIn(self):
@@ -311,8 +486,8 @@ class Island(BaseGridPointContainer):
         # Find all points not at pond-level.
         while toBeAnalyzed:
             gridPoint = toBeAnalyzed.pop()
-            neighbors = self.analyzeData.iterateDiagonal(gridPoint.x,
-                                                         gridPoint.y)
+            neighbors = self.datamap.iterateDiagonal(gridPoint.x,
+                                                     gridPoint.y)
             for _x, _y, elevation in neighbors:
 
                 if elevation != self.pondElevation and _y not in\
@@ -329,7 +504,7 @@ class Island(BaseGridPointContainer):
     __unicode__ = __str__ = __repr__
 
 
-class MultiPoint(_Base):
+class MultiPoint(object):
     """
     This is an "equal height" Multipoint storage container that
     provides a number of functions for analysis of these blob like
@@ -337,17 +512,44 @@ class MultiPoint(_Base):
     contains a list of all the points of this pond.
     :param points: list of BaseGridPoint objects
     :param elevation: elevation in meters
-    :param analyzeData: AnalyzeData object.
+    :param datamap: :class:`Datamap` object.
+    :param edgePoints: :class:`EdgePointContainer` object
+    :param inverseEdgePoints: :class:`InverseEdgePointContainer` object
     """
-    def __init__(self, points, elevation, analyzeData,
+    def __init__(self, points, elevation, datamap,
                  edgePoints=None, inverseEdgePoints=None):
         super(MultiPoint, self).__init__()
         self.points = points  # BaseGridPoint Object.
         self.elevation = elevation
-        self.analyzeData = analyzeData  # data analysis object.
+        self.datamap = datamap  # data analysis object.
         self.edgePoints = edgePoints
         self.inverseEdgePoints = inverseEdgePoints
         self.mapEdge = []
+
+    def to_dict(self, verbose=True):
+        """
+        :param verbose: returns extra data like `InverseEdgePoint`
+        and `EdgePoint` (future)
+        :return: list of dicts.
+        """
+        plist = list()
+        for point in self.points:
+            pdict = dict()
+            pdict['gridpoint'] = point.to_dict()
+            pdict['coordinate'] = \
+                BaseCoordinate(self.datamap.x_position_latitude(point.x),
+                               self.datamap.y_position_longitude(point.y)
+                               ).to_dict()
+            plist.append(pdict)
+        return plist
+
+    def to_json(self, verbose=False):
+        """
+        :param verbose: returns extra data like `InverseEdgePoint`
+        and `EdgePoint` (future)
+        :return: json data
+        """
+        return json.dumps(self.to_dict(verbose=verbose))
 
     def findExtremities(self):
         """
@@ -364,12 +566,12 @@ class MultiPoint(_Base):
         """
         mapEdge = list()
         for point in self.points:
-            if point.x == 0 or point.x == self.analyzeData.max_x:
+            if point.x == 0 or point.x == self.datamap.max_x:
                 newPoint = GridPoint(point.x, point.y, self.elevation)
-                mapEdge.append(newPoint.toSpotElevation(self.analyzeData))
-            if point.y == 0 or point.y == self.analyzeData.max_y:
+                mapEdge.append(newPoint.toSpotElevation(self.datamap))
+            if point.y == 0 or point.y == self.datamap.max_y:
                 newPoint = GridPoint(point.x, point.y, self.elevation)
-                mapEdge.append(newPoint.toSpotElevation(self.analyzeData))
+                mapEdge.append(newPoint.toSpotElevation(self.datamap))
         return mapEdge
 
     def findEdge(self):
@@ -443,8 +645,8 @@ class MultiPoint(_Base):
                 shoreList[listIndex].append(gridPoint)
             else:
                 continue
-            neighbors = self.analyzeData.iterateOrthogonal(gridPoint.x,
-                                                           gridPoint.y)
+            neighbors = self.datamap.iterateOrthogonal(gridPoint.x,
+                                                       gridPoint.y)
             for _x, _y, elevation in neighbors:
                 candidate = GridPoint(_x, _y, elevation)
                 if candidate.y in shoreIndex[candidate.x]:
@@ -518,7 +720,7 @@ class MultiPoint(_Base):
         islands = list()
         for island in shoreList:
             islands.append(Island(island.points,
-                                  self.analyzeData,
+                                  self.datamap,
                                   self.elevation))
         return islands
 
@@ -528,8 +730,8 @@ class MultiPoint(_Base):
         :return: List of All blob points with lat/long instead of x/y
         """
         return [BaseCoordinate(
-                self.analyzeData.datamap.x_position_latitude(coord.x),
-                self.analyzeData.datamap.y_position_longitude(coord.y))
+                self.datamap.x_position_latitude(coord.x),
+                self.datamap.y_position_longitude(coord.y))
                 for coord in self.points]
 
     def __repr__(self):
@@ -612,7 +814,7 @@ class EdgePointContainer(_Base):
     """
     def __init__(self, edgePointList=None,
                  edgePointIndex=None,
-                 analyzeData=None):
+                 datamap=None):
         super(EdgePointContainer, self).__init__()
         if edgePointIndex:
             self.edgePointIndex = edgePointIndex
@@ -620,7 +822,7 @@ class EdgePointContainer(_Base):
                            for v in y.items()]
         if edgePointList:
             self.points = edgePointList
-        self.analyzeData = analyzeData
+        self.datamap = datamap
 
     def __repr__(self):
         return "<EdgePointContainer> {} Objects".format(len(self.points))
@@ -630,6 +832,62 @@ class EdgePointContainer(_Base):
             yield edgePoint
 
     __unicode__ = __str__ = __repr__
+
+
+class HighEdgeContainer(object):
+    """
+    Container for High Edge Lists -- Specifically for the purpose of storing
+     high edge sections around Saddles.
+    :param shore: ordered list of :class:`GridPoint` type objects
+    :param blobElevation: elevation (m) of blob.
+    """
+    def __init__(self, shore, blobElevation):
+        # list of list of high edges.
+        self._highPoints = list()
+        highEdgePoints = list()
+        first = True
+        firstPoint = shore.points[0]
+        for shorePoint in shore.points:
+            if shorePoint.elevation > blobElevation:
+                highEdgePoints.append(shorePoint)
+                self.summitLike = False
+            elif shorePoint.elevation < blobElevation:
+                if first:
+                    first = False
+                if highEdgePoints:
+                    self._highPoints.append(highEdgePoints)
+                    highEdgePoints = list()
+            # If its elevation = None (map edge) and we're
+            # on a string of highs...
+            if not shorePoint.elevation and highEdgePoints:
+                highEdgePoints.append(shorePoint)
+        if first:
+            return
+        else:
+            # Do we have a queue of highpoints and was the first one
+            # also high? but we're not on the initial high string?
+            # then we need to string them together.
+            if highEdgePoints\
+                    and firstPoint.elevation > blobElevation\
+                    and not first:
+                self._highPoints[0] = \
+                     highEdgePoints + self._highPoints[0]
+
+    @property
+    def highPoints(self):
+        return self._highPoints
+
+    def __repr__(self):
+        return "<HighEdgeContainer> {} Lists".format(len(self.highPoints))
+
+
+class ShoreContainer(BaseGridPointContainer):
+    """
+    Container for Shore Segments.
+    """
+    def __init__(self, gridPointList, mapEdge=False):
+        super(ShoreContainer, self).__init__(gridPointList)
+        self.mapEdge = mapEdge
 
 
 class InverseEdgePointContainer(_Base):
@@ -643,7 +901,7 @@ class InverseEdgePointContainer(_Base):
     """
     def __init__(self, inverseEdgePointList=None,
                  inverseEdgePointIndex=None,
-                 analyzeData=None):
+                 datamap=None, mapEdge=False):
         super(InverseEdgePointContainer, self).__init__()
         if inverseEdgePointIndex:
             self.inverseEdgePointIndex = inverseEdgePointIndex
@@ -651,8 +909,10 @@ class InverseEdgePointContainer(_Base):
                            for v in y.items()]
         if inverseEdgePointList:
             self.points = inverseEdgePointList
-        self.analyzeData = analyzeData
+        self.datamap = datamap
         self.exemptPoints = defaultdict(list)
+        self.mapEdge = mapEdge
+        self.branchMapEdge = False
 
     def iterNeighborDiagonal(self, inverseEdgePoint):
         """
@@ -666,8 +926,8 @@ class InverseEdgePointContainer(_Base):
             x = inverseEdgePoint.x+shift[0]
             y = inverseEdgePoint.y+shift[1]
             if self.inverseEdgePointIndex[x][y]:
-                if 0 <= x <= self.analyzeData.max_x\
-                        and 0 <= y <= self.analyzeData.max_y:
+                if -1 <= x <= self.datamap.max_x + 1\
+                        and -1 <= y <= self.datamap.max_y + 1:
                     yield self.inverseEdgePointIndex[x][y]
             else:
                 continue
@@ -684,23 +944,22 @@ class InverseEdgePointContainer(_Base):
             x = inverseEdgePoint.x + shift[0]
             y = inverseEdgePoint.y + shift[1]
             if self.inverseEdgePointIndex[x][y]:
-                if 0 <= x <= self.analyzeData.max_x \
-                        and 0 <= y <= self.analyzeData.max_y:
+                if -1 <= x <= self.datamap.max_x + 1 \
+                        and -1 <= y <= self.datamap.max_y + 1:
                     yield self.inverseEdgePointIndex[x][y]
             else:
                 continue
 
     def findLinear(self):
         """
-        Returns a list of :class:`InverseEdgePoint`s in order.
-        :return:
+        :return: list of GridPoint containers representing individual edges
         """
 
         shoreContainers = list()
         self.exemptPoints = defaultdict(list)
 
         rounds = 0
-        edge = list()
+        self.edge = list()
         two = list()
 
         # Find points with exactly one neighbor. These are edgepoints.
@@ -709,14 +968,14 @@ class InverseEdgePointContainer(_Base):
         for point in (pt for pt in self.points):
             neighbors = [x for x in self.iterNeighborOrthogonal(point)]
             if len(neighbors) == 1:
-                if point.x in [self.analyzeData.max_x, 0] or\
-                                point.y in [self.analyzeData.max_y, 0]:
-                    edge.append(point)
+                if point.x in [self.datamap.max_x, 0] or\
+                                point.y in [self.datamap.max_y, 0]:
+                    self.edge.append(point)
             if len(neighbors) == 2:
                 two.append(point)
 
         # order the points
-        scanOrder = edge + two + self.points
+        scanOrder = self.edge + two + self.points
 
         while True:
             rounds += 1
@@ -726,15 +985,20 @@ class InverseEdgePointContainer(_Base):
                 masterPoint = point
 
                 if not len(neighbors):
-                    shoreContainers.append(GridPointContainer([point]))
                     self.exemptPoints[point.x].append(point.y)
+                    if point.x in (0, self.datamap.max_x) or \
+                       point.y in (0, self.datamap.max_y):
+                        shoreContainers.append(ShoreContainer([point], True))
+                    else:
+                        shoreContainers.append(ShoreContainer([point]))
                     break
 
                 firstPoint = neighbors[0]
-                shoreContainers.append(GridPointContainer(
+                shoreContainers.append(ShoreContainer(
                     self.branchChaser(masterPoint,
                                       masterPoint,
-                                      firstPoint)))
+                                      firstPoint), self.branchMapEdge))
+                self.branchMapEdge = False
                 break
 
             if not len([pt for pt in self.points if pt.y not in
@@ -774,6 +1038,9 @@ class InverseEdgePointContainer(_Base):
             # More than one neighbor? We'll need to look back at the last
             # point and find how common neighbors we have.
             commonEdgeHash = defaultdict(list)
+            if currentPoint.x in (0, self.datamap.max_x) or\
+               currentPoint.y in (0, self.datamap.max_y):
+                self.branchMapEdge = True
             if len(neighbors) > 1:
                 for neighbor in neighbors:
                     commonEdgePoints =\
@@ -801,18 +1068,20 @@ class InverseEdgePointContainer(_Base):
                             self.logger.debug(
                                 "TroubleMakers {}".format(currentPoint))
 
-                        orderedList += self.branchChaser(masterPoint,
-                                                         currentPoint,
-                                       level1CommonEdgeHash[max(
-                                            level1CommonEdgeHash.keys())][0])
+                        orderedList +=\
+                            self.branchChaser(
+                                masterPoint,
+                                currentPoint,
+                                level1CommonEdgeHash[max(
+                                    level1CommonEdgeHash.keys())][0])
                         continue
                 else:
                     # Follow the branch with the most common neighbors.
-                    orderedList += self.branchChaser(masterPoint,
-                                                     currentPoint,
-                                                     commonEdgeHash[max(
-                                                       commonEdgeHash.keys())]
-                                                          [0])
+                    orderedList +=\
+                        self.branchChaser(
+                            masterPoint,
+                            currentPoint,
+                            commonEdgeHash[max(commonEdgeHash.keys())][0])
                     continue
 
             # Not exempt? Add to the ordered list.
