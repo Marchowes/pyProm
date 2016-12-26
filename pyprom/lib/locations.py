@@ -265,6 +265,14 @@ class SpotElevationContainer(_Base):
         self.points = spotElevationList
 
     def radius(self, lat, long, datamap, value, unit='m'):
+        """
+        :param lat: latitude of center in dotted decimal
+        :param long: longitude of center in dotted decimal
+        :param datamap: datamap object
+        :param value: number of units of distance
+        :param unit: type of unit (m, km, mi, ft)
+        :return: SpotElevationContainer loaded with results.
+        """
         unit = unit.lower()
         if unit in ['meters', 'meter', 'm']:
             convertedDist = value
