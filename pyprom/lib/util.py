@@ -17,14 +17,6 @@ def degreesToDottedDecimal(deg, mnt=0, sec=0):
     return float(round(deg + (mnt / 60) + (sec / 3600), 6))
 
 
-def longitudeArcSec(longitude):
-    """
-    Accepts longitude in dotted decimal notation, and returns
-    Arcsecond distance in meters.
-    """
-    return math.cos(math.radians(longitude))*30.87
-
-
 def coordinateHashToList(coordianteHash):
     """
     :param coordianteHash: a hash using {x1:[y1,y2..],x1:[y1,y2..]} format

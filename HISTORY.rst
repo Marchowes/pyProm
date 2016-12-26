@@ -1,8 +1,12 @@
 Release History
 --------------
+0.2.1 ()
++++++++++++++++++++++++
+*Radius Search for locations
+*SpotElevationContainer filters all return new SpotElevationContainers
 
 0.2.0 (November 23, 2016)
-+++++++++++++++++++++++
++++++++++++++++++++++++++
 *Fixed Edge Locator
 *100% accurate summit scan
 *to_json for objects

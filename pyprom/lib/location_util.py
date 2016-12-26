@@ -1,6 +1,7 @@
 """
 We need this utility to be seperate becasue of circular dependencies.
 """
+import math
 
 
 def findExtremities(points):
@@ -27,3 +28,10 @@ def findExtremities(points):
         elif point.y == W[0].y:
             W.append(point)
     return {'N': N, 'S': S, 'E': E, 'W': W}
+
+def longitudeArcSec(longitude):
+    """
+    Accepts longitude in dotted decimal notation, and returns
+    Arcsecond distance in meters.
+    """
+    return math.cos(math.radians(longitude))*30.87

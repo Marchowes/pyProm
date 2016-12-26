@@ -4,7 +4,9 @@ This lib contains objects for storing various geographic data.
 import logging
 
 from collections import defaultdict, Counter
-from location_util import findExtremities
+from location_util import (findExtremities,
+                          longitudeArcSec)
+from math import sqrt
 import json
 
 
@@ -262,6 +264,35 @@ class SpotElevationContainer(_Base):
         super(SpotElevationContainer, self).__init__()
         self.points = spotElevationList
 
+    def radius(self, lat, long, datamap, value, unit='m'):
+        unit = unit.lower()
+        if unit in ['meters', 'meter', 'm']:
+            convertedDist = value
+        elif unit in ['kilometers', 'kilometer', 'km']:
+            convertedDist = value * 1000
+        elif unit in ['feet', 'foot', 'ft']:
+            convertedDist = 0.3048 * value
+        elif unit in ['miles', 'mile', 'mi']:
+            convertedDist = 0.3048 * value * 5280
+        else:
+            raise ValueError('No unit value specified')
+
+        positive = list()
+        longitudalMetersPerArcSec = longitudeArcSec(lat) *\
+                                       datamap.arcsec_resolution
+        lateralMetersPerArcSec = 30.8666
+        for point in self.points:
+            latDist = (abs(lat - point.latitude) * 3600) *\
+                      lateralMetersPerArcSec
+            longDist = (abs(long - point.longitude) * 3600) *\
+                       longitudalMetersPerArcSec
+            distance = sqrt(longDist**2 + latDist**2)
+            if distance <= convertedDist:
+                positive.append(point)
+        return SpotElevationContainer(positive)
+
+
+
     def rectangle(self, lat1, long1, lat2, long2):
         """
         For the purpose of gathering all points in a rectangle of
@@ -277,8 +308,9 @@ class SpotElevationContainer(_Base):
         upperlong = max(long1, long2)
         lowerlat = min(lat1, lat2)
         lowerlong = min(long1, long2)
-        return [x for x in self.points if lowerlat < x.latitude < upperlat and
-                lowerlong < x.longitude < upperlong]
+        return SpotElevationContainer(
+            [x for x in self.points if lowerlat < x.latitude < upperlat and
+            lowerlong < x.longitude < upperlong])
 
     def byType(self, string):
         """
@@ -295,7 +327,8 @@ class SpotElevationContainer(_Base):
         :param upper: upper limit in feet
         :return: list of all points in range between lower and upper
         """
-        return [x for x in self.points if x.feet > lower and x.feet < upper]
+        return SpotElevationContainer([x for x in self.points if
+                                       x.feet > lower and x.feet < upper])
 
     def elevationRangeMetric(self, lower=None, upper=100000):
         """
@@ -303,8 +336,9 @@ class SpotElevationContainer(_Base):
         :param upper: upper limit in Meters
         :return: list of all points in range between lower and upper
         """
-        return [x for x in self.points if x.elevation > lower and
-                x.elevation < upper]
+        return SpotElevationContainer([x for x in self.points if
+                                       x.elevation > lower and
+                                       x.elevation < upper])
 
     def __repr__(self):
         return "<SpotElevationContainer> {} Objects".format(len(self.points))
