@@ -1,4 +1,10 @@
-"""PyProm: This library includes tools for surface network analysis.
+"""
+pyProm: Copyright 2016
+
+This software is distributed under a license that is described in
+the LICENSE file that accompanies it.
+
+PyProm: This library includes tools for surface network analysis.
 """
 version_info = (0, 2, 1)
 __name__ = 'pyProm'

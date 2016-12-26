@@ -1,7 +1,13 @@
+"""
+pyProm: Copyright 2016
+
+This software is distributed under a license that is described in
+the LICENSE file that accompanies it.
+"""
+
 from __future__ import division
 from locations import BaseGridPoint
 import itertools
-import math
 
 
 def dottedDecimaltoDegrees(coordinate):
