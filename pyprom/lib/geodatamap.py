@@ -3,6 +3,9 @@ pyProm: Copyright 2016
 
 This software is distributed under a license that is described in
 the LICENSE file that accompanies it.
+
+This file acts as the glue between the raster data loaded and the logic
+used to analyze the map.
 """
 
 from __future__ import division
