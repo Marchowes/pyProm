@@ -1,7 +1,13 @@
+"""
+pyProm: Copyright 2016
+
+This software is distributed under a license that is described in
+the LICENSE file that accompanies it.
+"""
+
 from __future__ import division
-from locations import BaseGridPoint
+from locations.base_gridpoint import BaseGridPoint
 import itertools
-import math
 
 
 def dottedDecimaltoDegrees(coordinate):
@@ -15,14 +21,6 @@ def degreesToDottedDecimal(deg, mnt=0, sec=0):
     Accepts dms and converts to dd
     """
     return float(round(deg + (mnt / 60) + (sec / 3600), 6))
-
-
-def longitudeArcSec(longitude):
-    """
-    Accepts longitude in dotted decimal notation, and returns
-    Arcsecond distance in meters.
-    """
-    return math.cos(math.radians(longitude))*30.87
 
 
 def coordinateHashToList(coordianteHash):

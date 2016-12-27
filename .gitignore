@@ -1,2 +1,5 @@
 .idea
 *.pyc
+_dumpster
+test.py
+pyProm.egg*

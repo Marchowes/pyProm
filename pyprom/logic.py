@@ -1,16 +1,27 @@
+"""
+pyProm: Copyright 2016
+
+This software is distributed under a license that is described in
+the LICENSE file that accompanies it.
+"""
+
 from __future__ import division
 
 import numpy
 import logging
 
 from collections import defaultdict
-from lib.locations import (SpotElevationContainer,
-                           Summit, Saddle,
-                           GridPoint, MultiPoint,
-                           EdgePoint, InverseEdgePoint,
-                           EdgePointContainer,
-                           InverseEdgePointContainer,
-                           HighEdgeContainer, GridPointContainer)
+from lib.locations.gridpoint import GridPoint
+from lib.locations.saddle import Saddle
+from lib.locations.summit import Summit
+from lib.locations.inverse_edgepoint import InverseEdgePoint
+from lib.locations.edgepoint import EdgePoint
+from lib.containers.spot_elevation import SpotElevationContainer
+from lib.containers.multipoint import MultiPoint
+from lib.containers.edgepoint import EdgePointContainer
+from lib.containers.inverse_edgepoint import InverseEdgePointContainer
+from lib.containers.high_edge import HighEdgeContainer
+from lib.containers.gridpoint import GridPointContainer
 from lib.util import (coordinateHashToGridPointList,
                       compressRepetetiveChars)
 
