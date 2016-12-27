@@ -9,7 +9,7 @@ import logging
 import os
 from pykml.factory import KML_ElementMaker as KML
 from lxml import etree
-from lib.locations import SpotElevationContainer
+from lib.containers.spot_elevation import SpotElevationContainer
 
 
 class KMLfileWriter(object):

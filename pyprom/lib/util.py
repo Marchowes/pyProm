@@ -6,7 +6,7 @@ the LICENSE file that accompanies it.
 """
 
 from __future__ import division
-from locations import BaseGridPoint
+from locations.base_gridpoint import BaseGridPoint
 import itertools
 
 
