@@ -83,7 +83,7 @@ class InverseEdgePointContainer(_Base):
 
         rounds = 0
         self.edge = list()
-        two = list()
+        one = list()
 
         # Find points with exactly one neighbor. These are edgepoints.
         # Subdivide these into two groups, edges and stubs.
@@ -94,11 +94,11 @@ class InverseEdgePointContainer(_Base):
                 if point.x in [self.datamap.max_x, 0] or\
                                 point.y in [self.datamap.max_y, 0]:
                     self.edge.append(point)
-            if len(neighbors) == 2:
-                two.append(point)
+            if len(neighbors) == 1:
+                one.append(point)
 
         # order the points
-        scanOrder = self.edge + two + self.points
+        scanOrder = self.edge + one + self.points
 
         while True:
             rounds += 1

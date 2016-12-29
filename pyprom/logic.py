@@ -41,8 +41,6 @@ class AnalyzeData(object):
         self.span_latitude = self.datamap.span_latitude
         self.cardinalGrid = dict()
         self.skipSummitAnalysis = defaultdict(list)
-        self.summitObjects = SpotElevationContainer([])
-        self.saddleObjects = SpotElevationContainer([])
 
     def analyze(self):
         """
@@ -51,6 +49,8 @@ class AnalyzeData(object):
         return: (:class:`SpotElevationContainer`,SpotElevationContainer)
         """
         self.logger.info("Initiating Analysis")
+        self.summitObjects = SpotElevationContainer([])
+        self.saddleObjects = SpotElevationContainer([])
         iterator = numpy.nditer(self.data, flags=['multi_index'])
         index = 0
         # Iterate through numpy grid, and keep track of gridpoint coordinates.
@@ -85,11 +85,15 @@ class AnalyzeData(object):
 
         saddleProfile = ["HLHL", "LHLH"]
         summitProfile = "L"
+        immitProfile = "H"
 
         def _analyze_multipoint(x, y, ptElevation):
             self.blob = self.equalHeightBlob(x, y, ptElevation)
             pseudoShores = self.blob.inverseEdgePoints.findLinear()
             summitLike = False
+            saddle = False
+            saddleCandidate = list()
+            outside = True
 
             # Go find the shore of each blob, and assign a "H"
             # for points higher than the equalHeightBlob, and "L"
@@ -105,25 +109,35 @@ class AnalyzeData(object):
                         shoreProfile += "L"
                 reducedNeighborProfile = compressRepetetiveChars(shoreProfile)
 
-                if any(x in reducedNeighborProfile for x in saddleProfile)\
-                        and not summitLike:
-                    for exemptPoint in self.blob.points:
-                        self.skipSummitAnalysis[exemptPoint.x] \
-                            .append(exemptPoint.y)
-                    shores = HighEdgeContainer(shoreSet, ptElevation)
-                    saddle = Saddle(self.datamap.x_position_latitude(x),
-                                    self.datamap.y_position_longitude(y),
-                                    self.elevation,
-                                    edge=self.edge,
-                                    multiPoint=self.blob,
-                                    highShores=shores)
-                    self.saddleObjects.points.append(saddle)
-                    return
-                elif reducedNeighborProfile == summitProfile:
+                # First scanned and meets saddleProfile? It's a saddle.
+                if any(x in reducedNeighborProfile for x in saddleProfile):
+                    saddle = True
+                    saddleCandidate.append(shoreSet)
+                # First scanned and meets summitProfile? Maybe a summit.
+                elif reducedNeighborProfile == summitProfile and outside:
                     summitLike = True
-                else:
+                # Scanned at any time, and has at least one higher neighbor?
+                # Maybe a saddle, certainly not a summit.
+                elif immitProfile in reducedNeighborProfile:
                     summitLike = False
-                    break
+                    saddleCandidate.append(shoreSet)
+                outside = False
+
+            if len(saddleCandidate) >= 2 or saddle:
+                for exemptPoint in self.blob.points:
+                    self.skipSummitAnalysis[exemptPoint.x] \
+                        .append(exemptPoint.y)
+                highShores = list()
+                for side in saddleCandidate:
+                    highShores.append(HighEdgeContainer(side, ptElevation))
+                saddle = Saddle(self.datamap.x_position_latitude(x),
+                                self.datamap.y_position_longitude(y),
+                                self.elevation,
+                                edge=self.edge,
+                                multiPoint=self.blob,
+                                highShores=highShores)
+                self.saddleObjects.points.append(saddle)
+                return
 
             if summitLike:
                 for exemptPoint in self.blob.points:
@@ -137,11 +151,11 @@ class AnalyzeData(object):
                                 )
                 self.summitObjects.points.append(summit)
                 return
-            else:
-                for exemptPoint in self.blob.points:
-                    self.skipSummitAnalysis[exemptPoint.x] \
-                        .append(exemptPoint.y)
-                return
+            #else:
+            for exemptPoint in self.blob.points:
+                self.skipSummitAnalysis[exemptPoint.x] \
+                    .append(exemptPoint.y)
+            return
 
         # Label this as an mapEdge under the following condition
         if x in (self.max_x, 0) or y in (self.max_y, 0):
@@ -181,7 +195,7 @@ class AnalyzeData(object):
                             self.datamap.y_position_longitude(y),
                             self.elevation,
                             edge=self.edge,
-                            highShores=shores)
+                            highShores=[shores])
             self.saddleObjects.points.append(saddle)
         return
 
