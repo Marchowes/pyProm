@@ -83,7 +83,7 @@ class InverseEdgePointContainer(_Base):
 
         rounds = 0
         self.edge = list()
-        one = list()
+        two = list()
 
         # Find points with exactly one neighbor. These are edgepoints.
         # Subdivide these into two groups, edges and stubs.
@@ -94,11 +94,11 @@ class InverseEdgePointContainer(_Base):
                 if point.x in [self.datamap.max_x, 0] or\
                                 point.y in [self.datamap.max_y, 0]:
                     self.edge.append(point)
-            if len(neighbors) == 1:
-                one.append(point)
+            if len(neighbors) == 2:
+                two.append(point)
 
         # order the points
-        scanOrder = self.edge + one + self.points
+        scanOrder = self.edge + two + self.points
 
         while True:
             rounds += 1
@@ -120,7 +120,8 @@ class InverseEdgePointContainer(_Base):
                 shoreContainers.append(ShoreContainer(
                     self.branchChaser(masterPoint,
                                       masterPoint,
-                                      firstPoint), self.branchMapEdge))
+                                      firstPoint,
+                                      True), self.branchMapEdge))
                 self.branchMapEdge = False
                 break
 
@@ -131,7 +132,7 @@ class InverseEdgePointContainer(_Base):
                 self.logger.info('Something broke in {}'.format(self))
                 return shoreContainers
 
-    def branchChaser(self, masterPoint, originalPoint, firstPoint):
+    def branchChaser(self, masterPoint, originalPoint, firstPoint, fst=False):
         """
         Recursive function for chasing down inverse edge Branches
         :param masterPoint: Master point for this segment. This is
@@ -217,6 +218,16 @@ class InverseEdgePointContainer(_Base):
                 # End of the line? return the ordered list.
                 for point in orderedList:
                     self.exemptPoints[point.x].append(point.y)
+                if fst:
+                    neighbors = [pt for pt in self.iterNeighborOrthogonal(masterPoint)
+                                 if pt.y not in self.exemptPoints[pt.x]]
+                    if neighbors:
+                        # reverse that since we're working back from master point.'
+                        result = self.branchChaser(masterPoint,
+                                                   masterPoint,
+                                                   neighbors[0])
+                        return [x for x in reversed(result)][1:] + orderedList
+
                 return orderedList
 
             # Just one neighbor? Okay, do this...
