@@ -187,7 +187,7 @@ class AnalyzeData(object):
             gridPoint = toBeAnalyzed.pop()
             neighbors = self.datamap.iterateDiagonal(gridPoint.x, gridPoint.y)
             # Determine if edge or not.
-            if gridPoint.x in (self.max_x, 0) or gridPoint.y in\
+            if gridPoint.x in (self.max_x, 0) or gridPoint.y in \
                     (self.max_y, 0):
                 self.edge = True
             for _x, _y, elevation in neighbors:
@@ -196,7 +196,7 @@ class AnalyzeData(object):
                     branch = GridPoint(_x, _y, elevation)
                     equalHeightHash[_x].append(_y)
                     toBeAnalyzed.append(branch)
-                elif elevation != gridPoint.elevation:
+                elif elevation != masterGridPoint.elevation:
                     if not inverseEdgeHash[_x][_y]:
                         inverseEdgeHash[_x][_y] = \
                             InverseEdgePoint(_x, _y, elevation)
