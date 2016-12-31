@@ -8,7 +8,6 @@ This library contains a base class for x,y oriented objects.
 """
 
 import json
-import spot_elevation as s
 from .base_gridpoint import BaseGridPoint
 
 
@@ -43,9 +42,10 @@ class GridPoint(BaseGridPoint):
         :param datamap: :class:`Datamap` object
         :return: SpotElevation object
         """
-        return s.SpotElevation(datamap.x_position_latitude(self.x),
-                               datamap.y_position_longitude(self.y),
-                               self.elevation)
+        from .spot_elevation import SpotElevation
+        return SpotElevation(datamap.x_position_latitude(self.x),
+                             datamap.y_position_longitude(self.y),
+                             self.elevation)
 
     def __eq__(self, other):
         return [self.x, self.y, self.elevation] ==\

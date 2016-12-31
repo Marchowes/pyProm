@@ -9,7 +9,7 @@ type location objects.
 """
 
 from ..location_util import longitudeArcSec
-from base import _Base
+from .base import _Base
 from math import sqrt
 
 

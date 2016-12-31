@@ -8,7 +8,7 @@ This library contains a container class for creating Islands.
 """
 
 from collections import defaultdict
-from base_gridpoint import BaseGridPointContainer
+from .base_gridpoint import BaseGridPointContainer
 from ..locations.gridpoint import GridPoint
 
 

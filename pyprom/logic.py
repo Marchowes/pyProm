@@ -11,6 +11,8 @@ import numpy
 import logging
 
 from collections import defaultdict
+from timeit import default_timer
+from datetime import timedelta
 from lib.locations.gridpoint import GridPoint
 from lib.locations.saddle import Saddle
 from lib.locations.summit import Summit
@@ -48,6 +50,8 @@ class AnalyzeData(object):
         Looks for :class:`Summit`s, and :class:`Saddle`s
         return: (:class:`SpotElevationContainer`,SpotElevationContainer)
         """
+        self.start = default_timer()
+        self.lasttime = self.start
         self.logger.info("Initiating Analysis")
         self.summitObjects = SpotElevationContainer([])
         self.saddleObjects = SpotElevationContainer([])
@@ -61,8 +65,19 @@ class AnalyzeData(object):
             # Quick Progress Meter. Needs refinement,
             index += 1
             if not index % 100000:
-                self.logger.info("{}/{} - {}%".format(index, self.data.size,
-                                 (index/self.data.size)*100))
+
+                thisTime = default_timer()
+                split = round(thisTime - self.lasttime,2)
+                self.lasttime = default_timer()
+                rt = self.lasttime - self.start
+
+                pointsPerSec = round(index/rt,2)
+                self.logger.info("Points per second: {} - {}% runtime: {}, split: {}".format(
+                    pointsPerSec,
+                    round(index/self.data.size*100,2),
+                    (str(timedelta(seconds=round(rt,2)))),
+                    split
+                ))
 
             # Check for summit
             self._summit_and_saddle(x, y)
@@ -70,6 +85,8 @@ class AnalyzeData(object):
             self.edge = False
             self.blob = None
             iterator.iternext()
+        #cleanup.
+        del(self.skipSummitAnalysis)
         return self.summitObjects, self.saddleObjects
 
     def _summit_and_saddle(self, x, y):
@@ -128,6 +145,119 @@ class AnalyzeData(object):
         if x in (self.max_x, 0) or y in (self.max_y, 0):
             self.edge = True
 
+        # # Begin the ardous task of analyzing points and multipoints
+        # neighbor = self.datamap.iterateDiagonal(x, y)
+        # shoreSet = GridPointContainer([])
+        # #neighborProfile = ""
+        # nesteddict = lambda: defaultdict(nesteddict)
+        # inverseEdgeHash = nesteddict()  # InverseEdgepoint (shore).
+        # for _x, _y, elevation in neighbor:
+        #
+        #     # If we have equal neighbors, we need to kick off analysis to
+        #     # a special MultiPoint analysis function.
+        #     if not elevation:
+        #         continue
+        #     if elevation == self.elevation and _y not in\
+        #                     self.skipSummitAnalysis[_x]:
+        #         _analyze_multipoint(_x, _y, elevation)
+        #         return
+        #     if not inverseEdgeHash[_x][_y]:
+        #         inverseEdgeHash[_x][_y] = \
+        #             InverseEdgePoint(_x, _y, elevation)
+        #     shoreSet.points.append(GridPoint(_x, _y, elevation))
+        #
+        # shores = HighEdgeContainer(shoreSet, self.elevation)
+        # if not len(shores.highPoints):
+        #     summit = Summit(self.datamap.x_position_latitude(x),
+        #                     self.datamap.y_position_longitude(y),
+        #                     self.elevation,
+        #                     edge=self.edge,
+        #                     multiPoint=self.blob
+        #                     )
+        #     self.summitObjects.points.append(summit)
+        #     return
+        # if len(shores.highPoints) > 1:
+        #     saddle = Saddle(self.datamap.x_position_latitude(x),
+        #                     self.datamap.y_position_longitude(y),
+        #                     self.elevation,
+        #                     edge=self.edge,
+        #                     multiPoint=self.blob,
+        #                     highShores=shores.highPoints)
+        #     self.saddleObjects.points.append(saddle)
+        #     return
+        #
+        # if len(shores.highPoints) == 1 and self.edge:
+        #     saddle = Saddle(self.datamap.x_position_latitude(x),
+        #                     self.datamap.y_position_longitude(y),
+        #                     self.elevation,
+        #                     edge=self.edge,
+        #                     multiPoint=self.blob,
+        #                     highShores=shores.highPoints)
+        #     self.saddleObjects.points.append(saddle)
+        #     return
+        # return
+
+
+        # # Begin the ardous task of analyzing points and multipoints
+        # neighbor = self.datamap.iterateDiagonal(x, y)
+        # #shoreSet = GridPointContainer([])
+        # #neighborProfile = ""
+        # nesteddict = lambda: defaultdict(nesteddict)
+        # inverseEdgeHash = nesteddict()  # InverseEdgepoint (shore).
+        # for _x, _y, elevation in neighbor:
+        #
+        #     # If we have equal neighbors, we need to kick off analysis to
+        #     # a special MultiPoint analysis function.
+        #     if not elevation:
+        #         continue
+        #     if elevation == self.elevation and _y not in\
+        #                     self.skipSummitAnalysis[_x]:
+        #         _analyze_multipoint(_x, _y, elevation)
+        #         return
+        #     # if elevation > self.elevation:
+        #     #     neighborProfile += "H"
+        #     # if elevation < self.elevation:
+        #     #     neighborProfile += "L"
+        #     if not inverseEdgeHash[_x][_y]:
+        #         inverseEdgeHash[_x][_y] = \
+        #             InverseEdgePoint(_x, _y, elevation)
+        #
+        # inverseEdgePoints = InverseEdgePointContainer(
+        #     inverseEdgePointIndex=inverseEdgeHash,
+        #     datamap=self.datamap, mapEdge=self.edge)
+        # highInverseEdge = inverseEdgePoints.findHighEdges(self.elevation)
+        #
+        # if not len(highInverseEdge):
+        #     summit = Summit(self.datamap.x_position_latitude(x),
+        #                     self.datamap.y_position_longitude(y),
+        #                     self.elevation,
+        #                     edge=self.edge,
+        #                     multiPoint=self.blob
+        #                     )
+        #     self.summitObjects.points.append(summit)
+        #     return
+        # if len(highInverseEdge) > 1:
+        #     saddle = Saddle(self.datamap.x_position_latitude(x),
+        #                     self.datamap.y_position_longitude(y),
+        #                     self.elevation,
+        #                     edge=self.edge,
+        #                     multiPoint=self.blob,
+        #                     highShores=highInverseEdge)
+        #     self.saddleObjects.points.append(saddle)
+        #     return
+        #
+        # if len(highInverseEdge) == 1 and self.edge:
+        #     saddle = Saddle(self.datamap.x_position_latitude(x),
+        #                     self.datamap.y_position_longitude(y),
+        #                     self.elevation,
+        #                     edge=self.edge,
+        #                     multiPoint=self.blob,
+        #                     highShores=highInverseEdge)
+        #     self.saddleObjects.points.append(saddle)
+        #     return
+        # return
+
+
         # Begin the ardous task of analyzing points and multipoints
         neighbor = self.datamap.iterateDiagonal(x, y)
         shoreSet = GridPointContainer([])
@@ -138,8 +268,8 @@ class AnalyzeData(object):
             # a special MultiPoint analysis function.
             if not elevation:
                 continue
-            if elevation == self.elevation and _y not in\
-                            self.skipSummitAnalysis[_x]:
+            if elevation == self.elevation and _y not in \
+                    self.skipSummitAnalysis[_x]:
                 _analyze_multipoint(_x, _y, elevation)
                 return
             if elevation > self.elevation:
@@ -162,8 +292,10 @@ class AnalyzeData(object):
                             self.datamap.y_position_longitude(y),
                             self.elevation,
                             edge=self.edge,
-                            highShores=[shores])
+                            highShores=shores.highPoints)
             self.saddleObjects.points.append(saddle)
+
+
         return
 
     def equalHeightBlob(self, x, y, elevation):

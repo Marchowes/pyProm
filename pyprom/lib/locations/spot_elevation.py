@@ -8,7 +8,6 @@ This library contains a base class for Coordinate oriented objects with
 Elevation data.
 """
 import json
-import gridpoint as g
 from .base_coordinate import BaseCoordinate
 
 
@@ -50,7 +49,8 @@ class SpotElevation(BaseCoordinate):
         :param datamap: :class:`Datamap` object
         :return: :class:`GridPoint object`
         """
-        return g.GridPoint(datamap.relative_position_latitude(self.latitude),
+        from .gridpoint import GridPoint
+        return GridPoint(datamap.relative_position_latitude(self.latitude),
                            datamap.relative_position_longitude(
                             self.longitude),
                            self.elevation)
