@@ -89,60 +89,12 @@ class AnalyzeData(object):
 
         def _analyze_multipoint(x, y, ptElevation):
             self.blob = self.equalHeightBlob(x, y, ptElevation)
-            pseudoShores = self.blob.inverseEdgePoints.findLinear()
-            summitLike = False
-            saddle = False
-            saddleCandidate = list()
-            outside = True
+            highInverseEdge = self.blob.inverseEdgePoints.findHighEdges(self.elevation)
 
-            # Go find the shore of each blob, and assign a "H"
-            # for points higher than the equalHeightBlob, and "L"
-            # for points lower.
-            for shoreSet in pseudoShores:
-                shoreProfile = ""
-                for shorePoint in shoreSet.points:
-                    if not shorePoint.elevation:
-                        continue
-                    if shorePoint.elevation > ptElevation:
-                        shoreProfile += "H"
-                    if shorePoint.elevation < ptElevation:
-                        shoreProfile += "L"
-                reducedNeighborProfile = compressRepetetiveChars(shoreProfile)
-
-                # First scanned and meets saddleProfile? It's a saddle.
-                if any(x in reducedNeighborProfile for x in saddleProfile):
-                    saddle = True
-                    saddleCandidate.append(shoreSet)
-                # First scanned and meets summitProfile? Maybe a summit.
-                elif reducedNeighborProfile == summitProfile and outside:
-                    summitLike = True
-                # Scanned at any time, and has at least one higher neighbor?
-                # Maybe a saddle, certainly not a summit.
-                elif immitProfile in reducedNeighborProfile:
-                    summitLike = False
-                    saddleCandidate.append(shoreSet)
-                outside = False
-
-            if len(saddleCandidate) >= 2 or saddle:
-                for exemptPoint in self.blob.points:
-                    self.skipSummitAnalysis[exemptPoint.x] \
-                        .append(exemptPoint.y)
-                highShores = list()
-                for side in saddleCandidate:
-                    highShores.append(HighEdgeContainer(side, ptElevation))
-                saddle = Saddle(self.datamap.x_position_latitude(x),
-                                self.datamap.y_position_longitude(y),
-                                self.elevation,
-                                edge=self.edge,
-                                multiPoint=self.blob,
-                                highShores=highShores)
-                self.saddleObjects.points.append(saddle)
-                return
-
-            if summitLike:
-                for exemptPoint in self.blob.points:
-                    self.skipSummitAnalysis[exemptPoint.x] \
-                        .append(exemptPoint.y)
+            for exemptPoint in self.blob.points:
+                self.skipSummitAnalysis[exemptPoint.x] \
+                    .append(exemptPoint.y)
+            if not len(highInverseEdge):
                 summit = Summit(self.datamap.x_position_latitude(x),
                                 self.datamap.y_position_longitude(y),
                                 self.elevation,
@@ -151,10 +103,25 @@ class AnalyzeData(object):
                                 )
                 self.summitObjects.points.append(summit)
                 return
-            #else:
-            for exemptPoint in self.blob.points:
-                self.skipSummitAnalysis[exemptPoint.x] \
-                    .append(exemptPoint.y)
+            if len(highInverseEdge) > 1:
+                saddle = Saddle(self.datamap.x_position_latitude(x),
+                                 self.datamap.y_position_longitude(y),
+                                 self.elevation,
+                                 edge=self.edge,
+                                 multiPoint=self.blob,
+                                 highShores=highInverseEdge)
+                self.saddleObjects.points.append(saddle)
+                return
+
+            if len(highInverseEdge) == 1 and self.edge:
+                saddle = Saddle(self.datamap.x_position_latitude(x),
+                                self.datamap.y_position_longitude(y),
+                                self.elevation,
+                                edge=self.edge,
+                                multiPoint=self.blob,
+                                highShores=highInverseEdge)
+                self.saddleObjects.points.append(saddle)
+                return
             return
 
         # Label this as an mapEdge under the following condition
@@ -212,26 +179,14 @@ class AnalyzeData(object):
         equalHeightHash = defaultdict(list)
         equalHeightHash[x].append(y)
         nesteddict = lambda: defaultdict(nesteddict)
-        edgeHash = nesteddict()  # {X : { Y : EdgePoint}}
         inverseEdgeHash = nesteddict()  # InverseEdgepoint (shore).
         toBeAnalyzed = [masterGridPoint]
-
-        # Helper function for equal neighbors.
-        def addEqual():
-            if edgeHash[gridPoint.x][gridPoint.y]:
-                    edgeHash[gridPoint.x][gridPoint.y]. \
-                         equalNeighbors.append(branch)
-            # Does not exist? Create.
-            else:
-                edgeHash[gridPoint.x][gridPoint.y] = \
-                    EdgePoint(gridPoint.x, gridPoint.y,
-                              gridPoint.elevation,
-                              [], [branch])
 
         # Loop until pool of equalHeight neighbors has been exhausted.
         while toBeAnalyzed:
             gridPoint = toBeAnalyzed.pop()
             neighbors = self.datamap.iterateDiagonal(gridPoint.x, gridPoint.y)
+            # Determine if edge or not.
             if gridPoint.x in (self.max_x, 0) or gridPoint.y in\
                     (self.max_y, 0):
                 self.edge = True
@@ -241,42 +196,17 @@ class AnalyzeData(object):
                     branch = GridPoint(_x, _y, elevation)
                     equalHeightHash[_x].append(_y)
                     toBeAnalyzed.append(branch)
-                    addEqual()
-                # Equal and exempt? add to equal neighbor list.
-                elif elevation == gridPoint.elevation:
-                    addEqual()
                 elif elevation != gridPoint.elevation:
-                    # EdgePoint Object Exists? append nonEqual
-                    if edgeHash[gridPoint.x][gridPoint.y]:
-                        edgeHash[gridPoint.x][gridPoint.y]. \
-                            nonEqualNeighbors.append(GridPoint(
-                                 _x, _y, elevation))
-                    # Does not exist? Create.
-                    else:
-                        edgeHash[gridPoint.x][gridPoint.y] = \
-                            EdgePoint(gridPoint.x, gridPoint.y,
-                                      gridPoint.elevation,
-                                      [GridPoint(_x, _y, elevation)], [])
-
-                    # Add inverse EdgePoints (aka shores).
-                    if inverseEdgeHash[_x][_y]:
-                        inverseEdgeHash[_x][_y].addEdge(
-                            edgeHash[gridPoint.x][gridPoint.y])
-                    else:
+                    if not inverseEdgeHash[_x][_y]:
                         inverseEdgeHash[_x][_y] = \
-                            InverseEdgePoint(_x, _y, elevation,
-                                             [edgeHash[gridPoint.x]
-                                              [gridPoint.y]])
+                            InverseEdgePoint(_x, _y, elevation)
 
         return MultiPoint(coordinateHashToGridPointList(equalHeightHash),
                           masterGridPoint.elevation, self.datamap,
-                          edgePoints=EdgePointContainer(
-                              edgePointIndex=edgeHash),
                           inverseEdgePoints=InverseEdgePointContainer(
                               inverseEdgePointIndex=inverseEdgeHash,
                               datamap=self.datamap, mapEdge=self.edge)
                           )
-
 
 class EqualHeightBlob(object):
     """
