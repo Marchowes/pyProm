@@ -7,10 +7,10 @@ the LICENSE file that accompanies it.
 This library contains a base container class for storing GridPoint
 type location objects.
 """
-
 from collections import defaultdict
 from .base import _Base
 from .shore import ShoreContainer
+from .gridpoint import GridPointContainer
 
 
 class InverseEdgePointContainer(_Base):
@@ -73,6 +73,40 @@ class InverseEdgePointContainer(_Base):
             else:
                 continue
 
+
+    def findHighEdges(self, elevation):
+        """
+        Hopefully a way more efficient way of finding high edges.
+        :return:
+        """
+        purgedIndex = defaultdict(list)
+        highLists = list()
+        for point in self.points:
+            if point.y in purgedIndex[point.x]:
+                continue
+            if point.elevation > elevation:
+                toBeAnalyzed = [point]
+                highList = list()
+                while True:
+                    if not toBeAnalyzed:
+                        highLists.append(highList)
+                        break
+                    try:
+                        gridPoint = toBeAnalyzed.pop()
+                    except:
+                        highLists.append(highList)
+                        break
+                    purgedIndex[gridPoint.x].append(gridPoint.y)
+                    highList.append(gridPoint)
+                    neighbors = [x for x in self.iterNeighborOrthogonal(gridPoint) if x.elevation > elevation and x.y not in purgedIndex[x.x]]
+                    toBeAnalyzed += neighbors
+            else:
+                purgedIndex[point.x].append(point.y)
+
+        return [GridPointContainer(x) for x in highLists]
+
+
+
     def findLinear(self):
         """
         :return: list of GridPoint containers representing individual edges
@@ -90,10 +124,14 @@ class InverseEdgePointContainer(_Base):
 
         for point in (pt for pt in self.points):
             neighbors = [x for x in self.iterNeighborOrthogonal(point)]
-            if len(neighbors) == 1:
-                if point.x in [self.datamap.max_x, 0] or\
-                                point.y in [self.datamap.max_y, 0]:
-                    self.edge.append(point)
+            if point.x in [self.datamap.max_x, 0] or \
+                            point.y in [self.datamap.max_y, 0]:
+                self.edge.append(point)
+
+            # if len(neighbors) == 1:
+            #     if point.x in [self.datamap.max_x, 0] or\
+            #                     point.y in [self.datamap.max_y, 0]:
+            #         self.edge.append(point)
             if len(neighbors) == 2:
                 two.append(point)
 
@@ -147,6 +185,8 @@ class InverseEdgePointContainer(_Base):
         currentPoint = firstPoint
 
         orderedList = [originalPoint]
+        thisRoundList = list()
+        hit = False
 
         while True:
             # First, we find all neighbors who are not the original point,
@@ -191,7 +231,7 @@ class InverseEdgePointContainer(_Base):
                                               "Exception! on {}".format(self))
                             self.logger.debug(
                                 "TroubleMakers {}".format(currentPoint))
-
+                        hit = True
                         orderedList +=\
                             self.branchChaser(
                                 masterPoint,
@@ -201,6 +241,7 @@ class InverseEdgePointContainer(_Base):
                         continue
                 else:
                     # Follow the branch with the most common neighbors.
+                    hit = True
                     orderedList +=\
                         self.branchChaser(
                             masterPoint,
@@ -212,12 +253,14 @@ class InverseEdgePointContainer(_Base):
             if currentPoint.y not in self.exemptPoints[currentPoint.x]:
                 # Last modification in PR, delete this comment someday.
                 self.exemptPoints[currentPoint.x].append(currentPoint.y)
+                thisRoundList.append(currentPoint)
                 orderedList.append(currentPoint)
 
             if len(neighbors) == 0:
                 # End of the line? return the ordered list.
                 for point in orderedList:
                     self.exemptPoints[point.x].append(point.y)
+
                 if fst:
                     neighbors = [pt for pt in self.iterNeighborOrthogonal(masterPoint)
                                  if pt.y not in self.exemptPoints[pt.x]]
@@ -227,7 +270,10 @@ class InverseEdgePointContainer(_Base):
                                                    masterPoint,
                                                    neighbors[0])
                         return [x for x in reversed(result)][1:] + orderedList
-
+                else:
+                    #reversed if not up against an edge
+                    if masterPoint not in [x for x in self.iterNeighborOrthogonal(currentPoint)] and not hit:
+                        return orderedList + [x for x in reversed(orderedList)]
                 return orderedList
 
             # Just one neighbor? Okay, do this...
