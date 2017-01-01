@@ -9,7 +9,6 @@ import logging
 import os
 from fastkml import kml
 from shapely.geometry import Point
-from lxml import etree
 from lib.containers.spot_elevation import SpotElevationContainer
 
 
@@ -32,9 +31,15 @@ class KMLfileWriter(object):
         ns = '{http://www.opengis.net/kml/2.2}'
 
         # Create a KML Document and add it to the KML root object
-        d = kml.Document(ns, 'docid', 'doc name', 'doc description')
+        d = kml.Document(ns,
+                         'docid',
+                         'doc name',
+                         'doc description')
         self.k.append(d)
-        self.kmlFolder = kml.Folder(ns, 'timedatepeaks', 'peaks', 'kml map of summits')
+        self.kmlFolder = kml.Folder(ns,
+                                    'timedatepeaks',
+                                    'peaks',
+                                    'kml map of summits')
         for spotElevation in kmlList:
             self.kmlFolder.append(self.generateKMLPlacemark(spotElevation))
         d.append(self.kmlFolder)
@@ -45,10 +50,12 @@ class KMLfileWriter(object):
         :return:
         """
         ns = '{http://www.opengis.net/kml/2.2}'
-        p = kml.Placemark(ns, "{:.3f}".format(spotElevation.feet) , "{:.3f}".format(spotElevation.feet), 'Summit')
+        p = kml.Placemark(ns,
+                          "{:.3f}".format(spotElevation.feet),
+                          "{:.3f}".format(spotElevation.feet),
+                          'Summit')
         p.geometry = Point(spotElevation.longitude, spotElevation.latitude)
         return p
-
 
     def writeFile(self):
         output = open(self.outputFile, "w")

@@ -17,10 +17,8 @@ from lib.locations.gridpoint import GridPoint
 from lib.locations.saddle import Saddle
 from lib.locations.summit import Summit
 from lib.locations.inverse_edgepoint import InverseEdgePoint
-from lib.locations.edgepoint import EdgePoint
 from lib.containers.spot_elevation import SpotElevationContainer
 from lib.containers.multipoint import MultiPoint
-from lib.containers.edgepoint import EdgePointContainer
 from lib.containers.inverse_edgepoint import InverseEdgePointContainer
 from lib.containers.high_edge import HighEdgeContainer
 from lib.containers.gridpoint import GridPointContainer
@@ -67,17 +65,18 @@ class AnalyzeData(object):
             if not index % 100000:
 
                 thisTime = default_timer()
-                split = round(thisTime - self.lasttime,2)
+                split = round(thisTime - self.lasttime, 2)
                 self.lasttime = default_timer()
                 rt = self.lasttime - self.start
-
-                pointsPerSec = round(index/rt,2)
-                self.logger.info("Points per second: {} - {}% runtime: {}, split: {}".format(
-                    pointsPerSec,
-                    round(index/self.data.size*100,2),
-                    (str(timedelta(seconds=round(rt,2)))),
-                    split
-                ))
+                pointsPerSec = round(index/rt, 2)
+                self.logger.info(
+                    "Points per second: {} - {}%"
+                    " runtime: {}, split: {}".format(
+                        pointsPerSec,
+                        round(index/self.data.size * 100, 2),
+                        (str(timedelta(seconds=round(rt, 2)))),
+                        split
+                    ))
 
             # Check for summit or saddle
             result = self.summit_and_saddle(x, y)
@@ -90,7 +89,7 @@ class AnalyzeData(object):
             self.edge = False
             self.blob = None
             iterator.iternext()
-        #cleanup.
+        # Free some memory.
         del(self.skipAnalysis)
         return self.summitObjects, self.saddleObjects
 
@@ -102,7 +101,8 @@ class AnalyzeData(object):
         :return: Summit, Saddle, or None
         """
         self.blob = self.equalHeightBlob(x, y, ptElevation)
-        highInverseEdge = self.blob.inverseEdgePoints.findHighEdges(self.elevation)
+        highInverseEdge = self.blob.inverseEdgePoints.findHighEdges(
+            self.elevation)
 
         for exemptPoint in self.blob.points:
             self.skipAnalysis[exemptPoint.x] \
@@ -114,16 +114,15 @@ class AnalyzeData(object):
                             edge=self.edge,
                             multiPoint=self.blob
                             )
-            #self.summitObjects.points.append(summit)
             return summit
-        if (len(highInverseEdge) > 1) or (len(highInverseEdge) == 1 and self.edge):
+        if (len(highInverseEdge) > 1) or\
+                (len(highInverseEdge) == 1 and self.edge):
             saddle = Saddle(self.datamap.x_position_latitude(x),
                             self.datamap.y_position_longitude(y),
                             self.elevation,
                             edge=self.edge,
                             multiPoint=self.blob,
                             highShores=highInverseEdge)
-            #self.saddleObjects.points.append(saddle)
             return saddle
         return None
 
@@ -158,7 +157,6 @@ class AnalyzeData(object):
             if elevation == self.elevation and _y not in \
                     self.skipAnalysis[_x]:
                 return self.analyze_multipoint(_x, _y, elevation)
-                #return
             if elevation > self.elevation:
                 neighborProfile += "H"
             if elevation < self.elevation:
@@ -171,7 +169,6 @@ class AnalyzeData(object):
                             self.datamap.y_position_longitude(y),
                             self.elevation,
                             edge=self.edge)
-            #self.summitObjects.points.append(summit)
             return summit
 
         elif any(x in reducedNeighborProfile for x in saddleProfile):
@@ -181,7 +178,6 @@ class AnalyzeData(object):
                             self.elevation,
                             edge=self.edge,
                             highShores=shores.highPoints)
-            #self.saddleObjects.points.append(saddle)
             return saddle
         return None
 

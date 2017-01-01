@@ -51,9 +51,9 @@ class SpotElevation(BaseCoordinate):
         """
         from .gridpoint import GridPoint
         return GridPoint(datamap.relative_position_latitude(self.latitude),
-                           datamap.relative_position_longitude(
+                         datamap.relative_position_longitude(
                             self.longitude),
-                           self.elevation)
+                         self.elevation)
 
     @property
     def feet(self):

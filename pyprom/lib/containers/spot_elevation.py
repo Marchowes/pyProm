@@ -114,7 +114,6 @@ class SpotElevationContainer(_Base):
         """
         json.dumps([x.to_dict() for x in self.points])
 
-
     def __repr__(self):
         return "<SpotElevationContainer> {} Objects".format(len(self.points))
 

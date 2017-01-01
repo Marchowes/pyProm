@@ -8,8 +8,6 @@ This library contains a base container class for storing GridPoint
 type location objects.
 """
 from collections import defaultdict
-from .base import _Base
-from .shore import ShoreContainer
 from .gridpoint import GridPointContainer
 
 
@@ -71,7 +69,6 @@ class InverseEdgePointContainer(object):
             else:
                 continue
 
-
     def findHighEdges(self, elevation):
         """
         Hopefully a way more efficient way of finding high edges.
@@ -96,7 +93,10 @@ class InverseEdgePointContainer(object):
                         break
                     purgedIndex[gridPoint.x].append(gridPoint.y)
                     highList.append(gridPoint)
-                    neighbors = [x for x in self.iterNeighborOrthogonal(gridPoint) if x.elevation > elevation and x.y not in purgedIndex[x.x]]
+                    neighbors = [x for x in
+                                 self.iterNeighborOrthogonal(gridPoint)
+                                 if x.elevation > elevation
+                                 and x.y not in purgedIndex[x.x]]
                     toBeAnalyzed += neighbors
             else:
                 purgedIndex[point.x].append(point.y)
