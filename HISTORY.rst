@@ -1,5 +1,11 @@
 Release History
 --------------
+0.2.5 ()
++++++++++++++++++++++++
+Complete rewrite of saddle analysis.
+33% runtime improvement. 66% memory reduction.
+
+
 0.2.1 (December 26, 2016)
 +++++++++++++++++++++++
 *Radius Search for locations

@@ -1,4 +1,4 @@
-### pyProm v0.2.1
+### pyProm v0.2.5
 
 
 This library is still under development. Do not expect full functionality, or documentation until release 1.0.0
@@ -35,6 +35,7 @@ Why?? Why are you installing this??? It's nowhere near done.
 
 Download zip from github, or clone.
 Go to extraction directory and run `pip install -e .`
+This will work with Python 2.7 and 3.4+
 
 
 Trouble Getting GDAL installed?
