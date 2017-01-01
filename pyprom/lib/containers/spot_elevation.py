@@ -7,9 +7,10 @@ the LICENSE file that accompanies it.
 This library contains a container class for storing SpotElevation
 type location objects.
 """
+import json
 
 from ..location_util import longitudeArcSec
-from base import _Base
+from .base import _Base
 from math import sqrt
 
 
@@ -88,7 +89,7 @@ class SpotElevationContainer(_Base):
         return SpotElevationContainer([x for x in self.points
                                        if type(x).__name__.upper() == name])
 
-    def elevationRange(self, lower=None, upper=100000):
+    def elevationRange(self, lower=-100000, upper=100000):
         """
         :param lower: lower limit in feet
         :param upper: upper limit in feet
@@ -97,7 +98,7 @@ class SpotElevationContainer(_Base):
         return SpotElevationContainer([x for x in self.points if
                                        x.feet > lower and x.feet < upper])
 
-    def elevationRangeMetric(self, lower=None, upper=100000):
+    def elevationRangeMetric(self, lower=-100000, upper=100000):
         """
         :param lower: lower limit in Meters
         :param upper: upper limit in Meters
@@ -106,6 +107,12 @@ class SpotElevationContainer(_Base):
         return SpotElevationContainer([x for x in self.points if
                                        x.elevation > lower and
                                        x.elevation < upper])
+
+    def to_json(self):
+        """
+        :return: json string of all points in this container.
+        """
+        json.dumps([x.to_dict() for x in self.points])
 
     def __repr__(self):
         return "<SpotElevationContainer> {} Objects".format(len(self.points))

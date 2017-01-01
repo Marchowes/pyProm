@@ -1,7 +1,20 @@
 Release History
---------------
-0.2.1 (December 26, 2016)
+---------------
+
+0.2.5 (January 1, 2017)
 +++++++++++++++++++++++
+Complete rewrite of saddle analysis.
+33% runtime improvement. 66% memory reduction.
+Overhauled Logic Process, Functions now more atomic
+Overhauled InverseEdgePoints
+Eliminated EdgePoints (keeping objects for later)
+Python 3 compatability
+Overhauled KML export for Python 3 compatability
+to_json to SpotElevation container
+Expunged old Pond/Island analysis in multipoints
+
+0.2.1 (December 26, 2016)
++++++++++++++++++++++++++
 *Radius Search for locations
 *SpotElevationContainer filters all return new SpotElevationContainers
 *Break Locations and container into their own files.

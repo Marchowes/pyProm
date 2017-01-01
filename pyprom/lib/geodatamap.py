@@ -12,7 +12,7 @@ from __future__ import division
 
 import logging
 
-from util import dottedDecimaltoDegrees, degreesToDottedDecimal
+from .util import dottedDecimaltoDegrees, degreesToDottedDecimal
 
 ARCSEC_DEG = 3600
 ARCMIN_DEG = 60
@@ -131,7 +131,7 @@ class DataMap(object):
                0 <= _y <= self.max_y:
                 yield _x, _y, float(self.numpy_map[_x, _y])
             else:
-                yield _x, _y, None
+                yield _x, _y, -10000
 
     def iterateOrthogonal(self, x, y):
         """
@@ -148,4 +148,4 @@ class DataMap(object):
                0 <= _y <= self.max_y:
                 yield _x, _y, float(self.numpy_map[_x, _y])
             else:
-                yield _x, _y, None
+                yield _x, _y, -10000

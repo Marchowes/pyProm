@@ -37,6 +37,8 @@ class HighEdgeContainer(object):
             if not shorePoint.elevation and highEdgePoints:
                 highEdgePoints.append(shorePoint)
         if first:
+            if highEdgePoints:
+                self._highPoints.append(highEdgePoints)
             return
         else:
             # Do we have a queue of highpoints and was the first one
@@ -47,6 +49,8 @@ class HighEdgeContainer(object):
                     and not first:
                 self._highPoints[0] = \
                      highEdgePoints + self._highPoints[0]
+            elif highEdgePoints:
+                self._highPoints.append(highEdgePoints)
 
     @property
     def highPoints(self):

@@ -22,7 +22,7 @@ class InverseEdgePoint(GridPoint):
     :param inverseEdgePointNeighbors: list of neighboring
      :class:`InverseEdgePoint`
     """
-    def __init__(self, x, y, elevation, edgePoints,
+    def __init__(self, x, y, elevation, edgePoints=[],
                  inverseEdgePointNeighbors=[]):
         super(InverseEdgePoint, self).__init__(x, y, elevation)
         self.edgePoints = edgePoints

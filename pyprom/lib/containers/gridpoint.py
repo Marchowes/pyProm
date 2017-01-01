@@ -9,7 +9,6 @@ type location objects.
 """
 
 from .base_gridpoint import BaseGridPointContainer
-from ..location_util import findExtremities
 
 
 class GridPointContainer(BaseGridPointContainer):
@@ -19,9 +18,6 @@ class GridPointContainer(BaseGridPointContainer):
     """
     def __init__(self, gridPointList):
         super(GridPointContainer, self).__init__(gridPointList)
-
-    def findExtremities(self):
-        return findExtremities(self.points)
 
     def __repr__(self):
         return "<GridPointContainer> {} Objects".format(len(self.points))
