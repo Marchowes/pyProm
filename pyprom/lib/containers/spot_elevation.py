@@ -156,8 +156,6 @@ class SpotElevationContainer(_Base):
                         GridPointContainer(
                             [GridPoint(x['x'], x['y'], x['elevation'])
                              for x in hs]))
-
-
             feature.edgeEffect = point['edge']
             self.points.append(feature)
 

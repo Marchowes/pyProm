@@ -25,7 +25,7 @@ class Summit(SpotElevation):
         super(Summit, self).__init__(latitude, longitude,
                                      elevation, *args, **kwargs)
         self.multiPoint = kwargs.get('multiPoint', None)
-
+        self.saddles = list()
     def to_dict(self, recurse=False):
         """
         :param recurse: include multipoint

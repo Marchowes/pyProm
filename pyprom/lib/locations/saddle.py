@@ -29,7 +29,7 @@ class Saddle(SpotElevation):
         self.highShores = kwargs.get('highShores', None)
         #Temporary until I've build a linker
         self.summits = list()
-        self.paths = list()
+        self.disqualified = False
 
 
     def to_dict(self, recurse=False):
