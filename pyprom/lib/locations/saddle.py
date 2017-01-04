@@ -27,17 +27,28 @@ class Saddle(SpotElevation):
                                      elevation, *args, **kwargs)
         self.multiPoint = kwargs.get('multiPoint', None)
         self.highShores = kwargs.get('highShores', None)
+        #Temporary until I've build a linker
+        self.summits = list()
+        self.paths = list()
+
 
     def to_dict(self, recurse=False):
         """
         :param recurse: include multipoint
         :return: dict of :class:`Saddle`
         """
-        to_dict = {'latitude': self.latitude,
+        to_dict = {'type': 'Saddle',
+                   'latitude': self.latitude,
                    'longitude': self.longitude,
-                   'elevation': self.elevation}
+                   'elevation': self.elevation,
+                   'edge': self.edgeEffect}
         if self.multiPoint and recurse:
             to_dict['multipoint'] = self.multiPoint.to_dict()
+        if self.highShores:
+            to_dict['highShores'] = list()
+            for shore in self.highShores:
+                hs = [x.to_dict() for x in shore.points]
+                to_dict['highShores'].append(hs)
         return to_dict
 
     def to_json(self, recurse=False):

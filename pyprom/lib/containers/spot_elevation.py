@@ -10,8 +10,16 @@ type location objects.
 import json
 
 from ..location_util import longitudeArcSec
+from ..locations.saddle import Saddle
+from ..locations.summit import Summit
+from ..locations.spot_elevation import SpotElevation
+from ..locations.base_gridpoint import BaseGridPoint
+from ..locations.gridpoint import GridPoint
+from .multipoint import MultiPoint
+from .gridpoint import GridPointContainer
 from .base import _Base
 from math import sqrt
+
 
 
 class SpotElevationContainer(_Base):
@@ -112,7 +120,46 @@ class SpotElevationContainer(_Base):
         """
         :return: json string of all points in this container.
         """
-        json.dumps([x.to_dict() for x in self.points])
+        return json.dumps([x.to_dict(recurse=True) for x in self.points])
+
+    def from_json(self, jsonData, datamap):
+        hash = json.loads(jsonData)
+        self.points = list()
+        for point in hash:
+            objType = point.get('type', 'SpotElevation')
+            if objType == 'Summit':
+                feature = Summit(point['latitude'],
+                                 point['longitude'],
+                                 point['elevation'])
+            elif objType == 'Saddle':
+                feature = Saddle(point['latitude'],
+                                 point['longitude'],
+                                 point['elevation'])
+            elif objType == 'SpotElevation':
+                feature = SpotElevation(point['latitude'],
+                                        point['longitude'],
+                                        point['elevation'])
+            else:
+                raise Exception('Cannot import unknown type:'.format(objType))
+            mpPoints = list()
+            if point.get('multipoint', None):
+                for mp in point['multipoint']:
+                    mpPoints.append(BaseGridPoint(mp['gridpoint']['x'],
+                                                  mp['gridpoint']['y']))
+                feature.multiPoint = MultiPoint(mpPoints,
+                                                point['elevation'],
+                                                datamap)
+            if point.get('highShores', None):
+                feature.highShores = list()
+                for hs in point['highShores']:
+                    feature.highShores.append(
+                        GridPointContainer(
+                            [GridPoint(x['x'], x['y'], x['elevation'])
+                             for x in hs]))
+
+
+            feature.edgeEffect = point['edge']
+            self.points.append(feature)
 
     def __repr__(self):
         return "<SpotElevationContainer> {} Objects".format(len(self.points))

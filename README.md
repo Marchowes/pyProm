@@ -36,6 +36,7 @@ Why?? Why are you installing this??? It's nowhere near done.
 Download zip from github, or clone.
 Go to extraction directory and run `pip install -e .`
 This will work with Python 2.7 and 3.4+
+GDAL doesnt work in Python3, so ADFLoader (DEM) wont work. Want to analyze DEM data? use Python 2.7 instead.
 
 
 Trouble Getting GDAL installed?

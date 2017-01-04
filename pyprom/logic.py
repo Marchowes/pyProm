@@ -177,7 +177,8 @@ class AnalyzeData(object):
                             self.datamap.y_position_longitude(y),
                             self.elevation,
                             edge=self.edge,
-                            highShores=shores.highPoints)
+                            highShores=[GridPointContainer(x)
+                                        for x in shores.highPoints])
             return saddle
         return None
 

@@ -66,8 +66,8 @@ class DataMap(object):
         hms_longitude = dottedDecimaltoDegrees(longitude)
         return int(abs((round(hms_longitude[2] +
                              (hms_longitude[1] * ARCMIN_DEG) +
-                             (hms_longitude[0] * ARCSEC_DEG)) -
-                             (self.longitude) * ARCSEC_DEG) /
+                             (hms_longitude[0] * ARCSEC_DEG) -
+                             (self.longitude) * ARCSEC_DEG)) /
                         self.arcsec_resolution))
 
     def relative_position_latitude(self, latitude):
@@ -83,8 +83,8 @@ class DataMap(object):
         return int(abs((round(hms_latitude[2] +
                        (hms_latitude[1] * ARCMIN_DEG) +
                        (hms_latitude[0] * ARCSEC_DEG)) -
-                       (self.latitude_max) * ARCSEC_DEG) /
-                   self.arcsec_resolution))
+                       (self.latitude_max) * ARCSEC_DEG)) /
+                   self.arcsec_resolution)
 
     def _position_formula(self, x):
         """
@@ -131,7 +131,7 @@ class DataMap(object):
                0 <= _y <= self.max_y:
                 yield _x, _y, float(self.numpy_map[_x, _y])
             else:
-                yield _x, _y, ""
+                yield _x, _y, -10000
 
     def iterateOrthogonal(self, x, y):
         """
@@ -148,4 +148,4 @@ class DataMap(object):
                0 <= _y <= self.max_y:
                 yield _x, _y, float(self.numpy_map[_x, _y])
             else:
-                yield _x, _y, None
+                yield _x, _y, -10000

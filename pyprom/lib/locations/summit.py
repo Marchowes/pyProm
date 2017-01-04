@@ -31,9 +31,11 @@ class Summit(SpotElevation):
         :param recurse: include multipoint
         :return: dict of :class:`Summit`
         """
-        to_dict = {'latitude': self.latitude,
+        to_dict = {'type': 'Summit',
+                   'latitude': self.latitude,
                    'longitude': self.longitude,
-                   'elevation': self.elevation}
+                   'elevation': self.elevation,
+                   'edge': self.edgeEffect}
         if self.multiPoint and recurse:
             to_dict['multipoint'] = self.multiPoint.to_dict()
         return to_dict
