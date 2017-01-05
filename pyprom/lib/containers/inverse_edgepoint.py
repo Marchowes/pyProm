@@ -94,7 +94,7 @@ class InverseEdgePointContainer(object):
                     purgedIndex[gridPoint.x].append(gridPoint.y)
                     highList.append(gridPoint)
                     neighbors = [x for x in
-                                 self.iterNeighborOrthogonal(gridPoint)
+                                 self.iterNeighborDiagonal(gridPoint)
                                  if x.elevation > elevation and
                                  x.y not in purgedIndex[x.x]]
                     toBeAnalyzed += neighbors
