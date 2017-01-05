@@ -55,20 +55,22 @@ class Walk(object):
             #Sort High Shores from high to low
             highEdge.points.sort(key=lambda x: x.elevation, reverse=True)
 
-            path = list()
+
+            lookback = 1
             point = highEdge.points[0]
+            path = list([point])
             exemptHash = defaultdict(list)
 
             while True:
-                path.append(point)
+
                 ####
                 if len(path) > 5000:
                     self.logger.info("BORK! stuck at {}".format(point))
                     return path
                 ####
                 point = self._climb_up(point, exemptHash)
-                if not point:
-                    break
+                #if not point:
+                #    break
                 if isinstance(point, Summit):
                     self.logger.info('Linked {} -> {}'.format(saddle, point))
                     link = Linker(point, saddle, path)
@@ -77,7 +79,14 @@ class Walk(object):
                     point.saddles.append(link)
 
                     break
-                exemptHash[point.x].append(point.y)
+                if point:
+                    exemptHash[point.x].append(point.y)
+                    lookback = 1
+                    path.append(point)
+                else:
+                    lookback += 1
+                    point = path[-lookback]
+
 
         if len(set(saddle.summits)) == 1:
             saddle.disqualified = True
@@ -107,11 +116,17 @@ class Walk(object):
                 candidates.append(GridPoint(x, y, elevation))
         # Make smarter?
         # if currentHigh == point.elevation:
-        try:
+        if candidates:
             winner = candidates[0]
-        except:
-            self.logger.info("BORK! stuck at {}".format(point))
-            return None
+        else:
+            winner = None
+
+
+        # try:
+        #     winner = candidates[0]
+        # except:
+        #     self.logger.info("BORK! stuck at {}".format(point))
+        #     return None
         return winner
 
 
