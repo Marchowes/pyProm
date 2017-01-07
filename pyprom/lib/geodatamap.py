@@ -167,3 +167,14 @@ class DataMap(object):
                        xSpan,
                        ySpan,
                        self.arcsec_resolution)
+
+    def __repr__(self):
+        return "<DataMap> Lat {}, Long {}, SpanLat {}," \
+               " SpanLong {}, {} ArcSec/Point".format(
+            self.latitude,
+            self.longitude,
+            self.span_latitude,
+            self.span_longitude,
+            self.arcsec_resolution)
+
+    __unicode__ = __str__ = __repr__

@@ -37,8 +37,7 @@ class Saddle(SpotElevation):
         :param recurse: include multipoint
         :return: dict of :class:`Saddle`
         """
-        to_dict = {'type': 'Saddle',
-                   'latitude': self.latitude,
+        to_dict = {'latitude': self.latitude,
                    'longitude': self.longitude,
                    'elevation': self.elevation,
                    'edge': self.edgeEffect}

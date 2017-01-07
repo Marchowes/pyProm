@@ -3,6 +3,9 @@ pyProm: Copyright 2016
 
 This software is distributed under a license that is described in
 the LICENSE file that accompanies it.
+
+This file contains a class for walking from Saddles to Summits.
+
 """
 import logging
 from collections import defaultdict
