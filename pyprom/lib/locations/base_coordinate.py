@@ -32,11 +32,16 @@ class BaseCoordinate(object):
         return {'latitude': self.latitude,
                 'longitude': self.longitude}
 
-    def to_json(self):
+    def to_json(self, prettyprint=True):
         """
+        :param prettyprint: human readable,
         :return: json string of :class:`BaseCoordinate`
         """
-        return json.dumps(self.to_dict())
+        if prettyprint:
+            return json.dumps(to_json, sort_keys=True,
+                              indent=4, separators=(',', ': '))
+        else:
+            return json.dumps(to_json)
 
     @property
     def utm(self):

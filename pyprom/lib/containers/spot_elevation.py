@@ -116,13 +116,24 @@ class SpotElevationContainer(_Base):
                                        x.elevation > lower and
                                        x.elevation < upper])
 
-    def to_json(self):
+    def to_json(self, prettyprint=True):
         """
+        :param prettyprint: human readable,
+         but takes more space when written to a file.
         :return: json string of all points in this container.
         """
-        return json.dumps([x.to_dict(recurse=True) for x in self.points])
+        if prettyprint:
+            return json.dumps([x.to_dict(recurse=True) for x in self.points],
+                              sort_keys=True, indent=4, separators=(',', ': '))
+        else:
+            return json.dumps([x.to_dict(recurse=True) for x in self.points])
 
     def from_json(self, jsonData, datamap):
+        """
+        :param jsonData: json string of data to be loaded in this container
+        :param datamap:
+        :return:
+        """
         hash = json.loads(jsonData)
         self.points = list()
         for point in hash:

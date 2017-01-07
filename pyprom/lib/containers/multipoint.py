@@ -50,13 +50,19 @@ class MultiPoint(object):
             plist.append(pdict)
         return plist
 
-    def to_json(self, verbose=False):
+    def to_json(self, verbose=False, prettyprint=True):
         """
+        :param prettyprint: human readable,
+         but takes more space when written to a file.
         :param verbose: returns extra data like `InverseEdgePoint`
         and `EdgePoint` (future)
         :return: json data
         """
-        return json.dumps(self.to_dict(verbose=verbose))
+        if prettyprint:
+            return json.dumps(self.to_dict(verbose=verbose), sort_keys=True,
+                              indent=4, separators=(',', ': '))
+        else:
+            return json.dumps(self.to_dict(verbose=verbose))
 
     @property
     def pointsLatLong(self):

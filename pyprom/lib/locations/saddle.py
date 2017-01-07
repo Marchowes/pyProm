@@ -51,13 +51,20 @@ class Saddle(SpotElevation):
                 to_dict['highShores'].append(hs)
         return to_dict
 
-    def to_json(self, recurse=False):
+    def to_json(self, recurse=False, prettyprint=True):
         """
         :param recurse: include multipoint
+        :param prettyprint: human readable,
+         but takes more space when written to a file.
         :return: json string of :class:`Saddle`
         """
         to_json = self.to_dict(recurse=recurse)
-        return json.dumps(to_json)
+        if prettyprint:
+            return json.dumps(to_json, sort_keys=True,
+                              indent=4, separators=(',', ': '))
+        else:
+            return json.dumps(to_json)
+
 
     def __repr__(self):
         return "<Saddle> lat {} long {} {}ft {}m MultiPoint {}".format(

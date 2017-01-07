@@ -30,12 +30,17 @@ class GridPoint(BaseGridPoint):
                 'y': self.y,
                 'elevation': self.elevation}
 
-    def to_json(self):
+    def to_json(self, prettyprint=True):
         """
+        :param prettyprint: human readable,
         :return: json string of :class:`GridPoint`
         """
         to_json = self.to_dict()
-        return json.dumps(to_json)
+        if prettyprint:
+            return json.dumps(to_json, sort_keys=True,
+                              indent=4, separators=(',', ': '))
+        else:
+            return json.dumps(to_json)
 
     def toSpotElevation(self, datamap):
         """
