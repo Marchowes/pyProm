@@ -14,7 +14,7 @@ import json
 import logging
 
 from logic import AnalyzeData
-from lib.geodatamap import DataMap
+from lib.datamap import DataMap
 from dataload import Loader
 from lib.containers.spot_elevation import SpotElevationContainer
 from lib.locations.summit import Summit

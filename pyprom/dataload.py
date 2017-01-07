@@ -10,7 +10,7 @@ import gdal
 import numpy
 import logging
 
-from lib.geodatamap import DataMap
+from lib.datamap import DataMap
 
 
 class Loader(object):
