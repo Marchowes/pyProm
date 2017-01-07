@@ -8,6 +8,7 @@ This library contains a base class for Coordinate oriented objects.
 """
 
 import json
+import utm
 
 
 class BaseCoordinate(object):
@@ -36,6 +37,14 @@ class BaseCoordinate(object):
         :return: json string of :class:`BaseCoordinate`
         """
         return json.dumps(self.to_dict())
+
+    @property
+    def utm(self):
+        """
+        Returns Tuple of utm coordinate for this :class:`BaseCoordinate`.
+        :return:
+        """
+        return utm.from_latlon(self.latitude, self.longitude)
 
     def __eq__(self, other):
         latitude = longitude = olatitude = olongitude = None
