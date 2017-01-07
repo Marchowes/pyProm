@@ -18,6 +18,7 @@ class Walk(object):
         self.summits = summits
         self.saddles = saddles
         self.datamap = datamap
+        self.linkers = list()
 
         self.logger.info("Create Fast Lookup Hash for Summit Objects.")
         self.summitHash = self._to_hash(self.summits)
@@ -35,9 +36,9 @@ class Walk(object):
                 for mp in point.multiPoint.points:
                     hash[mp.x][mp.y] = point
             else:
-                hash[self.datamap.relative_position_latitude(
+                hash[self.datamap.latitude_to_x(
                         point.latitude)]\
-                    [self.datamap.relative_position_longitude(
+                    [self.datamap.longitude_to_y(
                         point.longitude)]\
                             = point
         return hash
@@ -50,7 +51,7 @@ class Walk(object):
 
     def walk(self, saddle):
         #iterate through high Shores
-        links = list()
+        self.linkers = list()
         for highEdge in saddle.highShores:
             #Sort High Shores from high to low
             highEdge.points.sort(key=lambda x: x.elevation, reverse=True)
@@ -69,12 +70,10 @@ class Walk(object):
                     return path
                 ####
                 point = self._climb_up(point, exemptHash)
-                #if not point:
-                #    break
                 if isinstance(point, Summit):
-                    self.logger.info('Linked {} -> {}'.format(saddle, point))
+                    #self.logger.info('Linked {} -> {}'.format(saddle, point))
                     link = Linker(point, saddle, path)
-                    links.append(link)
+                    self.linkers.append(link)
                     saddle.summits.append(link)
                     point.saddles.append(link)
 
@@ -90,12 +89,11 @@ class Walk(object):
 
         if len(set(saddle.summits)) == 1:
             saddle.disqualified = True
-        return links
+        return self.linkers
 
 
     def _climb_up(self, point, exemptHash):
 
-        #HERE: Logic to ID if we've hit a summit
         if self.summitHash[point.x][point.y]:
             return self.summitHash[point.x][point.y]
 
@@ -120,14 +118,12 @@ class Walk(object):
             winner = candidates[0]
         else:
             winner = None
-
-
-        # try:
-        #     winner = candidates[0]
-        # except:
-        #     self.logger.info("BORK! stuck at {}".format(point))
-        #     return None
         return winner
+
+
+    def mark_redundant_linkers(self):
+        for saddle in self.saddles:
+            pass
 
 
 
