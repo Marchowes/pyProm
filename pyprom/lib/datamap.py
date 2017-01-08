@@ -65,10 +65,10 @@ class DataMap(object):
                                                 self.longitude_max))
         hms_longitude = dottedDecimaltoDegrees(longitude)
         return int(abs((round(hms_longitude[2] +
-                             (hms_longitude[1] * ARCMIN_DEG) +
-                             (hms_longitude[0] * ARCSEC_DEG) -
-                             (self.longitude) * ARCSEC_DEG)) /
-                        self.arcsec_resolution))
+                              (hms_longitude[1] * ARCMIN_DEG) +
+                              (hms_longitude[0] * ARCSEC_DEG) -
+                              (self.longitude) * ARCSEC_DEG)) /
+                       self.arcsec_resolution))
 
     def latitude_to_x(self, latitude):
         """
@@ -160,7 +160,7 @@ class DataMap(object):
         """
         keyLat = self.x_to_latitude(x)
         keyLong = self.y_to_longitude(y)
-        numpy_map=(self.numpy_map[x:xSpan,y:ySpan])
+        numpy_map = (self.numpy_map[x:xSpan, y:ySpan])
         return DataMap(numpy_map,
                        keyLat,
                        keyLong,
@@ -171,10 +171,10 @@ class DataMap(object):
     def __repr__(self):
         return "<DataMap> Lat {}, Long {}, SpanLat {}," \
                " SpanLong {}, {} ArcSec/Point".format(
-            self.latitude,
-            self.longitude,
-            self.span_latitude,
-            self.span_longitude,
-            self.arcsec_resolution)
+                self.latitude,
+                self.longitude,
+                self.span_latitude,
+                self.span_longitude,
+                self.arcsec_resolution)
 
     __unicode__ = __str__ = __repr__

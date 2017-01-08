@@ -31,10 +31,9 @@ class Linker(object):
     def prom_ft(self):
         return self.summit.feet - self.saddle.feet
 
-
     def __repr__(self):
         return "<Linker> {} -> {} {}pft {}pm".format(
-            self.saddle,
-            self.summit,
-            self.prom_ft,
-            self.prom)
+                self.saddle,
+                self.summit,
+                self.prom_ft,
+                self.prom)

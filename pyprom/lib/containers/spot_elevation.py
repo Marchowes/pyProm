@@ -21,7 +21,6 @@ from .base import _Base
 from math import sqrt
 
 
-
 class SpotElevationContainer(_Base):
     """
     Container for Spot Elevation type lists.

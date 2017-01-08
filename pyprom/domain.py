@@ -150,16 +150,16 @@ class Domain(object):
                                   for x in self.summits.points]
         domain_dict['saddles'] = [x.to_dict(recurse=True)
                                   for x in self.saddles.points]
-        #domain_dict['linkers'] = ???Later???
+        # domain_dict['linkers'] = ???Later???
 
         return domain_dict
 
     def __repr__(self):
         return "<Domain> Lat/Long Extent {} Saddles " \
                "{} Summits {} Linkers {}".format(
-            self.extent,
-            len(self.saddles.points),
-            len(self.summits.points),
-            len(self.linkers))
+                    self.extent,
+                    len(self.saddles.points),
+                    len(self.summits.points),
+                    len(self.linkers))
 
     __unicode__ = __str__ = __repr__

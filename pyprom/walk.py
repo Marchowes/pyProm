@@ -13,6 +13,7 @@ from lib.locations.gridpoint import GridPoint
 from lib.locations.summit import Summit
 from lib.containers.linker import Linker
 
+
 class Walk(object):
     def __init__(self, summits, saddles, datamap):
 
@@ -25,7 +26,6 @@ class Walk(object):
 
         self.logger.info("Create Fast Lookup Hash for Summit Objects.")
         self.summitHash = self._to_hash(self.summits)
-
 
     def _to_hash(self, container):
         """
@@ -40,33 +40,28 @@ class Walk(object):
                     hash[mp.x][mp.y] = point
             else:
                 hash[self.datamap.latitude_to_x(
-                        point.latitude)]\
-                    [self.datamap.longitude_to_y(
-                        point.longitude)]\
-                            = point
+                        point.latitude)][self.datamap.longitude_to_y(
+                            point.longitude)]\
+                    = point
         return hash
 
-
     def run(self):
-        #iterate through saddles
+        # iterate through saddles
         for saddle in self.saddles:
             self.walk(saddle)
 
     def walk(self, saddle):
-        #iterate through high Shores
+        # iterate through high Shores
         self.linkers = list()
         for highEdge in saddle.highShores:
-            #Sort High Shores from high to low
+            # Sort High Shores from high to low
             highEdge.points.sort(key=lambda x: x.elevation, reverse=True)
-
-
             lookback = 1
             point = highEdge.points[0]
             path = list([point])
             exemptHash = defaultdict(list)
 
             while True:
-
                 ####
                 if len(path) > 5000:
                     self.logger.info("BORK! stuck at {}".format(point))
@@ -74,12 +69,10 @@ class Walk(object):
                 ####
                 point = self._climb_up(point, exemptHash)
                 if isinstance(point, Summit):
-                    #self.logger.info('Linked {} -> {}'.format(saddle, point))
                     link = Linker(point, saddle, path)
                     self.linkers.append(link)
                     saddle.summits.append(link)
                     point.saddles.append(link)
-
                     break
                 if point:
                     exemptHash[point.x].append(point.y)
@@ -89,20 +82,17 @@ class Walk(object):
                     lookback += 1
                     point = path[-lookback]
 
-
         if len(set(saddle.summits)) == 1:
             saddle.disqualified = True
         return self.linkers
-
 
     def _climb_up(self, point, exemptHash):
 
         if self.summitHash[point.x][point.y]:
             return self.summitHash[point.x][point.y]
 
-
         lastElevation = point.elevation
-        currentHigh= lastElevation
+        currentHigh = lastElevation
         candidates = list()
 
         neighbors = self.datamap.iterateDiagonal(point.x, point.y)
@@ -112,27 +102,15 @@ class Walk(object):
             if elevation > currentHigh and elevation > lastElevation:
                 currentHigh = elevation
                 candidates = list()
-                candidates.append(GridPoint(x,y,elevation))
+                candidates.append(GridPoint(x, y, elevation))
             if elevation == currentHigh:
                 candidates.append(GridPoint(x, y, elevation))
-        # Make smarter?
-        # if currentHigh == point.elevation:
         if candidates:
             winner = candidates[0]
         else:
             winner = None
         return winner
 
-
     def mark_redundant_linkers(self):
         for saddle in self.saddles:
             pass
-
-
-
-
-
-
-
-
-

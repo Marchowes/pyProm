@@ -38,10 +38,10 @@ class BaseCoordinate(object):
         :return: json string of :class:`BaseCoordinate`
         """
         if prettyprint:
-            return json.dumps(to_json, sort_keys=True,
+            return json.dumps(self.to_dict(), sort_keys=True,
                               indent=4, separators=(',', ': '))
         else:
-            return json.dumps(to_json)
+            return json.dumps(self.to_dict())
 
     @property
     def utm(self):

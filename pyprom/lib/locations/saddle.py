@@ -27,10 +27,9 @@ class Saddle(SpotElevation):
                                      elevation, *args, **kwargs)
         self.multiPoint = kwargs.get('multiPoint', None)
         self.highShores = kwargs.get('highShores', None)
-        #Temporary until I've build a linker
+        # Temporary until I've build a linker
         self.summits = list()
         self.disqualified = False
-
 
     def to_dict(self, recurse=False):
         """
@@ -63,7 +62,6 @@ class Saddle(SpotElevation):
                               indent=4, separators=(',', ': '))
         else:
             return json.dumps(to_json)
-
 
     def __repr__(self):
         return "<Saddle> lat {} long {} {}ft {}m MultiPoint {}".format(
