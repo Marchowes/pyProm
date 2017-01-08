@@ -10,10 +10,10 @@ import gdal
 import numpy
 import logging
 
-from lib.geodatamap import DataMap
+from lib.datamap import DataMap
 
 
-class _BaseLoader(object):
+class Loader(object):
     def __init__(self, filename):
         """
         Base class for data loaders.
@@ -22,7 +22,7 @@ class _BaseLoader(object):
         self.logger = logging.getLogger('pyProm.{}'.format(__name__))
 
 
-class SRTMLoader(_BaseLoader):
+class SRTMLoader(Loader):
     def __init__(self, filename,
                  arcsec_resolution=1,
                  span_latitude=3601,
@@ -51,12 +51,12 @@ class SRTMLoader(_BaseLoader):
                                               self.span_longitude,
                                               self.span_latitude))
 
-        self.geodatamap = DataMap(self.elevations,
-                                  self.latitude,
-                                  self.longitude,
-                                  self.span_latitude,
-                                  self.span_longitude,
-                                  self.arcsec_resolution)
+        self.datamap = DataMap(self.elevations,
+                               self.latitude,
+                               self.longitude,
+                               self.span_latitude,
+                               self.span_longitude,
+                               self.arcsec_resolution)
 
     def latlong(self):
         """
@@ -75,7 +75,7 @@ class SRTMLoader(_BaseLoader):
             self.longitude = -int(longitude[1:])
 
 
-class ADFLoader(_BaseLoader):
+class ADFLoader(Loader):
     """
     Arc/Info Binary Grid (.adf)
     latitude/longitude should be from the Lower Left corner of the map. see
@@ -101,9 +101,9 @@ class ADFLoader(_BaseLoader):
                                                  self.span_longitude,
                                                  arcsec_resolution))
 
-        self.geodatamap = DataMap(self.elevations,
-                                  self.latitude,
-                                  self.longitude,
-                                  self.span_latitude,
-                                  self.span_longitude,
-                                  self.arcsec_resolution)
+        self.datamap = DataMap(self.elevations,
+                               self.latitude,
+                               self.longitude,
+                               self.span_latitude,
+                               self.span_longitude,
+                               self.arcsec_resolution)

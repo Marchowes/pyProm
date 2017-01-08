@@ -48,13 +48,13 @@ class DataMap(object):
         :return: elevation of coordinate in meters.
         """
         hms_relative_position_long =\
-            self.relative_position_longitude(longitude)
+            self.longitude_to_y(longitude)
         hms_relative_position_lat =\
-            self.relative_position_latitude(latitude)
+            self.latitude_to_x(latitude)
         return self.numpy_map[hms_relative_position_lat,
                               hms_relative_position_long]
 
-    def relative_position_longitude(self, longitude):
+    def longitude_to_y(self, longitude):
         """
         :param longitude: longitude in dotted decimal notation.
         :return: relative Y position for coordinate in numpy map
@@ -64,13 +64,13 @@ class DataMap(object):
                              ' {} to {}'.format(self.longitude,
                                                 self.longitude_max))
         hms_longitude = dottedDecimaltoDegrees(longitude)
-        return int(abs((hms_longitude[2] +
-                       (hms_longitude[1] * ARCMIN_DEG) +
-                       (hms_longitude[0] * ARCSEC_DEG)) -
-                       (self.longitude) * ARCSEC_DEG) /
-                   self.arcsec_resolution)
+        return int(abs((round(hms_longitude[2] +
+                              (hms_longitude[1] * ARCMIN_DEG) +
+                              (hms_longitude[0] * ARCSEC_DEG) -
+                              (self.longitude) * ARCSEC_DEG)) /
+                       self.arcsec_resolution))
 
-    def relative_position_latitude(self, latitude):
+    def latitude_to_x(self, latitude):
         """
         :param latitude: latitude in dotted decimal notation
         :return: relative X position for coordinate in numpy map.
@@ -80,10 +80,10 @@ class DataMap(object):
                              ' {} to {}'.format(self.latitude,
                                                 self.latitude_max))
         hms_latitude = dottedDecimaltoDegrees(latitude)
-        return int(abs((hms_latitude[2] +
+        return int(abs((round(hms_latitude[2] +
                        (hms_latitude[1] * ARCMIN_DEG) +
                        (hms_latitude[0] * ARCSEC_DEG)) -
-                       (self.latitude_max) * ARCSEC_DEG) /
+                       (self.latitude_max) * ARCSEC_DEG)) /
                    self.arcsec_resolution)
 
     def _position_formula(self, x):
@@ -99,7 +99,7 @@ class DataMap(object):
         minutes = int(minutes)
         return hours, minutes, seconds
 
-    def x_position_latitude(self, x):
+    def x_to_latitude(self, x):
         """
         :param x: x location in `numpy_map`
         :return: position in dotted decimal latitude
@@ -107,7 +107,7 @@ class DataMap(object):
         hms = self._position_formula(x)
         return self.latitude_max - degreesToDottedDecimal(*hms)
 
-    def y_position_longitude(self, y):
+    def y_to_longitude(self, y):
         """
         :param y: y location in `numpy_map`
         :return: position in dotted decimal longitude
@@ -149,3 +149,32 @@ class DataMap(object):
                 yield _x, _y, float(self.numpy_map[_x, _y])
             else:
                 yield _x, _y, -10000
+
+    def subset(self, x, y, xSpan, ySpan):
+        """
+        :param x: NW corner x coordinate (latitude)
+        :param y: NW corner y coordinate (longitude)
+        :param xSpan: depth of subset in points (latitude)
+        :param ySpan: width of subset in points (longitude)
+        :return: :class:`Datamap`
+        """
+        keyLat = self.x_to_latitude(x)
+        keyLong = self.y_to_longitude(y)
+        numpy_map = (self.numpy_map[x:xSpan, y:ySpan])
+        return DataMap(numpy_map,
+                       keyLat,
+                       keyLong,
+                       xSpan,
+                       ySpan,
+                       self.arcsec_resolution)
+
+    def __repr__(self):
+        return "<DataMap> Lat {}, Long {}, SpanLat {}," \
+               " SpanLong {}, {} ArcSec/Point".format(
+                self.latitude,
+                self.longitude,
+                self.span_latitude,
+                self.span_longitude,
+                self.arcsec_resolution)
+
+    __unicode__ = __str__ = __repr__

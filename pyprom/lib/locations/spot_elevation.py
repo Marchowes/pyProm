@@ -35,12 +35,17 @@ class SpotElevation(BaseCoordinate):
                 'longitude': self.longitude,
                 'elevation': self.elevation}
 
-    def to_json(self):
+    def to_json(self, prettyprint=True):
         """
+        :param prettyprint: human readable,
         :return: json string of :class:`SpotElevation`
         """
         to_json = self.to_dict()
-        return json.dumps(to_json)
+        if prettyprint:
+            return json.dumps(to_json, sort_keys=True,
+                              indent=4, separators=(',', ': '))
+        else:
+            return json.dumps(to_json)
 
     def toGridPoint(self, datamap):
         """
@@ -50,8 +55,8 @@ class SpotElevation(BaseCoordinate):
         :return: :class:`GridPoint object`
         """
         from .gridpoint import GridPoint
-        return GridPoint(datamap.relative_position_latitude(self.latitude),
-                         datamap.relative_position_longitude(
+        return GridPoint(datamap.latitude_to_x(self.latitude),
+                         datamap.longitude_to_y(
                             self.longitude),
                          self.elevation)
 

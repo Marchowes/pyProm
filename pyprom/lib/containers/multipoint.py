@@ -44,19 +44,25 @@ class MultiPoint(object):
             pdict = dict()
             pdict['gridpoint'] = point.to_dict()
             pdict['coordinate'] = \
-                BaseCoordinate(self.datamap.x_position_latitude(point.x),
-                               self.datamap.y_position_longitude(point.y)
+                BaseCoordinate(self.datamap.x_to_latitude(point.x),
+                               self.datamap.y_to_longitude(point.y)
                                ).to_dict()
             plist.append(pdict)
         return plist
 
-    def to_json(self, verbose=False):
+    def to_json(self, verbose=False, prettyprint=True):
         """
+        :param prettyprint: human readable,
+         but takes more space when written to a file.
         :param verbose: returns extra data like `InverseEdgePoint`
         and `EdgePoint` (future)
         :return: json data
         """
-        return json.dumps(self.to_dict(verbose=verbose))
+        if prettyprint:
+            return json.dumps(self.to_dict(verbose=verbose), sort_keys=True,
+                              indent=4, separators=(',', ': '))
+        else:
+            return json.dumps(self.to_dict(verbose=verbose))
 
     @property
     def pointsLatLong(self):
@@ -64,8 +70,8 @@ class MultiPoint(object):
         :return: List of All blob points with lat/long instead of x/y
         """
         return [BaseCoordinate(
-                self.datamap.x_position_latitude(coord.x),
-                self.datamap.y_position_longitude(coord.y))
+                self.datamap.x_to_latitude(coord.x),
+                self.datamap.y_to_longitude(coord.y))
                 for coord in self.points]
 
     def __repr__(self):

@@ -1,4 +1,4 @@
-### pyProm v0.2.5
+### pyProm v0.3.0
 
 
 This library is still under development. Do not expect full functionality, or documentation until release 1.0.0
@@ -29,14 +29,50 @@ Datasources
 * 1 ArcSecond SRTM Data [#1](https://dds.cr.usgs.gov/srtm/version1/United_States_1arcsec/1arcsec/), [#2](https://dds.cr.usgs.gov/srtm/version2_1/SRTM1/)
 * [DEM type data] (http://viewer.nationalmap.gov/basic/#productGroupSearch) Start with Elevation Products (3DEP) - 1/3 arc-second DEM [More info](http://www.digitalpreservation.gov/formats/fdd/fdd000281.shtml)
 
+Example(s)
+----------
+* Install pyProm
+* [Download This](https://dds.cr.usgs.gov/srtm/version2_1/SRTM1/Region_06/N44W072.hgt.zip)
+* Extract the zip file
+In your favorite Python interpreter on a Unix system (I use `ipython` in `Linux`):
+
+```
+from dataload import SRTMLoader
+from domain import Domain
+from dataexport import KMLfileWriter
+import logging
+logging.basicConfig(level=logging.DEBUG)
+
+# Load your Datamap into your Domain
+data = SRTMLoader('YOURPATHHERE/N44W072.hgt')
+domain = Domain(data)
+domain.run()
+# ^This will run the Saddle/Summit discovery, it'll take a while..
+
+# Find all summits above 4000 feet
+_4ks = domain.summits.elevationRange(4000)
+
+# Write your fancy list of 4ks to a KML file
+mykml = KMLfileWriter(_4ks, 'YOURPATHHERE/myfile.kml')
+mykml.writeFile()
+
+# Save your Domain
+domain.write('YOURPATHHERE/mydomain.json')
+
+# Load your Domain you you don't need to wait forever for analysis.
+newdomain = Domain(data)
+newdomain.read('YOURPATHHERE/mydomain.json')
+```
+
 Installation
 ------------
-Why?? Why are you installing this??? It's nowhere near done.
+Warning! JSON data or saved Domains will almost certainly fail to load in future version. There WILL be breaking changes. You've been warned!
+
 
 Download zip from github, or clone.
 Go to extraction directory and run `pip install -e .`
 This will work with Python 2.7 and 3.4+
-
+GDAL doesnt work in Python3, so ADFLoader (DEM) wont work. Want to analyze DEM data? use Python 2.7 instead.
 
 Trouble Getting GDAL installed?
 -------------------------------

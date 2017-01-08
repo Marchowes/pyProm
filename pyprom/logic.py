@@ -108,8 +108,8 @@ class AnalyzeData(object):
             self.skipAnalysis[exemptPoint.x] \
                 .append(exemptPoint.y)
         if not len(highInverseEdge):
-            summit = Summit(self.datamap.x_position_latitude(x),
-                            self.datamap.y_position_longitude(y),
+            summit = Summit(self.datamap.x_to_latitude(x),
+                            self.datamap.y_to_longitude(y),
                             self.elevation,
                             edge=self.edge,
                             multiPoint=self.blob
@@ -117,8 +117,8 @@ class AnalyzeData(object):
             return summit
         if (len(highInverseEdge) > 1) or\
                 (len(highInverseEdge) == 1 and self.edge):
-            saddle = Saddle(self.datamap.x_position_latitude(x),
-                            self.datamap.y_position_longitude(y),
+            saddle = Saddle(self.datamap.x_to_latitude(x),
+                            self.datamap.y_to_longitude(y),
                             self.elevation,
                             edge=self.edge,
                             multiPoint=self.blob,
@@ -165,19 +165,20 @@ class AnalyzeData(object):
 
         reducedNeighborProfile = compressRepetetiveChars(neighborProfile)
         if reducedNeighborProfile == summitProfile:
-            summit = Summit(self.datamap.x_position_latitude(x),
-                            self.datamap.y_position_longitude(y),
+            summit = Summit(self.datamap.x_to_latitude(x),
+                            self.datamap.y_to_longitude(y),
                             self.elevation,
                             edge=self.edge)
             return summit
 
         elif any(x in reducedNeighborProfile for x in saddleProfile):
             shores = HighEdgeContainer(shoreSet, self.elevation)
-            saddle = Saddle(self.datamap.x_position_latitude(x),
-                            self.datamap.y_position_longitude(y),
+            saddle = Saddle(self.datamap.x_to_latitude(x),
+                            self.datamap.y_to_longitude(y),
                             self.elevation,
                             edge=self.edge,
-                            highShores=shores.highPoints)
+                            highShores=[GridPointContainer(x)
+                                        for x in shores.highPoints])
             return saddle
         return None
 
