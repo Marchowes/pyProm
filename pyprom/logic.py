@@ -78,6 +78,9 @@ class AnalyzeData(object):
                         split
                     ))
 
+            if self.elevation == -32768:
+                iterator.iternext()
+                continue
             # Check for summit or saddle
             result = self.summit_and_saddle(x, y)
             if result:

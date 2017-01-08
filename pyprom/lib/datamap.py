@@ -131,7 +131,7 @@ class DataMap(object):
                0 <= _y <= self.max_y:
                 yield _x, _y, float(self.numpy_map[_x, _y])
             else:
-                yield _x, _y, -10000
+                yield _x, _y, -32768
 
     def iterateOrthogonal(self, x, y):
         """
@@ -148,7 +148,7 @@ class DataMap(object):
                0 <= _y <= self.max_y:
                 yield _x, _y, float(self.numpy_map[_x, _y])
             else:
-                yield _x, _y, -10000
+                yield _x, _y, -32768
 
     def subset(self, x, y, xSpan, ySpan):
         """
