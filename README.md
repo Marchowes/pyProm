@@ -36,6 +36,7 @@ Example(s)
 * Extract the zip file
 In your favorite Python interpreter on a Unix system (I use `ipython` in `Linux`):
 
+```
 from dataload import SRTMLoader
 from domain import Domain
 from dataexport import KMLfileWriter
@@ -61,10 +62,12 @@ domain.write('YOURPATHHERE/mydomain.json')
 # Load your Domain you you don't need to wait forever for analysis.
 newdomain = Domain(data)
 newdomain.read('YOURPATHHERE/mydomain.json')
+```
 
 Installation
 ------------
-Why?? Why are you installing this??? It's nowhere near done.
+Warning! JSON data or saved Domains will almost certainly fail to load in future version. There WILL be breaking changes. You've been warned!
+
 
 Download zip from github, or clone.
 Go to extraction directory and run `pip install -e .`
