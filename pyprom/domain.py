@@ -12,6 +12,7 @@ import os
 import time
 import json
 import logging
+import gzip
 
 from logic import AnalyzeData
 from lib.datamap import DataMap
@@ -45,8 +46,8 @@ class Domain(object):
         self.extent = '{}, {} - {}, {}'.format(
             self.datamap.latitude,
             self.datamap.longitude,
-            self.datamap.x_to_latitude(self.datamap.max_x),
-            self.datamap.y_to_longitude(self.datamap.max_y))
+            self.datamap.latitude_max,
+            self.datamap.longitude_max)
         self.logger = logging.getLogger('pyProm.{}'.format(__name__))
         self.logger.info("Domain Object Created {}.".format(self.extent))
 
@@ -67,8 +68,7 @@ class Domain(object):
         """
         # Expunge any existing saddles, summits, and linkers
         filename = os.path.expanduser(filename)
-        incoming = open(filename, "r")
-        self.logger.info("Loading {} into Domain Dataset.".format(filename))
+        incoming = gzip.open(filename, 'rb')
         self.saddles = SpotElevationContainer([])
         self.summits = SpotElevationContainer([])
         self.linkers = list()
@@ -77,19 +77,19 @@ class Domain(object):
 
     def write(self, filename):
         """
-        :param filename: name of file (including path) to read json data from
+        :param filename: name of file (including path) to read compressed json data from
         """
         filename = os.path.expanduser(filename)
         self.logger.info("Writing Domain Dataset to {}.".format(filename))
-        outgoing = open(filename, "w")
-        outgoing.write(self.to_json())
+        outgoing = gzip.open(filename, 'wb', 5)  # ('filename', 'read/write mode', compression level)
+        outgoing.write(self.to_json(prettyprint=False).encode('utf-8'))
         outgoing.close()
 
     def from_json(self, jsonString):
         """
         :param jsonString: json string of :class:`Domain` data
         """
-        hash = json.loads(jsonString)
+        hash = json.loads(jsonString.decode("utf-8"))
 
         def _loader(point, otype):
 
@@ -120,7 +120,6 @@ class Domain(object):
                              for x in hs]))
             feature.edgeEffect = point['edge']
             return feature
-
         self.summits = SpotElevationContainer(
             [_loader(x, 'Summit') for x in hash['summits']])
         self.saddles = SpotElevationContainer(
