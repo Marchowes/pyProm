@@ -68,7 +68,7 @@ class Domain(object):
         """
         # Expunge any existing saddles, summits, and linkers
         filename = os.path.expanduser(filename)
-        incoming = gzip.open(filename, 'rb')
+        incoming = gzip.open(filename, 'r')
         self.saddles = SpotElevationContainer([])
         self.summits = SpotElevationContainer([])
         self.linkers = list()
@@ -81,7 +81,7 @@ class Domain(object):
         """
         filename = os.path.expanduser(filename)
         self.logger.info("Writing Domain Dataset to {}.".format(filename))
-        outgoing = gzip.open(filename, 'wb', 5)  # ('filename', 'read/write mode', compression level)
+        outgoing = gzip.open(filename, 'w', 5)  # ('filename', 'read/write mode', compression level)
         outgoing.write(self.to_json(prettyprint=False).encode('utf-8'))
         outgoing.close()
 
