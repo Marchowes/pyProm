@@ -68,6 +68,7 @@ class Domain(object):
         """
         # Expunge any existing saddles, summits, and linkers
         filename = os.path.expanduser(filename)
+        self.logger.info("Loading Domain Dataset from {}.".format(filename))
         incoming = gzip.open(filename, 'r')
         self.saddles = SpotElevationContainer([])
         self.summits = SpotElevationContainer([])
