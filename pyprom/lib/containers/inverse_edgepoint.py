@@ -86,18 +86,16 @@ class InverseEdgePointContainer(object):
                     if not toBeAnalyzed:
                         highLists.append(highList)
                         break
-                    try:
+                    else:
                         gridPoint = toBeAnalyzed.pop()
-                    except:
-                        highLists.append(highList)
-                        break
-                    purgedIndex[gridPoint.x].append(gridPoint.y)
-                    highList.append(gridPoint)
-                    neighbors = [x for x in
-                                 self.iterNeighborDiagonal(gridPoint)
-                                 if x.elevation > elevation and
-                                 x.y not in purgedIndex[x.x]]
-                    toBeAnalyzed += neighbors
+                    if gridPoint.y not in purgedIndex[gridPoint.x]:
+                        highList.append(gridPoint)
+                        neighbors = [x for x in
+                                     self.iterNeighborDiagonal(gridPoint)
+                                     if x.elevation > elevation and
+                                     x.y not in purgedIndex[x.x]]
+                        toBeAnalyzed += neighbors
+                        purgedIndex[gridPoint.x].append(gridPoint.y)
             else:
                 purgedIndex[point.x].append(point.y)
         return [GridPointContainer(x) for x in highLists]
