@@ -24,6 +24,7 @@ class InverseEdgePointContainer(object):
                  inverseEdgePointIndex=None,
                  datamap=None, mapEdge=False):
         super(InverseEdgePointContainer, self).__init__()
+        self.points = list()
         if inverseEdgePointIndex:
             self.inverseEdgePointIndex = inverseEdgePointIndex
             self.points = [v[1] for x, y in self.inverseEdgePointIndex.items()

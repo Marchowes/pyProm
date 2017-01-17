@@ -215,7 +215,7 @@ class AnalyzeData(object):
                     branch = GridPoint(_x, _y, elevation)
                     equalHeightHash[_x].append(_y)
                     toBeAnalyzed.append(branch)
-                elif elevation != masterGridPoint.elevation:
+                elif elevation > masterGridPoint.elevation:
                     if not inverseEdgeHash[_x][_y]:
                         inverseEdgeHash[_x][_y] = \
                             InverseEdgePoint(_x, _y, elevation)
