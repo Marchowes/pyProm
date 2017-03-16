@@ -32,6 +32,7 @@ class Saddle(SpotElevation):
         self.singleSummit = False  # All Edges lead to One summit.
         self.tooLow = False # redundant saddle, but too low.
         self._disqualified = None # Non specific disqualification
+        self.lprBoundary = list()
 
     @property
     def disqualified(self):

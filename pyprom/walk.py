@@ -110,10 +110,16 @@ class Walk(object):
 
 
     def disqualify_lower_linkers(self):
-        # Run through all saddles
-        # find all redundant linkers that lead from one saddle to one summit
-        # disqualify lowest linkers.
-
+        """
+        Disqualifies Linkers and Saddles if these conditions are met:
+        - Saddle connects to two or less Summits
+        - (Summit, Summit) Pair contains another Saddle which is higher
+                    OK
+                 /--995--\
+        Summit 1000     1001 Summit
+                 \--990--/
+                  tooLow
+        """
         for summit in self.summits.points:
             found = list()
             for linker in summit.saddles:
@@ -137,6 +143,12 @@ class Walk(object):
                     linker.saddle.tooLow = True
 
     def mark_redundant_linkers(self):
+        """
+        Disqualifies Linkers and Saddles for Single Summit Saddles.
+                  /-----\
+        Summit 1000    995 Saddle  <-Disqualify
+                  \-----/
+        """
         for saddle in self.saddles.points:
             uniqueSummits = set(saddle.summits)
 

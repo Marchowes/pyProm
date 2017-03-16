@@ -26,6 +26,8 @@ class Summit(SpotElevation):
                                      elevation, *args, **kwargs)
         self.multiPoint = kwargs.get('multiPoint', None)
         self.saddles = list()
+        self.localHighest = None
+        self.parent = None
 
     def to_dict(self, recurse=False):
         """

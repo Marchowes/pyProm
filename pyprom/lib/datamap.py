@@ -158,9 +158,9 @@ class DataMap(object):
         :param ySpan: width of subset in points (longitude)
         :return: :class:`Datamap`
         """
-        keyLat = self.x_to_latitude(x)
-        keyLong = self.y_to_longitude(y)
-        numpy_map = (self.numpy_map[x:xSpan, y:ySpan])
+        keyLat = self.x_to_latitude(x+xSpan) # Southermost
+        keyLong = self.y_to_longitude(y+ySpan) # Westernmost
+        numpy_map = (self.numpy_map[x:x+xSpan, y:y+ySpan])
         return DataMap(numpy_map,
                        keyLat,
                        keyLong,
