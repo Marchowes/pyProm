@@ -1,12 +1,12 @@
 from __future__ import division
-from unittest import TestCase
+import unittest
 from getData import getTestZip
-from ..dataload import SRTMLoader
+from pyprom.dataload import SRTMLoader
 
 
 
 
-class DataMapTests(TestCase):
+class DataMapTests(unittest.TestCase):
     def setUp(self):
         getTestZip()
         self.datafile = SRTMLoader('/tmp/N44W072.hgt')
@@ -64,6 +64,9 @@ class DataMapTests(TestCase):
         subset = self.datamap.subset(100,100,200,200)
         self.assertEqual(subset.latitude, 44.916667)
         self.assertEqual(subset.longitude, -71.916667)
-        self.assertEqual(self.datamap.latitude_max, 44.9719447778)
-        self.assertEqual(self.datamap.longitude_max, -71.8613892222)
-        self.assertEqual(self.datamap.arcsec_resolution, 1)
+        self.assertEqual(subset.latitude_max, 44.9719447778)
+        self.assertEqual(subset.longitude_max, -71.8613892222)
+        self.assertEqual(subset.arcsec_resolution, 1)
+
+if __name__ == '__main__':
+    unittest.main()

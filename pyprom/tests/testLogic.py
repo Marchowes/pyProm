@@ -1,12 +1,12 @@
-from unittest import TestCase
+import unittest
 from getData import getTestZip
-from ..dataload import SRTMLoader
-from ..logic import AnalyzeData
-from ..lib.locations.summit import Summit
-from ..lib.locations.saddle import Saddle
+from pyprom.dataload import SRTMLoader
+from pyprom.logic import AnalyzeData
+from pyprom.lib.locations.summit import Summit
+from pyprom.lib.locations.saddle import Saddle
 
 
-class LogicTests(TestCase):
+class LogicTests(unittest.TestCase):
     def setUp(self):
         getTestZip()
         self.datafile = SRTMLoader('/tmp/N44W072.hgt')
@@ -48,7 +48,8 @@ class LogicTests(TestCase):
         # make sure we find 2 points
         self.assertEqual(len(mpSummit.multiPoint.points),2)
 
-
+if __name__ == '__main__':
+    unittest.main()
 
 
 

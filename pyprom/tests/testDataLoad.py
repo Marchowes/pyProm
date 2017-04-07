@@ -1,10 +1,10 @@
-from unittest import TestCase
+import unittest
 from getData import getTestZip
-from ..dataload import SRTMLoader
-from ..logic import AnalyzeData
+from pyprom.dataload import SRTMLoader
+from pyprom.logic import AnalyzeData
 
 
-class SRTMDataTests(TestCase):
+class SRTMDataTests(unittest.TestCase):
     def setUp(self):
         getTestZip()
         self.datafile = SRTMLoader('/tmp/N44W072.hgt')
@@ -16,3 +16,6 @@ class SRTMDataTests(TestCase):
         self.assertEqual(self.datafile.span_latitude, 3601)
         self.assertEqual(self.datafile.span_longitude, 3601)
         self.assertEqual(self.datafile.arcsec_resolution, 1)
+
+if __name__ == '__main__':
+    unittest.main()
