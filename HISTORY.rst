@@ -1,6 +1,16 @@
 Release History
 ---------------
 
+0.3.5 (November 19, 2017)
++++++++++++++++++++++++++
+* Added some unit tests
+* Start of Divide tree objects
+* Bug Fixes in Domains
+* GZIP domain files
+* Walks can disqualify invalid links, like links to single summits, and duplicate links which are not the highest.
+* Fixed some imports.
+
+
 0.3.0 (January 7, 2017)
 +++++++++++++++++++++++
 * Partial Walk Functionality

@@ -1,6 +1,6 @@
 from __future__ import division
 import unittest
-from getData import getTestZip
+from .getData import getTestZip
 from pyprom.dataload import SRTMLoader
 
 

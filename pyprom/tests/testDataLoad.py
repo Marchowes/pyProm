@@ -1,5 +1,5 @@
 import unittest
-from getData import getTestZip
+from .getData import getTestZip
 from pyprom.dataload import SRTMLoader
 from pyprom.logic import AnalyzeData
 

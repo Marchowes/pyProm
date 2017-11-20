@@ -13,16 +13,16 @@ import logging
 from collections import defaultdict
 from timeit import default_timer
 from datetime import timedelta
-from lib.locations.gridpoint import GridPoint
-from lib.locations.saddle import Saddle
-from lib.locations.summit import Summit
-from lib.locations.inverse_edgepoint import InverseEdgePoint
-from lib.containers.spot_elevation import SpotElevationContainer
-from lib.containers.multipoint import MultiPoint
-from lib.containers.inverse_edgepoint import InverseEdgePointContainer
-from lib.containers.high_edge import HighEdgeContainer
-from lib.containers.gridpoint import GridPointContainer
-from lib.util import (coordinateHashToGridPointList,
+from .lib.locations.gridpoint import GridPoint
+from .lib.locations.saddle import Saddle
+from .lib.locations.summit import Summit
+from .lib.locations.inverse_edgepoint import InverseEdgePoint
+from .lib.containers.spot_elevation import SpotElevationContainer
+from .lib.containers.multipoint import MultiPoint
+from .lib.containers.inverse_edgepoint import InverseEdgePointContainer
+from .lib.containers.high_edge import HighEdgeContainer
+from .lib.containers.gridpoint import GridPointContainer
+from .lib.util import (coordinateHashToGridPointList,
                       compressRepetetiveChars)
 
 

@@ -9,9 +9,9 @@ This file contains a class for walking from Saddles to Summits.
 """
 import logging
 from collections import defaultdict
-from lib.locations.gridpoint import GridPoint
-from lib.locations.summit import Summit
-from lib.containers.linker import Linker
+from .lib.locations.gridpoint import GridPoint
+from .lib.locations.summit import Summit
+from .lib.containers.linker import Linker
 
 
 class Walk(object):

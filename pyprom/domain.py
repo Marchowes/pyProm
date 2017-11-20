@@ -14,16 +14,16 @@ import json
 import logging
 import gzip
 
-from logic import AnalyzeData
-from lib.datamap import DataMap
-from dataload import Loader
-from lib.containers.spot_elevation import SpotElevationContainer
-from lib.locations.summit import Summit
-from lib.locations.saddle import Saddle
-from lib.locations.base_gridpoint import BaseGridPoint
-from lib.containers.multipoint import MultiPoint
-from lib.containers.gridpoint import GridPointContainer
-from lib.locations.gridpoint import GridPoint
+from .logic import AnalyzeData
+from .lib.datamap import DataMap
+from .dataload import Loader
+from .lib.containers.spot_elevation import SpotElevationContainer
+from .lib.locations.summit import Summit
+from .lib.locations.saddle import Saddle
+from .lib.locations.base_gridpoint import BaseGridPoint
+from .lib.containers.multipoint import MultiPoint
+from .lib.containers.gridpoint import GridPointContainer
+from .lib.locations.gridpoint import GridPoint
 
 
 class Domain(object):
