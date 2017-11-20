@@ -13,16 +13,16 @@ import logging
 from collections import defaultdict
 from timeit import default_timer
 from datetime import timedelta
-from lib.locations.gridpoint import GridPoint
-from lib.locations.saddle import Saddle
-from lib.locations.summit import Summit
-from lib.locations.inverse_edgepoint import InverseEdgePoint
-from lib.containers.spot_elevation import SpotElevationContainer
-from lib.containers.multipoint import MultiPoint
-from lib.containers.inverse_edgepoint import InverseEdgePointContainer
-from lib.containers.high_edge import HighEdgeContainer
-from lib.containers.gridpoint import GridPointContainer
-from lib.util import (coordinateHashToGridPointList,
+from .lib.locations.gridpoint import GridPoint
+from .lib.locations.saddle import Saddle
+from .lib.locations.summit import Summit
+from .lib.locations.inverse_edgepoint import InverseEdgePoint
+from .lib.containers.spot_elevation import SpotElevationContainer
+from .lib.containers.multipoint import MultiPoint
+from .lib.containers.inverse_edgepoint import InverseEdgePointContainer
+from .lib.containers.high_edge import HighEdgeContainer
+from .lib.containers.gridpoint import GridPointContainer
+from .lib.util import (coordinateHashToGridPointList,
                       compressRepetetiveChars)
 
 
@@ -78,6 +78,9 @@ class AnalyzeData(object):
                         split
                     ))
 
+            if self.elevation == -32768:
+                iterator.iternext()
+                continue
             # Check for summit or saddle
             result = self.summit_and_saddle(x, y)
             if result:
@@ -212,7 +215,7 @@ class AnalyzeData(object):
                     branch = GridPoint(_x, _y, elevation)
                     equalHeightHash[_x].append(_y)
                     toBeAnalyzed.append(branch)
-                elif elevation != masterGridPoint.elevation:
+                elif elevation > masterGridPoint.elevation:
                     if not inverseEdgeHash[_x][_y]:
                         inverseEdgeHash[_x][_y] = \
                             InverseEdgePoint(_x, _y, elevation)

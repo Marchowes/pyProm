@@ -131,7 +131,7 @@ class DataMap(object):
                0 <= _y <= self.max_y:
                 yield _x, _y, float(self.numpy_map[_x, _y])
             else:
-                yield _x, _y, -10000
+                yield _x, _y, -32768
 
     def iterateOrthogonal(self, x, y):
         """
@@ -148,7 +148,7 @@ class DataMap(object):
                0 <= _y <= self.max_y:
                 yield _x, _y, float(self.numpy_map[_x, _y])
             else:
-                yield _x, _y, -10000
+                yield _x, _y, -32768
 
     def subset(self, x, y, xSpan, ySpan):
         """
@@ -158,9 +158,9 @@ class DataMap(object):
         :param ySpan: width of subset in points (longitude)
         :return: :class:`Datamap`
         """
-        keyLat = self.x_to_latitude(x)
-        keyLong = self.y_to_longitude(y)
-        numpy_map = (self.numpy_map[x:xSpan, y:ySpan])
+        keyLat = self.x_to_latitude(x+xSpan) # Southermost
+        keyLong = self.y_to_longitude(y+ySpan) # Westernmost
+        numpy_map = (self.numpy_map[x:x+xSpan, y:y+ySpan])
         return DataMap(numpy_map,
                        keyLat,
                        keyLong,

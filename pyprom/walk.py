@@ -9,9 +9,9 @@ This file contains a class for walking from Saddles to Summits.
 """
 import logging
 from collections import defaultdict
-from lib.locations.gridpoint import GridPoint
-from lib.locations.summit import Summit
-from lib.containers.linker import Linker
+from .lib.locations.gridpoint import GridPoint
+from .lib.locations.summit import Summit
+from .lib.containers.linker import Linker
 
 
 class Walk(object):
@@ -47,12 +47,12 @@ class Walk(object):
 
     def run(self):
         # iterate through saddles
-        for saddle in self.saddles:
-            self.walk(saddle)
+        for saddle in self.saddles.points:
+            self.linkers += self.walk(saddle)
 
     def walk(self, saddle):
         # iterate through high Shores
-        self.linkers = list()
+        linkers = list()
         for highEdge in saddle.highShores:
             # Sort High Shores from high to low
             highEdge.points.sort(key=lambda x: x.elevation, reverse=True)
@@ -70,7 +70,7 @@ class Walk(object):
                 point = self._climb_up(point, exemptHash)
                 if isinstance(point, Summit):
                     link = Linker(point, saddle, path)
-                    self.linkers.append(link)
+                    linkers.append(link)
                     saddle.summits.append(link)
                     point.saddles.append(link)
                     break
@@ -81,10 +81,7 @@ class Walk(object):
                 else:
                     lookback += 1
                     point = path[-lookback]
-
-        if len(set(saddle.summits)) == 1:
-            saddle.disqualified = True
-        return self.linkers
+        return linkers
 
     def _climb_up(self, point, exemptHash):
 
@@ -111,6 +108,56 @@ class Walk(object):
             winner = None
         return winner
 
+
+    def disqualify_lower_linkers(self):
+        """
+        Disqualifies Linkers and Saddles if these conditions are met:
+        - Saddle connects to two or less Summits
+        - (Summit, Summit) Pair contains another Saddle which is higher
+                    OK
+                 /--995--\
+        Summit 1000     1001 Summit
+                 \--990--/
+                  tooLow
+        """
+        for summit in self.summits.points:
+            found = list()
+            for linker in summit.saddles:
+                if len(linker.saddle.summits) > 2:
+                    # More than 2? Bail!
+                    continue
+                found += [x for x in linker.saddle_summits if x != summit]
+            redundants = set([x for x in found if found.count(x) > 1])
+            highest = -32768
+            # figure out what the highest Saddle is.
+            for redundant in redundants:
+                for linker in summit.saddles:
+                    if redundant in [x for x in linker.saddle_summits]:
+                        if linker.saddle.elevation > highest:
+                            highest = linker.saddle.elevation
+            # Disqualify Saddle and Linkers if not the highest.
+            for linker in summit.saddles:
+                if linker.saddle.elevation < highest:
+                    for link in linker.saddle.summits:
+                        link.disqualified = True
+                    linker.saddle.tooLow = True
+
     def mark_redundant_linkers(self):
-        for saddle in self.saddles:
-            pass
+        """
+        Disqualifies Linkers and Saddles for Single Summit Saddles.
+                  /-----\
+        Summit 1000    995 Saddle  <-Disqualify
+                  \-----/
+        """
+        for saddle in self.saddles.points:
+            uniqueSummits = set(saddle.summits)
+
+            # More than one summit to begin with, but only one unique?
+            # Thats not really a Saddle now is it? Why check if there is more
+            # than one when by definition a Saddle has two or more linked
+            # summits? Becasue EdgeEffect Saddles can technically have just
+            # one.
+            if len(saddle.summits) > 1 and len(uniqueSummits) == 1:
+                saddle.singleSummit = True
+                for linker in saddle.summits:
+                    linker.disqualified = True

@@ -9,7 +9,7 @@ import logging
 import os
 from fastkml import kml
 from shapely.geometry import Point
-from lib.containers.spot_elevation import SpotElevationContainer
+from .lib.containers.spot_elevation import SpotElevationContainer
 
 
 class KMLfileWriter(object):

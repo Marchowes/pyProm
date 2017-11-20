@@ -29,7 +29,29 @@ class Saddle(SpotElevation):
         self.highShores = kwargs.get('highShores', None)
         # Temporary until I've build a linker
         self.summits = list()
-        self.disqualified = False
+        self.singleSummit = False  # All Edges lead to One summit.
+        self.tooLow = False # redundant saddle, but too low.
+        self._disqualified = None # Non specific disqualification
+        self.lprBoundary = list()
+
+    @property
+    def disqualified(self):
+        """
+        :return: if any values that indicate disqualification are set,
+         return True.
+        """
+        # Allow for a manual override from user.
+        if self._disqualified in [True, False]:
+            return self._disqualified
+        else:
+            return self.singleSummit | self.tooLow
+
+    @disqualified.setter
+    def disqualified(self, value):
+        """
+        :param value: True or False. Override system disqualification
+        """
+        self._disqualified = value
 
     def to_dict(self, recurse=False):
         """

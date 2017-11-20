@@ -33,6 +33,34 @@ class SpotElevationContainer(_Base):
         super(SpotElevationContainer, self).__init__()
         self.points = spotElevationList
 
+    @property
+    def lowest(self):
+        """
+        :return: list of lowest spot_elevation object(s)
+        """
+        low = 10000
+        lowest = list()
+        for spot_elevation in self.points:
+            if spot_elevation.elevation < low:
+                low = spot_elevation.elevation
+                lowest = list()
+                lowest.append(spot_elevation)
+        return lowest
+
+    @property
+    def highest(self):
+        """
+        :return: list of highest spot_elevation object(s)
+        """
+        high = -32768
+        highest = list()
+        for spot_elevation in self.points:
+            if spot_elevation.elevation > high:
+                high = spot_elevation.elevation
+                highest = list()
+                highest.append(spot_elevation)
+        return highest
+
     def radius(self, lat, long, datamap, value, unit='m'):
         """
         :param lat: latitude of center in dotted decimal
