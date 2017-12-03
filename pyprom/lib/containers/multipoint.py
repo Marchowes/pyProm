@@ -43,10 +43,9 @@ class MultiPoint(object):
         for point in self.points:
             pdict = dict()
             pdict['gridpoint'] = point.to_dict()
+            latlong = self.datamap.xy_to_latlong(point.x, point.y)
             pdict['coordinate'] = \
-                BaseCoordinate(self.datamap.x_to_latitude(point.x),
-                               self.datamap.y_to_longitude(point.y)
-                               ).to_dict()
+                BaseCoordinate(latlong[0], latlong[1]).to_dict()
             plist.append(pdict)
         return plist
 
@@ -69,9 +68,7 @@ class MultiPoint(object):
         """
         :return: List of All blob points with lat/long instead of x/y
         """
-        return [BaseCoordinate(
-                self.datamap.x_to_latitude(coord.x),
-                self.datamap.y_to_longitude(coord.y))
+        return [BaseCoordinate(*self.datamap.xy_to_latlong(coord.x, coord.y))
                 for coord in self.points]
 
     def __repr__(self):

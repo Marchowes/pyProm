@@ -6,11 +6,13 @@ the LICENSE file that accompanies it.
 """
 
 import os
-import gdal
 import numpy
 import logging
 
-from .lib.datamap import DataMap
+from osgeo import gdal, osr
+
+from .lib.datamap import DataMap, ProjectionDataMap
+from .lib.util import seconds_to_arcseconds, arcseconds_to_seconds
 
 
 class Loader(object):
@@ -32,6 +34,7 @@ class SRTMLoader(Loader):
         :param arcsec_resolution: how many arcseconds per measurement unit.
         :param span_latitude: source datamap point span along latitude
         :param span_longitude: source datamap point span along longitude
+        latitude and longitude references are always "lower left"
         """
         super(SRTMLoader, self).__init__(filename)
         self.logger.info("Loading: {} Latitude span: {}, Longitude span: {}"
@@ -78,28 +81,44 @@ class SRTMLoader(Loader):
 class ADFLoader(Loader):
     """
     Arc/Info Binary Grid (.adf)
-    latitude/longitude should be from the Lower Left corner of the map. see
-    USGS_NED_13_XXXXX_ArcGrid_meta.txt for these values.
     """
-    def __init__(self, filename,
-                 latitude, longitude,
-                 arcsec_resolution=1):
+    def __init__(self, filename):
+        """
+        :param filename:
+        latitude and longitude references are always "lower left"
+        """
         super(ADFLoader, self).__init__(filename)
-        self.latitude = latitude
-        self.longitude = longitude
-        self.arcsec_resolution = arcsec_resolution
+        self.gdal_raster = gdal.Open(self.filename)
+        geotransform = self.gdal_raster.GetGeoTransform()
+        # make sure arcsecond resolution is the same on both axis. We don't
+        #  support differing resolutions yet.
+        if abs(geotransform[1]) != abs(geotransform[5]):
+            non_symmetric_error = \
+                ("BORK! arcsecond resolution for X and Y axis must match. "
+                 "non symmetric transform resolution not supported yet!")
+            self.logger.error(non_symmetric_error)
+            raise Exception(non_symmetric_error)
 
-        gdal_raster = gdal.Open(self.filename)
-        self.elevations = numpy.array(gdal_raster.GetRasterBand(1).
+        self.arcsec_resolution = seconds_to_arcseconds(geotransform[1])
+
+        self.elevations = numpy.array(self.gdal_raster.GetRasterBand(1).
                                       ReadAsArray())
         self.span_latitude = int(self.elevations.shape[0])
         self.span_longitude = int(self.elevations.shape[1])
+
+        self.longitude, self.latitude =\
+            getLowerLeftCoords(geotransform,
+                               self.span_longitude,
+                               self.span_latitude)
+
         self.logger.info("Loading: {} Latitude span: {}, Longitude span: {}"
-                         ", Resolution: {}"
-                         " ArcSec/point.".format(filename,
-                                                 self.span_latitude,
-                                                 self.span_longitude,
-                                                 arcsec_resolution))
+                         ", Resolution: {} ArcSec/point, N Boundary {},"
+                         " W Boundary {}".format(filename,
+                                              self.span_latitude,
+                                              self.span_longitude,
+                                              self.arcsec_resolution,
+                                              self.latitude,
+                                              self.longitude))
 
         self.datamap = DataMap(self.elevations,
                                self.latitude,
@@ -107,3 +126,82 @@ class ADFLoader(Loader):
                                self.span_latitude,
                                self.span_longitude,
                                self.arcsec_resolution)
+
+class LiDARLoader(Loader):
+    # need to be able to extract:
+    # dataset=gdal.Open('19_02744882.img')
+    # UTM region () dataset.GetProjection() Projection is PROJCS["NAD_1983_UTM_Zone_19N"
+    # geotransform = dataset.GetGeoTransform()
+    # (274000.0, 1.0, 0.0, 4884000.0, 0.0, -1.0) < -- UTM @ 1 meter res
+
+
+    """
+    Arc/Info Binary Grid (.adf)
+    """
+    def __init__(self, filename, hemisphere="N"):
+        """
+        :param filename:
+        latitude and longitude references are always "lower left"
+        """
+        super(LiDARLoader, self).__init__(filename)
+        self.dataset = gdal.Open(self.filename)
+        self.elevations = numpy.array(self.dataset.GetRasterBand(1).
+                                      ReadAsArray())
+        self.hemisphere = hemisphere
+        self.span_x = self.dataset.RasterXSize # longitude
+        self.span_y = self.dataset.RasterYSize # latitude
+        geotransform = self.dataset.GetGeoTransform()
+
+        # We don't know what kind of coordinate system we're using yet so jsut call them nX,nY
+        self.lowerLeftX, self.lowerLeftY =\
+            getLowerLeftCoords(geotransform,
+                               self.span_x,
+                               self.span_y)
+        spatialRef = osr.SpatialReference(wkt=self.dataset.GetProjection())
+        # Are we a projected map?
+        if spatialRef.IsProjected:
+            self.utmzone = spatialRef.GetUTMZone()
+            self.linear_unit = spatialRef.GetLinearUnits()
+            linear_unit_name = spatialRef.GetLinearUnitsName()
+
+            if not self.utmzone:
+                raise Exception("Could not read UTM Zone in projection. "
+                                "This may be useful: {}".format(
+                                self.dataset.GetProjectionRef()))
+            self.logger.info("Loading: {} X span: {}, Y span: {}"
+                             ", Resolution: {} {}, SW Boundary {},{}"
+                             "Hemisphere {}, Zone {}".format(filename,
+                                                             self.span_x,
+                                                             self.span_y,
+                                                             self.linear_unit,
+                                                             linear_unit_name,
+                                                             self.lowerLeftX,
+                                                             self.lowerLeftY,
+                                                             self.hemisphere,
+                                                             self.utmzone))
+            self.datamap = ProjectionDataMap(self.elevations,
+                                             self.lowerLeftY,
+                                             self.lowerLeftX,
+                                             self.span_y,
+                                             self.span_x,
+                                             self.linear_unit,
+                                             self.hemisphere,
+                                             self.utmzone)
+
+
+
+
+
+def getLowerLeftCoords(geoTransform, xSpan, ySpan):
+    """
+    :param geoTransform:  GetGeoTransform() output from gdal
+    :param xSpan: raster span on X axis (points) columns
+    :param ySpan: raster span on Y axis (points) rows
+    :return: tuple of (X,Y) coords
+    """
+    x = geoTransform[0]
+    y = geoTransform[3] + (ySpan*geoTransform[5])
+    return (x,y)
+
+
+

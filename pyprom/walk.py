@@ -39,10 +39,8 @@ class Walk(object):
                 for mp in point.multiPoint.points:
                     hash[mp.x][mp.y] = point
             else:
-                hash[self.datamap.latitude_to_x(
-                        point.latitude)][self.datamap.longitude_to_y(
-                            point.longitude)]\
-                    = point
+                xy = self.datamap.latlong_to_xy(point.latitude, point.longitude)
+                hash[xy[0]][xy[1]] = point
         return hash
 
     def run(self):
@@ -107,6 +105,9 @@ class Walk(object):
         else:
             winner = None
         return winner
+
+
+
 
 
     def disqualify_lower_linkers(self):

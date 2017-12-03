@@ -36,9 +36,7 @@ class AnalyzeData(object):
         self.data = self.datamap.numpy_map
         self.edge = False
         self.max_y = self.datamap.max_y
-        self.span_longitude = self.datamap.span_longitude
         self.max_x = self.datamap.max_x
-        self.span_latitude = self.datamap.span_latitude
         self.cardinalGrid = dict()
         self.skipAnalysis = defaultdict(list)
 
@@ -111,8 +109,9 @@ class AnalyzeData(object):
             self.skipAnalysis[exemptPoint.x] \
                 .append(exemptPoint.y)
         if not len(highInverseEdge):
-            summit = Summit(self.datamap.x_to_latitude(x),
-                            self.datamap.y_to_longitude(y),
+            latlong = self.datamap.xy_to_latlong(x, y)
+            summit = Summit(latlong[0],
+                            latlong[1],
                             self.elevation,
                             edge=self.edge,
                             multiPoint=self.blob
@@ -120,8 +119,9 @@ class AnalyzeData(object):
             return summit
         if (len(highInverseEdge) > 1) or\
                 (len(highInverseEdge) == 1 and self.edge):
-            saddle = Saddle(self.datamap.x_to_latitude(x),
-                            self.datamap.y_to_longitude(y),
+            latlong = self.datamap.xy_to_latlong(x, y)
+            saddle = Saddle(latlong[0],
+                            latlong[1],
                             self.elevation,
                             edge=self.edge,
                             multiPoint=self.blob,
@@ -168,16 +168,18 @@ class AnalyzeData(object):
 
         reducedNeighborProfile = compressRepetetiveChars(neighborProfile)
         if reducedNeighborProfile == summitProfile:
-            summit = Summit(self.datamap.x_to_latitude(x),
-                            self.datamap.y_to_longitude(y),
+            latlong = self.datamap.xy_to_latlong(x, y)
+            summit = Summit(latlong[0],
+                            latlong[1],
                             self.elevation,
                             edge=self.edge)
             return summit
 
         elif any(x in reducedNeighborProfile for x in saddleProfile):
             shores = HighEdgeContainer(shoreSet, self.elevation)
-            saddle = Saddle(self.datamap.x_to_latitude(x),
-                            self.datamap.y_to_longitude(y),
+            latlong = self.datamap.xy_to_latlong(x, y)
+            saddle = Saddle(latlong[0],
+                            latlong[1],
                             self.elevation,
                             edge=self.edge,
                             highShores=[GridPointContainer(x)
