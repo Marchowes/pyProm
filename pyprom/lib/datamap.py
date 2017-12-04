@@ -23,8 +23,11 @@ class DataMap(object):
     """
     Base class for Datamap type objects
     """
-    def __init__(self):
-        pass
+    def __init__(self, numpy_map, unit):
+        self.numpy_map = numpy_map
+        valid_units = ["METERS","US_FOOT"]
+        assert unit in valid_units, 'unit must be one of {}'.format(valid_units)
+        self.unit = unit
 
     def iterateDiagonal(self, x, y):
         """
@@ -65,10 +68,10 @@ class DataMap(object):
 
 class DegreesDataMap(DataMap):
     def __init__(self, numpy_map, latitude, longitude,
-                 span_latitude, span_longitude, arcsec_resolution):
+                 span_latitude, span_longitude, arcsec_resolution, unit):
+        super(DegreesDataMap, self).__init__(numpy_map, unit)
         self.logger = logging.getLogger('pyProm.{}'.format(__name__))
         self.logger.info("Datamap Object Created.")
-        self.numpy_map = numpy_map
         self.latitude = latitude  # SW Corner
         self.longitude = longitude  # SW Corner
         self.span_latitude = span_latitude
@@ -177,17 +180,18 @@ class DegreesDataMap(DataMap):
         :param y: NW corner y coordinate (longitude)
         :param xSpan: depth of subset in points (latitude)
         :param ySpan: width of subset in points (longitude)
-        :return: :class:`Datamap`
+        :return: :class:`DegreesDataMap`
         """
         keyLat = self.x_to_latitude(x+xSpan) # Southermost
         keyLong = self.y_to_longitude(y+ySpan) # Westernmost
         numpy_map = (self.numpy_map[x:x+xSpan, y:y+ySpan])
-        return DataMap(numpy_map,
-                       keyLat,
-                       keyLong,
-                       xSpan,
-                       ySpan,
-                       self.arcsec_resolution)
+        return DegreesDataMap(numpy_map,
+                              keyLat,
+                              keyLong,
+                              xSpan,
+                              ySpan,
+                              self.arcsec_resolution,
+                              self.unit)
 
     def __repr__(self):
         return "<DataMap> Lat {}, Long {}, SpanLat {}," \
@@ -203,10 +207,11 @@ class DegreesDataMap(DataMap):
 
 class ProjectionDataMap(DataMap):
     def __init__(self, numpy_map, utm_lowerLeftY, utm_lowerLeftX,
-                 utm_span_y, utm_span_x, linear_unit, hemisphere, utm_zone):
+                 utm_span_y, utm_span_x, linear_unit, hemisphere, utm_zone, unit):
+        super(ProjectionDataMap, self).__init__(numpy_map, unit)
         self.logger = logging.getLogger('pyProm.{}'.format(__name__))
         self.logger.info("ProjectedDataMap Object Created")
-        self.numpy_map = numpy_map
+        # These are deliberately flipped, yes I know it's confusing.
         self.lowerLeftY = utm_lowerLeftX  # SW Corner
         self.lowerLeftX = utm_lowerLeftY  # SW Corner
         self.span_y = utm_span_x
@@ -255,7 +260,7 @@ class ProjectionDataMap(DataMap):
         :param y: NW corner y coordinate (longitude)
         :param xSpan: depth of subset in points (latitude)
         :param ySpan: width of subset in points (longitude)
-        :return: :class:`Datamap`
+        :return: :class:`ProjectionDataMap`
         """
         southExtreme = (self.lowerLeftX + (self.span_x*self.linear_unit)) - (x+xSpan) #SouthernMost
         westExtreme = self.lowerLeftY + y #WesternMost

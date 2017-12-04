@@ -11,7 +11,7 @@ import logging
 
 from osgeo import gdal, osr
 
-from .lib.datamap import DataMap, ProjectionDataMap
+from .lib.datamap import DegreesDataMap, ProjectionDataMap
 from .lib.util import seconds_to_arcseconds, arcseconds_to_seconds
 
 
@@ -54,12 +54,13 @@ class SRTMLoader(Loader):
                                               self.span_longitude,
                                               self.span_latitude))
 
-        self.datamap = DataMap(self.elevations,
-                               self.latitude,
-                               self.longitude,
-                               self.span_latitude,
-                               self.span_longitude,
-                               self.arcsec_resolution)
+        self.datamap = DegreesDataMap(self.elevations,
+                                      self.latitude,
+                                      self.longitude,
+                                      self.span_latitude,
+                                      self.span_longitude,
+                                      self.arcsec_resolution,
+                                      "METERS")
 
     def latlong(self):
         """
@@ -88,8 +89,8 @@ class ADFLoader(Loader):
         latitude and longitude references are always "lower left"
         """
         super(ADFLoader, self).__init__(filename)
-        self.gdal_raster = gdal.Open(self.filename)
-        geotransform = self.gdal_raster.GetGeoTransform()
+        self.gdal_dataset = gdal.Open(self.filename)
+        geotransform = self.gdal_dataset.GetGeoTransform()
         # make sure arcsecond resolution is the same on both axis. We don't
         #  support differing resolutions yet.
         if abs(geotransform[1]) != abs(geotransform[5]):
@@ -101,7 +102,7 @@ class ADFLoader(Loader):
 
         self.arcsec_resolution = seconds_to_arcseconds(geotransform[1])
 
-        self.elevations = numpy.array(self.gdal_raster.GetRasterBand(1).
+        self.elevations = numpy.array(self.gdal_dataset.GetRasterBand(1).
                                       ReadAsArray())
         self.span_latitude = int(self.elevations.shape[0])
         self.span_longitude = int(self.elevations.shape[1])
@@ -120,12 +121,13 @@ class ADFLoader(Loader):
                                               self.latitude,
                                               self.longitude))
 
-        self.datamap = DataMap(self.elevations,
-                               self.latitude,
-                               self.longitude,
-                               self.span_latitude,
-                               self.span_longitude,
-                               self.arcsec_resolution)
+        self.datamap = DegreesDataMap(self.elevations,
+                                      self.latitude,
+                                      self.longitude,
+                                      self.span_latitude,
+                                      self.span_longitude,
+                                      self.arcsec_resolution,
+                                      "METERS")
 
 class LiDARLoader(Loader):
     # need to be able to extract:
@@ -136,7 +138,7 @@ class LiDARLoader(Loader):
 
 
     """
-    Arc/Info Binary Grid (.adf)
+    General GDAL datasets.
     """
     def __init__(self, filename, hemisphere="N"):
         """
@@ -144,37 +146,40 @@ class LiDARLoader(Loader):
         latitude and longitude references are always "lower left"
         """
         super(LiDARLoader, self).__init__(filename)
-        self.dataset = gdal.Open(self.filename)
-        self.elevations = numpy.array(self.dataset.GetRasterBand(1).
+        self.gdal_dataset = gdal.Open(self.filename)
+        raster_band = self.gdal_dataset.GetRasterBand(1)
+        self.no_data_value = raster_band.GetNoDataValue()
+        self.elevations = numpy.array(raster_band.
                                       ReadAsArray())
         self.hemisphere = hemisphere
-        self.span_x = self.dataset.RasterXSize # longitude
-        self.span_y = self.dataset.RasterYSize # latitude
-        geotransform = self.dataset.GetGeoTransform()
+        self.span_x = self.gdal_dataset.RasterXSize # longitude
+        self.span_y = self.gdal_dataset.RasterYSize # latitude
+        geotransform = self.gdal_dataset.GetGeoTransform()
 
         # We don't know what kind of coordinate system we're using yet so jsut call them nX,nY
         self.lowerLeftX, self.lowerLeftY =\
             getLowerLeftCoords(geotransform,
                                self.span_x,
                                self.span_y)
-        spatialRef = osr.SpatialReference(wkt=self.dataset.GetProjection())
+        spatialRef = osr.SpatialReference(wkt=self.gdal_dataset.GetProjection())
         # Are we a projected map?
         if spatialRef.IsProjected:
             self.utmzone = spatialRef.GetUTMZone()
             self.linear_unit = spatialRef.GetLinearUnits()
-            linear_unit_name = spatialRef.GetLinearUnitsName()
+            self.linear_unit_name = spatialRef.GetLinearUnitsName()
+
 
             if not self.utmzone:
                 raise Exception("Could not read UTM Zone in projection. "
                                 "This may be useful: {}".format(
-                                self.dataset.GetProjectionRef()))
+                                self.gdal_dataset.GetProjectionRef()))
             self.logger.info("Loading: {} X span: {}, Y span: {}"
                              ", Resolution: {} {}, SW Boundary {},{}"
                              "Hemisphere {}, Zone {}".format(filename,
                                                              self.span_x,
                                                              self.span_y,
                                                              self.linear_unit,
-                                                             linear_unit_name,
+                                                             self.linear_unit_name,
                                                              self.lowerLeftX,
                                                              self.lowerLeftY,
                                                              self.hemisphere,
@@ -186,7 +191,8 @@ class LiDARLoader(Loader):
                                              self.span_x,
                                              self.linear_unit,
                                              self.hemisphere,
-                                             self.utmzone)
+                                             self.utmzone,
+                                             self.linear_unit_name)
 
 
 
