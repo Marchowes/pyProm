@@ -1,4 +1,4 @@
-### pyProm v0.3.0
+### pyProm v0.3.5
 
 
 This library is still under development. Do not expect full functionality, or documentation until release 1.0.0
