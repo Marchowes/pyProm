@@ -11,7 +11,7 @@ import logging
 
 from osgeo import gdal, osr
 
-from .lib.datamap import DegreesDataMap, ProjectionDataMap
+from .lib.datamap import DegreesDataMap, ProjectionDataMap, ProjectionDataMapV2
 from .lib.util import seconds_to_arcseconds, arcseconds_to_seconds
 
 
@@ -149,65 +149,74 @@ class LiDARLoader(Loader):
         self.gdal_dataset = gdal.Open(self.filename)
         raster_band = self.gdal_dataset.GetRasterBand(1)
         self.no_data_value = raster_band.GetNoDataValue()
-        self.elevations = numpy.array(raster_band.
+        self.raster_data = numpy.array(raster_band.
                                       ReadAsArray())
         self.hemisphere = hemisphere
         self.span_x = self.gdal_dataset.RasterXSize # longitude
         self.span_y = self.gdal_dataset.RasterYSize # latitude
-        geotransform = self.gdal_dataset.GetGeoTransform()
+        ulx, xres, xskew, uly, yskew, yres = self.gdal_dataset.GetGeoTransform() # clean up later
 
-        # We don't know what kind of coordinate system we're using yet so jsut call them nX,nY
+        # We don't know what kind of coordinate system we're using yet so just call them nX,nY
         self.lowerLeftX, self.lowerLeftY =\
-            getLowerLeftCoords(geotransform,
-                               self.span_x,
-                               self.span_y)
+            getLowerLeftCoords(ulx, uly, yres, self.span_y)
         spatialRef = osr.SpatialReference(wkt=self.gdal_dataset.GetProjection())
         # Are we a projected map?
         if spatialRef.IsProjected:
-            self.utmzone = spatialRef.GetUTMZone()
+            target = osr.SpatialReference()
+            target.ImportFromEPSG(4269) #NAD83 -- this should be made import-able.
+            transform = osr.CoordinateTransformation(spatialRef, target)
+            reverse_transform = osr.CoordinateTransformation(target, spatialRef)
             self.linear_unit = spatialRef.GetLinearUnits()
             self.linear_unit_name = spatialRef.GetLinearUnitsName()
 
-
-            if not self.utmzone:
-                raise Exception("Could not read UTM Zone in projection. "
-                                "This may be useful: {}".format(
-                                self.gdal_dataset.GetProjectionRef()))
-            self.logger.info("Loading: {} X span: {}, Y span: {}"
-                             ", Resolution: {} {}, SW Boundary {},{}"
-                             "Hemisphere {}, Zone {}".format(filename,
-                                                             self.span_x,
-                                                             self.span_y,
-                                                             self.linear_unit,
-                                                             self.linear_unit_name,
-                                                             self.lowerLeftX,
-                                                             self.lowerLeftY,
-                                                             self.hemisphere,
-                                                             self.utmzone))
-            self.datamap = ProjectionDataMap(self.elevations,
-                                             self.lowerLeftY,
-                                             self.lowerLeftX,
-                                             self.span_y,
-                                             self.span_x,
-                                             self.linear_unit,
-                                             self.hemisphere,
-                                             self.utmzone,
-                                             self.linear_unit_name)
+            self.datamap = ProjectionDataMapV2(self.raster_data, self.lowerLeftY, self.lowerLeftX, yres, xres, self.span_y, self.span_x, self.linear_unit, self.linear_unit_name, transform, reverse_transform)
 
 
 
+            # self.utmzone = spatialRef.GetUTMZone()
+            # self.linear_unit = spatialRef.GetLinearUnits()
+            # self.linear_unit_name = spatialRef.GetLinearUnitsName()
+            #
+            #
+            # if not self.utmzone:
+            #     raise Exception("Could not read UTM Zone in projection. "
+            #                     "This may be useful: {}".format(
+            #                     self.gdal_dataset.GetProjectionRef()))
+            # self.logger.info("Loading: {} X span: {}, Y span: {}"
+            #                  ", Resolution: {} {}, SW Boundary {},{}"
+            #                  "Hemisphere {}, Zone {}".format(filename,
+            #                                                  self.span_x,
+            #                                                  self.span_y,
+            #                                                  self.linear_unit,
+            #                                                  self.linear_unit_name,
+            #                                                  self.lowerLeftX,
+            #                                                  self.lowerLeftY,
+            #                                                  self.hemisphere,
+            #                                                  self.utmzone))
+            # self.datamap = ProjectionDataMap(self.raster_data,
+            #                                  self.lowerLeftY,
+            #                                  self.lowerLeftX,
+            #                                  self.span_y,
+            #                                  self.span_x,
+            #                                  self.linear_unit,
+            #                                  self.hemisphere,
+            #                                  self.utmzone,
+            #                                  self.linear_unit_name)
 
 
-def getLowerLeftCoords(geoTransform, xSpan, ySpan):
+
+
+
+def getLowerLeftCoords(ulx, uly, yres, ySpan):
     """
-    :param geoTransform:  GetGeoTransform() output from gdal
+    :param ulx:  upper left X
+    :param uly: upper left Y
+    :param yres: y axis linear resolution
     :param xSpan: raster span on X axis (points) columns
     :param ySpan: raster span on Y axis (points) rows
     :return: tuple of (X,Y) coords
     """
-    x = geoTransform[0]
-    y = geoTransform[3] + (ySpan*geoTransform[5])
-    return (x,y)
+    return (ulx,uly + (ySpan*yres))
 
 
 

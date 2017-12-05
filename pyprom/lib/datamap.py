@@ -25,8 +25,8 @@ class DataMap(object):
     """
     def __init__(self, numpy_map, unit):
         self.numpy_map = numpy_map
-        valid_units = ["METERS","US_FOOT"]
-        assert unit in valid_units, 'unit must be one of {}'.format(valid_units)
+        valid_units = ["METERS","Foot_US", "Meter"]
+        assert unit in valid_units, 'unit must be one of {}, got {}'.format(valid_units, unit)
         self.unit = unit
 
     def iterateDiagonal(self, x, y):
@@ -283,5 +283,134 @@ class ProjectionDataMap(DataMap):
                 self.span_y,
                 self.span_x,
                 self.linear_unit)
+
+    __unicode__ = __str__ = __repr__
+
+
+class ProjectionDataMapV2(DataMap):
+    def __init__(self, numpy_map, lowerLeftY, lowerLeftX, resolutionY, resolutionX,
+                 span_y, span_x, linear_unit, unit, transform, reverse_transform):
+        super(ProjectionDataMapV2, self).__init__(numpy_map, unit)
+        self.logger = logging.getLogger('pyProm.{}'.format(__name__))
+        self.logger.info("ProjectedDataMap Object Created")
+        # These are deliberately flipped, yes I know it's confusing.
+        self.lowerLeftY = lowerLeftX  # SW Corner
+        self.lowerLeftX = lowerLeftY  # SW Corner
+        self.res_y = resolutionX
+        self.res_x = resolutionY
+        self.span_y = span_x
+        self.max_y = self.span_y - 1
+        self.span_x = span_y
+        self.max_x = self.span_x - 1
+        self.linear_unit = linear_unit
+        self.transform = transform
+        self.reverse_transform = reverse_transform
+
+
+    def xy_to_latlong(self, x,y):
+        """
+        :param x: x location in `numpy_map`
+        :param y: y location in `numpy_map`
+        :return: (latitude, longitude)
+        """
+
+        absolute_x_position = (self.lowerLeftX - (self.span_x * self.res_x)) + (x * self.res_x)
+        absolute_y_position = self.lowerLeftY + (y * self.res_y)
+        #print (absolute_x_position, absolute_y_position) # Wrong!
+        transformed = self.transform.TransformPoint(absolute_y_position, absolute_x_position)[:2]
+        return (transformed[1],transformed[0])
+
+    def latlong_to_xy(self, latitude, longitude):
+        """
+        :param latitude:
+        :param longitude:
+        :return: (x,y)
+        """
+        coordinate = self.reverse_transform.TransformPoint(longitude, latitude)
+        x = coordinate[1]
+        y = coordinate[0]
+        rel_x = round((x - (self.lowerLeftX - (self.span_x * self.res_x)))/self.res_x)
+        rel_y = round((y - self.lowerLeftY)/self.res_y)
+        return (rel_x, rel_y)
+
+    def elevation(self, latitude, longitude):
+        """
+        :param latitude: latitude in dotted demical notation
+        :param longitude: longitude in dotted decimal notation.
+        :return: elevation of coordinate in meters.
+        """
+        xy = self.latlong_to_xy(latitude, longitude)
+        return self.numpy_map[xy[0], xy[1]]
+
+    def _leftmost_absolute(self):
+        return self.lowerLeftY
+
+    def _rightmost_absolute(self):
+        return self.lowerLeftY + (self.res_y * self.span_y)
+
+    def _lowermost_absolute(self):
+        return self.lowerLeftX
+
+    def _uppermost_absolute(self):
+        return self.lowerLeftX - (self.res_x * self.span_y)
+
+    def x_to_absolute_x(self):
+        pass
+
+    def y_to_absolute_y(self):
+        pass
+
+    @property
+    def upper_left(self):
+        transformed = self.transform.TransformPoint(self._leftmost_absolute(), self._uppermost_absolute())
+        return (transformed[1],transformed[0])
+
+    @property
+    def lower_left(self):
+        transformed = self.transform.TransformPoint(self._leftmost_absolute(), self._lowermost_absolute())
+        return (transformed[1], transformed[0])
+
+    @property
+    def upper_right(self):
+        transformed = self.transform.TransformPoint(self._rightmost_absolute(), self._uppermost_absolute())
+        return (transformed[1], transformed[0])
+
+    @property
+    def lower_right(self):
+        transformed = self.transform.TransformPoint(self._rightmost_absolute(), self._lowermost_absolute())
+        return (transformed[1], transformed[0])
+
+
+    def subset(self, x, y, xSpan, ySpan):
+        """
+        :param x: NW corner x coordinate (latitude)
+        :param y: NW corner y coordinate (longitude)
+        :param xSpan: depth of subset in points (latitude)
+        :param ySpan: width of subset in points (longitude)
+        :return: :class:`ProjectionDataMap`
+        """
+        southExtreme = self._uppermost_absolute() + (x*self.res_x) + ((x*self.res_x)*xSpan)
+        westExtreme = self.lowerLeftY + (y*self.res_y)
+        numpy_map = (self.numpy_map[x:x+xSpan, y:y+ySpan])
+        return ProjectionDataMapV2(numpy_map,
+                       westExtreme,
+                       southExtreme,
+                       self.res_y,
+                       self.res_x,
+                       ySpan,
+                       xSpan,
+                       self.linear_unit,
+                       self.unit,
+                       self.transform,
+                       self.reverse_transform)
+
+    def __repr__(self):
+        return "<ProjectionDataMap> LowerLeft LatLon {}, LowerLeft Local "\
+                "Coords {}, SpanX {}, SpanY {}, {} Units".format(
+                 self.lower_left,
+                 (self._leftmost_absolute(), self._lowermost_absolute()),
+                 self.span_x,
+                 self.span_y,
+                 self.unit)
 
     __unicode__ = __str__ = __repr__
