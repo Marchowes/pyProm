@@ -25,9 +25,15 @@ class DataMap(object):
     """
     def __init__(self, numpy_map, unit):
         self.numpy_map = numpy_map
-        valid_units = ["METERS","Foot_US", "Meter"]
-        assert unit in valid_units, 'unit must be one of {}, got {}'.format(valid_units, unit)
-        self.unit = unit
+        unit_and_substrings = {"METERS":["meter"], "FEET": ["foot","feet"]}
+        self.unit = None
+        for unitname, unit_options in unit_and_substrings.items():
+            for option in unit_options:
+                if option.upper() in unit.upper():
+                    self.unit = unitname
+        if not self.unit:
+            raise Exception("Need Meters or Feet. Got {}".format(unit))
+
 
     def iterateDiagonal(self, x, y):
         """
@@ -43,7 +49,10 @@ class DataMap(object):
             _y = y + shift[1]
             if 0 <= _x <= self.max_x and \
                0 <= _y <= self.max_y:
-                yield _x, _y, float(self.numpy_map[_x, _y])
+                if self.unit == 'FEET':
+                    yield _x, _y, float(.3048 * self.numpy_map[_x, _y])
+                else:
+                    yield _x, _y, float(self.numpy_map[_x, _y])
             else:
                 yield _x, _y, -32768
 
@@ -60,7 +69,10 @@ class DataMap(object):
             _y = y + shift[1]
             if 0 <= _x <= self.max_x and \
                0 <= _y <= self.max_y:
-                yield _x, _y, float(self.numpy_map[_x, _y])
+                if self.unit == 'FEET':
+                    yield _x, _y, float(.3048 * self.numpy_map[_x, _y])
+                else:
+                    yield _x, _y, float(self.numpy_map[_x, _y])
             else:
                 yield _x, _y, -32768
 
@@ -205,86 +217,86 @@ class DegreesDataMap(DataMap):
     __unicode__ = __str__ = __repr__
 
 
-class ProjectionDataMap(DataMap):
-    def __init__(self, numpy_map, utm_lowerLeftY, utm_lowerLeftX,
-                 utm_span_y, utm_span_x, linear_unit, hemisphere, utm_zone, unit):
-        super(ProjectionDataMap, self).__init__(numpy_map, unit)
-        self.logger = logging.getLogger('pyProm.{}'.format(__name__))
-        self.logger.info("ProjectedDataMap Object Created")
-        # These are deliberately flipped, yes I know it's confusing.
-        self.lowerLeftY = utm_lowerLeftX  # SW Corner
-        self.lowerLeftX = utm_lowerLeftY  # SW Corner
-        self.span_y = utm_span_x
-        self.max_y = self.span_y - 1
-        self.span_x = utm_span_y
-        self.max_x = self.span_x - 1
-        self.linear_unit = linear_unit
-        self.hemisphere = hemisphere
-        self.utm_zone = utm_zone
-
-    def xy_to_latlong(self, x,y):
-        """
-        :param x: x location in `numpy_map`
-        :param y: y location in `numpy_map`
-        :return: tuple position in dotted decimal lat/long
-        """
-        relative_x_position = (self.lowerLeftX + (self.span_x * self.linear_unit)) - (x * self.linear_unit)
-        relative_y_position = self.lowerLeftY + (y * self.linear_unit)
-        return utm.to_latlon(relative_y_position, relative_x_position, self.utm_zone, northern=self.hemisphere=='N')
-
-    def latlong_to_xy(self, latitude, longitude):
-        """
-        :param latitude:
-        :param longitude:
-        :return:
-        """
-        utm_coord = utm.from_latlon(latitude, longitude)
-        x = round(utm_coord[1])
-        y = round(utm_coord[0])
-        rel_x = x - (self.lowerLeftX + (self.span_x * self.linear_unit))
-        rel_y = y - self.lowerLeftY
-        return (rel_x, rel_y)
-
-    def elevation(self, latitude, longitude):
-        """
-        :param latitude: latitude in dotted demical notation
-        :param longitude: longitude in dotted decimal notation.
-        :return: elevation of coordinate in meters.
-        """
-        xy = self.latlong_to_xy(latitude, longitude)
-        return self.numpy_map[xy[0], xy[1]]
-
-    def subset(self, x, y, xSpan, ySpan):
-        """
-        :param x: NW corner x coordinate (latitude)
-        :param y: NW corner y coordinate (longitude)
-        :param xSpan: depth of subset in points (latitude)
-        :param ySpan: width of subset in points (longitude)
-        :return: :class:`ProjectionDataMap`
-        """
-        southExtreme = (self.lowerLeftX + (self.span_x*self.linear_unit)) - (x+xSpan) #SouthernMost
-        westExtreme = self.lowerLeftY + y #WesternMost
-        numpy_map = (self.numpy_map[x:x+xSpan, y:y+ySpan])
-        return ProjectionDataMap(numpy_map,
-                       westExtreme,
-                       southExtreme,
-                       ySpan,
-                       xSpan,
-                       self.linear_unit,
-                       self.hemisphere,
-                       self.utm_zone)
-
-    def __repr__(self):
-        return "<ProjectionDataMap> UTM {} Easting {} Northing, Zone {}, SpanX {}," \
-               " SpanY {}, {} Units".format(
-                self.lowerLeftX,
-                self.lowerLeftY,
-                self.utm_zone,
-                self.span_y,
-                self.span_x,
-                self.linear_unit)
-
-    __unicode__ = __str__ = __repr__
+# class ProjectionDataMap(DataMap):
+#     def __init__(self, numpy_map, utm_lowerLeftY, utm_lowerLeftX,
+#                  utm_span_y, utm_span_x, linear_unit, hemisphere, utm_zone, unit):
+#         super(ProjectionDataMap, self).__init__(numpy_map, unit)
+#         self.logger = logging.getLogger('pyProm.{}'.format(__name__))
+#         self.logger.info("ProjectedDataMap Object Created")
+#         # These are deliberately flipped, yes I know it's confusing.
+#         self.lowerLeftY = utm_lowerLeftX  # SW Corner
+#         self.lowerLeftX = utm_lowerLeftY  # SW Corner
+#         self.span_y = utm_span_x
+#         self.max_y = self.span_y - 1
+#         self.span_x = utm_span_y
+#         self.max_x = self.span_x - 1
+#         self.linear_unit = linear_unit
+#         self.hemisphere = hemisphere
+#         self.utm_zone = utm_zone
+#
+#     def xy_to_latlong(self, x,y):
+#         """
+#         :param x: x location in `numpy_map`
+#         :param y: y location in `numpy_map`
+#         :return: tuple position in dotted decimal lat/long
+#         """
+#         relative_x_position = (self.lowerLeftX + (self.span_x * self.linear_unit)) - (x * self.linear_unit)
+#         relative_y_position = self.lowerLeftY + (y * self.linear_unit)
+#         return utm.to_latlon(relative_y_position, relative_x_position, self.utm_zone, northern=self.hemisphere=='N')
+#
+#     def latlong_to_xy(self, latitude, longitude):
+#         """
+#         :param latitude:
+#         :param longitude:
+#         :return:
+#         """
+#         utm_coord = utm.from_latlon(latitude, longitude)
+#         x = round(utm_coord[1])
+#         y = round(utm_coord[0])
+#         rel_x = x - (self.lowerLeftX + (self.span_x * self.linear_unit))
+#         rel_y = y - self.lowerLeftY
+#         return (rel_x, rel_y)
+#
+#     def elevation(self, latitude, longitude):
+#         """
+#         :param latitude: latitude in dotted demical notation
+#         :param longitude: longitude in dotted decimal notation.
+#         :return: elevation of coordinate in meters.
+#         """
+#         xy = self.latlong_to_xy(latitude, longitude)
+#         return self.numpy_map[xy[0], xy[1]]
+#
+#     def subset(self, x, y, xSpan, ySpan):
+#         """
+#         :param x: NW corner x coordinate (latitude)
+#         :param y: NW corner y coordinate (longitude)
+#         :param xSpan: depth of subset in points (latitude)
+#         :param ySpan: width of subset in points (longitude)
+#         :return: :class:`ProjectionDataMap`
+#         """
+#         southExtreme = (self.lowerLeftX + (self.span_x*self.linear_unit)) - (x+xSpan) #SouthernMost
+#         westExtreme = self.lowerLeftY + y #WesternMost
+#         numpy_map = (self.numpy_map[x:x+xSpan, y:y+ySpan])
+#         return ProjectionDataMap(numpy_map,
+#                        westExtreme,
+#                        southExtreme,
+#                        ySpan,
+#                        xSpan,
+#                        self.linear_unit,
+#                        self.hemisphere,
+#                        self.utm_zone)
+#
+#     def __repr__(self):
+#         return "<ProjectionDataMap> UTM {} Easting {} Northing, Zone {}, SpanX {}," \
+#                " SpanY {}, {} Units".format(
+#                 self.lowerLeftX,
+#                 self.lowerLeftY,
+#                 self.utm_zone,
+#                 self.span_y,
+#                 self.span_x,
+#                 self.linear_unit)
+#
+#     __unicode__ = __str__ = __repr__
 
 
 class ProjectionDataMapV2(DataMap):
@@ -352,13 +364,13 @@ class ProjectionDataMapV2(DataMap):
         return self.lowerLeftX
 
     def _uppermost_absolute(self):
-        return self.lowerLeftX - (self.res_x * self.span_y)
+        return self.lowerLeftX - (self.res_x * self.span_x)
 
-    def x_to_absolute_x(self):
-        pass
+    def x_to_native_x(self, x):
+        return self._uppermost_absolute() + (x * self.res_x)
 
-    def y_to_absolute_y(self):
-        pass
+    def y_to_native_y(self, y):
+        return self._leftmost_absolute() + (y * self.res_y)
 
     @property
     def upper_left(self):

@@ -11,7 +11,7 @@ import logging
 
 from osgeo import gdal, osr
 
-from .lib.datamap import DegreesDataMap, ProjectionDataMap, ProjectionDataMapV2
+from .lib.datamap import DegreesDataMap, ProjectionDataMapV2
 from .lib.util import seconds_to_arcseconds, arcseconds_to_seconds
 
 
