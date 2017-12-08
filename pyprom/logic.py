@@ -31,7 +31,7 @@ class AnalyzeData(object):
         """
         :param datamap: `DataMap` object.
         """
-        self.logger = logging.getLogger('pyProm.{}'.format(__name__))
+        self.logger = logging.getLogger('{}'.format(__name__))
         self.datamap = datamap
         self.data = self.datamap.numpy_map
         self.edge = False

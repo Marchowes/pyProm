@@ -17,7 +17,7 @@ from .lib.containers.linker import Linker
 class Walk(object):
     def __init__(self, summits, saddles, datamap):
 
-        self.logger = logging.getLogger('pyProm.{}'.format(__name__))
+        self.logger = logging.getLogger('{}'.format(__name__))
         self.logger.info("Initiating Walk")
         self.summits = summits
         self.saddles = saddles
