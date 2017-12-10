@@ -1,6 +1,6 @@
 import unittest
 from .getData import getTestZip
-from pyprom.dataload import SRTMLoader
+from pyprom.dataload import GDALLoader
 from pyprom.logic import AnalyzeData
 from pyprom.lib.locations.summit import Summit
 from pyprom.lib.locations.saddle import Saddle
@@ -9,7 +9,7 @@ from pyprom.lib.locations.saddle import Saddle
 class LogicTests(unittest.TestCase):
     def setUp(self):
         getTestZip()
-        self.datafile = SRTMLoader('/tmp/N44W072.hgt')
+        self.datafile = GDALLoader('/tmp/N44W072.hgt')
         self.datamap = self.datafile.datamap
         self.mtWashingtonDM = self.datamap.subset(2600, 2500, 30, 30)
         self.washingtonVicinity = AnalyzeData(self.mtWashingtonDM)

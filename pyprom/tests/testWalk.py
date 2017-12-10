@@ -1,14 +1,14 @@
 from __future__ import division
 import unittest
 from .getData import getTestZip
-from pyprom.dataload import SRTMLoader
+from pyprom.dataload import GDALLoader
 from pyprom.logic import AnalyzeData
 from pyprom.walk import Walk
 
 class WalkTests(unittest.TestCase):
     def setUp(self):
         getTestZip()
-        self.datafile = SRTMLoader('/tmp/N44W072.hgt')
+        self.datafile = GDALLoader('/tmp/N44W072.hgt')
         datamap = self.datafile.datamap
         self.islandpondVT = datamap.subset(602, 353, 260, 260)
         self.islandpondVTVicinity = AnalyzeData(self.islandpondVT)

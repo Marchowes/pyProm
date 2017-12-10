@@ -1,72 +1,73 @@
 from __future__ import division
 import unittest
 from .getData import getTestZip
-from pyprom.dataload import SRTMLoader
-
-
+from pyprom.dataload import GDALLoader
 
 
 class DataMapTests(unittest.TestCase):
     def setUp(self):
         getTestZip()
-        self.datafile = SRTMLoader('/tmp/N44W072.hgt')
+        self.datafile = GDALLoader('/tmp/N44W072.hgt')
         self.datamap = self.datafile.datamap
 
     def testGeneralDataMap(self):
         """
         Test defaults
         """
-        self.assertEqual(self.datamap.latitude, 44)
-        self.assertEqual(self.datamap.longitude, -72)
-        self.assertEqual(self.datamap.latitude_max, 45.0)
-        self.assertEqual(self.datamap.longitude_max, -71.0)
-        self.assertEqual(self.datamap.arcsec_resolution, 1)
+        self.assertEqual(self.datamap.upperLeftX, 45.00013888888889)
+        self.assertEqual(self.datamap.upperLeftY, -72.00013888888888)
+        self.assertEqual(self.datamap.max_x, 3600)
+        self.assertEqual(self.datamap.max_y, 3600)
+        self.assertEqual(self.datamap.res_x, -0.0002777777777777778)
+        self.assertEqual(self.datamap.res_y, 0.0002777777777777778)
+        self.assertEqual(self.datamap.span_x, 3601)
+        self.assertEqual(self.datamap.span_y, 3601)
+        self.assertEqual(self.datamap.unit, "METERS")
+        self.assertEqual(self.datamap.lower_left, (43.999861111111116, -72.00013888888888))
+        self.assertEqual(self.datamap.upper_left, (45.00013888888889, -72.00013888888888))
+        self.assertEqual(self.datamap.lower_right, (43.999861111111116, -70.9998611111111))
+        self.assertEqual(self.datamap.upper_right, (45.00013888888889, -70.9998611111111))
 
-    def testLatitudeToX(self):
+    def testLatLongToXY(self):
         """
-        Test Latitude to X function
+        Test Lat-long to XY function
         """
-        input = [44, 44.1, 44.2, 44.25, 44.33333, 44.5, 44.6125, 44.75,
-                 44.7777, 44.8125, 45.0]
-        output = [3600, 3240, 2880, 2700, 2400, 1800, 1395, 900, 800, 675, 0]
+        input = [(44.000138, -71.000138888), (44.1, -71.1), (44.2, -71.2), (44.25, -71.25), (44.33333, -71.33333), (44.5, -71.5), (44.6125, -71.6125), (44.75, -71.75),
+                 (44.7777, -71.7777), (44.8125, -71.8125), (45.00013888888889, -72.00013888888888)]
+        output = [(3600,3600), (3241,3241), (2880,2880), (2701, 2700), (2401, 2401), (1801, 1800), (1396, 1395), (901, 900), (801, 801), (676, 675), (0,0)]
         for index, value in enumerate(input):
-            self.assertEqual(self.datamap.latitude_to_x(value), output[index])
+            self.assertEqual(self.datamap.latlong_to_xy(value[0],value[1]), output[index])
 
-    def testLongitudeToY(self):
+    def test_XY_latlong_determinism(self):
         """
-        Test Longitude to Y function
+        Ensure converting from XY to LATLONG and back returns the same results.
         """
-        input = [-71, -71.1, -71.2, -71.25, -71.3333, -71.45, -71.5, -71.6125,
-                 -71.75, -71.7777, -71.8125, -71.83122, -71.9, -72]
-        output = [3600, 3240, 2880, 2700, 2400, 1980, 1800, 1395, 900, 800,
-                  675, 608, 360, 0]
-        for index, value in enumerate(input):
-            self.assertEqual(self.datamap.longitude_to_y(value), output[index])
+        for x in range(0, 3601, 17):
+            for y in range(0, 3601, 1):
+                latlong = self.datamap.xy_to_latlong(x,y)
+                xy = self.datamap.latlong_to_xy(latlong[0],latlong[1])
+                self.assertEqual(xy[0], x)
+                self.assertEqual(xy[1], y)
 
-    def testXtoLatitude(self):
-        """
-        Test X to Latitude function
-        """
-        results = [x/100 for x in range(4500,4400, -1)]
-        for index, value in enumerate([x for x in range(0, 3600, 36)]):
-            self.assertEqual(self.datamap.x_to_latitude(value), results[index])
-
-
-    def testYtoLongitude(self):
-        """
-        Test Y to Longitude function
-        """
-        results = [x / 100 for x in range(-7200, -7100, 1)]
-        for index, value in enumerate([x for x in range(0, 3600, 36)]):
-            self.assertEqual(self.datamap.y_to_longitude(value), results[index])
 
     def testSubset(self):
-        subset = self.datamap.subset(100,100,200,200)
-        self.assertEqual(subset.latitude, 44.916667)
-        self.assertEqual(subset.longitude, -71.916667)
-        self.assertEqual(subset.latitude_max, 44.9719447778)
-        self.assertEqual(subset.longitude_max, -71.8613892222)
-        self.assertEqual(subset.arcsec_resolution, 1)
+        """
+        Test that datamap subsets return accurate subsets
+        """
+        subset = self.datamap.subset(100,100,200,199)
+        self.assertEqual(subset.upperLeftX, 44.97236111111111)
+        self.assertEqual(subset.upperLeftY, -71.97236111111111)
+        self.assertEqual(subset.max_x, 199)
+        self.assertEqual(subset.max_y, 198)
+        self.assertEqual(subset.res_x, -0.0002777777777777778)
+        self.assertEqual(subset.res_y, 0.0002777777777777778)
+        self.assertEqual(subset.span_x, 200)
+        self.assertEqual(subset.span_y, 199)
+        self.assertEqual(subset.unit, "METERS")
+        self.assertEqual(subset.lower_left, (44.916805555555555, -71.97236111111111))
+        self.assertEqual(subset.upper_left, (44.97236111111111, -71.97236111111111))
+        self.assertEqual(subset.lower_right, (44.916805555555555, -71.91708333333334))
+        self.assertEqual(subset.upper_right, (44.97236111111111, -71.91708333333334))
 
 if __name__ == '__main__':
     unittest.main()

@@ -6,7 +6,7 @@ the LICENSE file that accompanies it.
 
 PyProm: This library includes tools for surface network analysis.
 """
-version_info = (0, 3, 0)
+version_info = (0, 3, 6)
 __name__ = 'pyProm'
 __doc__ = 'A python surface network analysis script'
 __author__ = 'Marc Howes'

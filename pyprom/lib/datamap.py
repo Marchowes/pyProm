@@ -75,15 +75,15 @@ class DataMap(object):
 
 
 class ProjectionDataMap(DataMap):
-    def __init__(self, numpy_map, lowerLeftY, lowerLeftX, resolutionY,
+    def __init__(self, numpy_map, upperLeftY, upperLeftX, resolutionY,
                  resolutionX, span_y, span_x, linear_unit, unit, transform,
                  reverse_transform):
         """
         :param numpy_map: numpy_array multidimensional array of data
          numpy_map[x][y]
-        :param lowerLeftY: Lower Left Y native coordinate from GDAL. This
+        :param upperLeftY: Upper Left Y native coordinate from GDAL. This
          is the X axis for Numpy.
-        :param lowerLeftX: Lower Left X native coordinate from GDAL. This
+        :param upperLeftX: Upper Left X native coordinate from GDAL. This
          is the Y axis for Numpy
         :param resolutionY: Number of units per pixel on GDAL native Y axis.
          This is the X axis for Numpy
@@ -116,8 +116,8 @@ class ProjectionDataMap(DataMap):
         self.logger = logging.getLogger('{}'.format(__name__))
         self.logger.info("ProjectedDataMap Object Created")
         # These are deliberately flipped, yes I know it's confusing.
-        self.lowerLeftY = lowerLeftX  # SW Corner
-        self.lowerLeftX = lowerLeftY  # SW Corner
+        self.upperLeftY = upperLeftX  # SW Corner
+        self.upperLeftX = upperLeftY  # SW Corner
         self.res_y = resolutionX
         self.res_x = resolutionY
         self.span_y = span_x
@@ -137,9 +137,8 @@ class ProjectionDataMap(DataMap):
         :return: (latitude, longitude)
         """
 
-        absolute_x_position = (self.lowerLeftX - (self.span_x * self.res_x)) + (x * self.res_x)
-        absolute_y_position = self.lowerLeftY + (y * self.res_y)
-        #print (absolute_x_position, absolute_y_position) # Wrong!
+        absolute_x_position = self._uppermost_absolute() + (x * self.res_x)
+        absolute_y_position = self._leftmost_absolute() + (y * self.res_y)
         transformed = self.transform.TransformPoint(absolute_y_position, absolute_x_position)[:2]
         return (transformed[1],transformed[0])
 
@@ -153,8 +152,8 @@ class ProjectionDataMap(DataMap):
         coordinate = self.reverse_transform.TransformPoint(longitude, latitude)
         x = coordinate[1]
         y = coordinate[0]
-        rel_x = round((x - (self.lowerLeftX - (self.span_x * self.res_x)))/self.res_x)
-        rel_y = round((y - self.lowerLeftY)/self.res_y)
+        rel_x = round((x - self._uppermost_absolute())/self.res_x)
+        rel_y = round((y - self._leftmost_absolute())/self.res_y)
         return (rel_x, rel_y)
 
     def elevation(self, latitude, longitude):
@@ -171,19 +170,19 @@ class ProjectionDataMap(DataMap):
 
     def _leftmost_absolute(self):
         # Returns the Leftmost GDAL Native X coordinate (Y for numpy_map)
-        return self.lowerLeftY
+        return self.upperLeftY
 
     def _rightmost_absolute(self):
         # Returns the Rightmost GDAL Native X coordinate (Y for numpy_map)
-        return self.lowerLeftY + (self.res_y * self.span_y)
+        return self.upperLeftY + (self.res_y * self.span_y)
 
     def _lowermost_absolute(self):
         # Returns the Lowermost GDAL Native Y coordinate (X for numpy_map)
-        return self.lowerLeftX
+        return self.upperLeftX + (self.res_x * self.span_x)
 
     def _uppermost_absolute(self):
         # Returns the Uppermost GDAL Native Y coordinate (X for numpy_map)
-        return self.lowerLeftX - (self.res_x * self.span_x)
+        return self.upperLeftX
 
     def x_to_native_x(self, x):
         # Converts a numpy X coordinate the the gdal native Y (X for numpy_map)
@@ -236,16 +235,16 @@ class ProjectionDataMap(DataMap):
         :param ySpan: width of subset in points (longitude)
         :return: :class:`ProjectionDataMap`
         """
-        southExtreme = self._uppermost_absolute() + (x*self.res_x) + ((x*self.res_x)*xSpan)
-        westExtreme = self.lowerLeftY + (y*self.res_y)
+        southExtreme = self.x_to_native_x(x)
+        westExtreme = self.y_to_native_y(y)
         numpy_map = (self.numpy_map[x:x+xSpan, y:y+ySpan])
         return ProjectionDataMap(numpy_map,
-                       westExtreme,
                        southExtreme,
-                       self.res_y,
+                       westExtreme,
                        self.res_x,
-                       ySpan,
+                       self.res_y,
                        xSpan,
+                       ySpan,
                        self.linear_unit,
                        self.unit,
                        self.transform,

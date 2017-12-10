@@ -73,6 +73,8 @@ class GDALLoader(Loader):
             self.gdal_dataset.GetGeoTransform()
         # Get lower left Native Dataset coordinates for passing into
         # the DataMap.
+        self.upperLeftY = uly
+        self.upperLeftX = ulx
         self.lowerLeftX, self.lowerLeftY =\
             getLowerLeftCoords(ulx, uly, yres, self.span_y)
         spatialRef = osr.SpatialReference(
@@ -92,8 +94,8 @@ class GDALLoader(Loader):
 
             # Create out DataMap Object.
             self.datamap = ProjectionDataMap(self.raster_data,
-                                             self.lowerLeftY,
-                                             self.lowerLeftX,
+                                             self.upperLeftY,
+                                             self.upperLeftX,
                                              yres,
                                              xres,
                                              self.span_y,

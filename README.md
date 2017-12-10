@@ -1,4 +1,4 @@
-### pyProm v0.3.5
+### pyProm v0.3.6
 
 
 This library is still under development. Do not expect full functionality, or documentation until release 1.0.0
@@ -37,14 +37,14 @@ Example(s)
 In your favorite Python interpreter on a Unix system (I use `ipython` in `Linux`):
 
 ```
-from dataload import SRTMLoader
+from dataload import GDALLoader
 from domain import Domain
 from dataexport import KMLfileWriter
 import logging
 logging.basicConfig(level=logging.DEBUG)
 
 # Load your Datamap into your Domain
-data = SRTMLoader('YOURPATHHERE/N44W072.hgt')
+data = GDALLoader('YOURPATHHERE/N44W072.hgt')
 domain = Domain(data)
 domain.run()
 # ^This will run the Saddle/Summit discovery, it'll take a while..
