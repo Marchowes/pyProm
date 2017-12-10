@@ -1,5 +1,5 @@
 """
-pyProm: Copyright 2016
+pyProm: Copyright 2016.
 
 This software is distributed under a license that is described in
 the LICENSE file that accompanies it.
@@ -17,12 +17,11 @@ ARCMIN_DEG = 60
 
 
 class DataMap(object):
-    """
-    Base class for Datamap type objects
-    """
+    """Base class for Datamap type objects."""
     def __init__(self, numpy_map, unit):
+        """__init__."""
         self.numpy_map = numpy_map
-        unit_and_substrings = {"METERS":["meter"], "FEET": ["foot","feet"]}
+        unit_and_substrings = {"METERS": ["meter"], "FEET": ["foot", "feet"]}
         self.unit = None
         for unitname, unit_options in unit_and_substrings.items():
             for option in unit_options:
@@ -30,7 +29,6 @@ class DataMap(object):
                     self.unit = unitname
         if not self.unit:
             raise Exception("Need Meters or Feet. Got {}".format(unit))
-
 
     def iterateDiagonal(self, x, y):
         """
@@ -55,7 +53,7 @@ class DataMap(object):
 
     def iterateOrthogonal(self, x, y):
         """
-        generator returns 4 closest neighbors to a raster grid location,
+        Generator returns 4 closest neighbors to a raster grid location,
         that is, all points touching excluding the diagonals.
         """
         shiftList = [[-1, 0], [0, 1], [1, 0], [0, -1]]
@@ -75,6 +73,10 @@ class DataMap(object):
 
 
 class ProjectionDataMap(DataMap):
+    """
+    ProjectionDataMap is a Datamap object for projection style
+    datasets from GDAL.
+    """
     def __init__(self, numpy_map, upperLeftY, upperLeftX, resolutionY,
                  resolutionX, span_y, span_x, linear_unit, unit, transform,
                  reverse_transform):
@@ -128,23 +130,23 @@ class ProjectionDataMap(DataMap):
         self.transform = transform
         self.reverse_transform = reverse_transform
 
-
-    def xy_to_latlong(self, x,y):
+    def xy_to_latlong(self, x, y):
         """
-        This function converts a numpy[x][y] coordinate to lat/long coordinates.
+        This function converts a numpy[x][y] coordinate to
+        lat/long coordinates.
         :param x: x location in `numpy_map`
         :param y: y location in `numpy_map`
         :return: (latitude, longitude)
         """
-
         absolute_x_position = self._uppermost_absolute() + (x * self.res_x)
         absolute_y_position = self._leftmost_absolute() + (y * self.res_y)
-        transformed = self.transform.TransformPoint(absolute_y_position, absolute_x_position)[:2]
-        return (transformed[1],transformed[0])
+        transformed = self.transform.TransformPoint(absolute_y_position,
+                                                    absolute_x_position)[:2]
+        return (transformed[1], transformed[0])
 
     def latlong_to_xy(self, latitude, longitude):
         """
-        This function converts a lat/long coordinate set to numpy[x][y]
+        This function converts a lat/long coordinate set to numpy[x][y].
         :param latitude:
         :param longitude:
         :return: (x,y)
@@ -158,6 +160,7 @@ class ProjectionDataMap(DataMap):
 
     def elevation(self, latitude, longitude):
         """
+        This function returns the elevation at a certain lat/long in Meters.
         :param latitude: latitude in dotted demical notation
         :param longitude: longitude in dotted decimal notation.
         :return: elevation of coordinate in meters.
@@ -169,40 +172,53 @@ class ProjectionDataMap(DataMap):
             return self.numpy_map[xy[0], xy[1]]
 
     def _leftmost_absolute(self):
-        # Returns the Leftmost GDAL Native X coordinate (Y for numpy_map)
+        """Returns the Leftmost GDAL Native X coordinate (Y for numpy_map)."""
         return self.upperLeftY
 
     def _rightmost_absolute(self):
-        # Returns the Rightmost GDAL Native X coordinate (Y for numpy_map)
+        """
+        Returns the Rightmost GDAL Native X coordinate (Y for numpy_map).
+        """
         return self.upperLeftY + (self.res_y * self.span_y)
 
     def _lowermost_absolute(self):
-        # Returns the Lowermost GDAL Native Y coordinate (X for numpy_map)
+        """
+        Returns the Lowermost GDAL Native Y coordinate (X for numpy_map).
+        """
         return self.upperLeftX + (self.res_x * self.span_x)
 
     def _uppermost_absolute(self):
-        # Returns the Uppermost GDAL Native Y coordinate (X for numpy_map)
+        """
+        Returns the Uppermost GDAL Native Y coordinate
+        (X for numpy_map).
+        """
         return self.upperLeftX
 
     def x_to_native_x(self, x):
-        # Converts a numpy X coordinate the the gdal native Y (X for numpy_map)
+        """
+        Converts a numpy X coordinate the the gdal native Y
+        (X for numpy_map).
+        """
         return self._uppermost_absolute() + (x * self.res_x)
 
     def y_to_native_y(self, y):
-        # Converts a numpy Y coordinate the the gdal native X (Y for numpy_map)
+        """
+        Converts a numpy Y coordinate the the gdal native X
+        (Y for numpy_map).
+        """
         return self._leftmost_absolute() + (y * self.res_y)
 
     @property
     def upper_left(self):
-        # Produce the upper leftmost coordinate value in degrees.
+        """Produce the upper leftmost coordinate value in degrees."""
         transformed =\
             self.transform.TransformPoint(self._leftmost_absolute(),
                                           self._uppermost_absolute())
-        return (transformed[1],transformed[0])
+        return (transformed[1], transformed[0])
 
     @property
     def lower_left(self):
-        # Produce the upper leftmost coordinate value in degrees.
+        """Produce the upper leftmost coordinate value in degrees."""
         transformed =\
             self.transform.TransformPoint(self._leftmost_absolute(),
                                           self._lowermost_absolute())
@@ -210,7 +226,7 @@ class ProjectionDataMap(DataMap):
 
     @property
     def upper_right(self):
-        # Produce the upper leftmost coordinate value in degrees.
+        """Produce the upper leftmost coordinate value in degrees."""
         transformed =\
             self.transform.TransformPoint(self._rightmost_absolute(),
                                           self._uppermost_absolute())
@@ -218,17 +234,16 @@ class ProjectionDataMap(DataMap):
 
     @property
     def lower_right(self):
-        # Produce the upper leftmost coordinate value in degrees.
+        """Produce the upper leftmost coordinate value in degrees."""
         transformed =\
             self.transform.TransformPoint(self._rightmost_absolute(),
                                           self._lowermost_absolute())
         return (transformed[1], transformed[0])
 
-
     def subset(self, x, y, xSpan, ySpan):
         """
-        subset produces a subset of the parent (current) map. Uses numpy X,Y
-        axis where X,Y are the upper left coordinates
+        Subset produces a subset of the parent (self) map. Uses numpy X,Y
+        axis where X,Y are the upper left coordinates.
         :param x: NW corner x coordinate (latitude)
         :param y: NW corner y coordinate (longitude)
         :param xSpan: depth of subset in points (latitude)
@@ -239,16 +254,16 @@ class ProjectionDataMap(DataMap):
         westExtreme = self.y_to_native_y(y)
         numpy_map = (self.numpy_map[x:x+xSpan, y:y+ySpan])
         return ProjectionDataMap(numpy_map,
-                       southExtreme,
-                       westExtreme,
-                       self.res_x,
-                       self.res_y,
-                       xSpan,
-                       ySpan,
-                       self.linear_unit,
-                       self.unit,
-                       self.transform,
-                       self.reverse_transform)
+                                 southExtreme,
+                                 westExtreme,
+                                 self.res_x,
+                                 self.res_y,
+                                 xSpan,
+                                 ySpan,
+                                 self.linear_unit,
+                                 self.unit,
+                                 self.transform,
+                                 self.reverse_transform)
 
     def __repr__(self):
         return "<ProjectionDataMap> LowerLeft LatLon {}, LowerLeft Local "\

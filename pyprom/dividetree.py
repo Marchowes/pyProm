@@ -1,5 +1,5 @@
 """
-pyProm: Copyright 2017
+pyProm: Copyright 2017.
 
 This software is distributed under a license that is described in
 the LICENSE file that accompanies it.
@@ -17,7 +17,7 @@ class DivideTree(object):
         :param domain:
         :param datamap:
         """
-        self.logger = logging.getLogger('pyProm.{}'.format(__name__))
+        self.logger = logging.getLogger('{}'.format(__name__))
         self.summits = domain.summits
         self.saddles = domain.saddles
         self.linkers = domain.linkers
@@ -37,7 +37,7 @@ class DivideTree(object):
 
     def branchChaser(self, master, branch, depth, exempt):
         depth += 1
-        self.logger.info("Assessing {} off Master {} depth {}".format(branch, master, depth))
+        #self.logger.info("Assessing {} off Master {} depth {}".format(branch, master, depth))
         if depth > 400:
             self.logger.info("Near Max Recurse! Bail! Master: {}".format(master))
             if master not in self.busted:
@@ -59,7 +59,7 @@ class DivideTree(object):
                     self.branchChaser(master, nextSummit, depth, exempt)
                 # Neighbor Higher? then this is a LPR Boundary.
                 if nextSummit.elevation > branch.elevation:
-                    self.logger.info("Boundary At {}".format(linker.saddle))
+                    #self.logger.info("Boundary At {}".format(linker.saddle))
                     if master not in linker.saddle.lprBoundary:
                         linker.saddle.lprBoundary.append(master)
 

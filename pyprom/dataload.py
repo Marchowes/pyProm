@@ -1,5 +1,5 @@
 """
-pyProm: Copyright 2016
+pyProm: Copyright 2016.
 
 This software is distributed under a license that is described in
 the LICENSE file that accompanies it.
@@ -14,8 +14,8 @@ from osgeo import gdal, osr
 from .lib.datamap import ProjectionDataMap
 
 EPSGMap = {
-            "WGS84": 4326, #http://spatialreference.org/ref/epsg/4326/
-            "NAD83": 4269, #http://spatialreference.org/ref/epsg/4269/
+            "WGS84": 4326,  # http://spatialreference.org/ref/epsg/4326/
+            "NAD83": 4269,  # http://spatialreference.org/ref/epsg/4269/
 }
 
 
@@ -27,11 +27,9 @@ class Loader(object):
         self.filename = os.path.expanduser(filename)
         self.logger = logging.getLogger('{}'.format(__name__))
 
-class GDALLoader(Loader):
 
-    """
-    General GDAL datasets.
-    """
+class GDALLoader(Loader):
+    """General GDAL datasets."""
     def __init__(self, filename, epsg_alias="WGS84"):
         """
         :param filename: full or relative file location.
@@ -58,16 +56,15 @@ class GDALLoader(Loader):
         if not epsg_code:
             raise Exception("epsg_code not understood.")
 
-
         # Load Raster File into GDAL
         self.gdal_dataset = gdal.Open(self.filename)
         # Load Raster Data into numpy array
         raster_band = self.gdal_dataset.GetRasterBand(1)
         self.raster_data = numpy.array(raster_band.
-                                      ReadAsArray())
+                                       ReadAsArray())
         # Gather span for X and Y axis.
-        self.span_x = self.gdal_dataset.RasterXSize # longitude
-        self.span_y = self.gdal_dataset.RasterYSize # latitude
+        self.span_x = self.gdal_dataset.RasterXSize  # longitude
+        self.span_y = self.gdal_dataset.RasterYSize  # latitude
         # Collect Geo Transform data for later consumption
         ulx, xres, xskew, uly, yskew, yres =\
             self.gdal_dataset.GetGeoTransform()
@@ -75,8 +72,6 @@ class GDALLoader(Loader):
         # the DataMap.
         self.upperLeftY = uly
         self.upperLeftX = ulx
-        self.lowerLeftX, self.lowerLeftY =\
-            getLowerLeftCoords(ulx, uly, yres, self.span_y)
         spatialRef = osr.SpatialReference(
             wkt=self.gdal_dataset.GetProjection())
         # Are we a projected map?
@@ -106,19 +101,3 @@ class GDALLoader(Loader):
                                              reverse_transform)
         else:
             raise Exception("Unsupported, non projected map")
-
-
-
-def getLowerLeftCoords(ulx, uly, yres, ySpan):
-    """
-    :param ulx:  upper left X
-    :param uly: upper left Y
-    :param yres: y axis linear resolution
-    :param xSpan: raster span on X axis (points) columns
-    :param ySpan: raster span on Y axis (points) rows
-    :return: tuple of (X,Y) coords
-    """
-    return (ulx,uly + (ySpan*yres))
-
-
-

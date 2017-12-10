@@ -1,5 +1,5 @@
 """
-pyProm: Copyright 2016
+pyProm: Copyright 2016.
 
 This software is distributed under a license that is described in
 the LICENSE file that accompanies it.
@@ -196,6 +196,22 @@ class SpotElevationContainer(_Base):
                              for x in hs]))
             feature.edgeEffect = point['edge']
             self.points.append(feature)
+
+    def process_saddles_into_dual_linkers_or_less(self):
+        """
+        Any saddle with more than 2 linkers will be broken down into multiple equal saddles with only 2 linkers.
+        EX:
+        Saddle (X,Y) with Linkers A,B,C,D becomes:
+
+        Saddle (X,Y): A,B
+        Saddle (X,Y): A,C
+        Saddle (X,Y): A,D
+        Saddle (X,Y): B,C
+        Saddle (X,Y): B,D
+        Saddle (X,Y): C,D
+        """
+        pass
+
 
     def __repr__(self):
         return "<SpotElevationContainer> {} Objects".format(len(self.points))
