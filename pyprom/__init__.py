@@ -1,12 +1,12 @@
 """
-pyProm: Copyright 2016
+pyProm: Copyright 2017.
 
 This software is distributed under a license that is described in
 the LICENSE file that accompanies it.
 
 PyProm: This library includes tools for surface network analysis.
 """
-version_info = (0, 3, 0)
+version_info = (0, 3, 6)
 __name__ = 'pyProm'
 __doc__ = 'A python surface network analysis script'
 __author__ = 'Marc Howes'

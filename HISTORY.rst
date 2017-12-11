@@ -1,6 +1,11 @@
 Release History
 ---------------
 
+0.3.6 (December 10, 2017)
++++++++++++++++++++++++++
+* Tore out old Dataloaders and replaced with a universal GDAL based solution
+* Fixed the logger name.
+
 0.3.5 (November 19, 2017)
 +++++++++++++++++++++++++
 * Added some unit tests

@@ -1,16 +1,22 @@
 """
-pyProm: Copyright 2016
+pyProm: Copyright 2016.
 
 This software is distributed under a license that is described in
 the LICENSE file that accompanies it.
 """
 
 import os
-import gdal
 import numpy
 import logging
 
-from .lib.datamap import DataMap
+from osgeo import gdal, osr
+
+from .lib.datamap import ProjectionDataMap
+
+EPSGMap = {
+            "WGS84": 4326,  # http://spatialreference.org/ref/epsg/4326/
+            "NAD83": 4269,  # http://spatialreference.org/ref/epsg/4269/
+}
 
 
 class Loader(object):
@@ -19,91 +25,79 @@ class Loader(object):
         Base class for data loaders.
         """
         self.filename = os.path.expanduser(filename)
-        self.logger = logging.getLogger('pyProm.{}'.format(__name__))
+        self.logger = logging.getLogger('{}'.format(__name__))
 
 
-class SRTMLoader(Loader):
-    def __init__(self, filename,
-                 arcsec_resolution=1,
-                 span_latitude=3601,
-                 span_longitude=3601):
+class GDALLoader(Loader):
+    """General GDAL datasets."""
+    def __init__(self, filename, epsg_alias="WGS84"):
         """
-        :param filename: File name, for instance ~/N44W072.hgt
-        :param arcsec_resolution: how many arcseconds per measurement unit.
-        :param span_latitude: source datamap point span along latitude
-        :param span_longitude: source datamap point span along longitude
+        :param filename: full or relative file location.
+        :param epsg_alias: common name for epsg code
+
+        latitude and longitude references are always "lower left"
+        GDAL raster data is always presented as such:
+
+        Y: left/right
+        X: up/down
+
+        UL---UR
+        |     |
+        LL---LR
+
+        The LL corner is always passed to the Datamap Object with a reference
+        to the Native grid Lower Left corner.
+
         """
-        super(SRTMLoader, self).__init__(filename)
-        self.logger.info("Loading: {} Latitude span: {}, Longitude span: {}"
-                         ", Resolution: {}"
-                         " ArcSec/point.".format(filename, span_latitude,
-                                                 span_longitude,
-                                                 arcsec_resolution))
-        self.span_latitude = span_latitude
-        self.span_longitude = span_longitude
-        self.arcsec_resolution = arcsec_resolution
-        self.latitude = self.longitude = None
-        self.latlong()
-        with open(self.filename) as hgt_data:
-            self.elevations = numpy.fromfile(hgt_data, numpy.dtype('>i2'),
-                                             self.span_longitude *
-                                             self.span_latitude).reshape((
-                                              self.span_longitude,
-                                              self.span_latitude))
+        super(GDALLoader, self).__init__(filename)
 
-        self.datamap = DataMap(self.elevations,
-                               self.latitude,
-                               self.longitude,
-                               self.span_latitude,
-                               self.span_longitude,
-                               self.arcsec_resolution)
+        # Get our transform target EPSG
+        epsg_code = EPSGMap.get(epsg_alias, None)
+        if not epsg_code:
+            raise Exception("epsg_code not understood.")
 
-    def latlong(self):
-        """
-        Converts hgt filename string to usable latitude and longitude
-        """
-        filename = self.filename.split('/')[-1]
-        latitude = filename[:3]
-        longitude = filename[3:7]
-        if latitude[0] == 'N':
-            self.latitude = int(latitude[1:])
-        if latitude[0] == 'S':
-            self.latitude = -int(latitude[1:])
-        if longitude[0] == 'E':
-            self.longitude = int(longitude[1:])
-        if longitude[0] == 'W':
-            self.longitude = -int(longitude[1:])
+        # Load Raster File into GDAL
+        self.gdal_dataset = gdal.Open(self.filename)
+        # Load Raster Data into numpy array
+        raster_band = self.gdal_dataset.GetRasterBand(1)
+        self.raster_data = numpy.array(raster_band.
+                                       ReadAsArray())
+        # Gather span for X and Y axis.
+        self.span_x = self.gdal_dataset.RasterXSize  # longitude
+        self.span_y = self.gdal_dataset.RasterYSize  # latitude
+        # Collect Geo Transform data for later consumption
+        ulx, xres, xskew, uly, yskew, yres =\
+            self.gdal_dataset.GetGeoTransform()
+        # Get lower left Native Dataset coordinates for passing into
+        # the DataMap.
+        self.upperLeftY = uly
+        self.upperLeftX = ulx
+        spatialRef = osr.SpatialReference(
+            wkt=self.gdal_dataset.GetProjection())
+        # Are we a projected map?
+        if spatialRef.IsProjected:
+            # Create target Spatial Reference for converting coordinates.
+            target = osr.SpatialReference()
+            target.ImportFromEPSG(epsg_code)
+            transform = osr.CoordinateTransformation(spatialRef, target)
+            # create a reverse transform for translating back
+            #  into Native GDAL coordiantes
+            reverse_transform = osr.CoordinateTransformation(target,
+                                                             spatialRef)
+            self.linear_unit = spatialRef.GetLinearUnits()
+            self.linear_unit_name = spatialRef.GetLinearUnitsName()
 
-
-class ADFLoader(Loader):
-    """
-    Arc/Info Binary Grid (.adf)
-    latitude/longitude should be from the Lower Left corner of the map. see
-    USGS_NED_13_XXXXX_ArcGrid_meta.txt for these values.
-    """
-    def __init__(self, filename,
-                 latitude, longitude,
-                 arcsec_resolution=1):
-        super(ADFLoader, self).__init__(filename)
-        self.latitude = latitude
-        self.longitude = longitude
-        self.arcsec_resolution = arcsec_resolution
-
-        gdal_raster = gdal.Open(self.filename)
-        self.elevations = numpy.array(gdal_raster.GetRasterBand(1).
-                                      ReadAsArray())
-        self.span_latitude = int(self.elevations.shape[0])
-        self.span_longitude = int(self.elevations.shape[1])
-        self.logger.info("Loading: {} Latitude span: {}, Longitude span: {}"
-                         ", Resolution: {}"
-                         " ArcSec/point.".format(filename,
-                                                 self.span_latitude,
-                                                 self.span_longitude,
-                                                 arcsec_resolution))
-
-        self.datamap = DataMap(self.elevations,
-                               self.latitude,
-                               self.longitude,
-                               self.span_latitude,
-                               self.span_longitude,
-                               self.arcsec_resolution)
+            # Create out DataMap Object.
+            self.datamap = ProjectionDataMap(self.raster_data,
+                                             self.upperLeftY,
+                                             self.upperLeftX,
+                                             yres,
+                                             xres,
+                                             self.span_y,
+                                             self.span_x,
+                                             self.linear_unit,
+                                             self.linear_unit_name,
+                                             transform,
+                                             reverse_transform)
+        else:
+            raise Exception("Unsupported, non projected map")

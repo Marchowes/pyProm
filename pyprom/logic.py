@@ -1,5 +1,5 @@
 """
-pyProm: Copyright 2016
+pyProm: Copyright 2016.
 
 This software is distributed under a license that is described in
 the LICENSE file that accompanies it.
@@ -31,14 +31,12 @@ class AnalyzeData(object):
         """
         :param datamap: `DataMap` object.
         """
-        self.logger = logging.getLogger('pyProm.{}'.format(__name__))
+        self.logger = logging.getLogger('{}'.format(__name__))
         self.datamap = datamap
         self.data = self.datamap.numpy_map
         self.edge = False
         self.max_y = self.datamap.max_y
-        self.span_longitude = self.datamap.span_longitude
         self.max_x = self.datamap.max_x
-        self.span_latitude = self.datamap.span_latitude
         self.cardinalGrid = dict()
         self.skipAnalysis = defaultdict(list)
 
@@ -58,7 +56,11 @@ class AnalyzeData(object):
         # Iterate through numpy grid, and keep track of gridpoint coordinates.
         while not iterator.finished:
             x, y = iterator.multi_index
-            self.elevation = float(iterator[0])
+            # core storage is always in metric.
+            if self.datamap.unit == "FEET":
+                self.elevation = float(.3048*iterator[0])
+            else:
+                self.elevation = float(iterator[0])
 
             # Quick Progress Meter. Needs refinement,
             index += 1
@@ -111,8 +113,9 @@ class AnalyzeData(object):
             self.skipAnalysis[exemptPoint.x] \
                 .append(exemptPoint.y)
         if not len(highInverseEdge):
-            summit = Summit(self.datamap.x_to_latitude(x),
-                            self.datamap.y_to_longitude(y),
+            latlong = self.datamap.xy_to_latlong(x, y)
+            summit = Summit(latlong[0],
+                            latlong[1],
                             self.elevation,
                             edge=self.edge,
                             multiPoint=self.blob
@@ -120,8 +123,9 @@ class AnalyzeData(object):
             return summit
         if (len(highInverseEdge) > 1) or\
                 (len(highInverseEdge) == 1 and self.edge):
-            saddle = Saddle(self.datamap.x_to_latitude(x),
-                            self.datamap.y_to_longitude(y),
+            latlong = self.datamap.xy_to_latlong(x, y)
+            saddle = Saddle(latlong[0],
+                            latlong[1],
                             self.elevation,
                             edge=self.edge,
                             multiPoint=self.blob,
@@ -168,16 +172,18 @@ class AnalyzeData(object):
 
         reducedNeighborProfile = compressRepetetiveChars(neighborProfile)
         if reducedNeighborProfile == summitProfile:
-            summit = Summit(self.datamap.x_to_latitude(x),
-                            self.datamap.y_to_longitude(y),
+            latlong = self.datamap.xy_to_latlong(x, y)
+            summit = Summit(latlong[0],
+                            latlong[1],
                             self.elevation,
                             edge=self.edge)
             return summit
 
         elif any(x in reducedNeighborProfile for x in saddleProfile):
             shores = HighEdgeContainer(shoreSet, self.elevation)
-            saddle = Saddle(self.datamap.x_to_latitude(x),
-                            self.datamap.y_to_longitude(y),
+            latlong = self.datamap.xy_to_latlong(x, y)
+            saddle = Saddle(latlong[0],
+                            latlong[1],
                             self.elevation,
                             edge=self.edge,
                             highShores=[GridPointContainer(x)

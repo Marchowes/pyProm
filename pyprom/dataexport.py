@@ -1,5 +1,5 @@
 """
-pyProm: Copyright 2016
+pyProm: Copyright 2016.
 
 This software is distributed under a license that is described in
 the LICENSE file that accompanies it.
@@ -19,7 +19,7 @@ class KMLfileWriter(object):
          SpotElevationContainer object
         :param outputFile: /path/to/your/file.kml
         """
-        self.logger = logging.getLogger('pyProm.{}'.format(__name__))
+        self.logger = logging.getLogger('{}'.format(__name__))
         if isinstance(kmlList, SpotElevationContainer):
             kmlList = kmlList.points
         self.kml = kmlList

@@ -1,11 +1,10 @@
 """
-pyProm: Copyright 2016
+pyProm: Copyright 2016.
 
 This software is distributed under a license that is described in
 the LICENSE file that accompanies it.
 
 This file contains a class for walking from Saddles to Summits.
-
 """
 import logging
 from collections import defaultdict
@@ -17,7 +16,7 @@ from .lib.containers.linker import Linker
 class Walk(object):
     def __init__(self, summits, saddles, datamap):
 
-        self.logger = logging.getLogger('pyProm.{}'.format(__name__))
+        self.logger = logging.getLogger('{}'.format(__name__))
         self.logger.info("Initiating Walk")
         self.summits = summits
         self.saddles = saddles
@@ -39,10 +38,8 @@ class Walk(object):
                 for mp in point.multiPoint.points:
                     hash[mp.x][mp.y] = point
             else:
-                hash[self.datamap.latitude_to_x(
-                        point.latitude)][self.datamap.longitude_to_y(
-                            point.longitude)]\
-                    = point
+                xy = self.datamap.latlong_to_xy(point.latitude, point.longitude)
+                hash[xy[0]][xy[1]] = point
         return hash
 
     def run(self):
@@ -107,6 +104,9 @@ class Walk(object):
         else:
             winner = None
         return winner
+
+
+
 
 
     def disqualify_lower_linkers(self):

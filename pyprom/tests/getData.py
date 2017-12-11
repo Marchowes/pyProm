@@ -1,3 +1,10 @@
+"""
+pyProm: Copyright 2017.
+
+This software is distributed under a license that is described in
+the LICENSE file that accompanies it.
+"""
+
 import sys
 import logging
 import zipfile
@@ -15,7 +22,6 @@ def getTestZip():
     Python 2 and 3 compatible helper function for pulling down the
     desired test data.
     """
-
     logger = logging.getLogger('pyProm.{}'.format(__name__))
     domain = "https://dds.cr.usgs.gov"
     path = "srtm/version2_1/SRTM1/Region_06"
@@ -24,7 +30,7 @@ def getTestZip():
     suffix = ".hgt.zip"
     nh_north_zip = nh_north+suffix
     tmp = "/tmp"
-    destination = "{}/{}".format(tmp,nh_north+suffix)
+    destination = "{}/{}".format(tmp, nh_north+suffix)
 
     extracted = tmp+"/"+nh_north+hgtsuffix
 

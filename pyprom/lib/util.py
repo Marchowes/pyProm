@@ -1,5 +1,5 @@
 """
-pyProm: Copyright 2016
+pyProm: Copyright 2016.
 
 This software is distributed under a license that is described in
 the LICENSE file that accompanies it.
@@ -48,3 +48,19 @@ def compressRepetetiveChars(string):
     :return:
     """
     return ''.join(ch for ch, _ in itertools.groupby(string))
+
+
+def seconds_to_arcseconds(seconds):
+    """
+    :param seconds:
+    :return: converts seconds into arcseconds.
+    """
+    return seconds * 3600
+
+def arcseconds_to_seconds(arcseconds):
+    """
+    :param arcseconds:
+    :return: converts arcseconds into seconds.
+    """
+    return arcseconds / 3600
+

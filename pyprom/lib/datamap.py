@@ -1,5 +1,5 @@
 """
-pyProm: Copyright 2016
+pyProm: Copyright 2016.
 
 This software is distributed under a license that is described in
 the LICENSE file that accompanies it.
@@ -12,108 +12,23 @@ from __future__ import division
 
 import logging
 
-from .util import dottedDecimaltoDegrees, degreesToDottedDecimal
-
 ARCSEC_DEG = 3600
 ARCMIN_DEG = 60
 
 
 class DataMap(object):
-    def __init__(self, numpy_map, latitude, longitude,
-                 span_latitude, span_longitude, arcsec_resolution):
-        self.logger = logging.getLogger('pyProm.{}'.format(__name__))
-        self.logger.info("Datamap Object Created.")
+    """Base class for Datamap type objects."""
+    def __init__(self, numpy_map, unit):
+        """__init__."""
         self.numpy_map = numpy_map
-        self.latitude = latitude  # SW Corner
-        self.longitude = longitude  # SW Corner
-        self.span_latitude = span_latitude
-        self.max_x = span_latitude - 1
-        self.span_longitude = span_longitude
-        self.max_y = span_longitude - 1
-        self.arcsec_resolution = arcsec_resolution
-        self.latitude_max = float("{0:.10f}".format(((((
-                                        self.span_latitude-1) *
-                                        self.arcsec_resolution)) /
-                                        ARCSEC_DEG) + self.latitude))
-
-        self.longitude_max = float("{0:.10f}".format(((((
-                                        self.span_longitude-1) *
-                                        self.arcsec_resolution)) /
-                                        ARCSEC_DEG) + self.longitude))
-
-    def elevation(self, latitude, longitude):
-        """
-        :param latitude: latitude in dotted demical notation
-        :param longitude: longitude in dotted decimal notation.
-        :return: elevation of coordinate in meters.
-        """
-        hms_relative_position_long =\
-            self.longitude_to_y(longitude)
-        hms_relative_position_lat =\
-            self.latitude_to_x(latitude)
-        return self.numpy_map[hms_relative_position_lat,
-                              hms_relative_position_long]
-
-    def longitude_to_y(self, longitude):
-        """
-        :param longitude: longitude in dotted decimal notation.
-        :return: relative Y position for coordinate in numpy map
-        """
-        if not self.longitude <= longitude <= self.longitude_max:
-            raise ValueError('Invalid Value! must be in the range of'
-                             ' {} to {}'.format(self.longitude,
-                                                self.longitude_max))
-        hms_longitude = dottedDecimaltoDegrees(longitude)
-        return int(abs((round(hms_longitude[2] +
-                              (hms_longitude[1] * ARCMIN_DEG) +
-                              (hms_longitude[0] * ARCSEC_DEG) -
-                              (self.longitude) * ARCSEC_DEG)) /
-                       self.arcsec_resolution))
-
-    def latitude_to_x(self, latitude):
-        """
-        :param latitude: latitude in dotted decimal notation
-        :return: relative X position for coordinate in numpy map.
-        """
-        if not self.latitude <= latitude <= self.latitude_max:
-            raise ValueError('Invalid Value! must be in the range of'
-                             ' {} to {}'.format(self.latitude,
-                                                self.latitude_max))
-        hms_latitude = dottedDecimaltoDegrees(latitude)
-        return int(abs((round(hms_latitude[2] +
-                       (hms_latitude[1] * ARCMIN_DEG) +
-                       (hms_latitude[0] * ARCSEC_DEG)) -
-                       (self.latitude_max) * ARCSEC_DEG)) /
-                   self.arcsec_resolution)
-
-    def _position_formula(self, x):
-        """
-        Produces a relative coordinate based on x value and arcsec_resolution
-        :param x: relative location
-        :return: relative (hours, minutes, seconds)
-        """
-        hours = int(x/(ARCSEC_DEG / self.arcsec_resolution))
-        minutes = (((x/(ARCSEC_DEG / self.arcsec_resolution) * ARCMIN_DEG)) -
-                   (hours*ARCMIN_DEG))
-        seconds = (minutes - int(minutes)) * ARCMIN_DEG
-        minutes = int(minutes)
-        return hours, minutes, seconds
-
-    def x_to_latitude(self, x):
-        """
-        :param x: x location in `numpy_map`
-        :return: position in dotted decimal latitude
-        """
-        hms = self._position_formula(x)
-        return self.latitude_max - degreesToDottedDecimal(*hms)
-
-    def y_to_longitude(self, y):
-        """
-        :param y: y location in `numpy_map`
-        :return: position in dotted decimal longitude
-        """
-        hms = self._position_formula(y)
-        return self.longitude + degreesToDottedDecimal(*hms)
+        unit_and_substrings = {"METERS": ["meter"], "FEET": ["foot", "feet"]}
+        self.unit = None
+        for unitname, unit_options in unit_and_substrings.items():
+            for option in unit_options:
+                if option.upper() in unit.upper():
+                    self.unit = unitname
+        if not self.unit:
+            raise Exception("Need Meters or Feet. Got {}".format(unit))
 
     def iterateDiagonal(self, x, y):
         """
@@ -129,13 +44,16 @@ class DataMap(object):
             _y = y + shift[1]
             if 0 <= _x <= self.max_x and \
                0 <= _y <= self.max_y:
-                yield _x, _y, float(self.numpy_map[_x, _y])
+                if self.unit == 'FEET':
+                    yield _x, _y, float(.3048 * self.numpy_map[_x, _y])
+                else:
+                    yield _x, _y, float(self.numpy_map[_x, _y])
             else:
                 yield _x, _y, -32768
 
     def iterateOrthogonal(self, x, y):
         """
-        generator returns 4 closest neighbors to a raster grid location,
+        Generator returns 4 closest neighbors to a raster grid location,
         that is, all points touching excluding the diagonals.
         """
         shiftList = [[-1, 0], [0, 1], [1, 0], [0, -1]]
@@ -146,35 +64,214 @@ class DataMap(object):
             _y = y + shift[1]
             if 0 <= _x <= self.max_x and \
                0 <= _y <= self.max_y:
-                yield _x, _y, float(self.numpy_map[_x, _y])
+                if self.unit == 'FEET':
+                    yield _x, _y, float(.3048 * self.numpy_map[_x, _y])
+                else:
+                    yield _x, _y, float(self.numpy_map[_x, _y])
             else:
                 yield _x, _y, -32768
 
+
+class ProjectionDataMap(DataMap):
+    """
+    ProjectionDataMap is a Datamap object for projection style
+    datasets from GDAL.
+    """
+    def __init__(self, numpy_map, upperLeftY, upperLeftX, resolutionY,
+                 resolutionX, span_y, span_x, linear_unit, unit, transform,
+                 reverse_transform):
+        """
+        :param numpy_map: numpy_array multidimensional array of data
+         numpy_map[x][y]
+        :param upperLeftY: Upper Left Y native coordinate from GDAL. This
+         is the X axis for Numpy.
+        :param upperLeftX: Upper Left X native coordinate from GDAL. This
+         is the Y axis for Numpy
+        :param resolutionY: Number of units per pixel on GDAL native Y axis.
+         This is the X axis for Numpy
+        :param resolutionX: Number of units per pixel on GDAL native X axis.
+         This is the Y axis for Numpy
+        :param span_y: number of units along GDAL native Y axis. This is the
+         X axis for Numpy
+        :param span_x: number of units along GDAL native X axis. This is the
+         Y axis for Numpy
+        :param linear_unit: Linear unit scale.
+        :param unit: Linear unit
+        :param transform: osr.CoordinateTransformation from GDAL native to
+         selected units (degrees)
+        :param reverse_transform: osr.CoordinateTransformation from selected
+         units degrees scale to GDAL native
+
+
+        GDAL Native coordiante system oriented:
+        Y: east/west
+        X: north/south
+
+        numpy_map is oriented:
+        Y: north/south
+        X: east/west
+
+        called like:
+        numpy_map[x][y]
+        """
+        super(ProjectionDataMap, self).__init__(numpy_map, unit)
+        self.logger = logging.getLogger('{}'.format(__name__))
+        self.logger.info("ProjectedDataMap Object Created")
+        # These are deliberately flipped, yes I know it's confusing.
+        self.upperLeftY = upperLeftX  # SW Corner
+        self.upperLeftX = upperLeftY  # SW Corner
+        self.res_y = resolutionX
+        self.res_x = resolutionY
+        self.span_y = span_x
+        self.max_y = self.span_y - 1
+        self.span_x = span_y
+        self.max_x = self.span_x - 1
+        self.linear_unit = linear_unit
+        self.transform = transform
+        self.reverse_transform = reverse_transform
+
+    def xy_to_latlong(self, x, y):
+        """
+        This function converts a numpy[x][y] coordinate to
+        lat/long coordinates.
+        :param x: x location in `numpy_map`
+        :param y: y location in `numpy_map`
+        :return: (latitude, longitude)
+        """
+        absolute_x_position = self._uppermost_absolute() + (x * self.res_x)
+        absolute_y_position = self._leftmost_absolute() + (y * self.res_y)
+        transformed = self.transform.TransformPoint(absolute_y_position,
+                                                    absolute_x_position)[:2]
+        return (transformed[1], transformed[0])
+
+    def latlong_to_xy(self, latitude, longitude):
+        """
+        This function converts a lat/long coordinate set to numpy[x][y].
+        :param latitude:
+        :param longitude:
+        :return: (x,y)
+        """
+        coordinate = self.reverse_transform.TransformPoint(longitude, latitude)
+        x = coordinate[1]
+        y = coordinate[0]
+        rel_x = round((x - self._uppermost_absolute())/self.res_x)
+        rel_y = round((y - self._leftmost_absolute())/self.res_y)
+        return (rel_x, rel_y)
+
+    def elevation(self, latitude, longitude):
+        """
+        This function returns the elevation at a certain lat/long in Meters.
+        :param latitude: latitude in dotted demical notation
+        :param longitude: longitude in dotted decimal notation.
+        :return: elevation of coordinate in meters.
+        """
+        xy = self.latlong_to_xy(latitude, longitude)
+        if self.unit == 'FEET':
+            return float(.3048 * self.numpy_map[xy[0], xy[1]])
+        else:
+            return self.numpy_map[xy[0], xy[1]]
+
+    def _leftmost_absolute(self):
+        """Returns the Leftmost GDAL Native X coordinate (Y for numpy_map)."""
+        return self.upperLeftY
+
+    def _rightmost_absolute(self):
+        """
+        Returns the Rightmost GDAL Native X coordinate (Y for numpy_map).
+        """
+        return self.upperLeftY + (self.res_y * self.span_y)
+
+    def _lowermost_absolute(self):
+        """
+        Returns the Lowermost GDAL Native Y coordinate (X for numpy_map).
+        """
+        return self.upperLeftX + (self.res_x * self.span_x)
+
+    def _uppermost_absolute(self):
+        """
+        Returns the Uppermost GDAL Native Y coordinate
+        (X for numpy_map).
+        """
+        return self.upperLeftX
+
+    def x_to_native_x(self, x):
+        """
+        Converts a numpy X coordinate the the gdal native Y
+        (X for numpy_map).
+        """
+        return self._uppermost_absolute() + (x * self.res_x)
+
+    def y_to_native_y(self, y):
+        """
+        Converts a numpy Y coordinate the the gdal native X
+        (Y for numpy_map).
+        """
+        return self._leftmost_absolute() + (y * self.res_y)
+
+    @property
+    def upper_left(self):
+        """Produce the upper leftmost coordinate value in degrees."""
+        transformed =\
+            self.transform.TransformPoint(self._leftmost_absolute(),
+                                          self._uppermost_absolute())
+        return (transformed[1], transformed[0])
+
+    @property
+    def lower_left(self):
+        """Produce the upper leftmost coordinate value in degrees."""
+        transformed =\
+            self.transform.TransformPoint(self._leftmost_absolute(),
+                                          self._lowermost_absolute())
+        return (transformed[1], transformed[0])
+
+    @property
+    def upper_right(self):
+        """Produce the upper leftmost coordinate value in degrees."""
+        transformed =\
+            self.transform.TransformPoint(self._rightmost_absolute(),
+                                          self._uppermost_absolute())
+        return (transformed[1], transformed[0])
+
+    @property
+    def lower_right(self):
+        """Produce the upper leftmost coordinate value in degrees."""
+        transformed =\
+            self.transform.TransformPoint(self._rightmost_absolute(),
+                                          self._lowermost_absolute())
+        return (transformed[1], transformed[0])
+
     def subset(self, x, y, xSpan, ySpan):
         """
+        Subset produces a subset of the parent (self) map. Uses numpy X,Y
+        axis where X,Y are the upper left coordinates.
         :param x: NW corner x coordinate (latitude)
         :param y: NW corner y coordinate (longitude)
         :param xSpan: depth of subset in points (latitude)
         :param ySpan: width of subset in points (longitude)
-        :return: :class:`Datamap`
+        :return: :class:`ProjectionDataMap`
         """
-        keyLat = self.x_to_latitude(x+xSpan) # Southermost
-        keyLong = self.y_to_longitude(y+ySpan) # Westernmost
+        southExtreme = self.x_to_native_x(x)
+        westExtreme = self.y_to_native_y(y)
         numpy_map = (self.numpy_map[x:x+xSpan, y:y+ySpan])
-        return DataMap(numpy_map,
-                       keyLat,
-                       keyLong,
-                       xSpan,
-                       ySpan,
-                       self.arcsec_resolution)
+        return ProjectionDataMap(numpy_map,
+                                 southExtreme,
+                                 westExtreme,
+                                 self.res_x,
+                                 self.res_y,
+                                 xSpan,
+                                 ySpan,
+                                 self.linear_unit,
+                                 self.unit,
+                                 self.transform,
+                                 self.reverse_transform)
 
     def __repr__(self):
-        return "<DataMap> Lat {}, Long {}, SpanLat {}," \
-               " SpanLong {}, {} ArcSec/Point".format(
-                self.latitude,
-                self.longitude,
-                self.span_latitude,
-                self.span_longitude,
-                self.arcsec_resolution)
+        return "<ProjectionDataMap> LowerLeft LatLon {}, LowerLeft Local "\
+                "Coords {}, SpanX {}, SpanY {}, {} Units".format(
+                 self.lower_left,
+                 (self._leftmost_absolute(), self._lowermost_absolute()),
+                 self.span_x,
+                 self.span_y,
+                 self.unit)
 
     __unicode__ = __str__ = __repr__

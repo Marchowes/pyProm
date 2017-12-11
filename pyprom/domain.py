@@ -1,5 +1,5 @@
 """
-pyProm: Copyright 2017
+pyProm: Copyright 2017.
 
 This software is distributed under a license that is described in
 the LICENSE file that accompanies it.
@@ -43,13 +43,13 @@ class Domain(object):
         self.saddles = None
         self.summits = None
         self.linkers = None
-        self.extent = '{}, {} - {}, {}'.format(
-            self.datamap.latitude,
-            self.datamap.longitude,
-            self.datamap.latitude_max,
-            self.datamap.longitude_max)
-        self.logger = logging.getLogger('pyProm.{}'.format(__name__))
-        self.logger.info("Domain Object Created {}.".format(self.extent))
+        self.extent = 'LL: {}\n LR: {}\n UL: {}\n UR: {}\n'.format(
+             self.datamap.lower_left,
+             self.datamap.lower_right,
+             self.datamap.upper_left,
+             self.datamap.upper_right)
+        self.logger = logging.getLogger('{}'.format(__name__))
+        self.logger.info("Domain Object Created: \n{}".format(self.extent))
 
     def run(self):
         """
