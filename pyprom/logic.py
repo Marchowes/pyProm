@@ -38,7 +38,7 @@ class AnalyzeData(object):
         self.max_y = self.datamap.max_y
         self.max_x = self.datamap.max_x
         self.cardinalGrid = dict()
-        self.skipAnalysis = defaultdict(list)
+        self.explored = defaultdict(dict)
 
     def analyze(self):
         """
@@ -95,7 +95,7 @@ class AnalyzeData(object):
             self.blob = None
             iterator.iternext()
         # Free some memory.
-        del(self.skipAnalysis)
+        del(self.explored)
         return self.summitObjects, self.saddleObjects
 
     def analyze_multipoint(self, x, y, ptElevation):
@@ -105,17 +105,18 @@ class AnalyzeData(object):
         :param ptElevation: Elevation of Multipoint Blob
         :return: Summit, Saddle, or None
         """
-        self.blob = self.equalHeightBlob(x, y, ptElevation)
+        self.blob = equalHeightBlob(self.datamap, x, y, ptElevation)
+        self.edge = self.blob.inverseEdgePoints.mapEdge
+
         highInverseEdge = self.blob.inverseEdgePoints.findHighEdges(
             self.elevation)
 
         for exemptPoint in self.blob.points:
-            self.skipAnalysis[exemptPoint.x] \
-                .append(exemptPoint.y)
+            self.explored[exemptPoint.x][exemptPoint.y]=True
         if not len(highInverseEdge):
-            latlong = self.datamap.xy_to_latlong(x, y)
-            summit = Summit(latlong[0],
-                            latlong[1],
+            lat, long = self.datamap.xy_to_latlong(x, y)
+            summit = Summit(lat,
+                            long,
                             self.elevation,
                             edge=self.edge,
                             multiPoint=self.blob
@@ -123,9 +124,9 @@ class AnalyzeData(object):
             return summit
         if (len(highInverseEdge) > 1) or\
                 (len(highInverseEdge) == 1 and self.edge):
-            latlong = self.datamap.xy_to_latlong(x, y)
-            saddle = Saddle(latlong[0],
-                            latlong[1],
+            lat, long = self.datamap.xy_to_latlong(x, y)
+            saddle = Saddle(lat,
+                            long,
                             self.elevation,
                             edge=self.edge,
                             multiPoint=self.blob,
@@ -141,15 +142,16 @@ class AnalyzeData(object):
         """
 
         # Exempt! bail out!
-        if y in self.skipAnalysis[x]:
+        if self.explored[x].get(y,False):
             return None
 
         saddleProfile = ["HLHL", "LHLH"]
         summitProfile = "L"
 
         # Label this as an mapEdge under the following condition
-        if x in (self.max_x, 0) or y in (self.max_y, 0):
-            self.edge = True
+        if not self.edge:
+            if x in (self.max_x, 0) or y in (self.max_y, 0):
+                self.edge = True
 
         # Begin the ardous task of analyzing points and multipoints
         neighbor = self.datamap.iterateDiagonal(x, y)
@@ -161,8 +163,8 @@ class AnalyzeData(object):
             # a special MultiPoint analysis function.
             if not elevation:
                 continue
-            if elevation == self.elevation and _y not in \
-                    self.skipAnalysis[_x]:
+            if elevation == self.elevation and\
+                    not self.explored[_x].get(_y, False):
                 return self.analyze_multipoint(_x, _y, elevation)
             if elevation > self.elevation:
                 neighborProfile += "H"
@@ -172,18 +174,18 @@ class AnalyzeData(object):
 
         reducedNeighborProfile = compressRepetetiveChars(neighborProfile)
         if reducedNeighborProfile == summitProfile:
-            latlong = self.datamap.xy_to_latlong(x, y)
-            summit = Summit(latlong[0],
-                            latlong[1],
+            lat, long = self.datamap.xy_to_latlong(x, y)
+            summit = Summit(lat,
+                            long,
                             self.elevation,
                             edge=self.edge)
             return summit
 
         elif any(x in reducedNeighborProfile for x in saddleProfile):
             shores = HighEdgeContainer(shoreSet, self.elevation)
-            latlong = self.datamap.xy_to_latlong(x, y)
-            saddle = Saddle(latlong[0],
-                            latlong[1],
+            lat, long = self.datamap.xy_to_latlong(x, y)
+            saddle = Saddle(lat,
+                            long,
                             self.elevation,
                             edge=self.edge,
                             highShores=[GridPointContainer(x)
@@ -191,44 +193,44 @@ class AnalyzeData(object):
             return saddle
         return None
 
-    def equalHeightBlob(self, x, y, elevation):
-        """
-        This function generates a list of coordinates that involve equal height
-        :param x: x coordinate
-        :param y: y coordinate
-        :param elevation: elevation
-        :return: Multipoint Object containing all x,y coordinates and elevation
-        """
 
-        masterGridPoint = GridPoint(x, y, elevation)
-        equalHeightHash = defaultdict(list)
-        equalHeightHash[x].append(y)
-        nesteddict = lambda: defaultdict(nesteddict)
-        inverseEdgeHash = nesteddict()  # InverseEdgepoint (shore).
-        toBeAnalyzed = [masterGridPoint]
+def equalHeightBlob(datamap, x, y, elevation):
+    """
+    This function generates a list of coordinates that involve equal height
+    :param x: x coordinate
+    :param y: y coordinate
+    :param elevation: elevation
+    :return: Multipoint Object containing all x,y coordinates and elevation
+    """
 
-        # Loop until pool of equalHeight neighbors has been exhausted.
-        while toBeAnalyzed:
-            gridPoint = toBeAnalyzed.pop()
-            neighbors = self.datamap.iterateDiagonal(gridPoint.x, gridPoint.y)
-            # Determine if edge or not.
-            if gridPoint.x in (self.max_x, 0) or gridPoint.y in \
-                    (self.max_y, 0):
-                self.edge = True
-            for _x, _y, elevation in neighbors:
-                if elevation == masterGridPoint.elevation and\
-                                _y not in equalHeightHash[_x]:
-                    branch = GridPoint(_x, _y, elevation)
-                    equalHeightHash[_x].append(_y)
-                    toBeAnalyzed.append(branch)
-                elif elevation > masterGridPoint.elevation:
-                    if not inverseEdgeHash[_x][_y]:
-                        inverseEdgeHash[_x][_y] = \
-                            InverseEdgePoint(_x, _y, elevation)
+    masterGridPoint = GridPoint(x, y, elevation)
+    exploredEqualHeight = defaultdict(dict)
+    exploredEqualHeight[x][y]=True
+    inverseEdgeHash = defaultdict(dict)
+    toBeAnalyzed = [masterGridPoint]
 
-        return MultiPoint(coordinateHashToGridPointList(equalHeightHash),
-                          masterGridPoint.elevation, self.datamap,
-                          inverseEdgePoints=InverseEdgePointContainer(
-                              inverseEdgePointIndex=inverseEdgeHash,
-                              datamap=self.datamap, mapEdge=self.edge)
-                          )
+    # Loop until pool of equalHeight neighbors has been exhausted.
+    edge = False
+    while toBeAnalyzed:
+        gridPoint = toBeAnalyzed.pop()
+        neighbors = datamap.iterateDiagonal(gridPoint.x, gridPoint.y)
+        # Determine if edge or not.
+        if gridPoint.x in (datamap.max_x, 0) or gridPoint.y in \
+                (datamap.max_y, 0):
+            edge = True
+        for _x, _y, elevation in neighbors:
+            if elevation == masterGridPoint.elevation and\
+                    not exploredEqualHeight[_x].get(_y, False):
+                branch = GridPoint(_x, _y, elevation)
+                exploredEqualHeight[_x][_y] = True
+                toBeAnalyzed.append(branch)
+            elif elevation > masterGridPoint.elevation:
+                if not inverseEdgeHash[_x].get(_y, False):
+                    inverseEdgeHash[_x][_y] = \
+                        InverseEdgePoint(_x, _y, elevation)
+    return MultiPoint(coordinateHashToGridPointList(exploredEqualHeight),
+                      masterGridPoint.elevation, datamap,
+                      inverseEdgePoints=InverseEdgePointContainer(
+                          inverseEdgePointIndex=inverseEdgeHash,
+                          datamap=datamap, mapEdge=edge)
+                      )

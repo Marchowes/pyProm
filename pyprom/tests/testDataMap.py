@@ -59,10 +59,10 @@ class DataMapTests(unittest.TestCase):
         """
         for x in range(0, 3601, 17):
             for y in range(0, 3601, 1):
-                latlong = self.datamap.xy_to_latlong(x, y)
-                xy = self.datamap.latlong_to_xy(latlong[0], latlong[1])
-                self.assertEqual(xy[0], x)
-                self.assertEqual(xy[1], y)
+                lat, long = self.datamap.xy_to_latlong(x, y)
+                _x, _y = self.datamap.latlong_to_xy(lat, long)
+                self.assertEqual(_x, x)
+                self.assertEqual(_y, y)
 
     def testSubset(self):
         """Test that datamap subsets return accurate subsets."""

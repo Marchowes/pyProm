@@ -165,11 +165,11 @@ class ProjectionDataMap(DataMap):
         :param longitude: longitude in dotted decimal notation.
         :return: elevation of coordinate in meters.
         """
-        xy = self.latlong_to_xy(latitude, longitude)
+        x, y = self.latlong_to_xy(latitude, longitude)
         if self.unit == 'FEET':
-            return float(.3048 * self.numpy_map[xy[0], xy[1]])
+            return float(.3048 * self.numpy_map[x, y])
         else:
-            return self.numpy_map[xy[0], xy[1]]
+            return self.numpy_map[x, y]
 
     def _leftmost_absolute(self):
         """Returns the Leftmost GDAL Native X coordinate (Y for numpy_map)."""

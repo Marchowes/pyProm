@@ -1,4 +1,4 @@
-### pyProm v0.3.6
+### pyProm v0.3.7
 
 
 This library is still under development. Do not expect full functionality, or documentation until release 1.0.0
@@ -6,13 +6,16 @@ This library is still under development. Do not expect full functionality, or do
 pyProm
 ======
 
+Supported version of Python: Python 3
+
 The purpose of PyProm is to load Surface datasets for discovery of Summit, Saddles (cols),
 Prominence, and data manipulation/parsing of those datapoints. The goal is the take in a number of
 different data formats, as well as produce a number of different result formats, including common
 ones like KML.
 
 pyProm is written in Python, which is a fairly accessible language to most people. My hope is once 
-a stable, and well documented version can be produced, others can add features as they see fit.
+a stable, and well documented version can be produced, others can add features as they see fit. The
+disadvantage of writing such a library in python is it is inherently slower and consumes more memory.
 
 This library is inspired by [WinProm](https://github.com/edwardearl/winprom), by the late [Edward Earl](http://peakbagger.com/climber/climber.aspx?cid=601), as well as the number of websites
 which make use of similiarly derived data, such as [LoJ](listsofjohn.com) and [peakbagger](peakbagger.com)
@@ -71,8 +74,7 @@ Warning! JSON data or saved Domains will almost certainly fail to load in future
 
 Download zip from github, or clone.
 Go to extraction directory and run `pip install -e .`
-This will work with Python 2.7 and 3.4+
-GDAL doesnt work in Python3, so ADFLoader (DEM) wont work. Want to analyze DEM data? use Python 2.7 instead.
+This will work with Python 3.4+
 
 Trouble Getting GDAL installed?
 -------------------------------

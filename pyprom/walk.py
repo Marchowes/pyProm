@@ -38,8 +38,8 @@ class Walk(object):
                 for mp in point.multiPoint.points:
                     hash[mp.x][mp.y] = point
             else:
-                xy = self.datamap.latlong_to_xy(point.latitude, point.longitude)
-                hash[xy[0]][xy[1]] = point
+                x,y = self.datamap.latlong_to_xy(point.latitude, point.longitude)
+                hash[x][y] = point
         return hash
 
     def run(self):
@@ -56,7 +56,7 @@ class Walk(object):
             lookback = 1
             point = highEdge.points[0]
             path = list([point])
-            exemptHash = defaultdict(list)
+            explored = defaultdict(dict)
 
             while True:
                 ####
@@ -64,7 +64,7 @@ class Walk(object):
                     self.logger.info("BORK! stuck at {}".format(point))
                     return path
                 ####
-                point = self._climb_up(point, exemptHash)
+                point = self._climb_up(point, explored)
                 if isinstance(point, Summit):
                     link = Linker(point, saddle, path)
                     linkers.append(link)
@@ -72,7 +72,7 @@ class Walk(object):
                     point.saddles.append(link)
                     break
                 if point:
-                    exemptHash[point.x].append(point.y)
+                    explored[point.x][point.y] = True
                     lookback = 1
                     path.append(point)
                 else:
@@ -80,7 +80,7 @@ class Walk(object):
                     point = path[-lookback]
         return linkers
 
-    def _climb_up(self, point, exemptHash):
+    def _climb_up(self, point, explored):
 
         if self.summitHash[point.x][point.y]:
             return self.summitHash[point.x][point.y]
@@ -91,7 +91,7 @@ class Walk(object):
 
         neighbors = self.datamap.iterateDiagonal(point.x, point.y)
         for x, y, elevation in neighbors:
-            if y in exemptHash[x]:
+            if explored[x].get(y, False):
                 continue
             if elevation > currentHigh and elevation > lastElevation:
                 currentHigh = elevation
