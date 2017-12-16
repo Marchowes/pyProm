@@ -55,8 +55,8 @@ class SpotElevation(BaseCoordinate):
         :return: :class:`GridPoint object`
         """
         from .gridpoint import GridPoint
-        xy = datamap.latlong_to_xy(self.latitude, self.longitude)
-        return GridPoint(xy[0], xy[1], self.elevation)
+        x, y = datamap.latlong_to_xy(self.latitude, self.longitude)
+        return GridPoint(x, y, self.elevation)
 
     @property
     def feet(self):

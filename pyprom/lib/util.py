@@ -25,19 +25,21 @@ def degreesToDottedDecimal(deg, mnt=0, sec=0):
 
 def coordinateHashToList(coordianteHash):
     """
-    :param coordianteHash: a hash using {x1:[y1,y2..],x1:[y1,y2..]} format
+    :param coordianteHash: a hash using
+    {x1:[y1:True,y2:True..],x1:[y1:True,y2:True..]} format
     :return: list coordinates [[x1,y1],[x1,y2]....]
     """
-    return [[x, y] for x, _y in coordianteHash.items() for y in _y]
+    return [[x, y] for x, _y in coordianteHash.items() for y, _ in _y.items()]
 
 
 def coordinateHashToGridPointList(coordianteHash):
     """
-    :param coordianteHash: a hash using {x1:[y1,y2..],x1:[y1,y2..]} format
+    :param coordianteHash: a hash using
+    {x1:[y1:True,y2:True..],x1:[y1:True,y2:True..]} format
     :return: list of BaseGridPoint objects.
     """
     return [BaseGridPoint(x, y)
-            for x, _y in coordianteHash.items() for y in _y]
+            for x, _y in coordianteHash.items() for y, _ in _y.items()]
 
 
 def compressRepetetiveChars(string):

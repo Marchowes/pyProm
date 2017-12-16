@@ -27,8 +27,8 @@ class InverseEdgePointContainer(object):
         self.points = list()
         if inverseEdgePointIndex:
             self.inverseEdgePointIndex = inverseEdgePointIndex
-            self.points = [v[1] for x, y in self.inverseEdgePointIndex.items()
-                           for v in y.items()]
+            self.points = [iep for x, _y in self.inverseEdgePointIndex.items()
+                           for y, iep in _y.items()]
         if inverseEdgePointList:
             self.points = inverseEdgePointList
         self.datamap = datamap
@@ -45,10 +45,10 @@ class InverseEdgePointContainer(object):
         for shift in shiftList:
             x = inverseEdgePoint.x+shift[0]
             y = inverseEdgePoint.y+shift[1]
-            if self.inverseEdgePointIndex[x][y]:
+            if self.inverseEdgePointIndex[x].get(y, False):
                 if -1 <= x <= self.datamap.max_x + 1\
                         and -1 <= y <= self.datamap.max_y + 1:
-                    yield self.inverseEdgePointIndex[x][y]
+                    yield self.inverseEdgePointIndex[x].get(y, False)
             else:
                 continue
 
@@ -63,10 +63,10 @@ class InverseEdgePointContainer(object):
         for shift in shiftList:
             x = inverseEdgePoint.x + shift[0]
             y = inverseEdgePoint.y + shift[1]
-            if self.inverseEdgePointIndex[x][y]:
+            if self.inverseEdgePointIndex[x].get(y, False):
                 if -1 <= x <= self.datamap.max_x + 1 \
                         and -1 <= y <= self.datamap.max_y + 1:
-                    yield self.inverseEdgePointIndex[x][y]
+                    yield self.inverseEdgePointIndex[x].get(y, False)
             else:
                 continue
 
@@ -75,10 +75,10 @@ class InverseEdgePointContainer(object):
         Hopefully a way more efficient way of finding high edges.
         :return:
         """
-        purgedIndex = defaultdict(list)
+        explored = defaultdict(dict)
         highLists = list()
         for point in self.points:
-            if point.y in purgedIndex[point.x]:
+            if explored[point.x].get(point.y, False):
                 continue
             if point.elevation > elevation:
                 toBeAnalyzed = [point]
@@ -89,16 +89,16 @@ class InverseEdgePointContainer(object):
                         break
                     else:
                         gridPoint = toBeAnalyzed.pop()
-                    if gridPoint.y not in purgedIndex[gridPoint.x]:
+                    if not explored[gridPoint.x].get(gridPoint.y, False):
                         highList.append(gridPoint)
                         neighbors = [x for x in
                                      self.iterNeighborDiagonal(gridPoint)
                                      if x.elevation > elevation and
-                                     x.y not in purgedIndex[x.x]]
+                                     not explored[x.x].get(x.y, False)]
                         toBeAnalyzed += neighbors
-                        purgedIndex[gridPoint.x].append(gridPoint.y)
+                        explored[gridPoint.x][gridPoint.y] = True
             else:
-                purgedIndex[point.x].append(point.y)
+                explored[point.x][point.y] = True
         return [GridPointContainer(x) for x in highLists]
 
     def __repr__(self):

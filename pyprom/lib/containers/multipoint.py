@@ -43,9 +43,9 @@ class MultiPoint(object):
         for point in self.points:
             pdict = dict()
             pdict['gridpoint'] = point.to_dict()
-            latlong = self.datamap.xy_to_latlong(point.x, point.y)
+            lat, long = self.datamap.xy_to_latlong(point.x, point.y)
             pdict['coordinate'] = \
-                BaseCoordinate(latlong[0], latlong[1]).to_dict()
+                BaseCoordinate(lat, long).to_dict()
             plist.append(pdict)
         return plist
 
