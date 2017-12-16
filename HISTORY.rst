@@ -1,6 +1,10 @@
 Release History
 ---------------
 
+0.3.7 (December 15, 2017)
++++++++++++++++++++++++++
+* Optimizations for explored points 33 - 50% performance improvement
+
 0.3.6 (December 10, 2017)
 +++++++++++++++++++++++++
 * Tore out old Dataloaders and replaced with a universal GDAL based solution

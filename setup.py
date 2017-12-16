@@ -1,5 +1,5 @@
 """
-pyProm: Copyright 2016
+pyProm: Copyright 2017
 
 This software is distributed under a license that is described in
 the LICENSE file that accompanies it.
@@ -24,7 +24,6 @@ setup(
     url='https://github.com/marchowes/pyProm',
     packages=['pyprom'],
     classifiers=[
-        'Programming Language :: Python :: 2',
         'Programming Language :: Python :: 3',
     ],
     install_requires=requires,
