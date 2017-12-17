@@ -49,7 +49,7 @@ class DataMap(object):
                 else:
                     yield _x, _y, float(self.numpy_map[_x, _y])
             else:
-                yield _x, _y, -32768
+                yield _x, _y, self.nodata
 
     def iterateOrthogonal(self, x, y):
         """
@@ -69,7 +69,7 @@ class DataMap(object):
                 else:
                     yield _x, _y, float(self.numpy_map[_x, _y])
             else:
-                yield _x, _y, -32768
+                yield _x, _y, self.nodata
 
 
 class ProjectionDataMap(DataMap):
@@ -78,8 +78,8 @@ class ProjectionDataMap(DataMap):
     datasets from GDAL.
     """
     def __init__(self, numpy_map, upperLeftY, upperLeftX, resolutionY,
-                 resolutionX, span_y, span_x, linear_unit, unit, transform,
-                 reverse_transform):
+                 resolutionX, span_y, span_x, linear_unit, unit, nodata,
+                 transform, reverse_transform):
         """
         :param numpy_map: numpy_array multidimensional array of data
          numpy_map[x][y]
@@ -97,6 +97,7 @@ class ProjectionDataMap(DataMap):
          Y axis for Numpy
         :param linear_unit: Linear unit scale.
         :param unit: Linear unit
+        :param nodata: raster point value indicating a NULL Value
         :param transform: osr.CoordinateTransformation from GDAL native to
          selected units (degrees)
         :param reverse_transform: osr.CoordinateTransformation from selected
@@ -127,6 +128,7 @@ class ProjectionDataMap(DataMap):
         self.span_x = span_y
         self.max_x = self.span_x - 1
         self.linear_unit = linear_unit
+        self.nodata = nodata
         self.transform = transform
         self.reverse_transform = reverse_transform
 
@@ -262,6 +264,7 @@ class ProjectionDataMap(DataMap):
                                  ySpan,
                                  self.linear_unit,
                                  self.unit,
+                                 self.nodata,
                                  self.transform,
                                  self.reverse_transform)
 

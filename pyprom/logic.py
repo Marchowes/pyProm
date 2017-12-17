@@ -80,7 +80,8 @@ class AnalyzeData(object):
                         split
                     ))
 
-            if self.elevation == -32768:
+            # skip if this is a nodata point.
+            if self.elevation == self.datamap.nodata:
                 iterator.iternext()
                 continue
             # Check for summit or saddle
