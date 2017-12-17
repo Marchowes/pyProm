@@ -1,6 +1,11 @@
 Release History
 ---------------
 
+0.3.8 (December 17, 2017)
++++++++++++++++++++++++++
+* Fixed radius() function for Spot Elevation containers.
+* Get nodata value and load appropriately. Considerable optimization.
+
 0.3.7 (December 15, 2017)
 +++++++++++++++++++++++++
 * Optimizations for explored points 33 - 50% performance improvement

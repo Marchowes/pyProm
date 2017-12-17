@@ -3,3 +3,4 @@ gdal
 fastkml
 shapely
 utm
+geopy

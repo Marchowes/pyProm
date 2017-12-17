@@ -58,10 +58,13 @@ class GDALLoader(Loader):
 
         # Load Raster File into GDAL
         self.gdal_dataset = gdal.Open(self.filename)
+        if self.gdal_dataset == None:
+            raise Exception("GDAL failed to load {}".format(filename))
         # Load Raster Data into numpy array
         raster_band = self.gdal_dataset.GetRasterBand(1)
         self.raster_data = numpy.array(raster_band.
                                        ReadAsArray())
+        nodata = raster_band.GetNoDataValue()
         # Gather span for X and Y axis.
         self.span_x = self.gdal_dataset.RasterXSize  # longitude
         self.span_y = self.gdal_dataset.RasterYSize  # latitude
@@ -97,6 +100,7 @@ class GDALLoader(Loader):
                                              self.span_x,
                                              self.linear_unit,
                                              self.linear_unit_name,
+                                             nodata,
                                              transform,
                                              reverse_transform)
         else:

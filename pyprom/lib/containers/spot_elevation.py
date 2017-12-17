@@ -18,7 +18,7 @@ from ..locations.gridpoint import GridPoint
 from .multipoint import MultiPoint
 from .gridpoint import GridPointContainer
 from .base import _Base
-from math import sqrt
+from geopy.distance import vincenty
 
 
 class SpotElevationContainer(_Base):
@@ -61,16 +61,17 @@ class SpotElevationContainer(_Base):
                 highest.append(spot_elevation)
         return highest
 
-    def radius(self, lat, long, datamap, value, unit='m'):
+    def radius(self, lat, long, value, unit='m'):
         """
         :param lat: latitude of center in dotted decimal
         :param long: longitude of center in dotted decimal
-        :param datamap: datamap object
         :param value: number of units of distance
         :param unit: type of unit (m, km, mi, ft)
         :return: SpotElevationContainer loaded with results.
         """
         unit = unit.lower()
+        # convert our units to meters so we only have to deal with one unit
+        #  type.
         if unit in ['meters', 'meter', 'm']:
             convertedDist = value
         elif unit in ['kilometers', 'kilometer', 'km']:
@@ -83,16 +84,12 @@ class SpotElevationContainer(_Base):
             raise ValueError('No unit value specified')
 
         positive = list()
-        longitudalMetersPerArcSec = longitudeArcSec(lat) *\
-            datamap.arcsec_resolution
-        lateralMetersPerArcSec = 30.8666
+        # iterate through points and collect only points within the specified
+        # distance using the vincenty algorithm.
         for point in self.points:
-            latDist = (abs(lat - point.latitude) * 3600) *\
-                lateralMetersPerArcSec
-            longDist = (abs(long - point.longitude) * 3600) *\
-                longitudalMetersPerArcSec
-            distance = sqrt(longDist**2 + latDist**2)
-            if distance <= convertedDist:
+            distance = vincenty((lat,long),
+                                (point.latitude, point.longitude)).meters
+            if distance < convertedDist:
                 positive.append(point)
         return SpotElevationContainer(positive)
 
