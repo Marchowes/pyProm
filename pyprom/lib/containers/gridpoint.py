@@ -66,6 +66,74 @@ class GridPointContainer(BaseGridPointContainer):
             else:
                 continue
 
+    def findPseudoSummits(self):
+        """ Similiar in concept to finding summits and multipoint blobs,
+         but smaller in scope.
+
+        Essentially this returns locally scoped Summit points, that is,
+        anything that meets the effective definition of a summit with all
+        the available data in a GridPoint container.
+        This is intended for use for finding high portions along an edge like:
+        [1][2][3][2][2][3][4][4][3][2]
+               ^           ^^^^
+                PSEUDO SUMMITS (simple 1D example)
+        No distinction is made between the pseudo summits. This is becasue these
+        points are used as a jumping off point for Saddle -> Summit walks.
+        """
+        exploredGridPoints = defaultdict(dict)
+        pseudoSummits = list()
+
+        def equalHeightBlob(point):
+            """
+            Find pseudosummits which contain more than a single point.
+            :param point:
+            :return:
+            """
+            toBeAnalyzed = [point]
+            analyzed = list()
+            while toBeAnalyzed:
+                gridPoint = toBeAnalyzed.pop()
+                # officially declare that we're looking at this point.
+                exploredGridPoints[gridPoint.x][gridPoint.y] = True
+                analyzed.append(gridPoint)
+                neighbors = self.iterNeighborDiagonal(gridPoint)
+                for neighbor in neighbors:
+                    if exploredGridPoints[neighbor.x].get(neighbor.y,None):
+                        continue
+                    # if the neighbor has the same elevation, explore it later
+                    if neighbor.elevation == gridPoint.elevation and\
+                            not exploredGridPoints[neighbor.x].get(neighbor.y,None):
+                        toBeAnalyzed.append(neighbor)
+                    # if the neighbor is higher, the whole party is ruined, bail.
+                    if neighbor.elevation > gridPoint.elevation:
+                        return None
+                # Didnt bail? must be a pseudoSummit
+            return analyzed
+
+        # Main Loop. Run through all points.
+        for point in self.points:
+            # already looked at it? move on.
+            if exploredGridPoints[point.x].get(point.y,None):
+                continue
+            # officially declare that we're looking at this point.
+            exploredGridPoints[point.x][point.y] = True
+            skip = False
+            for neighbor in self.iterNeighborDiagonal(point):
+                # do we have equal height neighbors?
+                if neighbor.elevation == point.elevation:
+                    pseudos = equalHeightBlob(point)
+                    if pseudos:
+                        pseudoSummits += pseudos
+                        skip = True
+                        break
+                # can't be a high point, bail.
+                if neighbor.elevation > point.elevation:
+                    skip = True
+                    break
+            if not skip:
+                # Made it this far? must be a pseudosummit.
+                pseudoSummits.append(point)
+        return pseudoSummits
 
     def __repr__(self):
         return "<GridPointContainer> {} Objects".format(len(self.points))
