@@ -1,6 +1,11 @@
 Release History
 ---------------
 
+0.3.9 ()
++++++++++++++++++++++++++
+* Added __len__() function to SpotElevationContainer()
+* Added neighbor iterators to GridPointContainers
+
 0.3.8 (December 17, 2017)
 +++++++++++++++++++++++++
 * Fixed radius() function for Spot Elevation containers.
