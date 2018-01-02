@@ -209,6 +209,8 @@ class SpotElevationContainer(_Base):
         """
         pass
 
+    def __len__(self):
+        return len(self.points)
 
     def __repr__(self):
         return "<SpotElevationContainer> {} Objects".format(len(self.points))
