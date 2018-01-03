@@ -1,10 +1,14 @@
 Release History
 ---------------
 
-0.3.9 ()
+0.4.0 (January 2018)
++++++++++++++++++++++++++
+
+0.3.9 (January 2, 2018)
 +++++++++++++++++++++++++
 * Added __len__() function to SpotElevationContainer()
 * Added neighbor iterators to GridPointContainers
+* Added PseudoSummit finder within GridPointContainer.
 
 0.3.8 (December 17, 2017)
 +++++++++++++++++++++++++

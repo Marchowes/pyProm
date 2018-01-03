@@ -1,21 +1,23 @@
-### pyProm v0.3.9
+### pyProm v0.4.0
 
 
 This library is still under development. Do not expect full functionality, or documentation until release 1.0.0
+
+**Warning** There will be breaking changes to how domains are exported. You've been warned.
 
 pyProm
 ======
 
 Supported version of Python: Python 3
 
-The purpose of PyProm is to load Surface datasets for discovery of Summit, Saddles (cols),
-Prominence, and data manipulation/parsing of those datapoints. The goal is the take in a number of
-different data formats, as well as produce a number of different result formats, including common
-ones like KML.
+The purpose of PyProm is to have a fully scriptable API for loading Raster Data for discovery of Summits,
+Saddles (cols), Prominence, Peak Parentage and all that good stuff. Anything you might want to be able to
+manipulate can be manipulated in a scalable, scriptable manner. 
 
-pyProm is written in Python, which is a fairly accessible language to most people. My hope is once 
+pyProm is written in Python, which is a fairly accessible language to most people. My master plan is once 
 a stable, and well documented version can be produced, others can add features as they see fit. The
-disadvantage of writing such a library in python is it is inherently slower and consumes more memory.
+disadvantage of writing such a deeply customizable library in python is it is inherently slower and
+consumes more memory (apalling so in some instances).
 
 This library is inspired by [WinProm](https://github.com/edwardearl/winprom), by the late [Edward Earl](http://peakbagger.com/climber/climber.aspx?cid=601), as well as the number of websites
 which make use of similiarly derived data, such as [LoJ](listsofjohn.com) and [peakbagger](peakbagger.com)
@@ -60,16 +62,16 @@ mykml = KMLfileWriter(_4ks, 'YOURPATHHERE/myfile.kml')
 mykml.writeFile()
 
 # Save your Domain
-domain.write('YOURPATHHERE/mydomain.json')
+domain.write('YOURPATHHERE/mydomain.dom')
 
 # Load your Domain you you don't need to wait forever for analysis.
 newdomain = Domain(data)
-newdomain.read('YOURPATHHERE/mydomain.json')
+newdomain.read('YOURPATHHERE/mydomain.dom')
 ```
 
 Installation
 ------------
-Warning! JSON data or saved Domains will almost certainly fail to load in future version. There WILL be breaking changes. You've been warned!
+Warning! JSON data or saved Domains will almost certainly fail to load in future version. There WILL be breaking changes. You've been warned! (twice!)
 
 
 Download zip from github, or clone.
@@ -89,6 +91,8 @@ More resources:
 * https://pypi.python.org/pypi/GDAL/
 * https://github.com/OSGeo/gdal
 * http://www.gdal.org/formats_list.html
+
+If all else fails, I've had goo luck getting it to work with conda. You're on your own with that one.
 
 
 
