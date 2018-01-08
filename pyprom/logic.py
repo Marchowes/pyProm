@@ -18,6 +18,8 @@ from .lib.locations.saddle import Saddle
 from .lib.locations.summit import Summit
 from .lib.locations.inverse_edgepoint import InverseEdgePoint
 from .lib.containers.spot_elevation import SpotElevationContainer
+from .lib.containers.saddles import SaddlesContainer
+from .lib.containers.summits import SummitsContainer
 from .lib.containers.multipoint import MultiPoint
 from .lib.containers.inverse_edgepoint import InverseEdgePointContainer
 from .lib.containers.high_edge import HighEdgeContainer
@@ -49,8 +51,8 @@ class AnalyzeData(object):
         self.start = default_timer()
         self.lasttime = self.start
         self.logger.info("Initiating Analysis")
-        self.summitObjects = SpotElevationContainer([])
-        self.saddleObjects = SpotElevationContainer([])
+        self.summitObjects = SummitsContainer([])
+        self.saddleObjects = SaddlesContainer([])
         iterator = numpy.nditer(self.data, flags=['multi_index'])
         index = 0
         # Iterate through numpy grid, and keep track of gridpoint coordinates.
@@ -97,6 +99,8 @@ class AnalyzeData(object):
             iterator.iternext()
         # Free some memory.
         del(self.explored)
+        self.logger.info("Rebuilding Saddles")
+        self.saddleObjects = self.saddleObjects.rebuildSaddles(self.datamap)
         return self.summitObjects, self.saddleObjects
 
     def analyze_multipoint(self, x, y, ptElevation):

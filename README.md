@@ -92,7 +92,7 @@ More resources:
 * https://github.com/OSGeo/gdal
 * http://www.gdal.org/formats_list.html
 
-If all else fails, I've had goo luck getting it to work with conda. You're on your own with that one.
+If all else fails, I've had good luck getting it to work with conda. You're on your own with that one.
 
 
 

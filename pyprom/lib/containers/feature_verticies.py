@@ -21,6 +21,10 @@ class Feature_Verticies(object):
     are all all linked to foreign verticies
     """
     def __init__(self, index, vertex_linkers):
+        """
+        :param index: index of feature
+        :param vertex_linkers: list of :class:`Vertex_Link`s
+        """
         self.index = index
         self.vertex_linkers = vertex_linkers
 
