@@ -22,6 +22,8 @@ from .lib.locations.summit import Summit
 from .lib.locations.saddle import Saddle
 from .lib.locations.base_gridpoint import BaseGridPoint
 from .lib.containers.multipoint import MultiPoint
+from .lib.containers.summits import SummitsContainer
+from .lib.containers.saddles import SaddlesContainer
 from .lib.containers.gridpoint import GridPointContainer
 from .lib.locations.gridpoint import GridPoint
 
@@ -121,9 +123,9 @@ class Domain(object):
                              for x in hs]))
             feature.edgeEffect = point['edge']
             return feature
-        self.summits = SpotElevationContainer(
+        self.summits = SummitsContainer(
             [_loader(x, 'Summit') for x in hash['summits']])
-        self.saddles = SpotElevationContainer(
+        self.saddles = SaddlesContainer(
             [_loader(x, 'Saddle') for x in hash['saddles']])
         # self.linkers = ????
 

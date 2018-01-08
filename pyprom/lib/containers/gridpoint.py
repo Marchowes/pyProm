@@ -7,9 +7,13 @@ the LICENSE file that accompanies it.
 This library contains a container class for storing GridPoint
 type location objects.
 """
+import math
+import sys
 
 from .base_gridpoint import BaseGridPointContainer
+from pyprom.lib.locations.gridpoint import GridPoint
 from collections import defaultdict
+
 
 
 class GridPointContainer(BaseGridPointContainer):
@@ -134,6 +138,29 @@ class GridPointContainer(BaseGridPointContainer):
                 # Made it this far? must be a pseudosummit.
                 pseudoSummits.append(point)
         return pseudoSummits
+
+    def findClosestPoints(self, otherGridpointContainer):
+        """
+        Calculates and returns The the two closest GridPoints from `self`
+        and `otherGridpointContainer` and their distance.
+        :param otherGridpointContainer: GridPointContainer
+        :return: GridPoint, GridPoint, distance
+        """
+        myClosest = None
+        theirClosest = None
+        closest_distance = sys.maxsize
+        # Loop through all points in `self`
+        for myPoint in self.points:
+            # Loop through all points in `otherGridpointContainer`
+            for theirPoint in otherGridpointContainer.points:
+                # Calculate hypotenuse
+                distance = math.sqrt((abs(myPoint.x - theirPoint.x) ** 2) + (abs(myPoint.y - theirPoint.y) ** 2))
+                # if this is the shortest, set it as such.
+                if distance < closest_distance:
+                    myClosest = myPoint
+                    theirClosest = theirPoint
+                    closest_distance = distance
+        return myClosest, theirClosest, closest_distance
 
     def __repr__(self):
         return "<GridPointContainer> {} Objects".format(len(self.points))
