@@ -9,7 +9,7 @@ from __future__ import division
 import unittest
 from .getData import getTestZip
 from pyprom.dataload import GDALLoader
-from pyprom.logic import AnalyzeData
+from pyprom.feature_discovery import AnalyzeData
 from pyprom.walk import Walk
 
 

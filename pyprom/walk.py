@@ -11,7 +11,7 @@ from collections import defaultdict
 from .lib.locations.gridpoint import GridPoint
 from .lib.locations.summit import Summit
 from .lib.containers.linker import Linker
-from .logic import equalHeightBlob
+from .lib.logic.equalheight import equalHeightBlob
 
 class Walk(object):
     def __init__(self, summits, saddles, datamap):

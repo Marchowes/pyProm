@@ -8,7 +8,7 @@ the LICENSE file that accompanies it.
 import unittest
 from .getData import getTestZip
 from pyprom.dataload import GDALLoader
-from pyprom.logic import AnalyzeData
+from pyprom.feature_discovery import AnalyzeData
 
 
 class LogicTests(unittest.TestCase):

@@ -14,7 +14,7 @@ import json
 import logging
 import gzip
 
-from .logic import AnalyzeData
+from .feature_discovery import AnalyzeData
 from .lib.datamap import DataMap
 from .dataload import Loader
 from .lib.containers.spot_elevation import SpotElevationContainer
