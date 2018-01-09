@@ -7,7 +7,7 @@ the LICENSE file that accompanies it.
 
 from __future__ import division
 import unittest
-from .getData import getTestZip
+from pyprom.tests.getData import getTestZip
 from pyprom.dataload import GDALLoader
 from pyprom.feature_discovery import AnalyzeData
 from pyprom.walk import Walk
@@ -27,13 +27,14 @@ class WalkTests(unittest.TestCase):
 
     def testWalkIslandPond(self):
         """Test walk around Island Pond VT."""
-        whittle = self.saddles.elevationRangeMetric(353, 355)
-        pond = [z for z in whittle.points if len(z.multiPoint.points) > 100][0]
-        walk = Walk(self.summits, [pond], self.islandpondVT)
-        linkers = walk.walk(pond)
-        # temporary
-        self.assertEqual(len(linkers), 2)
-
+        islandPondSaddleContainer = self.saddles.radius(44.810833, -71.8676388, 10)
+        islandPondSaddle = islandPondSaddleContainer.points[0]
+        walk = Walk(self.summits, [islandPondSaddleContainer], self.islandpondVT)
+        walk.walk(islandPondSaddle)
+        self.assertEqual(len(walk.linkers), 2)
+        self.assertEqual(len(islandPondSaddle.summits), 2)
+        self.assertEqual(islandPondSaddle.summits[0].summit, self.summits.points[155])
+        self.assertEqual(islandPondSaddle.summits[1].summit, self.summits.points[171])
 
 if __name__ == '__main__':
     unittest.main()

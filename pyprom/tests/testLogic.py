@@ -6,7 +6,7 @@ the LICENSE file that accompanies it.
 """
 
 import unittest
-from .getData import getTestZip
+from pyprom.tests.getData import getTestZip
 from pyprom.dataload import GDALLoader
 from pyprom.feature_discovery import AnalyzeData
 
