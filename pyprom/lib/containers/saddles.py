@@ -9,6 +9,7 @@ type location objects.
 """
 
 from .spot_elevation import SpotElevationContainer
+from ..logic.internal_saddle_network import InternalSaddleNetwork
 
 class SaddlesContainer(SpotElevationContainer):
     """
@@ -31,8 +32,8 @@ class SaddlesContainer(SpotElevationContainer):
             if len(saddle.highShores) < 2:
                 new_saddles.append(saddle)
                 continue
-
-            new_saddles += saddle.generate_child_saddles(datamap)
+            nw = InternalSaddleNetwork(saddle, datamap)
+            new_saddles += nw.generate_child_saddles()
             # If its an edgeEffect, we need to disqualify it and stash that away for later.
             if saddle.edgeEffect:
                 saddle.disqualified = True
