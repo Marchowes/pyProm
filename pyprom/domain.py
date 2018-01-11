@@ -62,7 +62,7 @@ class Domain(object):
         self.saddles = SpotElevationContainer([])
         self.summits = SpotElevationContainer([])
         self.linkers = list()
-        self.summits, self.saddles = AnalyzeData(self.datamap).analyze()
+        self.summits, self.saddles = AnalyzeData(self.datamap).run()
 
     def read(self, filename):
         """

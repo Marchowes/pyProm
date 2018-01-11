@@ -23,7 +23,7 @@ class WalkTests(unittest.TestCase):
         datamap = self.datafile.datamap
         self.islandpondVT = datamap.subset(602, 353, 260, 260)
         self.islandpondVTVicinity = AnalyzeData(self.islandpondVT)
-        self.summits, self.saddles = self.islandpondVTVicinity.analyze()
+        self.summits, self.saddles = self.islandpondVTVicinity.run()
 
     def testWalkIslandPond(self):
         """Test walk around Island Pond VT."""

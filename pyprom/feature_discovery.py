@@ -38,6 +38,12 @@ class AnalyzeData(object):
         self.cardinalGrid = dict()
         self.explored = defaultdict(dict)
 
+    def run(self):
+        self.logger.info("Rebuilding Saddles")
+        _, _ = self.analyze()
+        self.saddleObjects = self.saddleObjects.rebuildSaddles(self.datamap)
+        return self.summitObjects, self.saddleObjects
+
     def analyze(self):
         """
         Analyze Routine.
@@ -95,8 +101,6 @@ class AnalyzeData(object):
             iterator.iternext()
         # Free some memory.
         del(self.explored)
-        self.logger.info("Rebuilding Saddles")
-        self.saddleObjects = self.saddleObjects.rebuildSaddles(self.datamap)
         return self.summitObjects, self.saddleObjects
 
     def analyze_multipoint(self, x, y, ptElevation):
