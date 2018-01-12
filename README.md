@@ -1,6 +1,6 @@
 ### pyProm v0.4.0
 
-![pyProm](https://github.com/marchowes/pyProm/raw/master/images/pyProm-logo-500px.png.png "pyProm")
+![pyProm](https://github.com/marchowes/pyProm/raw/master/images/pyProm-logo-500px.png "pyProm")
 
 This library is still under development. Do not expect full functionality, or documentation until release 1.0.0
 
