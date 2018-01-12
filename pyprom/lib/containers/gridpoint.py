@@ -7,8 +7,11 @@ the LICENSE file that accompanies it.
 This library contains a container class for storing GridPoint
 type location objects.
 """
+import math
+import sys
 
 from .base_gridpoint import BaseGridPointContainer
+from pyprom.lib.locations.gridpoint import GridPoint
 from collections import defaultdict
 
 
@@ -77,8 +80,9 @@ class GridPointContainer(BaseGridPointContainer):
         [1][2][3][2][2][3][4][4][3][2]
                ^           ^^^^
                 PSEUDO SUMMITS (simple 1D example)
-        No distinction is made between the pseudo summits. This is becasue these
-        points are used as a jumping off point for Saddle -> Summit walks.
+        No distinction is made between the pseudo summits. This is becasue
+        these points are used as a jumping off point for Saddle -> Summit
+        walks.
         """
         exploredGridPoints = defaultdict(dict)
         pseudoSummits = list()
@@ -98,13 +102,15 @@ class GridPointContainer(BaseGridPointContainer):
                 analyzed.append(gridPoint)
                 neighbors = self.iterNeighborDiagonal(gridPoint)
                 for neighbor in neighbors:
-                    if exploredGridPoints[neighbor.x].get(neighbor.y,None):
+                    if exploredGridPoints[neighbor.x].get(neighbor.y, None):
                         continue
                     # if the neighbor has the same elevation, explore it later
                     if neighbor.elevation == gridPoint.elevation and\
-                            not exploredGridPoints[neighbor.x].get(neighbor.y,None):
+                            not exploredGridPoints[neighbor.x].get(
+                                neighbor.y, None):
                         toBeAnalyzed.append(neighbor)
-                    # if the neighbor is higher, the whole party is ruined, bail.
+                    # if the neighbor is higher,
+                    # the whole party is ruined, bail.
                     if neighbor.elevation > gridPoint.elevation:
                         return None
                 # Didnt bail? must be a pseudoSummit
@@ -113,7 +119,7 @@ class GridPointContainer(BaseGridPointContainer):
         # Main Loop. Run through all points.
         for point in self.points:
             # already looked at it? move on.
-            if exploredGridPoints[point.x].get(point.y,None):
+            if exploredGridPoints[point.x].get(point.y, None):
                 continue
             # officially declare that we're looking at this point.
             exploredGridPoints[point.x][point.y] = True
@@ -134,6 +140,30 @@ class GridPointContainer(BaseGridPointContainer):
                 # Made it this far? must be a pseudosummit.
                 pseudoSummits.append(point)
         return pseudoSummits
+
+    def findClosestPoints(self, otherGridpointContainer):
+        """
+        Calculates and returns The the two closest GridPoints from `self`
+        and `otherGridpointContainer` and their distance.
+        :param otherGridpointContainer: GridPointContainer
+        :return: GridPoint, GridPoint, distance
+        """
+        myClosest = None
+        theirClosest = None
+        closest_distance = sys.maxsize
+        # Loop through all points in `self`
+        for myPoint in self.points:
+            # Loop through all points in `otherGridpointContainer`
+            for theirPoint in otherGridpointContainer.points:
+                # Calculate hypotenuse
+                distance = math.sqrt((abs(myPoint.x - theirPoint.x) ** 2) +
+                                     (abs(myPoint.y - theirPoint.y) ** 2))
+                # if this is the shortest, set it as such.
+                if distance < closest_distance:
+                    myClosest = myPoint
+                    theirClosest = theirPoint
+                    closest_distance = distance
+        return myClosest, theirClosest, closest_distance
 
     def __repr__(self):
         return "<GridPointContainer> {} Objects".format(len(self.points))

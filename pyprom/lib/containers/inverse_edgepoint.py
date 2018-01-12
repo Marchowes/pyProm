@@ -101,6 +101,18 @@ class InverseEdgePointContainer(object):
                 explored[point.x][point.y] = True
         return [GridPointContainer(x) for x in highLists]
 
+    def findHighInverseEdgePoints(self, elevation):
+        """
+        This function returns all inverseEdgePoints higher than the passed in
+        elevation and returns them in a GridPointContainer.
+        :param elevation:
+        :return: GridPointContainer
+        """
+
+        higherPoints = [x for x in self.points if x.elevation > elevation]
+        return GridPointContainer(higherPoints)
+
+
     def __repr__(self):
         return "<InverseEdgePointContainer>" \
                " {} Objects".format(len(self.points))

@@ -6,9 +6,9 @@ the LICENSE file that accompanies it.
 """
 
 import unittest
-from .getData import getTestZip
+from pyprom.tests.getData import getTestZip
 from pyprom.dataload import GDALLoader
-from pyprom.logic import AnalyzeData
+from pyprom.feature_discovery import AnalyzeData
 
 
 class LogicTests(unittest.TestCase):
@@ -21,7 +21,7 @@ class LogicTests(unittest.TestCase):
         self.datamap = self.datafile.datamap
         self.mtWashingtonDM = self.datamap.subset(2600, 2500, 30, 30)
         self.washingtonVicinity = AnalyzeData(self.mtWashingtonDM)
-        self.summits, self.saddles = self.washingtonVicinity.analyze()
+        self.summits, self.saddles = self.washingtonVicinity.run()
 
     def testFindSummits(self):
         """Make sure we find the right number of summits and cols."""

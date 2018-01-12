@@ -14,7 +14,7 @@ import json
 import logging
 import gzip
 
-from .logic import AnalyzeData
+from .feature_discovery import AnalyzeData
 from .lib.datamap import DataMap
 from .dataload import Loader
 from .lib.containers.spot_elevation import SpotElevationContainer
@@ -22,6 +22,8 @@ from .lib.locations.summit import Summit
 from .lib.locations.saddle import Saddle
 from .lib.locations.base_gridpoint import BaseGridPoint
 from .lib.containers.multipoint import MultiPoint
+from .lib.containers.summits import SummitsContainer
+from .lib.containers.saddles import SaddlesContainer
 from .lib.containers.gridpoint import GridPointContainer
 from .lib.locations.gridpoint import GridPoint
 
@@ -60,11 +62,11 @@ class Domain(object):
         self.saddles = SpotElevationContainer([])
         self.summits = SpotElevationContainer([])
         self.linkers = list()
-        self.summits, self.saddles = AnalyzeData(self.datamap).analyze()
+        self.summits, self.saddles = AnalyzeData(self.datamap).run()
 
     def read(self, filename):
         """
-        :param filename: name of file (including path) to write json data to
+        :param filename: name of file (including path) to read
         """
         # Expunge any existing saddles, summits, and linkers
         filename = os.path.expanduser(filename)
@@ -78,11 +80,13 @@ class Domain(object):
 
     def write(self, filename):
         """
-        :param filename: name of file (including path) to read compressed json data from
+        :param filename: name of file (including path) to write json data to
+        compressed json data from
         """
         filename = os.path.expanduser(filename)
         self.logger.info("Writing Domain Dataset to {}.".format(filename))
-        outgoing = gzip.open(filename, 'w', 5)  # ('filename', 'read/write mode', compression level)
+        outgoing = gzip.open(filename, 'w', 5)
+        # ^^ ('filename', 'read/write mode', compression level)
         outgoing.write(self.to_json(prettyprint=False).encode('utf-8'))
         outgoing.close()
 
@@ -121,9 +125,9 @@ class Domain(object):
                              for x in hs]))
             feature.edgeEffect = point['edge']
             return feature
-        self.summits = SpotElevationContainer(
+        self.summits = SummitsContainer(
             [_loader(x, 'Summit') for x in hash['summits']])
-        self.saddles = SpotElevationContainer(
+        self.saddles = SaddlesContainer(
             [_loader(x, 'Saddle') for x in hash['saddles']])
         # self.linkers = ????
 

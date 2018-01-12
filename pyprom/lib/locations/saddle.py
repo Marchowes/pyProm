@@ -8,8 +8,8 @@ This library contains a class for storing Saddle data.
 """
 
 import json
-from .spot_elevation import SpotElevation
 
+from .spot_elevation import SpotElevation
 
 class Saddle(SpotElevation):
     """
@@ -26,9 +26,14 @@ class Saddle(SpotElevation):
         super(Saddle, self).__init__(latitude, longitude,
                                      elevation, *args, **kwargs)
         self.multiPoint = kwargs.get('multiPoint', None)
-        self.highShores = kwargs.get('highShores', None)
+        self.highShores = kwargs.get('highShores', [])
         # Temporary until I've build a linker
         self.summits = list()
+        # If this is set, this saddle was spun out of another
+        # Saddle with less data.
+        self.parent = None # Parent
+        # Saddles that have been spawned off of this one.
+        self.children = list()
         self.singleSummit = False  # All Edges lead to One summit.
         self.tooLow = False # redundant saddle, but too low.
         self._disqualified = None # Non specific disqualification

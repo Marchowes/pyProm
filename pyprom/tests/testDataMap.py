@@ -7,7 +7,7 @@ the LICENSE file that accompanies it.
 
 from __future__ import division
 import unittest
-from .getData import getTestZip
+from pyprom.tests.getData import getTestZip
 from pyprom.dataload import GDALLoader
 
 

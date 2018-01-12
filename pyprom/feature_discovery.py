@@ -16,14 +16,12 @@ from datetime import timedelta
 from .lib.locations.gridpoint import GridPoint
 from .lib.locations.saddle import Saddle
 from .lib.locations.summit import Summit
-from .lib.locations.inverse_edgepoint import InverseEdgePoint
-from .lib.containers.spot_elevation import SpotElevationContainer
-from .lib.containers.multipoint import MultiPoint
-from .lib.containers.inverse_edgepoint import InverseEdgePointContainer
+from .lib.containers.saddles import SaddlesContainer
+from .lib.containers.summits import SummitsContainer
 from .lib.containers.high_edge import HighEdgeContainer
 from .lib.containers.gridpoint import GridPointContainer
-from .lib.util import (coordinateHashToGridPointList,
-                      compressRepetetiveChars)
+from .lib.util import compressRepetetiveChars
+from .lib.logic.equalheight import equalHeightBlob
 
 
 class AnalyzeData(object):
@@ -40,6 +38,12 @@ class AnalyzeData(object):
         self.cardinalGrid = dict()
         self.explored = defaultdict(dict)
 
+    def run(self):
+        self.logger.info("Rebuilding Saddles")
+        _, _ = self.analyze()
+        self.saddleObjects = self.saddleObjects.rebuildSaddles(self.datamap)
+        return self.summitObjects, self.saddleObjects
+
     def analyze(self):
         """
         Analyze Routine.
@@ -49,8 +53,8 @@ class AnalyzeData(object):
         self.start = default_timer()
         self.lasttime = self.start
         self.logger.info("Initiating Analysis")
-        self.summitObjects = SpotElevationContainer([])
-        self.saddleObjects = SpotElevationContainer([])
+        self.summitObjects = SummitsContainer([])
+        self.saddleObjects = SaddlesContainer([])
         iterator = numpy.nditer(self.data, flags=['multi_index'])
         index = 0
         # Iterate through numpy grid, and keep track of gridpoint coordinates.
@@ -113,7 +117,7 @@ class AnalyzeData(object):
             self.elevation)
 
         for exemptPoint in self.blob.points:
-            self.explored[exemptPoint.x][exemptPoint.y]=True
+            self.explored[exemptPoint.x][exemptPoint.y] = True
         if not len(highInverseEdge):
             lat, long = self.datamap.xy_to_latlong(x, y)
             summit = Summit(lat,
@@ -137,13 +141,14 @@ class AnalyzeData(object):
 
     def summit_and_saddle(self, x, y):
         """
+        summit_and_saddle does that actual discovery of summits and saddles.
         :param x:
         :param y:
         :return: Summit, Saddle, or None
         """
 
         # Exempt! bail out!
-        if self.explored[x].get(y,False):
+        if self.explored[x].get(y, False):
             return None
 
         saddleProfile = ["HLHL", "LHLH"]
@@ -189,49 +194,7 @@ class AnalyzeData(object):
                             long,
                             self.elevation,
                             edge=self.edge,
-                            highShores=[GridPointContainer(x)
-                                        for x in shores.highPoints])
+                            highShores=[GridPointContainer(g)
+                                        for g in shores.highPoints])
             return saddle
         return None
-
-
-def equalHeightBlob(datamap, x, y, elevation):
-    """
-    This function generates a list of coordinates that involve equal height
-    :param x: x coordinate
-    :param y: y coordinate
-    :param elevation: elevation
-    :return: Multipoint Object containing all x,y coordinates and elevation
-    """
-
-    masterGridPoint = GridPoint(x, y, elevation)
-    exploredEqualHeight = defaultdict(dict)
-    exploredEqualHeight[x][y]=True
-    inverseEdgeHash = defaultdict(dict)
-    toBeAnalyzed = [masterGridPoint]
-
-    # Loop until pool of equalHeight neighbors has been exhausted.
-    edge = False
-    while toBeAnalyzed:
-        gridPoint = toBeAnalyzed.pop()
-        neighbors = datamap.iterateDiagonal(gridPoint.x, gridPoint.y)
-        # Determine if edge or not.
-        if gridPoint.x in (datamap.max_x, 0) or gridPoint.y in \
-                (datamap.max_y, 0):
-            edge = True
-        for _x, _y, elevation in neighbors:
-            if elevation == masterGridPoint.elevation and\
-                    not exploredEqualHeight[_x].get(_y, False):
-                branch = GridPoint(_x, _y, elevation)
-                exploredEqualHeight[_x][_y] = True
-                toBeAnalyzed.append(branch)
-            elif elevation > masterGridPoint.elevation:
-                if not inverseEdgeHash[_x].get(_y, False):
-                    inverseEdgeHash[_x][_y] = \
-                        InverseEdgePoint(_x, _y, elevation)
-    return MultiPoint(coordinateHashToGridPointList(exploredEqualHeight),
-                      masterGridPoint.elevation, datamap,
-                      inverseEdgePoints=InverseEdgePointContainer(
-                          inverseEdgePointIndex=inverseEdgeHash,
-                          datamap=datamap, mapEdge=edge)
-                      )
