@@ -1,11 +1,18 @@
 Release History
 ---------------
 
-0.4.0 (January 2018)
-+++++++++++++++++++++++++
+0.4.0 (January 11, 2018)
+++++++++++++++++++++++++
+* Walk now leverages equalHeightBlobs, but no longer keeps track of walk paths.
+* Summits and Saddles now have thier own containers.
+* Saddles can now have their high Shores reduced to a single point per shore and have their multipoint elements discarded while having their location set to the middle of those points.
+* ..and saddles with > 2 highShores now ahve an internal network built for linking them all together and reducing thier size.
+* logic.py is not feature_discovery.py
+* equalHeightBlob is now in its own file in lib/logic/
+* New Unit tests
 
 0.3.9 (January 2, 2018)
-+++++++++++++++++++++++++
++++++++++++++++++++++++
 * Added __len__() function to SpotElevationContainer()
 * Added neighbor iterators to GridPointContainers
 * Added PseudoSummit finder within GridPointContainer.
