@@ -66,7 +66,7 @@ class Domain(object):
 
     def read(self, filename):
         """
-        :param filename: name of file (including path) to write json data to
+        :param filename: name of file (including path) to read
         """
         # Expunge any existing saddles, summits, and linkers
         filename = os.path.expanduser(filename)
@@ -80,11 +80,13 @@ class Domain(object):
 
     def write(self, filename):
         """
-        :param filename: name of file (including path) to read compressed json data from
+        :param filename: name of file (including path) to write json data to
+        compressed json data from
         """
         filename = os.path.expanduser(filename)
         self.logger.info("Writing Domain Dataset to {}.".format(filename))
-        outgoing = gzip.open(filename, 'w', 5)  # ('filename', 'read/write mode', compression level)
+        outgoing = gzip.open(filename, 'w', 5)
+        # ^^ ('filename', 'read/write mode', compression level)
         outgoing.write(self.to_json(prettyprint=False).encode('utf-8'))
         outgoing.close()
 

@@ -8,18 +8,8 @@ This library contains a class for storing Saddle data.
 """
 
 import json
-import sys
 
 from .spot_elevation import SpotElevation
-from .gridpoint import GridPoint
-from .vertex_link import Vertex_Link
-
-
-from pyprom.lib.containers.feature_verticies import Feature_Verticies
-from pyprom.lib.containers.gridpoint import GridPointContainer
-
-from collections import defaultdict
-
 
 class Saddle(SpotElevation):
     """
@@ -42,7 +32,8 @@ class Saddle(SpotElevation):
         # If this is set, this saddle was spun out of another
         # Saddle with less data.
         self.parent = None # Parent
-        self.children = list() # Saddles that have been spawned off of this one.
+        # Saddles that have been spawned off of this one.
+        self.children = list()
         self.singleSummit = False  # All Edges lead to One summit.
         self.tooLow = False # redundant saddle, but too low.
         self._disqualified = None # Non specific disqualification

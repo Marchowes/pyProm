@@ -9,7 +9,6 @@ type location objects.
 """
 import json
 
-from ..location_util import longitudeArcSec
 from ..locations.saddle import Saddle
 from ..locations.summit import Summit
 from ..locations.spot_elevation import SpotElevation
@@ -87,7 +86,7 @@ class SpotElevationContainer(_Base):
         # iterate through points and collect only points within the specified
         # distance using the vincenty algorithm.
         for point in self.points:
-            distance = vincenty((lat,long),
+            distance = vincenty((lat, long),
                                 (point.latitude, point.longitude)).meters
             if distance < convertedDist:
                 positive.append(point)

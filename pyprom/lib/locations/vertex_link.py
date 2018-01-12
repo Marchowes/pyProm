@@ -13,7 +13,8 @@ class Vertex_Link(object):
     Vertex_Link connects a vertex (:class`GridPoint`) from one feature to
     a vertex from another
     """
-    def __init__(self, localPoint, remotePoint, distance, remote_container=None):
+    def __init__(self, localPoint, remotePoint,
+                 distance, remote_container=None):
         """
         :param localPoint: relative (local) GridPoint (vertex)
         :param remotePoint: relative (remote) GridPoint (vertex)
@@ -32,10 +33,11 @@ class Vertex_Link(object):
             return "None"
 
     def __repr__(self):
-        return "<Vertex_Link> local {} remote {} distance {} remote_container_idx {}".format(
-            self.local,
-            self.remote,
-            self.distance,
-            self._remote_container_idx())
+        return "<Vertex_Link> local {} remote {} " \
+               "distance {} remote_container_idx {}".format(
+                self.local,
+                self.remote,
+                self.distance,
+                self._remote_container_idx())
 
     __unicode__ = __str__ = __repr__

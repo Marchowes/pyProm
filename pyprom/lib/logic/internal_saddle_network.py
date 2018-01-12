@@ -25,12 +25,17 @@ class InternalSaddleNetwork(object):
     InternalSaddleNetwork object for computing internal saddle networks.
     """
     def __init__(self, saddle, datamap):
+        """
+        :param saddle: :class:`Saddle` object
+        :param datamap: :class:`DataMap` object
+        """
         self.saddle = saddle
         self.datamap = datamap
         self.allVertexLinkers = []
         self.shortest_links = []
 
-    def treeExploration(self, toBeExplored, toBeExploredIndex, explored_nodes_index, first):
+    def treeExploration(self, toBeExplored, toBeExploredIndex,
+                        explored_nodes_index, first):
         # Loop until toBeExplored is exhausted. This continues until all
         # conventionally accessible high shores are connected via Vertex
         # Links.
@@ -62,8 +67,7 @@ class InternalSaddleNetwork(object):
                 # `shortest_links` list, and add that node
                 # to the list of nodes to explore.
                 if reverse_shortest and \
-                                reverse_shortest.remote_container.index \
-                                == node.index:
+                        reverse_shortest.remote_container.index == node.index:
                     gotOne = True
                     toBeExplored.append(link.remote_container)
                     toBeExploredIndex[link.remote_container.index] = True
@@ -79,7 +83,6 @@ class InternalSaddleNetwork(object):
             explored_nodes_index[node.index] = True
             first = False
         return toBeExplored, toBeExploredIndex, explored_nodes_index, first
-
 
     def build_internal_tree(self):
         """
@@ -134,7 +137,8 @@ class InternalSaddleNetwork(object):
                 shortest_link = None
                 starting_point = None
                 for node in unexplored_nodes:
-                    shortest_distance_link = node.shortest_link(unexplored_nodes_index)
+                    shortest_distance_link =\
+                        node.shortest_link(unexplored_nodes_index)
                     if shortest_distance_link.distance < shortest_distance:
                         shortest_distance = shortest_distance_link.distance
                         shortest_link = shortest_distance_link
@@ -178,8 +182,11 @@ class InternalSaddleNetwork(object):
                                     int(link.local.y + link.remote.y) / 2,
                                     self.saddle.elevation)
             middleSpotElevation = middlePoint.toSpotElevation(self.datamap)
-            newSaddle = Saddle(middleSpotElevation.latitude, middleSpotElevation.longitude, middleSpotElevation.elevation)
-            newSaddle.highShores = [GridPointContainer([link.local]), GridPointContainer([link.remote])]
+            newSaddle = Saddle(middleSpotElevation.latitude,
+                               middleSpotElevation.longitude,
+                               middleSpotElevation.elevation)
+            newSaddle.highShores = [GridPointContainer([link.local]),
+                                    GridPointContainer([link.remote])]
             if self.saddle.edgeEffect:
                 newSaddle.parent = self.saddle
                 self.saddle.children.append(newSaddle)

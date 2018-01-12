@@ -24,7 +24,7 @@ def equalHeightBlob(datamap, x, y, elevation):
 
     masterGridPoint = GridPoint(x, y, elevation)
     exploredEqualHeight = defaultdict(dict)
-    exploredEqualHeight[x][y]=True
+    exploredEqualHeight[x][y] = True
     inverseEdgeHash = defaultdict(dict)
     toBeAnalyzed = [masterGridPoint]
 

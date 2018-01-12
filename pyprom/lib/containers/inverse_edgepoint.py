@@ -113,7 +113,6 @@ class InverseEdgePointContainer(object):
         return GridPointContainer(higherPoints)
 
 
-
     def __repr__(self):
         return "<InverseEdgePointContainer>" \
                " {} Objects".format(len(self.points))

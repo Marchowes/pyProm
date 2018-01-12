@@ -117,7 +117,7 @@ class AnalyzeData(object):
             self.elevation)
 
         for exemptPoint in self.blob.points:
-            self.explored[exemptPoint.x][exemptPoint.y]=True
+            self.explored[exemptPoint.x][exemptPoint.y] = True
         if not len(highInverseEdge):
             lat, long = self.datamap.xy_to_latlong(x, y)
             summit = Summit(lat,
@@ -141,13 +141,14 @@ class AnalyzeData(object):
 
     def summit_and_saddle(self, x, y):
         """
+        summit_and_saddle does that actual discovery of summits and saddles.
         :param x:
         :param y:
         :return: Summit, Saddle, or None
         """
 
         # Exempt! bail out!
-        if self.explored[x].get(y,False):
+        if self.explored[x].get(y, False):
             return None
 
         saddleProfile = ["HLHL", "LHLH"]
@@ -193,7 +194,7 @@ class AnalyzeData(object):
                             long,
                             self.elevation,
                             edge=self.edge,
-                            highShores=[GridPointContainer(x)
-                                        for x in shores.highPoints])
+                            highShores=[GridPointContainer(g)
+                                        for g in shores.highPoints])
             return saddle
         return None

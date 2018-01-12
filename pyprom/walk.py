@@ -15,6 +15,11 @@ from .lib.logic.equalheight import equalHeightBlob
 
 class Walk(object):
     def __init__(self, summits, saddles, datamap):
+        """
+        :param summits: summits container
+        :param saddles: saddles container
+        :param datamap: :class:`Datamap`
+        """
         self.logger = logging.getLogger('{}'.format(__name__))
         self.logger.info("Initiating Walk Object")
         self.summits = summits
@@ -27,6 +32,7 @@ class Walk(object):
 
     def _to_hash(self, container):
         """
+        Generates a lookup hash for whatever container is passed in.
         :param container:
         :return:
         """
@@ -36,12 +42,15 @@ class Walk(object):
                 for mp in point.multiPoint.points:
                     lookupHash[mp.x][mp.y] = point
             else:
-                x,y = self.datamap.latlong_to_xy(point.latitude, point.longitude)
+                x, y = self.datamap.latlong_to_xy(point.latitude,
+                                                  point.longitude)
                 lookupHash[x][y] = point
         return lookupHash
 
     def run(self):
-        # iterate through saddles
+        """
+        Helper for iterating through self.saddles.
+        """
         self.logger.info("Initiating Walk")
         for saddle in self.saddles.points:
             if not saddle.disqualified:
@@ -63,11 +72,14 @@ class Walk(object):
             while toBeAnalyzed:
                 pointUnderAnalysis = toBeAnalyzed.pop()
                 # Already explored these? move along.
-                if explored[pointUnderAnalysis.x].get(pointUnderAnalysis.y, False):
+                if explored[pointUnderAnalysis.x].get(pointUnderAnalysis.y,
+                                                      False):
                     continue
                 explored[pointUnderAnalysis.x][pointUnderAnalysis.y] = True
-                # call the climb up function and see what we got for out next Candidate
-                newCandidate, summit, explored = self._climb_up(pointUnderAnalysis, explored)
+                # call the climb up function and see what
+                # we got for out next Candidate
+                newCandidate, summit, explored =\
+                    self._climb_up(pointUnderAnalysis, explored)
                 if newCandidate:
                     toBeAnalyzed.append(newCandidate)
                 # If we got a summit as a result add it to the summits list.
@@ -110,16 +122,21 @@ class Walk(object):
             # Oh fuck no, we've got an equalHeightBlob. Better check that out.
             if elevation == startingElevation:
                 multipoint = equalHeightBlob(self.datamap, x, y, elevation)
-                #Find all inverse Edgepoints higher than the multiPointBlob elevation
-                highNeighbors = multipoint.inverseEdgePoints.findHighInverseEdgePoints(multipoint.elevation)
-                highNeighbors.points.sort(key=lambda x: x.elevation, reverse=True)
+                # Find all inverse Edgepoints higher than
+                # the multiPointBlob elevation
+                highNeighbors =\
+                    multipoint.inverseEdgePoints.findHighInverseEdgePoints(
+                        multipoint.elevation)
+                highNeighbors.points.sort(key=lambda x: x.elevation,
+                                          reverse=True)
                 # Mark multipoint components as explored.
                 for mp in multipoint.points:
                     explored[mp.x][mp.y] = True
                 return highNeighbors.points[0], None, explored
-            # Higher than current highest neighbor? Then this is the new candidate.
+            # Higher than current highest neighbor? Then this is
+            # the new candidate.
             if elevation > currentHigh:
-                candidates = GridPoint(x,y,elevation)
+                candidates = GridPoint(x, y, elevation)
         return candidates, None, explored
 
     def disqualify_lower_linkers(self):
@@ -157,7 +174,6 @@ class Walk(object):
                     linker.saddle.tooLow = True
                     count += 1
         self.logger.info("Linkers Disqualified: {}".format(count))
-
 
     def mark_redundant_linkers(self):
         """
