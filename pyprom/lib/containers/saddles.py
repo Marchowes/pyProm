@@ -10,6 +10,7 @@ type location objects.
 
 from .spot_elevation import SpotElevationContainer
 from ..logic.internal_saddle_network import InternalSaddleNetwork
+from ..locations.saddle import Saddle
 
 class SaddlesContainer(SpotElevationContainer):
     """
@@ -20,6 +21,9 @@ class SaddlesContainer(SpotElevationContainer):
         """
         :param saddleList: list of :class:`Saddle`s
         """
+        if len([x for x in saddleList if not isinstance(x, Saddle)]):
+            raise TypeError("saddleList passed to SaddlesContainer"
+                            " can only contain Saddle objects.")
         super(SaddlesContainer, self).__init__(saddleList)
 
     def rebuildSaddles(self, datamap):
@@ -59,6 +63,9 @@ class SaddlesContainer(SpotElevationContainer):
         Add a saddle to the container.
         :param saddle: :class:`Saddle`
         """
+        if not isinstance(saddle, Saddle):
+            raise TypeError("SaddlesContainer can only contain"
+                            " Saddle objects.")
         self.points.append(saddle)
 
     def __repr__(self):

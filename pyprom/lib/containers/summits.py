@@ -9,6 +9,7 @@ type location objects.
 """
 
 from .spot_elevation import SpotElevationContainer
+from ..locations.summit import Summit
 
 class SummitsContainer(SpotElevationContainer):
     """
@@ -19,6 +20,9 @@ class SummitsContainer(SpotElevationContainer):
         """
         :param summitList: list of :class:`Summit`s
         """
+        if len([x for x in summitList if not isinstance(x, Summit)]):
+            raise TypeError("summitList passed to SummitsContainer"
+                            " can only contain Summit objects.")
         super(SummitsContainer, self).__init__(summitList)
 
     @property
@@ -34,6 +38,9 @@ class SummitsContainer(SpotElevationContainer):
         Add a summit to the container.
         :param summit: :class:`Summit`
         """
+        if not isinstance(summit, Summit):
+            raise TypeError("SummitsContainer can only contain"
+                            " Summit objects.")
         self.points.append(summit)
 
     def __repr__(self):
