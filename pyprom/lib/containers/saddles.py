@@ -24,7 +24,13 @@ class SaddlesContainer(SpotElevationContainer):
 
     def rebuildSaddles(self, datamap):
         """
-        :return:
+        Uses the saddles contained in this container and rebuilds any saddle
+        which contains greater than 2 high edges as (n-1) new saddles where n
+        is the number of high edges. The old saddle is tossed out unless it
+        is an edge effect saddle, in which it is kept and disqualified.
+        Saddles with 2 high edges are added back in. This in effect deals
+        with waterbodies.
+        :return: :class:`SaddlesContainer` (new)
         """
         new_saddles = list()
         for saddle in self.points:

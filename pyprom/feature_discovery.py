@@ -39,8 +39,8 @@ class AnalyzeData(object):
         self.explored = defaultdict(dict)
 
     def run(self):
-        self.logger.info("Rebuilding Saddles")
         _, _ = self.analyze()
+        self.logger.info("Rebuilding Saddles")
         self.saddleObjects = self.saddleObjects.rebuildSaddles(self.datamap)
         return self.summitObjects, self.saddleObjects
 
@@ -52,7 +52,7 @@ class AnalyzeData(object):
         """
         self.start = default_timer()
         self.lasttime = self.start
-        self.logger.info("Initiating Analysis")
+        self.logger.info("Initiating Saddle and Summit Identification")
         self.summitObjects = SummitsContainer([])
         self.saddleObjects = SaddlesContainer([])
         iterator = numpy.nditer(self.data, flags=['multi_index'])

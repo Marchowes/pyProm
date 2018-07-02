@@ -90,7 +90,7 @@ class SpotElevationContainer(_Base):
                                 (point.latitude, point.longitude)).meters
             if distance < convertedDist:
                 positive.append(point)
-        return SpotElevationContainer(positive)
+        return self.__class__(positive)
 
     def rectangle(self, lat1, long1, lat2, long2):
         """
@@ -107,12 +107,13 @@ class SpotElevationContainer(_Base):
         upperlong = max(long1, long2)
         lowerlat = min(lat1, lat2)
         lowerlong = min(long1, long2)
-        return SpotElevationContainer(
+        return __class__(
             [x for x in self.points if lowerlat < x.latitude < upperlat and
                 lowerlong < x.longitude < upperlong])
 
     def byType(self, string):
         """
+        Filters spot elevation object types by name.
         :param string: Object type (as String). ex: Saddle, Summit
         :return: SpotElevationContainer of objects by type.
         """
@@ -126,7 +127,7 @@ class SpotElevationContainer(_Base):
         :param upper: upper limit in feet
         :return: list of all points in range between lower and upper
         """
-        return SpotElevationContainer([x for x in self.points if
+        return __class__([x for x in self.points if
                                        x.feet > lower and x.feet < upper])
 
     def elevationRangeMetric(self, lower=-100000, upper=100000):
@@ -135,7 +136,7 @@ class SpotElevationContainer(_Base):
         :param upper: upper limit in Meters
         :return: list of all points in range between lower and upper
         """
-        return SpotElevationContainer([x for x in self.points if
+        return __class__([x for x in self.points if
                                        x.elevation > lower and
                                        x.elevation < upper])
 

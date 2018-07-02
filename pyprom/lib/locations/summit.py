@@ -25,7 +25,10 @@ class Summit(SpotElevation):
         super(Summit, self).__init__(latitude, longitude,
                                      elevation, *args, **kwargs)
         self.multiPoint = kwargs.get('multiPoint', None)
+        # saddles contains a list of linker objects linking this summit to a
+        # saddle. These are populated by :class:`Walk`
         self.saddles = list()
+
         self.localHighest = None
         self.parent = None
 

@@ -11,16 +11,16 @@ type location objects.
 
 class Linker(object):
     """
-    Container for :class:`Linker` type lists.
-    Allows for various list transformations.
-    :param summit:
-    :param saddle:
-    :param path
+    A Linker links 1 :class:`Summit` with 1 :class:`Saddle`
+    :param summit: :class:`Summit`
+    :param saddle: :class:`Saddle`
+    :param path: data containing the path taken to link this Summit and Saddle
     """
     def __init__(self, summit, saddle, path):
         self.summit = summit
         self.saddle = saddle
         self.path = path
+        # disqualified means this Linker has been disqualified from further analysis, but not deleted.
         self.disqualified = False
 
     @property

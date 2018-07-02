@@ -8,10 +8,17 @@ This file contains a class for walking from Saddles to Summits.
 """
 import logging
 from collections import defaultdict
+from timeit import default_timer
+from datetime import timedelta
 from .lib.locations.gridpoint import GridPoint
 from .lib.locations.summit import Summit
 from .lib.containers.linker import Linker
+from .lib.containers.summits import SummitsContainer
+from .lib.containers.saddles import SaddlesContainer
+from .lib.datamap import DataMap
 from .lib.logic.equalheight import equalHeightBlob
+from .domain import Domain
+from .lib.errors.errors import NoLinkersError
 
 class Walk(object):
     def __init__(self, summits, saddles, datamap):
@@ -22,6 +29,12 @@ class Walk(object):
         """
         self.logger = logging.getLogger('{}'.format(__name__))
         self.logger.info("Initiating Walk Object")
+        if not isinstance(summits, SummitsContainer):
+            raise TypeError("summits param must be type SummitsContainer")
+        if not isinstance(saddles, SaddlesContainer):
+            raise TypeError("saddles param must be type SaddlesContainer")
+        if not isinstance(datamap, DataMap):
+            raise TypeError("datamap param must be type DataMap")
         self.summits = summits
         self.saddles = saddles
         self.datamap = datamap
@@ -52,9 +65,38 @@ class Walk(object):
         Helper for iterating through self.saddles.
         """
         self.logger.info("Initiating Walk")
-        for saddle in self.saddles.points:
+        start = default_timer()
+        lasttime = start
+        for idx, saddle in enumerate(self.saddles.points):
+            if not idx % 2000:
+                thisTime = default_timer()
+                split = round(thisTime - lasttime, 2)
+                self.lasttime = default_timer()
+                rt = self.lasttime - start
+                pointsPerSec = round(idx/rt, 2)
+                self.logger.info(
+                    "Saddles per second: {} - {}%"
+                    " runtime: {}, split: {}".format(
+                        pointsPerSec,
+                        round(idx/len(self.saddles.points)*100, 2),
+                        (str(timedelta(seconds=round(rt, 2)))),
+                        split
+                    ))
             if not saddle.disqualified:
                 self.walk(saddle)
+
+    def domain(self):
+        """
+        Generates :class:`Domain` from this walk.
+        :return: :class:`Domain`
+        """
+        if not len(self.linkers):
+            raise NoLinkersError
+        d = Domain(self.datamap)
+        d.saddles = self.saddles
+        d.summits = self.summits
+        d.linkers = self.linkers
+        return d
 
     def walk(self, saddle):
         # check our high shores
@@ -197,6 +239,15 @@ class Walk(object):
                 for linker in saddle.summits:
                     linker.disqualified = True
         self.logger.info("Saddles with disqualified Linkers: {}".format(count))
+
+    def __repr__(self):
+        return "<Walk> Saddles {} Summits {} Linkers {}".format(
+                    len(self.saddles.points),
+                    len(self.summits.points),
+                    len(self.linkers))
+
+    __unicode__ = __str__ = __repr__
+
 
 
 class BetaWalk(object):
@@ -350,3 +401,4 @@ class BetaWalk(object):
                 for linker in saddle.summits:
                     linker.disqualified = True
         self.logger.info("Saddles with disqualified Linkers: {}".format(count))
+
