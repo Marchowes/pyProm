@@ -44,6 +44,8 @@ class SpotElevationContainer(_Base):
                 low = spot_elevation.elevation
                 lowest = list()
                 lowest.append(spot_elevation)
+            elif spot_elevation.elevation == low:
+                lowest.append(spot_elevation)
         return lowest
 
     @property
@@ -57,6 +59,8 @@ class SpotElevationContainer(_Base):
             if spot_elevation.elevation > high:
                 high = spot_elevation.elevation
                 highest = list()
+                highest.append(spot_elevation)
+            elif spot_elevation.elevation == high:
                 highest.append(spot_elevation)
         return highest
 
@@ -107,19 +111,9 @@ class SpotElevationContainer(_Base):
         upperlong = max(long1, long2)
         lowerlat = min(lat1, lat2)
         lowerlong = min(long1, long2)
-        return __class__(
+        return self.__class__(
             [x for x in self.points if lowerlat < x.latitude < upperlat and
                 lowerlong < x.longitude < upperlong])
-
-    def byType(self, string):
-        """
-        Filters spot elevation object types by name.
-        :param string: Object type (as String). ex: Saddle, Summit
-        :return: SpotElevationContainer of objects by type.
-        """
-        name = string.upper()
-        return SpotElevationContainer([x for x in self.points
-                                       if type(x).__name__.upper() == name])
 
     def elevationRange(self, lower=-100000, upper=100000):
         """
@@ -127,7 +121,7 @@ class SpotElevationContainer(_Base):
         :param upper: upper limit in feet
         :return: list of all points in range between lower and upper
         """
-        return __class__([x for x in self.points if
+        return self.__class__([x for x in self.points if
                                        x.feet > lower and x.feet < upper])
 
     def elevationRangeMetric(self, lower=-100000, upper=100000):
@@ -136,7 +130,7 @@ class SpotElevationContainer(_Base):
         :param upper: upper limit in Meters
         :return: list of all points in range between lower and upper
         """
-        return __class__([x for x in self.points if
+        return self.__class__([x for x in self.points if
                                        x.elevation > lower and
                                        x.elevation < upper])
 

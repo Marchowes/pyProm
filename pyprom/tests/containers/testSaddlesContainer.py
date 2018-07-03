@@ -11,7 +11,7 @@ from pyprom.lib.locations.saddle import Saddle
 from pyprom.lib.locations.summit import Summit
 
 
-class SummitsContainerTests(unittest.TestCase):
+class SaddlesContainerTests(unittest.TestCase):
     def setUp(self):
         """Set Up Tests."""
         pass
@@ -21,6 +21,11 @@ class SummitsContainerTests(unittest.TestCase):
         summits = [Summit(1,2,3)]
         with self.assertRaises(TypeError):
             SaddlesContainer(summits)
+
+    def testEmptyInitiation(self):
+        """Ensure creating a SaddlesContainer with an empty list is OK"""
+        container = SaddlesContainer([])
+        self.assertEqual(len(container.saddles), 0)
 
     def testGoodInitiation(self):
         """

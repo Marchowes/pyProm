@@ -22,6 +22,11 @@ class SummitsContainerTests(unittest.TestCase):
         with self.assertRaises(TypeError):
             SummitsContainer(saddles)
 
+    def testEmptyInitiation(self):
+        """Ensure creating a SaddlesContainer with an empty list is OK"""
+        container = SummitsContainer([])
+        self.assertEqual(len(container.summits), 0)
+
     def testGoodInitiation(self):
         """
         Ensure creating a SummitsContainer with a list of Summits succeeds

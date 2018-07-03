@@ -40,6 +40,7 @@ class Summit(SpotElevation):
         to_dict = {'latitude': self.latitude,
                    'longitude': self.longitude,
                    'elevation': self.elevation,
+                   'type': 'Summit',
                    'edge': self.edgeEffect}
         if self.multiPoint and recurse:
             to_dict['multipoint'] = self.multiPoint.to_dict()

@@ -11,7 +11,6 @@ from pyprom.tests.getData import getTestZip
 from pyprom.dataload import GDALLoader
 from pyprom.feature_discovery import AnalyzeData
 from pyprom.walk import Walk
-from pyprom.lib.containers.saddles import SaddlesContainer
 from pyprom.lib.errors.errors import NoLinkersError
 
 

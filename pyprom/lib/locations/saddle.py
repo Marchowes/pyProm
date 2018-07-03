@@ -66,6 +66,7 @@ class Saddle(SpotElevation):
         to_dict = {'latitude': self.latitude,
                    'longitude': self.longitude,
                    'elevation': self.elevation,
+                   'type': 'Saddle',
                    'edge': self.edgeEffect}
         if self.multiPoint and recurse:
             to_dict['multipoint'] = self.multiPoint.to_dict()
