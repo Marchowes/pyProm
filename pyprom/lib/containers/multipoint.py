@@ -17,21 +17,20 @@ class MultiPoint(object):
     provides a number of functions for analysis of these blob like
     locations. An Example of this would be a pond. This object in
     contains a list of all the points of this pond.
-    :param points: list of BaseGridPoint objects
+    :param points: list of BaseGridPoint objects. These are the inside
+        points that make up a Multipoint.
     :param elevation: elevation in meters
     :param datamap: :class:`Datamap` object.
-    :param edgePoints: :class:`EdgePointContainer` object
-    :param inverseEdgePoints: :class:`InverseEdgePointContainer` object
+    :param inverseEdgePoints: :class:`InverseEdgePointContainer` object.
+        These are the points that make up the border of the multipoint
+        outside of the multipoint.
     """
-    def __init__(self, points, elevation, datamap,
-                 edgePoints=None, inverseEdgePoints=None):
+    def __init__(self, points, elevation, datamap, inverseEdgePoints=None):
         super(MultiPoint, self).__init__()
-        self.points = points  # BaseGridPoint Object.
+        self.points = points  # BaseGridPoint Objects.
         self.elevation = elevation
         self.datamap = datamap  # data analysis object.
-        self.edgePoints = edgePoints
         self.inverseEdgePoints = inverseEdgePoints
-        self.mapEdge = []
 
     def to_dict(self, verbose=True):
         """

@@ -9,12 +9,10 @@ import unittest
 from pyprom.tests.getData import getTestZip
 from pyprom.dataload import GDALLoader
 from pyprom.feature_discovery import AnalyzeData
-from pyprom.lib.containers.spot_elevation import SpotElevationContainer
 from pyprom.lib.containers.summits import SummitsContainer
-from pyprom.lib.locations.saddle import Saddle
 from pyprom.lib.locations.summit import Summit
 
-class SummitsContainerTests(unittest.TestCase):
+class SpotElevationContainerTests(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):

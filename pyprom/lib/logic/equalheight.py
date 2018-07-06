@@ -43,6 +43,9 @@ def equalHeightBlob(datamap, x, y, elevation):
                 branch = GridPoint(_x, _y, elevation)
                 exploredEqualHeight[_x][_y] = True
                 toBeAnalyzed.append(branch)
+            # If elevation >  master grid point, stash away as
+            # an inverse edge point. Only keep track of edgepoints
+            # higher!
             elif elevation > masterGridPoint.elevation:
                 if not inverseEdgeHash[_x].get(_y, False):
                     inverseEdgeHash[_x][_y] = \

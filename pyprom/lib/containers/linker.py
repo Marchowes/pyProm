@@ -52,7 +52,7 @@ class Linker(object):
         return [x.summit for x in self.saddle.summits]
 
     def __repr__(self):
-        return "<Linker> {} -> {} {}pft {}pm".format(
+        return "<Linker> {} -> {} {}promFt {}promM".format(
                 self.saddle,
                 self.summit,
                 self.prom_ft,
@@ -67,3 +67,5 @@ class Linker(object):
     def __eq__(self, other):
         return [self.summit, self.saddle] ==\
                [other.summit, other.saddle]
+
+    __unicode__ = __str__ = __repr__
