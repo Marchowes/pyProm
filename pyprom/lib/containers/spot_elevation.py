@@ -192,6 +192,6 @@ class SpotElevationContainer(_Base):
         return len(self.points)
 
     def __repr__(self):
-        return "<SpotElevationContainer> {} Objects".format(len(self.points))
+        return "<SpotElevationContainer> {} Objects".format(self.__len__())
 
     __unicode__ = __str__ = __repr__

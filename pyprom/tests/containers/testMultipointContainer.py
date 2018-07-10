@@ -91,3 +91,10 @@ class MultipointTests(unittest.TestCase):
 ]"""
         multipoint = self.saddle.multiPoint
         self.assertEqual(result, multipoint.to_json())
+
+    def testMultipointRepr(self):
+        """
+        Test multipoint container inverseEdgePoints count is as expected.
+        """
+        multipoint = self.saddle.multiPoint
+        self.assertEqual(multipoint.__repr__(), "<Multipoint> elevation(m): 552.0, points 4")

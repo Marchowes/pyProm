@@ -10,6 +10,7 @@ from pyprom.tests.getData import getTestZip
 from pyprom.dataload import GDALLoader
 from pyprom.feature_discovery import AnalyzeData
 from pyprom.lib.containers.summits import SummitsContainer
+from pyprom.lib.containers.spot_elevation import SpotElevationContainer
 from pyprom.lib.locations.summit import Summit
 
 class SpotElevationContainerTests(unittest.TestCase):
@@ -26,7 +27,7 @@ class SpotElevationContainerTests(unittest.TestCase):
         cls.oneKMradius =  cls.summits.radius(44.954583, -71.957916, 1000)
 
 
-    def testLowest(self):
+    def testSpotElevationContainerLowest(self):
         """ Make sure the lowest summit is what we expect."""
         self.assertEqual(self.summits.lowest[0].elevation, 501.0)
         self.assertEqual(len(self.summits.lowest), 1)
@@ -36,7 +37,7 @@ class SpotElevationContainerTests(unittest.TestCase):
         self.assertEqual(len(self.summits.lowest), 2)
 
 
-    def testHighest(self):
+    def testSpotElevationContainerHighest(self):
         """ Make sure the highest summit is what we expect."""
         self.assertEqual(self.summits.highest[0].elevation, 585.0)
         self.assertEqual(len(self.summits.highest),1)
@@ -45,7 +46,7 @@ class SpotElevationContainerTests(unittest.TestCase):
         self.summits.add(Summit(1, 1, self.summits.highest[0].elevation))
         self.assertEqual(len(self.summits.highest), 2)
 
-    def testRadiusMeters(self):
+    def testSpotElevationContainerRadiusMeters(self):
         """ Make sure radius calculation results are the same for meters. """
         meters = self.summits.radius(44.954583, -71.957916, 1000)
         self.assertEqual(meters.summits, self.oneKMradius.summits)
@@ -62,7 +63,7 @@ class SpotElevationContainerTests(unittest.TestCase):
         meters = self.summits.radius(44.954583, -71.957916, 1000, "Meters")
         self.assertEqual(meters.summits, self.oneKMradius.summits)
 
-    def testRadiusKilometers(self):
+    def testSpotElevationContainerRadiusKilometers(self):
         """
         Make sure radius calculation results are the same for kilometers.
         """
@@ -81,7 +82,7 @@ class SpotElevationContainerTests(unittest.TestCase):
         meters = self.summits.radius(44.954583, -71.957916, 1, "KiloMeters")
         self.assertEqual(meters.summits, self.oneKMradius.summits)
 
-    def testRadiusFeet(self):
+    def testSpotElevationContainerRadiusFeet(self):
         """
         Make sure radius calculation results are the same for feet.
         """
@@ -100,7 +101,7 @@ class SpotElevationContainerTests(unittest.TestCase):
         meters = self.summits.radius(44.954583, -71.957916, 3280.84, "FT")
         self.assertEqual(meters.summits, self.oneKMradius.summits)
 
-    def testRadiusMiles(self):
+    def testSpotElevationContainerRadiusMiles(self):
         """
         Make sure radius calculation results are the same for feet.
         """
@@ -119,7 +120,7 @@ class SpotElevationContainerTests(unittest.TestCase):
         meters = self.summits.radius(44.954583, -71.957916, 0.621371, "MI")
         self.assertEqual(meters.summits, self.oneKMradius.summits)
 
-    def testRectangle(self):
+    def testSpotElevationContainerRectangle(self):
         """
         Ensure taking out a rectangle subsection yields expected results.
         """
@@ -129,7 +130,7 @@ class SpotElevationContainerTests(unittest.TestCase):
         rectangle = self.summits.rectangle(44.98125, -71.9609, 44.954583,-71.957916, )
         self.assertEqual(len(rectangle.points), 6)
 
-    def testElevationRange(self):
+    def testSpotElevationContainerElevationRange(self):
         """
         Ensure elevation range yields expected results.
         """
@@ -139,7 +140,7 @@ class SpotElevationContainerTests(unittest.TestCase):
         self.assertEqual(len(elevationRange.summits), 44)
 
 
-    def testElevationRangeMetric(self):
+    def testSpotElevationContainerElevationRangeMetric(self):
         """
         Ensure metric elevation range yields expected results.
         """
@@ -148,7 +149,7 @@ class SpotElevationContainerTests(unittest.TestCase):
         elevationRange = self.summits.elevationRangeMetric(500, 580)
         self.assertEqual(len(elevationRange.summits), 53)
 
-    def testJSON(self):
+    def testSpotElevationContainerJSON(self):
         """
         Ensure basic json encoding works.
         """
@@ -157,3 +158,16 @@ class SpotElevationContainerTests(unittest.TestCase):
         summits = SummitsContainer([])
         summits.from_json(jsonString, self.someslice)
         self.assertEqual(self.summits.summits, summits.summits)
+
+    def testSpotElevationContainerLen(self):
+        """
+        Ensure __len__ produces expected results.
+        """
+        self.assertEqual(len(self.summits), 55)
+
+    def testSpotElevationContainerRepr(self):
+        """
+        Ensure __repr__ produces expected results.
+        """
+        container = SpotElevationContainer([])
+        self.assertEqual(container.__repr__(), "<SpotElevationContainer> 0 Objects")

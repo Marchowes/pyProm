@@ -22,12 +22,12 @@ class SaddlesContainerTests(unittest.TestCase):
         with self.assertRaises(TypeError):
             SaddlesContainer(summits)
 
-    def testEmptyInitiation(self):
+    def testSaddlesContainerEmptyInitiation(self):
         """Ensure creating a SaddlesContainer with an empty list is OK"""
         container = SaddlesContainer([])
         self.assertEqual(len(container.saddles), 0)
 
-    def testGoodInitiation(self):
+    def testSaddlesContainerGoodInitiation(self):
         """
         Ensure creating a SaddlesContainer with a list of Summits succeeds
         """
@@ -36,7 +36,7 @@ class SaddlesContainerTests(unittest.TestCase):
         self.assertEqual(len(container.points), 1)
         self.assertEqual(len(container.saddles), 1)
 
-    def testBadAdd(self):
+    def testSaddlesContainerBadAdd(self):
         """
         Ensure adding Summit to SaddlesContainer fails.
         """
@@ -45,12 +45,20 @@ class SaddlesContainerTests(unittest.TestCase):
         with self.assertRaises(TypeError):
             container.add(Summit(1,2,3))
 
-    def testRebuildSaddles(self):
+    def testSaddlesContainerRepr(self):
+        """ Ensure __repr__ yields expected result"""
+        saddles = [Saddle(1, 2, 3)]
+        container = SaddlesContainer(saddles)
+        self.assertEqual(container.__repr__(),
+                         "<SaddlesContainer> 1 Objects")
+
+    def testSaddlesContainerRebuildSaddles(self):
         """
         see testInternalSaddleNetwork.py::
         InternalSaddleNetworkTests::
         testInternalSaddleNetworkAziscohosViaContainer
         """
         pass
+
 
 

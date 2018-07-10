@@ -27,27 +27,27 @@ class LinkerTests(unittest.TestCase):
         self.saddle1.summits = [self.linker1]
         self.saddle2.summits = [self.linker2, self.linker3]
 
-    def testProminence(self):
+    def testLinkerProminence(self):
         """ Ensure prominence calculation are as expected """
         self.assertEqual(self.linker1.prom, 900)
 
-    def testProminenceFeet(self):
+    def testLinkerProminenceFeet(self):
         """ Ensure foot prominence calculation are as expected """
         self.assertEqual(self.linker1.prom_ft, 2952.7200000000003)
 
-    def testSummitSaddles(self):
+    def testLinkerSummitSaddles(self):
         """ Ensure summit saddles calculation are as expected """
         self.assertEqual(len(self.linker1.summit_saddles), 2)
         self.assertIn(self.saddle1, self.linker1.summit_saddles)
         self.assertIn(self.saddle2, self.linker1.summit_saddles)
 
-    def testSaddlesSummit(self):
+    def testLinkerSaddlesSummit(self):
         """ Ensure saddle summits calculation are as expected """
         self.assertEqual(len(self.linker2.saddle_summits), 2)
         self.assertIn(self.summit1, self.linker2.saddle_summits)
         self.assertIn(self.summit2, self.linker2.saddle_summits)
 
-    def testRepr(self):
+    def testLinkerRepr(self):
         """ Ensure __repr__ is as expected """
         expected = "<Linker> <Saddle> lat 5 long 5 328.08000000000004ft" \
                    " 100m MultiPoint False -> <Summit> lat 1 long 1" \
@@ -56,12 +56,12 @@ class LinkerTests(unittest.TestCase):
                    " 900promM"
         self.assertEqual(self.linker1.__repr__(), expected)
 
-    def testHash(self):
+    def testLinkerHash(self):
         """ Ensure __hash__ feature works as expected """
         self.assertEqual(len(set([self.linker1, self.linker1])), 1)
         self.assertEqual(len(set([self.linker1, self.linker2])), 2)
 
-    def testEq(self):
+    def testLinkerEq(self):
         """ Ensure __eq__ feature works as expected """
         self.assertEqual(self.linker1, self.linker1)
         testLinker = Linker(self.summit1, self.saddle1, None)

@@ -72,8 +72,11 @@ class InverseEdgePointContainer(object):
 
     def findHighEdges(self, elevation):
         """
-        Hopefully a way more efficient way of finding high edges.
-        :return:
+        This function returns a list of GridpointContainers. Each container
+        holds a list of inverseEdgePoints which are discontigous so far as
+        the other container is concerned. This is used to identify discontigous
+        sets of inverse EdgePoints for determining if this is a Saddle or not.
+        :return: list of GridPointContainers containing HighEdges.
         """
         explored = defaultdict(dict)
         highLists = list()

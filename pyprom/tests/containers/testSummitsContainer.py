@@ -45,4 +45,9 @@ class SummitsContainerTests(unittest.TestCase):
         with self.assertRaises(TypeError):
             container.add(Saddle(1,2,3))
 
-
+    def testSummitsContainerRepr(self):
+        """ Ensure __repr__ yields expected result"""
+        summits = [Summit(1, 2, 3)]
+        container = SummitsContainer(summits)
+        self.assertEqual(container.__repr__(),
+                         "<SummitsContainer> 1 Objects")
