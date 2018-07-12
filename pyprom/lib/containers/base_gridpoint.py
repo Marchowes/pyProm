@@ -8,6 +8,7 @@ This library contains a base container class for storing GridPoint
 type location objects.
 """
 
+from pyprom.lib.locations.gridpoint import GridPoint
 
 class BaseGridPointContainer(object):
     """
@@ -19,6 +20,22 @@ class BaseGridPointContainer(object):
         """
         super(BaseGridPointContainer, self).__init__()
         self.points = gridPointList
+
+    def append(self, gridPoint):
+        """
+        Append a gridpoint to the container.
+        :param gridPoint: :class:`GridPoint`
+        """
+        if not isinstance(gridPoint, GridPoint):
+            raise TypeError("GridPointContainer can only contain"
+                            " GridPoint objects.")
+        self.points.append(gridPoint)
+
+    def __setitem__(self, idx, value):
+         self.points[idx] = value
+
+    def __getitem__(self, idx):
+        return self.points[idx]
 
     def __hash__(self):
         return hash(tuple(sorted([x.x for x in self.points])))

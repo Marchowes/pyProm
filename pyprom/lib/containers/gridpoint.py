@@ -165,6 +165,18 @@ class GridPointContainer(BaseGridPointContainer):
                     closest_distance = distance
         return myClosest, theirClosest, closest_distance
 
+    def append(self, gridPoint):
+        """
+        Append a gridpoint to the container.
+        :param gridPoint: :class:`GridPoint`
+        """
+        if not isinstance(gridPoint, GridPoint):
+            raise TypeError("GridPointContainer can only contain"
+                            " GridPoint objects.")
+        self.points.append(gridPoint)
+        self.genFastLookup()
+
+
     def __repr__(self):
         return "<GridPointContainer> {} Objects".format(len(self.points))
 

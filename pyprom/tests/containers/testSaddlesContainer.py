@@ -36,14 +36,49 @@ class SaddlesContainerTests(unittest.TestCase):
         self.assertEqual(len(container.points), 1)
         self.assertEqual(len(container.saddles), 1)
 
-    def testSaddlesContainerBadAdd(self):
+    def testSaddlesContainerBadAppend(self):
         """
-        Ensure adding Summit to SaddlesContainer fails.
+        Ensure appending Summit to SaddlesContainer fails.
         """
         saddles = [Saddle(1, 2, 3)]
         container = SaddlesContainer(saddles)
         with self.assertRaises(TypeError):
-            container.add(Summit(1,2,3))
+            container.append(Summit(1,2,3))
+
+    def testSaddlesContainerGoodAppend(self):
+        """
+        Ensure adding Saddle to SaddlesContainer succeeds.
+        """
+        container = SaddlesContainer([])
+        container.append(Saddle(1,2,3))
+
+    def testSaddlesContainerGetItem(self):
+        """
+        Ensure getting item index succeeds.
+        """
+        saddles = [Saddle(1,2,3)]
+        container = SaddlesContainer(saddles)
+        self.assertEqual(container[0], saddles[0])
+
+    def testSaddlesContainerSetItem(self):
+        """
+        Ensure setting item index succeeds.
+        """
+        saddles = [Saddle(1, 2, 3), Saddle(1, 2, 3)]
+        saddle567 = Saddle(5, 6, 7)
+        container = SaddlesContainer(saddles)
+        container[1] = saddle567
+        self.assertEqual(container[1], saddle567)
+
+    def testSaddlesContainerSetItemNegative(self):
+        """
+        Ensure setting item index fails when non Saddle is passed in.
+        """
+        saddles = [Saddle(1, 2, 3), Saddle(1, 2, 3)]
+        summit567 = Summit(5, 6, 7)
+        container = SaddlesContainer(saddles)
+        with self.assertRaises(TypeError):
+            container[1] = summit567
 
     def testSaddlesContainerRepr(self):
         """ Ensure __repr__ yields expected result"""

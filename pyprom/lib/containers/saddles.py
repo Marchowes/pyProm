@@ -58,19 +58,27 @@ class SaddlesContainer(SpotElevationContainer):
         """
         return self.points
 
-    def add(self, saddle):
+    def append(self, saddle):
         """
-        Add a saddle to the container.
+        Append a saddle to the container.
         :param saddle: :class:`Saddle`
         """
-        if not isinstance(saddle, Saddle):
-            raise TypeError("SaddlesContainer can only contain"
-                            " Saddle objects.")
+        _isSaddle(saddle)
         self.points.append(saddle)
 
     def __repr__(self):
         return "<SaddlesContainer> {} Objects".format(len(self.points))
 
+    def __setitem__(self, idx, saddle):
+        _isSaddle(saddle)
+        self.points[idx] = saddle
+
     __unicode__ = __str__ = __repr__
+
+
+def _isSaddle(saddle):
+    if not isinstance(saddle, Saddle):
+        raise TypeError("SaddlesContainer can only contain"
+                        " Saddle objects.")
 
 

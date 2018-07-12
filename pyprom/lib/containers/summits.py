@@ -33,17 +33,27 @@ class SummitsContainer(SpotElevationContainer):
         """
         return self.points
 
-    def add(self, summit):
+
+
+    def append(self, summit):
         """
         Add a summit to the container.
         :param summit: :class:`Summit`
         """
-        if not isinstance(summit, Summit):
-            raise TypeError("SummitsContainer can only contain"
-                            " Summit objects.")
+        _isSummit(summit)
         self.points.append(summit)
+
+    def __setitem__(self, idx, summit):
+        _isSummit(summit)
+        self.points[idx] = summit
 
     def __repr__(self):
         return "<SummitsContainer> {} Objects".format(len(self.points))
 
     __unicode__ = __str__ = __repr__
+
+
+def _isSummit(summit):
+    if not isinstance(summit, Summit):
+        raise TypeError("SummitsContainer can only contain"
+                        " Summit objects.")

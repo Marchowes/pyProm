@@ -12,6 +12,7 @@ from pyprom.feature_discovery import AnalyzeData
 from pyprom.lib.containers.summits import SummitsContainer
 from pyprom.lib.containers.spot_elevation import SpotElevationContainer
 from pyprom.lib.locations.summit import Summit
+from pyprom.lib.locations.saddle import Saddle
 
 class SpotElevationContainerTests(unittest.TestCase):
 
@@ -33,7 +34,7 @@ class SpotElevationContainerTests(unittest.TestCase):
         self.assertEqual(len(self.summits.lowest), 1)
 
         # add another Summit with the same elevation as the lowest.
-        self.summits.add(Summit(1, 1, self.summits.lowest[0].elevation))
+        self.summits.append(Summit(1, 1, self.summits.lowest[0].elevation))
         self.assertEqual(len(self.summits.lowest), 2)
 
 
@@ -43,7 +44,7 @@ class SpotElevationContainerTests(unittest.TestCase):
         self.assertEqual(len(self.summits.highest),1)
 
         # add another Summit with the same elevation as the highest.
-        self.summits.add(Summit(1, 1, self.summits.highest[0].elevation))
+        self.summits.append(Summit(1, 1, self.summits.highest[0].elevation))
         self.assertEqual(len(self.summits.highest), 2)
 
     def testSpotElevationContainerRadiusMeters(self):
@@ -164,6 +165,49 @@ class SpotElevationContainerTests(unittest.TestCase):
         Ensure __len__ produces expected results.
         """
         self.assertEqual(len(self.summits), 55)
+
+    def testSpotElevationContainerAppend(self):
+        """
+        Ensure appending Different child SpotElevations
+        to SpotElevationContainer succeeds.
+        """
+
+        container = SpotElevationContainer([])
+        container.append(Summit(1, 2, 3))
+        container.append(Saddle(1, 2, 3))
+
+    def testSpotElevationContainerSetItem(self):
+        """
+        Ensure setting item index succeeds.
+        """
+        sum = Summit(1, 2, 3)
+        sad = Saddle(1, 2, 3)
+        sum2 = Summit(2, 3, 4)
+        container = SpotElevationContainer([sum, sad])
+        container[1] = sum2
+        self.assertEqual(container[1], sum2)
+
+
+    def testSpotElevationContainerSetItemNegative(self):
+        """
+        Ensure setting item index succeeds.
+        """
+        sum = Summit(1, 2, 3)
+        sad = Saddle(1, 2, 3)
+        container = SpotElevationContainer([sum, sad])
+        with self.assertRaises(TypeError):
+            container[1] = "wtf"
+
+    def testSpotElevationContainerGetItem(self):
+        """
+        Ensure setting item index succeeds.
+        """
+        sum = Summit(1, 2, 3)
+        sad = Saddle(1, 2, 3)
+
+        container = SpotElevationContainer([sum, sad])
+        self.assertEqual(container[0], sum)
+        self.assertEqual(container[1], sad)
 
     def testSpotElevationContainerRepr(self):
         """

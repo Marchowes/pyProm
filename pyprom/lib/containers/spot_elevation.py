@@ -188,10 +188,30 @@ class SpotElevationContainer(_Base):
             feature.edgeEffect = point['edge']
             self.points.append(feature)
 
+    def append(self, spotElevation):
+        """
+        Add a SpotElevation to the container.
+        :param SpotElevation: :class:`SpotElevation`
+        """
+        _isSpotElevation(spotElevation)
+        self.points.append(spotElevation)
+
     def __len__(self):
         return len(self.points)
 
     def __repr__(self):
         return "<SpotElevationContainer> {} Objects".format(self.__len__())
 
+    def __setitem__(self, idx, spotElevation):
+        _isSpotElevation(spotElevation)
+        self.points[idx] = spotElevation
+
+    def __getitem__(self, idx):
+        return self.points[idx]
+
     __unicode__ = __str__ = __repr__
+
+def _isSpotElevation(spotElevation):
+    if not isinstance(spotElevation, SpotElevation):
+        raise TypeError("SpotElevation can only contain"
+                        " SpotElevation objects.")

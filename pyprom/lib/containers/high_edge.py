@@ -13,7 +13,11 @@ class HighEdgeContainer(object):
     """
     Container for High Edge Lists -- Specifically for the purpose of storing
      high edge sections around Saddles.
-    :param shore: ordered list of :class:`GridPoint` type objects
+
+    The object takes a gridPoint container which represents all Perimeter
+    points around a point. And breaks it down into distinct highEdge regions.
+
+    :param shore: :class:`GridPointCointer`
     :param blobElevation: elevation (m) of blob.
     """
     def __init__(self, shore, blobElevation):

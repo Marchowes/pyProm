@@ -165,13 +165,15 @@ class AnalyzeData(object):
         neighborProfile = ""
         for _x, _y, elevation in neighbor:
 
-            # If we have equal neighbors, we need to kick off analysis to
-            # a special MultiPoint analysis function.
+            # Nothing there? move along.
             if not elevation:
                 continue
+            # If we have equal neighbors, we need to kick off analysis to
+            # a special MultiPoint analysis function and return the result.
             if elevation == self.elevation and\
                     not self.explored[_x].get(_y, False):
                 return self.analyze_multipoint(_x, _y, elevation)
+
             if elevation > self.elevation:
                 neighborProfile += "H"
             if elevation < self.elevation:
@@ -179,6 +181,7 @@ class AnalyzeData(object):
             shoreSet.points.append(GridPoint(_x, _y, elevation))
 
         reducedNeighborProfile = compressRepetetiveChars(neighborProfile)
+        # Did the profile match "L" aka a Summit?
         if reducedNeighborProfile == summitProfile:
             lat, long = self.datamap.xy_to_latlong(x, y)
             summit = Summit(lat,
@@ -187,6 +190,7 @@ class AnalyzeData(object):
                             edge=self.edge)
             return summit
 
+        # Did the profile match HLHL or LHLH?
         elif any(x in reducedNeighborProfile for x in saddleProfile):
             shores = HighEdgeContainer(shoreSet, self.elevation)
             lat, long = self.datamap.xy_to_latlong(x, y)
