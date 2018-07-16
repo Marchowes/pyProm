@@ -16,7 +16,7 @@ ARCSEC_DEG = 3600
 ARCMIN_DEG = 60
 
 
-class DataMap(object):
+class DataMap():
     """Base class for Datamap type objects."""
     def __init__(self, numpy_map, unit):
         """__init__."""

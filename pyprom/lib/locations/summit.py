@@ -9,6 +9,7 @@ This library contains a class for storing Summit data.
 
 import json
 from .spot_elevation import SpotElevation
+from ..containers.linker import isLinker
 
 
 class Summit(SpotElevation):
@@ -31,6 +32,13 @@ class Summit(SpotElevation):
 
         self.localHighest = None
         self.parent = None
+
+    def addSaddleLinker(self, linker):
+        """
+        :param linker: :class:`Linker`
+        """
+        isLinker(linker)
+        self.saddles.append(linker)
 
     def to_dict(self, recurse=False):
         """
@@ -61,6 +69,9 @@ class Summit(SpotElevation):
             return json.dumps(to_json)
 
     def __repr__(self):
+        """
+        :return: String representation of this object
+        """
         return "<Summit> lat {} long {} {}ft {}m MultiPoint {}".format(
             self.latitude,
             self.longitude,
@@ -69,3 +80,13 @@ class Summit(SpotElevation):
             bool(self.multiPoint))
 
     __unicode__ = __str__ = __repr__
+
+
+def isSummit(summit):
+    """
+    :param summit: object under scrutiny
+    :raises: TypeError if other not of :class:`Summit`
+    """
+    if not isinstance(summit, Summit):
+        raise TypeError("Expected Summit Object.")
+

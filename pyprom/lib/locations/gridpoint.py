@@ -52,12 +52,33 @@ class GridPoint(BaseGridPoint):
         return SpotElevation(lat, long, self.elevation)
 
     def __eq__(self, other):
+        """
+        :param other: object which we compare against.
+        :return: bool if self is equal to other
+        :raises: TypeError if other not of :class:`GridPoint`
+        """
+        isGridPoint(other)
         return [self.x, self.y, self.elevation] ==\
                [other.x, other.y, other.elevation]
 
     def __ne__(self, other):
+        """
+        :param other: object which we compare against.
+        :return: bool if self is not equal to other
+        :raises: TypeError if other not of :class:`GridPoint`
+        """
+        isGridPoint(other)
         return [self.x, self.y, self.elevation] !=\
                [other.x, other.y, other.elevation]
+
+    def __lt__(self, other):
+        """
+        :param other: object which we compare against.
+        :return: bool of if self is of lower elevation than other.
+        :raises: TypeError if other not of :class:`GridPoint`
+        """
+        isGridPoint(other)
+        return self.elevation < other.elevation
 
     def __repr__(self):
         return "<GridPoint> x: {}, y: {}, elevation(m); {}".\
@@ -66,3 +87,12 @@ class GridPoint(BaseGridPoint):
                       self.elevation)
 
     __unicode__ = __str__ = __repr__
+
+
+def isGridPoint(gridPoint):
+    """
+    :param gridPoint: object under scrutiny
+    :raises: TypeError if other not of :class:`GridPoint`
+    """
+    if not isinstance(gridPoint, GridPoint):
+        raise TypeError("Expected GridPoint Object.")

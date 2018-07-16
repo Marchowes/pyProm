@@ -8,8 +8,8 @@ the LICENSE file that accompanies it.
 import os
 import numpy
 import logging
-
-from osgeo import gdal, osr
+import gdal
+import osr
 
 from .lib.datamap import ProjectionDataMap
 

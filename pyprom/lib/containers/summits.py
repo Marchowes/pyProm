@@ -9,7 +9,7 @@ type location objects.
 """
 
 from .spot_elevation import SpotElevationContainer
-from ..locations.summit import Summit
+from ..locations.summit import Summit, isSummit
 
 class SummitsContainer(SpotElevationContainer):
     """
@@ -33,27 +33,29 @@ class SummitsContainer(SpotElevationContainer):
         """
         return self.points
 
-
-
     def append(self, summit):
         """
         Add a summit to the container.
         :param summit: :class:`Summit`
+        :raises: TypeError if summit not of :class:`Summit`
         """
-        _isSummit(summit)
+        isSummit(summit)
         self.points.append(summit)
 
     def __setitem__(self, idx, summit):
-        _isSummit(summit)
+        """
+        Gives SummitsContainer list like set capabilities
+        :param idx: index value
+        :param summit: :class:`Summit`
+        :raises: TypeError if summit not of :class:`Summit`
+        """
+        isSummit(summit)
         self.points[idx] = summit
 
     def __repr__(self):
+        """
+        :return: String representation of this object
+        """
         return "<SummitsContainer> {} Objects".format(len(self.points))
 
     __unicode__ = __str__ = __repr__
-
-
-def _isSummit(summit):
-    if not isinstance(summit, Summit):
-        raise TypeError("SummitsContainer can only contain"
-                        " Summit objects.")

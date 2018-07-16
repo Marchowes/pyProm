@@ -28,7 +28,8 @@ class MultipointTests(unittest.TestCase):
 
     def testMultipointPointsLatLong(self):
         """
-        Test multipoint container ability to convert GridPoints to BaseCoordinates
+        Test multipoint container ability to convert GridPoints
+        to BaseCoordinates
         """
         multipoint = self.summitWithoutMultipointEdge.multiPoint
         bc0 = BaseCoordinate(44.70986111111111, -71.71263888888889)

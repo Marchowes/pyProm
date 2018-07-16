@@ -35,7 +35,6 @@ class AnalyzeData(object):
         self.edge = False
         self.max_y = self.datamap.max_y
         self.max_x = self.datamap.max_x
-        self.cardinalGrid = dict()
         self.explored = defaultdict(dict)
 
     def run(self):

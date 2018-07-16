@@ -11,7 +11,7 @@ import json
 
 from ..locations.saddle import Saddle
 from ..locations.summit import Summit
-from ..locations.spot_elevation import SpotElevation
+from ..locations.spot_elevation import SpotElevation, isSpotElevation
 from ..locations.base_gridpoint import BaseGridPoint
 from ..locations.gridpoint import GridPoint
 from .multipoint import MultiPoint
@@ -193,25 +193,67 @@ class SpotElevationContainer(_Base):
         Add a SpotElevation to the container.
         :param SpotElevation: :class:`SpotElevation`
         """
-        _isSpotElevation(spotElevation)
+        isSpotElevation(spotElevation)
         self.points.append(spotElevation)
 
     def __len__(self):
+        """
+        :return: integer - number of items in self.points
+        """
         return len(self.points)
 
     def __repr__(self):
+        """
+        :return: String representation of this object
+        """
         return "<SpotElevationContainer> {} Objects".format(self.__len__())
 
     def __setitem__(self, idx, spotElevation):
-        _isSpotElevation(spotElevation)
+        """
+        Gives SpotElevationContainer list like set capabilities
+        :param idx: index value
+        :param spotElevation: :class:`SpotElevation`
+        :raises: TypeError if spotElevation not of :class:`SpotElevation`
+        """
+        isSpotElevation(spotElevation)
         self.points[idx] = spotElevation
 
     def __getitem__(self, idx):
+        """
+    `   Gives SpotElevationContainer list like get capabilities
+        :param idx: index value
+        :return: :class:`SpotElevation` self.point at idx
+        """
         return self.points[idx]
+
+    def __eq__(self, other):
+        """
+        Determines if SpotElevationContainer is equal to another.
+        :param other: :class:`SpotElevationContainer`
+        :return: bool of equality
+        :raises: TypeError if other not of :class:`SpotElevation`
+        """
+        _isSpotElevationContainer(other)
+        return sorted([x for x in self.points]) == \
+               sorted([x for x in other.points])
+
+    def __ne__(self, other):
+        """
+        :param other: :class:`SpotElevationContainer`
+        :return: bool of inequality
+        :raises: TypeError if other not of :class:`SpotElevationContainer`
+        """
+        _isSpotElevationContainer(other)
+        return sorted([x for x in self.points]) != \
+               sorted([x for x in other.points])
 
     __unicode__ = __str__ = __repr__
 
-def _isSpotElevation(spotElevation):
-    if not isinstance(spotElevation, SpotElevation):
-        raise TypeError("SpotElevation can only contain"
-                        " SpotElevation objects.")
+
+def _isSpotElevationContainer(spotElevationContainer):
+    """
+    :param spotElevationContainer: object under scrutiny
+    :raises: TypeError if other not of :class:`SpotElevationContainer`
+    """
+    if not isinstance(spotElevationContainer, SpotElevationContainer):
+        raise TypeError("SpotElevationContainer expected")

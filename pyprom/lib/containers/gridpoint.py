@@ -11,7 +11,7 @@ import math
 import sys
 
 from .base_gridpoint import BaseGridPointContainer
-from pyprom.lib.locations.gridpoint import GridPoint
+from pyprom.lib.locations.gridpoint import GridPoint, isGridPoint
 from collections import defaultdict
 
 
@@ -22,6 +22,10 @@ class GridPointContainer(BaseGridPointContainer):
     """
     def __init__(self, gridPointList):
         super(GridPointContainer, self).__init__(gridPointList)
+        if len([x for x in gridPointList if not isinstance(x, GridPoint)]):
+            raise TypeError("gridPointList passed to GridPointContainer"
+                            " can only contain GridPoint objects.")
+
         self.fastLookup = defaultdict(dict)
         # Generate a fast lookup table.
         self.genFastLookup()
@@ -169,15 +173,16 @@ class GridPointContainer(BaseGridPointContainer):
         """
         Append a gridpoint to the container.
         :param gridPoint: :class:`GridPoint`
+        :raises: TypeError if gridPoint not of :class:`GridPoint`
         """
-        if not isinstance(gridPoint, GridPoint):
-            raise TypeError("GridPointContainer can only contain"
-                            " GridPoint objects.")
+        isGridPoint(gridPoint)
         self.points.append(gridPoint)
         self.genFastLookup()
 
-
     def __repr__(self):
+        """
+        :return: String representation of this object
+        """
         return "<GridPointContainer> {} Objects".format(len(self.points))
 
     __unicode__ = __str__ = __repr__

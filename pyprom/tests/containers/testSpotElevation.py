@@ -140,7 +140,6 @@ class SpotElevationContainerTests(unittest.TestCase):
         elevationRange = self.summits.elevationRange(1640, 1840)
         self.assertEqual(len(elevationRange.summits), 44)
 
-
     def testSpotElevationContainerElevationRangeMetric(self):
         """
         Ensure metric elevation range yields expected results.
@@ -208,6 +207,20 @@ class SpotElevationContainerTests(unittest.TestCase):
         container = SpotElevationContainer([sum, sad])
         self.assertEqual(container[0], sum)
         self.assertEqual(container[1], sad)
+
+    def testSpotElevationContainerEquals(self):
+        """
+        Ensure __eq__ produces expected results.
+        """
+        self.assertEqual(SpotElevationContainer([Summit(1, 2, 3)]),
+                         SpotElevationContainer([Summit(1, 2, 3)]))
+
+    def testSpotElevationContainerNotEquals(self):
+        """
+        Ensure __ne__ produces expected results.
+        """
+        self.assertNotEqual(SpotElevationContainer([Summit(1, 2, 3)]),
+                            SpotElevationContainer([Summit(2, 2, 3)]))
 
     def testSpotElevationContainerRepr(self):
         """

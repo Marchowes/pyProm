@@ -10,7 +10,7 @@ type location objects.
 
 from .spot_elevation import SpotElevationContainer
 from ..logic.internal_saddle_network import InternalSaddleNetwork
-from ..locations.saddle import Saddle
+from ..locations.saddle import Saddle, isSaddle
 
 class SaddlesContainer(SpotElevationContainer):
     """
@@ -63,22 +63,17 @@ class SaddlesContainer(SpotElevationContainer):
         Append a saddle to the container.
         :param saddle: :class:`Saddle`
         """
-        _isSaddle(saddle)
+        isSaddle(saddle)
         self.points.append(saddle)
 
     def __repr__(self):
+        """
+        :return: String representation of this object
+        """
         return "<SaddlesContainer> {} Objects".format(len(self.points))
 
     def __setitem__(self, idx, saddle):
-        _isSaddle(saddle)
+        isSaddle(saddle)
         self.points[idx] = saddle
 
     __unicode__ = __str__ = __repr__
-
-
-def _isSaddle(saddle):
-    if not isinstance(saddle, Saddle):
-        raise TypeError("SaddlesContainer can only contain"
-                        " Saddle objects.")
-
-

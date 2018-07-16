@@ -51,6 +51,16 @@ class Linker(object):
         """
         return [x.summit for x in self.saddle.summits]
 
+    def add_to_remote_saddle_and_summit(self):
+        """
+        Adds this linker to the remote :class:`Saddle` and :class:`Summit`
+        """
+        if self not in self.summit.saddles:
+            self.summit.addSaddleLinker(self)
+        if self not in self.saddle.summits:
+            self.saddle.addSummitLinker(self)
+
+
     def __repr__(self):
         return "<Linker> {} -> {} {}promFt {}promM".format(
                 self.saddle,
@@ -68,4 +78,17 @@ class Linker(object):
         return [self.summit, self.saddle] ==\
                [other.summit, other.saddle]
 
+    def __ne__(self, other):
+        return [self.summit, self.saddle] !=\
+               [other.summit, other.saddle]
+
     __unicode__ = __str__ = __repr__
+
+
+def isLinker(linker):
+    """
+    :param linker: object under scrutiny
+    :raises: TypeError if other not of :class:`Summit`
+    """
+    if not isinstance(linker, Linker):
+        raise TypeError("Expected Linker Object.")

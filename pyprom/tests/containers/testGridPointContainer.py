@@ -27,11 +27,28 @@ class GridPointContainerTests(unittest.TestCase):
                                        self.p26])
 
     def testGridPointContainerCreate(self):
+        """
+        Ensure Creating a basic GridPointContainer works.
+        """
         container = GridPointContainer([self.p11, self.p12])
         dd = defaultdict(dict)
         dd[1][1] = self.p11
         dd[1][2] = self.p12
         self.assertEqual(container.fastLookup, dd)
+
+    def testGridPointContainerBadInitiation(self):
+        """
+        Ensure creating a GridPointContainer with a list of strings fails
+        """
+        with self.assertRaises(TypeError):
+            GridPointContainer(["wtf"])
+
+    def testGridPointContainerEmptyInitiation(self):
+        """
+        Ensure creating a GridPointContainer with an empty list is OK
+        """
+        container = GridPointContainer([])
+        self.assertEqual(len(container.points), 0)
 
     def testGridPointContainerIterNeighborDiagonal(self):
         """
@@ -76,7 +93,6 @@ class GridPointContainerTests(unittest.TestCase):
         Iter diagonal returns all orthogonal (right angle) neighbors
         of a GridPoint contained in the GridPointContainer
         """
-
         count = 0
         # Should have two results.
         for point in self.gpc.iterNeighborOrthogonal(self.p12):
@@ -106,14 +122,17 @@ class GridPointContainerTests(unittest.TestCase):
         self.assertEqual(count, 2)
 
     def testGridPointContainerFindPseudoSummits(self):
-        """ ensure findPseudoSummits gives the expected result"""
+        """
+        Ensure findPseudoSummits gives the expected result
+        """
         ps = self.gpc.findPseudoSummits()
         self.assertEqual(ps,[self.p12, self.p24])
 
 
     def testGridPointContainerFindClosestPoints(self):
-        """ ensure findClosestPoints gives the expected result"""
-
+        """
+        Ensure findClosestPoints gives the expected result
+        """
         them = GridPointContainer([GridPoint(5, 5, 5),
                                    GridPoint(3, 3, 3)])
         closest = self.gpc.findClosestPoints(them)
@@ -121,8 +140,9 @@ class GridPointContainerTests(unittest.TestCase):
         self.assertTupleEqual(closest, result)
 
     def testGridPointContainerAppend(self):
-        """ ensure append appends to points and updates fastLookup"""
-
+        """
+        Ensure append appends to points and updates fastLookup
+        """
         container = GridPointContainer([self.p11, self.p12])
         dd = defaultdict(dict)
         dd[1][1] = self.p11
@@ -131,8 +151,90 @@ class GridPointContainerTests(unittest.TestCase):
         container.append(self.p13)
         self.assertEqual(container.fastLookup, dd)
 
-    def testGridPointContainerRepr(self):
-        """ ensure append __repr__() yields expected results."""
+    def testGridPointContainerBadAppend(self):
+        """
+        Ensure adding !GridPoint to GridPointContainer fails.
+        """
+        gridpoints = [self.p11]
+        container = GridPointContainer(gridpoints)
+        with self.assertRaises(TypeError):
+            container.append("wtf")
 
+    def testGridPointContainerGoodAppend(self):
+        """
+        Ensure adding GridPoint to GridPointContainer succeeds.
+        """
+        container = GridPointContainer([])
+        container.append(self.p11)
+
+    def testGridPointContainerGetItem(self):
+        """
+        Ensure getting item on index succeeds.
+        """
+        gridpoints = [self.p11]
+        container = GridPointContainer(gridpoints)
+        self.assertEqual(container[0], gridpoints[0])
+
+    def testGridPointContainerSetItem(self):
+        """
+        Ensure setting item on index succeeds.
+        """
+        gridpoints = [self.p11, self.p12]
+        container = GridPointContainer(gridpoints)
+        container[1] = self.p13
+        self.assertEqual(container[1], self.p13)
+
+    def testGridPointContainerSetItemNegative(self):
+        """
+        Ensure setting item index fails when non GridPoint is passed in.
+        """
+        gridpoints = [self.p11, self.p12]
+        container = GridPointContainer(gridpoints)
+        with self.assertRaises(TypeError):
+            container[1] = "wtf"
+
+    def testGridPointContainerEqual(self):
+        """
+        Ensure Equality Test works as expected.
+        """
+        gridpoints = [self.p11, self.p12]
+        container = GridPointContainer(gridpoints)
+        container2 = GridPointContainer(gridpoints)
+        container3 = GridPointContainer([])
+
+        c1c2 = container == container2
+        c1c3 = container == container3
+
+        self.assertTrue(c1c2)
+        self.assertFalse(c1c3)
+
+    def testGridPointContainerNotEqual(self):
+        """
+        Ensure Inequality Test works as expected.
+        """
+        gridpoints = [self.p11, self.p12]
+        container = GridPointContainer(gridpoints)
+        container2 = GridPointContainer(gridpoints)
+        container3 = GridPointContainer([])
+
+        c1c2 = container != container2
+        c1c3 = container != container3
+
+        self.assertFalse(c1c2)
+        self.assertTrue(c1c3)
+
+    def testGridPointContainerHash(self):
+        """
+        Ensure __hash__() produces the expected results.
+        """
+        gridpoints = [self.p11, self.p12]
+        container = GridPointContainer(gridpoints)
+        self.assertEqual(container.__hash__(), 3713081631935493181)
+
+    def testGridPointContainerRepr(self):
+        """
+        Ensure append __repr__() yields expected results.
+        """
         container = GridPointContainer([self.p11, self.p12])
-        self.assertEqual(container.__repr__(), "<GridPointContainer> 2 Objects")
+        self.assertEqual(container.__repr__(),
+                         "<GridPointContainer> 2 Objects")

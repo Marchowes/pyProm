@@ -10,6 +10,7 @@ This library contains a class for storing Saddle data.
 import json
 
 from .spot_elevation import SpotElevation
+from ..containers.linker import isLinker
 
 class Saddle(SpotElevation):
     """
@@ -38,6 +39,13 @@ class Saddle(SpotElevation):
         self.tooLow = False # redundant saddle, but too low.
         self._disqualified = None # Non specific disqualification
         self.lprBoundary = list()
+
+    def addSummitLinker(self, linker):
+        """
+        :param linker: :class:`Linker`
+        """
+        isLinker(linker)
+        self.summits.append(linker)
 
     @property
     def disqualified(self):
@@ -100,3 +108,12 @@ class Saddle(SpotElevation):
             bool(self.multiPoint))
 
     __unicode__ = __str__ = __repr__
+
+
+def isSaddle(saddle):
+    """
+    :param saddle: object under scrutiny
+    :raises: TypeError if other not of :class:`Saddle`
+    """
+    if not isinstance(saddle, Saddle):
+        raise TypeError("Expected Saddle Object.")

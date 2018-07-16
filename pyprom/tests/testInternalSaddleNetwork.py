@@ -56,12 +56,3 @@ class InternalSaddleNetworkTests(unittest.TestCase):
         for child in children:
             self.assertIsNotNone(child.parent)
 
-
-
-
-
-
-
-
-if __name__ == '__main__':
-    unittest.main()

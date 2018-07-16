@@ -28,7 +28,7 @@ class Feature_Verticies(object):
         self.index = index
         self.vertex_linkers = vertex_linkers
 
-    def shortest_link(self, ignored_link_index=dict()):
+    def shortest_link(self, ignored_link_index={}):
         """
         shortest_link returns the shortest link found in `self.vertex_linkers`
         but ignores any links connecting to a foreign index container in

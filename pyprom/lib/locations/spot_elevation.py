@@ -99,3 +99,8 @@ class SpotElevation(BaseCoordinate):
                                       self.elevation)
 
     __unicode__ = __str__ = __repr__
+
+def isSpotElevation(spotElevation):
+    if not isinstance(spotElevation, SpotElevation):
+        raise TypeError("Expected SpotElevation or child"
+                        " of SpotElevation Object.")
