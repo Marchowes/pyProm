@@ -37,7 +37,7 @@ class SaddlesContainerTests(unittest.TestCase):
         """
         saddles = [Saddle(1,2,3)]
         container = SaddlesContainer(saddles)
-        self.assertEqual(len(container.points), 1)
+        self.assertEqual(len(container), 1)
         self.assertEqual(len(container.saddles), 1)
 
     def testSaddlesContainerBadAppend(self):

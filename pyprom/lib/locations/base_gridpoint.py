@@ -47,3 +47,12 @@ class BaseGridPoint(object):
         return "<BaseGridPoint> x: {}, y: {}".format(self.x, self.y)
 
     __unicode__ = __str__ = __repr__
+
+
+def isBaseGridPoint(gridPoint):
+    """
+    :param gridPoint: object under scrutiny
+    :raises: TypeError if other not of :class:`BaseGridPoint`
+    """
+    if not isinstance(gridPoint, BaseGridPoint):
+        raise TypeError("Expected BaseGridPoint Object.")

@@ -30,6 +30,12 @@ class BaseGridPointContainer(object):
         isGridPoint(gridPoint)
         self.points.append(gridPoint)
 
+    def __len__(self):
+        """
+        :return: integer - number of items in self.points
+        """
+        return len(self.points)
+
     def __setitem__(self, idx, gridPoint):
         """
         Gives BaseGridpoint list like set capabilities

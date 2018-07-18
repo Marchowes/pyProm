@@ -44,13 +44,13 @@ class WalkTests(unittest.TestCase):
     def testWalkIslandPond(self):
         """Test walk around Island Pond VT."""
         islandPondSaddleContainer = self.saddles.radius(44.810833, -71.8676388, 10)
-        islandPondSaddle = islandPondSaddleContainer.points[0]
+        islandPondSaddle = islandPondSaddleContainer[0]
         walk = Walk(self.summits, islandPondSaddleContainer, self.islandpondVT)
         walk.walk(islandPondSaddle)
         self.assertEqual(len(walk.linkers), 2)
         self.assertEqual(len(islandPondSaddle.summits), 2)
-        self.assertEqual(islandPondSaddle.summits[0].summit, self.summits.points[155])
-        self.assertEqual(islandPondSaddle.summits[1].summit, self.summits.points[171])
+        self.assertEqual(islandPondSaddle.summits[0].summit, self.summits[155])
+        self.assertEqual(islandPondSaddle.summits[1].summit, self.summits[171])
 
     def testGenerateDomainNoLinkers(self):
         """
@@ -66,14 +66,10 @@ class WalkTests(unittest.TestCase):
         Test that generating a domain from a properly executed Walk succeeds
         """
         islandPondSaddleContainer = self.saddles.radius(44.810833, -71.8676388, 10)
-        islandPondSaddle = islandPondSaddleContainer.points[0]
+        islandPondSaddle = islandPondSaddleContainer[0]
         walk = Walk(self.summits, islandPondSaddleContainer, self.islandpondVT)
         walk.walk(islandPondSaddle)
         d = walk.domain()
         self.assertEqual(len(d.linkers),2)
         self.assertEqual(len(d.summits), 342)
         self.assertEqual(len(d.saddles), 1)
-
-
-if __name__ == '__main__':
-    unittest.main()

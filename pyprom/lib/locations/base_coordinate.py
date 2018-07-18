@@ -76,3 +76,12 @@ class BaseCoordinate(object):
                                                         self.longitude)
 
     __unicode__ = __str__ = __repr__
+
+
+def isBaseCoordinate(baseCoordinate):
+    """
+    :param baseCoordinate: object under scrutiny
+    :raises: TypeError if other not of :class:`BaseCoordinate`
+    """
+    if not isinstance(baseCoordinate, BaseCoordinate):
+        raise TypeError("Expected BaseCoordinate Object.")

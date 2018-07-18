@@ -91,9 +91,9 @@ class AnalyzeData(object):
             result = self.summit_and_saddle(x, y)
             if result:
                 if isinstance(result, Saddle):
-                    self.saddleObjects.points.append(result)
+                    self.saddleObjects.append(result)
                 if isinstance(result, Summit):
-                    self.summitObjects.points.append(result)
+                    self.summitObjects.append(result)
             # Reset variables, and go to next gridpoint.
             self.edge = False
             self.blob = None
@@ -115,7 +115,7 @@ class AnalyzeData(object):
         highInverseEdge = self.blob.inverseEdgePoints.findHighEdges(
             self.elevation)
 
-        for exemptPoint in self.blob.points:
+        for exemptPoint in self.blob:
             self.explored[exemptPoint.x][exemptPoint.y] = True
         if not len(highInverseEdge):
             lat, long = self.datamap.xy_to_latlong(x, y)
@@ -177,7 +177,7 @@ class AnalyzeData(object):
                 neighborProfile += "H"
             if elevation < self.elevation:
                 neighborProfile += "L"
-            shoreSet.points.append(GridPoint(_x, _y, elevation))
+            shoreSet.append(GridPoint(_x, _y, elevation))
 
         reducedNeighborProfile = compressRepetetiveChars(neighborProfile)
         # Did the profile match "L" aka a Summit?

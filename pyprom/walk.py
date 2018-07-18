@@ -50,9 +50,9 @@ class Walk(object):
         :return:
         """
         lookupHash = defaultdict(dict)
-        for point in container.points:
+        for point in container:
             if point.multiPoint:
-                for mp in point.multiPoint.points:
+                for mp in point.multiPoint:
                     lookupHash[mp.x][mp.y] = point
             else:
                 x, y = self.datamap.latlong_to_xy(point.latitude,
@@ -67,7 +67,7 @@ class Walk(object):
         self.logger.info("Initiating Walk")
         start = default_timer()
         lasttime = start
-        for idx, saddle in enumerate(self.saddles.points):
+        for idx, saddle in enumerate(self.saddles):
             if not idx % 2000:
                 thisTime = default_timer()
                 split = round(thisTime - lasttime, 2)
@@ -78,7 +78,7 @@ class Walk(object):
                     "Saddles per second: {} - {}%"
                     " runtime: {}, split: {}".format(
                         pointsPerSec,
-                        round(idx/len(self.saddles.points)*100, 2),
+                        round(idx/len(self.saddles)*100, 2),
                         (str(timedelta(seconds=round(rt, 2)))),
                         split
                     ))
@@ -172,7 +172,7 @@ class Walk(object):
                 highNeighbors.points.sort(key=lambda x: x.elevation,
                                           reverse=True)
                 # Mark multipoint components as explored.
-                for mp in multipoint.points:
+                for mp in multipoint:
                     explored[mp.x][mp.y] = True
                 return highNeighbors.points[0], None, explored
             # Higher than current highest neighbor? Then this is
@@ -193,7 +193,7 @@ class Walk(object):
                   tooLow
         """
         count = 0
-        for summit in self.summits.points:
+        for summit in self.summits:
             found = list()
             for linker in summit.saddles:
                 if len(linker.saddle.summits) > 2:
@@ -225,7 +225,7 @@ class Walk(object):
                   \-----/
         """
         count = 0
-        for saddle in self.saddles.points:
+        for saddle in self.saddles:
             uniqueSummits = set(saddle.summits)
 
             # More than one summit to begin with, but only one unique?
@@ -242,8 +242,8 @@ class Walk(object):
 
     def __repr__(self):
         return "<Walk> Saddles {} Summits {} Linkers {}".format(
-                    len(self.saddles.points),
-                    len(self.summits.points),
+                    len(self.saddles),
+                    len(self.summits),
                     len(self.linkers))
 
     __unicode__ = __str__ = __repr__

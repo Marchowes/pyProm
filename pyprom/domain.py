@@ -151,10 +151,10 @@ class Domain(object):
                        'date': time.strftime("%m-%d-%Y %H:%M:%S")}
 
         domain_dict['summits'] = [x.to_dict(recurse=True)
-                                  for x in self.summits.points]
+                                  for x in self.summits]
         domain_dict['saddles'] = [x.to_dict(recurse=True)
-                                  for x in self.saddles.points]
-        # domain_dict['linkers'] = ???Later???
+                                  for x in self.saddles]
+        # domain_dict['linkers'] = ?TODO
 
         return domain_dict
 
@@ -162,8 +162,8 @@ class Domain(object):
         return "<Domain> Lat/Long Extent {} Saddles " \
                "{} Summits {} Linkers {}".format(
                     self.extent,
-                    len(self.saddles.points),
-                    len(self.summits.points),
+                    len(self.saddles),
+                    len(self.summits),
                     len(self.linkers))
 
     __unicode__ = __str__ = __repr__

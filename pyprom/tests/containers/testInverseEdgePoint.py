@@ -76,7 +76,6 @@ class InverseEdgePointContainerTests(unittest.TestCase):
         Iter diagonal returns all orthogonal (right angle) neighbors
         of an inverseEdgePoint contained in the InverseEdgePoint container
         """
-
         count = 0
         # Should have two results.
         for point in self.iep.iterNeighborOrthogonal(self.p12):
@@ -106,7 +105,9 @@ class InverseEdgePointContainerTests(unittest.TestCase):
         self.assertEqual(count, 2)
 
     def testPerimeterFindHighEdges(self):
-        """ test findHighEdges on a discontigous iep set"""
+        """
+        test findHighEdges on a discontigous iep set
+        """
         iepid = defaultdict(dict)
         iepid[1][1] = self.p11
         iepid[1][2] = self.p12
@@ -143,7 +144,9 @@ class InverseEdgePointContainerTests(unittest.TestCase):
         self.assertEqual(6,len(highEdges[0].points))
 
     def testPerimeterFindHighInverseEdgePoints(self):
-        """ Ensure findHighInverseEdgePoints produces expected results """
+        """
+        Ensure findHighInverseEdgePoints produces expected results
+        """
         higher554 = self.iep.findHighInverseEdgePoints(554)
         self.assertEqual(1, len(higher554.points))
 
@@ -153,10 +156,112 @@ class InverseEdgePointContainerTests(unittest.TestCase):
         higher552 = self.iep.findHighInverseEdgePoints(552)
         self.assertEqual(7, len(higher552.points))
 
-    def testPerimeterRepr(self):
-        """ Ensure repr returns expected results."""
-        self.assertEqual(self.iep.__repr__(), "<InverseEdgePointContainer> 7 Objects")
-
     def testPerimeterIterator(self):
-        """ Ensure iter returns expected results."""
+        """
+        Ensure __iter__ returns expected results.
+        """
         self.assertEqual(len([x for x in self.iep]), 7)
+
+    def testPerimeterLen(self):
+        """
+        Ensure __len__ returns expected results.
+        """
+        self.assertEqual(len(self.iep), 7)
+
+    def testPerimeterSetItem(self):
+        """
+        Ensure __setattr__ works as expected.
+        """
+
+        perimeter =\
+            InverseEdgePointContainer(inverseEdgePointList = [self.p11],
+                                      datamap = self.datamap)
+        self.assertEqual(len(perimeter), 1)
+        perimeter[0] = self.p12
+        self.assertEqual(perimeter[0], self.p12)
+
+    def testPerimeterSetItemNeg(self):
+        """
+        Ensure __setattr__ Disallows Non Gridpoints to be set.
+        """
+
+        perimeter =\
+            InverseEdgePointContainer(inverseEdgePointList = [self.p11],
+                                      datamap = self.datamap)
+        self.assertEqual(len(perimeter), 1)
+        with self.assertRaises(TypeError):
+            perimeter[0] = "wtf"
+
+    def testPerimeterGetItem(self):
+        """
+        Ensure __getattr__ works as expected.
+        """
+
+        perimeter =\
+            InverseEdgePointContainer(inverseEdgePointList = [self.p11],
+                                      datamap = self.datamap)
+        self.assertEqual(len(perimeter), 1)
+        self.assertEqual(perimeter[0], self.p11)
+
+    def testPerimeterBadAppend(self):
+        """
+        Ensure adding string to Perimeter fails.
+        """
+        perimeter =\
+            InverseEdgePointContainer(inverseEdgePointList = [self.p11],
+                                      datamap = self.datamap)
+        with self.assertRaises(TypeError):
+            perimeter.append("stuff")
+
+    def testPerimeterGoodAppend(self):
+        """
+        Ensure adding GridPoint to SummitsContainer succeeds.
+        """
+        perimeter =\
+            InverseEdgePointContainer(inverseEdgePointList = [self.p11],
+                                      datamap = self.datamap)
+        perimeter.append(self.p12)
+        self.assertEqual(len(perimeter), 2)
+
+    def testPerimeterEq(self):
+        """
+        Ensure __eq__ works as expected.
+        """
+        perimeter =\
+            InverseEdgePointContainer(inverseEdgePointList = [self.p11],
+                                      datamap = self.datamap)
+        perimeter2 =\
+            InverseEdgePointContainer(inverseEdgePointList = [self.p11],
+                                      datamap = self.datamap)
+        perimeter3 =\
+            InverseEdgePointContainer(inverseEdgePointList = [self.p12],
+                                      datamap = self.datamap)
+
+        self.assertEqual(perimeter, perimeter2)
+        test = perimeter2 == perimeter3
+        self.assertFalse(test)
+
+    def testPerimeterNe(self):
+        """
+        Ensure __ne__ works as expected.
+        """
+        perimeter = \
+            InverseEdgePointContainer(inverseEdgePointList=[self.p11],
+                                      datamap=self.datamap)
+        perimeter2 = \
+            InverseEdgePointContainer(inverseEdgePointList=[self.p11],
+                                      datamap=self.datamap)
+        perimeter3 = \
+            InverseEdgePointContainer(inverseEdgePointList=[self.p12],
+                                      datamap=self.datamap)
+
+        self.assertNotEqual(perimeter, perimeter3)
+        test = perimeter != perimeter2
+        self.assertFalse(test)
+
+    def testPerimeterRepr(self):
+        """
+        Ensure repr returns expected results.
+        """
+        self.assertEqual(self.iep.__repr__(),
+                         "<InverseEdgePointContainer> 7 Objects")

@@ -191,7 +191,8 @@ class SpotElevationContainer(_Base):
     def append(self, spotElevation):
         """
         Add a SpotElevation to the container.
-        :param SpotElevation: :class:`SpotElevation`
+        :param spotElevation: :class:`SpotElevation`
+        :raises: TypeError if point not of :class:`SpotElevation`
         """
         isSpotElevation(spotElevation)
         self.points.append(spotElevation)

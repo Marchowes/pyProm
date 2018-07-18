@@ -26,12 +26,12 @@ class LogicTests(unittest.TestCase):
     def testFindSummits(self):
         """Make sure we find the right number of summits and cols."""
         # Should find 3 Summits
-        self.assertEqual(len(self.summits.points), 3)
+        self.assertEqual(len(self.summits), 3)
         # Should find 2 Cols (non edge Effect)
-        self.assertEqual(len([x for x in self.saddles.points
+        self.assertEqual(len([x for x in self.saddles
                               if not x.edgeEffect]), 2)
         # Should find 13 cols with edgeEffect.
-        self.assertEqual(len(self.saddles.points), 13)
+        self.assertEqual(len(self.saddles), 13)
 
     def testFindSummitsHighest(self):
         """Ensure it finds Mt Washington to be the highest."""
@@ -47,9 +47,9 @@ class LogicTests(unittest.TestCase):
         <Summit> lat 44.2822225556 long -71.299723 6082.6032ft
         1854.0m MultiPoint True is found to be a multipoint.
         """
-        mpSummit = self.summits.points[0]
+        mpSummit = self.summits[0]
         # make sure we find 2 points
-        self.assertEqual(len(mpSummit.multiPoint.points), 2)
+        self.assertEqual(len(mpSummit.multiPoint), 2)
 
 
 if __name__ == '__main__':

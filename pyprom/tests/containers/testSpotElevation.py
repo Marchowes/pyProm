@@ -126,10 +126,10 @@ class SpotElevationContainerTests(unittest.TestCase):
         Ensure taking out a rectangle subsection yields expected results.
         """
         rectangle = self.summits.rectangle(44.954583,-71.957916, 44.98125, -71.9609)
-        self.assertEqual(len(rectangle.points), 6)
+        self.assertEqual(len(rectangle), 6)
         # flip lat/long around, should still be able to figure out rectangle.
         rectangle = self.summits.rectangle(44.98125, -71.9609, 44.954583,-71.957916, )
-        self.assertEqual(len(rectangle.points), 6)
+        self.assertEqual(len(rectangle), 6)
 
     def testSpotElevationContainerElevationRange(self):
         """

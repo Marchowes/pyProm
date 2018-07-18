@@ -48,7 +48,7 @@ class GridPointContainerTests(unittest.TestCase):
         Ensure creating a GridPointContainer with an empty list is OK
         """
         container = GridPointContainer([])
-        self.assertEqual(len(container.points), 0)
+        self.assertEqual(len(container), 0)
 
     def testGridPointContainerIterNeighborDiagonal(self):
         """
@@ -138,6 +138,13 @@ class GridPointContainerTests(unittest.TestCase):
         closest = self.gpc.findClosestPoints(them)
         result = (self.p24, GridPoint(3, 3, 3), 1.4142135623730951)
         self.assertTupleEqual(closest, result)
+
+    def testGridPointContainerLen(self):
+        """
+        Ensure __len__ produces the expected result.
+        """
+        container = GridPointContainer([GridPoint(5, 5, 5)])
+        self.assertEqual(len(container), 1)
 
     def testGridPointContainerAppend(self):
         """

@@ -25,7 +25,7 @@ class InternalSaddleNetworkTests(unittest.TestCase):
         self.aziscohosVicinity = AnalyzeData(self.aziscohos)
         self.summits, self.saddles = self.aziscohosVicinity.analyze()
         mp = [x for x in self.saddles.saddles if x.multiPoint]
-        self.aziscohosSaddle = [x for x in mp if len(x.multiPoint.points) > 1000][0]
+        self.aziscohosSaddle = [x for x in mp if len(x.multiPoint) > 1000][0]
 
     def testInternalSaddleNetworkAziscohos(self):
         """
@@ -47,8 +47,8 @@ class InternalSaddleNetworkTests(unittest.TestCase):
         saddleContainer = SaddlesContainer([self.aziscohosSaddle])
         new_saddles = saddleContainer.rebuildSaddles(self.datamap)
         self.assertEqual(len(new_saddles), 7)
-        parent = [x for x in new_saddles.points if x.children]
-        children = [x for x in new_saddles.points if x.parent]
+        parent = [x for x in new_saddles if x.children]
+        children = [x for x in new_saddles if x.parent]
         self.assertEqual(len(parent), 1)
         self.assertEqual(parent[0].disqualified, True)
         self.assertEqual(parent[0].edgeEffect, True)

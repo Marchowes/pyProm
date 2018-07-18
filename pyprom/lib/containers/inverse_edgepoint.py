@@ -9,6 +9,7 @@ type location objects.
 """
 from collections import defaultdict
 from .gridpoint import GridPointContainer
+from ..locations.gridpoint import isGridPoint
 
 
 class InverseEdgePointContainer(object):
@@ -115,8 +116,64 @@ class InverseEdgePointContainer(object):
         higherPoints = [x for x in self.points if x.elevation > elevation]
         return GridPointContainer(higherPoints)
 
+    def append(self, point):
+        """
+        Add a GridPoint to the container.
+        :param point: :class:`GridPoint`
+        :raises: TypeError if point not of :class:`GridPoint`
+        """
+        isGridPoint(point)
+        self.points.append(point)
+
+    def __len__(self):
+        """
+        :return: integer - number of items in self.points
+        """
+        return len(self.points)
+
+    def __setitem__(self, idx, point):
+        """
+        Gives Perimeter list like set capabilities
+        :param idx: index value
+        :param point: :class:`SpotElevation`
+        :raises: TypeError if point not of :class:`GridPoint`
+        """
+        isGridPoint(point)
+        self.points[idx] = point
+
+    def __getitem__(self, idx):
+        """
+    `   Gives Perimeter list like get capabilities
+        :param idx: index value
+        :return: :class:`SpotElevation` self.point at idx
+        """
+        return self.points[idx]
+
+    def __eq__(self, other):
+        """
+        Determines if Perimeter is equal to another.
+        :param other: :class:`Perimeter`
+        :return: bool of equality
+        :raises: TypeError if other not of :class:`Perimeter`
+        """
+        _isPerimeter(other)
+        return sorted([x for x in self.points]) == \
+               sorted([x for x in other.points])
+
+    def __ne__(self, other):
+        """
+        :param other: :class:`Perimeter`
+        :return: bool of inequality
+        :raises: TypeError if other not of :class:`Perimeter`
+        """
+        _isPerimeter(other)
+        return sorted([x for x in self.points]) != \
+               sorted([x for x in other.points])
 
     def __repr__(self):
+        """
+        :return: String representation of this object
+        """
         return "<InverseEdgePointContainer>" \
                " {} Objects".format(len(self.points))
 
@@ -125,3 +182,12 @@ class InverseEdgePointContainer(object):
             yield inverseEdgePoint
 
     __unicode__ = __str__ = __repr__
+
+
+def _isPerimeter(perimeter):
+    """
+    :param perimeter: object under scrutiny
+    :raises: TypeError if other not of :class:`Perimeter`
+    """
+    if not isinstance(perimeter, InverseEdgePointContainer):
+        raise TypeError("Perimeter expected")

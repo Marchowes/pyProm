@@ -33,7 +33,7 @@ class SummitsContainerTests(unittest.TestCase):
         """
         summits = [Summit(1,2,3)]
         container = SummitsContainer(summits)
-        self.assertEqual(len(container.points), 1)
+        self.assertEqual(len(container), 1)
         self.assertEqual(len(container.summits), 1)
 
     def testSummitsContainerBadAppend(self):

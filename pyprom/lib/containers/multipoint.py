@@ -9,7 +9,7 @@ type location objects as well as a number of functions.
 """
 import json
 from ..locations.base_coordinate import BaseCoordinate
-
+from ..locations.base_gridpoint import isBaseGridPoint
 
 class MultiPoint(object):
     """
@@ -70,9 +70,75 @@ class MultiPoint(object):
         return [BaseCoordinate(*self.datamap.xy_to_latlong(coord.x, coord.y))
                 for coord in self.points]
 
+    def append(self, point):
+        """
+        Add a BaseGridPoint to the container.
+        :param point: :class:`BaseGridPoint`
+        :raises: TypeError if point not of :class:`BaseGridPoint`
+        """
+        isBaseGridPoint(point)
+        self.points.append(point)
+
+    def __len__(self):
+        """
+        :return: integer - number of items in self.points
+        """
+        return len(self.points)
+
+    def __setitem__(self, idx, point):
+        """
+        Gives MultiPoint list like set capabilities
+        :param idx: index value
+        :param point: :class:`BaseGridPoint`
+        :raises: TypeError if point not of :class:`MultiPoint`
+        """
+        isBaseGridPoint(point)
+        self.points[idx] = point
+
+    def __getitem__(self, idx):
+        """
+    `   Gives MultiPoint list like get capabilities
+        :param idx: index value
+        :return: :class:`GridPoint` self.point at idx
+        """
+        return self.points[idx]
+
+    def __eq__(self, other):
+        """
+        Determines if MultiPoint is equal to another.
+        :param other: :class:`MultiPoint`
+        :return: bool of equality
+        :raises: TypeError if other not of :class:`MultiPoint`
+        """
+        _isMultiPoint(other)
+        return sorted([x for x in self.points]) == \
+               sorted([x for x in other.points])
+
+    def __ne__(self, other):
+        """
+        :param other: :class:`MultiPoint`
+        :return: bool of inequality
+        :raises: TypeError if other not of :class:`MultiPoint`
+        """
+        _isMultiPoint(other)
+        return sorted([x for x in self.points]) != \
+               sorted([x for x in other.points])
+
+    def __iter__(self):
+        for point in self.points:
+            yield point
+
     def __repr__(self):
         return "<Multipoint> elevation(m): {}, points {}". \
             format(self.elevation,
                    len(self.points))
 
     __unicode__ = __str__ = __repr__
+
+def _isMultiPoint(mp):
+    """
+    :param spotElevationContainer: object under scrutiny
+    :raises: TypeError if other not of :class:`SpotElevationContainer`
+    """
+    if not isinstance(mp, MultiPoint):
+        raise TypeError("MultiPoint expected")
