@@ -10,7 +10,7 @@ from collections import defaultdict
 
 from pyprom.tests.getData import getTestZip
 from pyprom.dataload import GDALLoader
-from pyprom.lib.locations.perimeterpoint import PerimeterPoint
+from pyprom.lib.locations.gridpoint import GridPoint
 from pyprom.lib.containers.perimeter import Perimeter
 
 class PerimeterTests(unittest.TestCase):
@@ -24,20 +24,20 @@ class PerimeterTests(unittest.TestCase):
         cls.someslice = cls.datamap.subset(1000, 1000, 10, 10)
         # contigous Perimeter
         cls.perimeterI = defaultdict(dict)
-        cls.perimeterI[1][1] = cls.p11 = PerimeterPoint(1, 1, 553)
-        cls.perimeterI[1][2] = cls.p12 = PerimeterPoint(1, 2, 554)
-        cls.perimeterI[1][3] = cls.p13 = PerimeterPoint(1, 3, 554)
-        cls.perimeterI[1][4] = cls.p14 = PerimeterPoint(1, 4, 553)
-        cls.perimeterI[2][4] = cls.p24 = PerimeterPoint(2, 4, 555)
-        cls.perimeterI[2][5] = cls.p25 = PerimeterPoint(2, 5, 554)
-        cls.perimeterI[2][6] = cls.p26 = PerimeterPoint(2, 6, 553)
+        cls.perimeterI[1][1] = cls.p11 = GridPoint(1, 1, 553)
+        cls.perimeterI[1][2] = cls.p12 = GridPoint(1, 2, 554)
+        cls.perimeterI[1][3] = cls.p13 = GridPoint(1, 3, 554)
+        cls.perimeterI[1][4] = cls.p14 = GridPoint(1, 4, 553)
+        cls.perimeterI[2][4] = cls.p24 = GridPoint(2, 4, 555)
+        cls.perimeterI[2][5] = cls.p25 = GridPoint(2, 5, 554)
+        cls.perimeterI[2][6] = cls.p26 = GridPoint(2, 6, 553)
         cls.perimeter = Perimeter(pointIndex=cls.perimeterI,
                                   datamap=cls.datamap)
 
     def testPerimeterIterNeighborDiagonal(self):
         """
         Ensure that iterDiagonal returns the expected results.
-        Iter diagonal returns all neighbors of a perimeterPoint contained
+        Iter diagonal returns all neighbors of a GridPoint contained
         in the Perimeter Container
         """
         count = 0
@@ -74,7 +74,7 @@ class PerimeterTests(unittest.TestCase):
         """
         Ensure that iterOrthogonal returns the expected results.
         Iter diagonal returns all orthogonal (right angle) neighbors
-        of an perimeterPoint contained in the Perimeter container
+        of an GridPoint contained in the Perimeter container
         """
         count = 0
         # Should have two results.
@@ -106,7 +106,7 @@ class PerimeterTests(unittest.TestCase):
 
     def testPerimeterFindHighEdges(self):
         """
-        test findHighEdges on a discontigous PerimeterPoint set
+        test findHighEdges on a discontigous GridPoint set
         """
         perimeterId = defaultdict(dict)
         perimeterId[1][1] = self.p11

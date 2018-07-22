@@ -4,8 +4,8 @@ pyProm: Copyright 2016.
 This software is distributed under a license that is described in
 the LICENSE file that accompanies it.
 
-This library contains a base container class for storing GridPoint
-type location objects.
+This library contains a Perimeter container class for storing GridPoints
+type location objects. and various transforms.
 """
 from collections import defaultdict
 from .gridpoint import GridPointContainer
@@ -16,9 +16,9 @@ class Perimeter(object):
     """
     Container for :class:`Perimeter` type lists.
     Allows for various list transformations.
-    :param pointList: list of :class:`PerimeterPoint` to
+    :param pointList: list of :class:`GridPoint` to
      self.points
-    :param pointIndex: {X: { Y: :class:`PerimeterPoint`}} passing
+    :param pointIndex: {X: { Y: :class:`GridPoint`}} passing
     this will automatically generate self.points
     """
     def __init__(self, pointList=None,
@@ -37,7 +37,7 @@ class Perimeter(object):
 
     def iterNeighborDiagonal(self, point):
         """
-        Iterate through existing diagonal :class:`PerimeterPoint`
+        Iterate through existing diagonal :class:`GridPoint`
         neighbors.
         :param point:
         """
@@ -55,7 +55,7 @@ class Perimeter(object):
 
     def iterNeighborOrthogonal(self, point):
         """
-        Iterate through existing orthogonal :class:`PerimeterPoint`
+        Iterate through existing orthogonal :class:`GridPoint`
         neighbors.
         :param point:
         """
@@ -74,9 +74,9 @@ class Perimeter(object):
     def findHighEdges(self, elevation):
         """
         This function returns a list of GridpointContainers. Each container
-        holds a list of perimeterPoints which are discontigous so far as
+        holds a list of GridPoints which are discontigous so far as
         the other container is concerned. This is used to identify discontigous
-        sets of perimeterPoints for determining if this is a Saddle or not.
+        sets of GridPoints for determining if this is a Saddle or not.
         :return: list of GridPointContainers containing HighEdges.
         """
         explored = defaultdict(dict)

@@ -110,9 +110,9 @@ class AnalyzeData(object):
         :return: Summit, Saddle, or None
         """
         self.blob = equalHeightBlob(self.datamap, x, y, ptElevation)
-        self.edge = self.blob.perimeterPoints.mapEdge
+        self.edge = self.blob.perimeter.mapEdge
 
-        highPerimeter = self.blob.perimeterPoints.findHighEdges(
+        highPerimeter = self.blob.perimeter.findHighEdges(
             self.elevation)
 
         for exemptPoint in self.blob:

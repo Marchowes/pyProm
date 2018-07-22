@@ -8,7 +8,6 @@ the LICENSE file that accompanies it.
 from collections import defaultdict
 
 from ..locations.gridpoint import GridPoint
-from ..locations.perimeterpoint import PerimeterPoint
 from ..containers.multipoint import MultiPoint
 from ..util import coordinateHashToGridPointList
 from ..containers.perimeter import Perimeter
@@ -49,10 +48,10 @@ def equalHeightBlob(datamap, x, y, elevation):
             elif elevation > masterGridPoint.elevation:
                 if not perimeterPointHash[_x].get(_y, False):
                     perimeterPointHash[_x][_y] = \
-                        PerimeterPoint(_x, _y, elevation)
+                        GridPoint(_x, _y, elevation)
     return MultiPoint(coordinateHashToGridPointList(exploredEqualHeight),
                       masterGridPoint.elevation, datamap,
-                      perimeterPoints=Perimeter(
+                      perimeter=Perimeter(
                           pointIndex=perimeterPointHash,
                           datamap=datamap, mapEdge=edge)
                       )

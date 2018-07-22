@@ -21,21 +21,19 @@ class MultiPoint(object):
         points that make up a Multipoint.
     :param elevation: elevation in meters
     :param datamap: :class:`Datamap` object.
-    :param perimeterPoints: :class:`Perimeter` object.
+    :param perimeter: :class:`Perimeter` object.
         These are the points that make up the border of the multipoint
         outside of the multipoint.
     """
-    def __init__(self, points, elevation, datamap, perimeterPoints=None):
+    def __init__(self, points, elevation, datamap, perimeter=None):
         super(MultiPoint, self).__init__()
         self.points = points  # BaseGridPoint Objects.
         self.elevation = elevation
         self.datamap = datamap  # data analysis object.
-        self.perimeterPoints = perimeterPoints
+        self.perimeter = perimeter
 
-    def to_dict(self, verbose=True):
+    def to_dict(self):
         """
-        :param verbose: returns extra data like `PerimeterPoint`
-        and `EdgePoint` (future)
         :return: list of dicts.
         """
         plist = list()
@@ -48,19 +46,17 @@ class MultiPoint(object):
             plist.append(pdict)
         return plist
 
-    def to_json(self, verbose=False, prettyprint=True):
+    def to_json(self, prettyprint=True):
         """
         :param prettyprint: human readable,
          but takes more space when written to a file.
-        :param verbose: returns extra data like `PerimeterPoint`
-        and `EdgePoint` (future)
         :return: json data
         """
         if prettyprint:
-            return json.dumps(self.to_dict(verbose=verbose), sort_keys=True,
+            return json.dumps(self.to_dict(), sort_keys=True,
                               indent=4, separators=(',', ': '))
         else:
-            return json.dumps(self.to_dict(verbose=verbose))
+            return json.dumps(self.to_dict())
 
     @property
     def pointsLatLong(self):

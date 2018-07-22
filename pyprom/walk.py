@@ -167,7 +167,7 @@ class Walk(object):
                 # Find all perimeter points higher than
                 # the multiPointBlob elevation
                 highNeighbors =\
-                    multipoint.perimeterPoints.findHighPerimeter(
+                    multipoint.perimeter.findHighPerimeter(
                         multipoint.elevation)
                 highNeighbors.points.sort(key=lambda x: x.elevation,
                                           reverse=True)
