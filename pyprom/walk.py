@@ -164,10 +164,10 @@ class Walk(object):
             # Oh fuck no, we've got an equalHeightBlob. Better check that out.
             if elevation == startingElevation:
                 multipoint = equalHeightBlob(self.datamap, x, y, elevation)
-                # Find all inverse Edgepoints higher than
+                # Find all perimeter points higher than
                 # the multiPointBlob elevation
                 highNeighbors =\
-                    multipoint.inverseEdgePoints.findHighInverseEdgePoints(
+                    multipoint.perimeterPoints.findHighPerimeter(
                         multipoint.elevation)
                 highNeighbors.points.sort(key=lambda x: x.elevation,
                                           reverse=True)

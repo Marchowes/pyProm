@@ -110,14 +110,14 @@ class AnalyzeData(object):
         :return: Summit, Saddle, or None
         """
         self.blob = equalHeightBlob(self.datamap, x, y, ptElevation)
-        self.edge = self.blob.inverseEdgePoints.mapEdge
+        self.edge = self.blob.perimeterPoints.mapEdge
 
-        highInverseEdge = self.blob.inverseEdgePoints.findHighEdges(
+        highPerimeter = self.blob.perimeterPoints.findHighEdges(
             self.elevation)
 
         for exemptPoint in self.blob:
             self.explored[exemptPoint.x][exemptPoint.y] = True
-        if not len(highInverseEdge):
+        if not len(highPerimeter):
             lat, long = self.datamap.xy_to_latlong(x, y)
             summit = Summit(lat,
                             long,
@@ -126,15 +126,15 @@ class AnalyzeData(object):
                             multiPoint=self.blob
                             )
             return summit
-        if (len(highInverseEdge) > 1) or\
-                (len(highInverseEdge) == 1 and self.edge):
+        if (len(highPerimeter) > 1) or\
+                (len(highPerimeter) == 1 and self.edge):
             lat, long = self.datamap.xy_to_latlong(x, y)
             saddle = Saddle(lat,
                             long,
                             self.elevation,
                             edge=self.edge,
                             multiPoint=self.blob,
-                            highShores=highInverseEdge)
+                            highShores=highPerimeter)
             return saddle
         return None
 

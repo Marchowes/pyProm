@@ -21,20 +21,20 @@ class MultiPoint(object):
         points that make up a Multipoint.
     :param elevation: elevation in meters
     :param datamap: :class:`Datamap` object.
-    :param inverseEdgePoints: :class:`InverseEdgePointContainer` object.
+    :param perimeterPoints: :class:`Perimeter` object.
         These are the points that make up the border of the multipoint
         outside of the multipoint.
     """
-    def __init__(self, points, elevation, datamap, inverseEdgePoints=None):
+    def __init__(self, points, elevation, datamap, perimeterPoints=None):
         super(MultiPoint, self).__init__()
         self.points = points  # BaseGridPoint Objects.
         self.elevation = elevation
         self.datamap = datamap  # data analysis object.
-        self.inverseEdgePoints = inverseEdgePoints
+        self.perimeterPoints = perimeterPoints
 
     def to_dict(self, verbose=True):
         """
-        :param verbose: returns extra data like `InverseEdgePoint`
+        :param verbose: returns extra data like `PerimeterPoint`
         and `EdgePoint` (future)
         :return: list of dicts.
         """
@@ -52,7 +52,7 @@ class MultiPoint(object):
         """
         :param prettyprint: human readable,
          but takes more space when written to a file.
-        :param verbose: returns extra data like `InverseEdgePoint`
+        :param verbose: returns extra data like `PerimeterPoint`
         and `EdgePoint` (future)
         :return: json data
         """

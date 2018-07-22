@@ -43,10 +43,10 @@ class MultipointTests(unittest.TestCase):
 
     def testMultipointJsonNoEdge(self):
         """
-        Test multipoint container inverseEdgePoints count is as expected.
+        Test multipoint container perimeterPoints count is as expected.
         """
         multipoint = self.saddle.multiPoint
-        self.assertEqual(len(multipoint.inverseEdgePoints), 7)
+        self.assertEqual(len(multipoint.perimeterPoints), 7)
 
     def testMultipointToJSON(self):
         """
@@ -99,7 +99,7 @@ class MultipointTests(unittest.TestCase):
 
     def testMultipointRepr(self):
         """
-        Test multipoint container inverseEdgePoints count is as expected.
+        Test multipoint container perimeterPoints count is as expected.
         """
         multipoint = self.saddle.multiPoint
         self.assertEqual(multipoint.__repr__(), "<Multipoint> elevation(m): 552.0, points 4")

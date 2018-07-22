@@ -8,10 +8,10 @@ the LICENSE file that accompanies it.
 from collections import defaultdict
 
 from ..locations.gridpoint import GridPoint
-from ..locations.inverse_edgepoint import InverseEdgePoint
+from ..locations.perimeterpoint import PerimeterPoint
 from ..containers.multipoint import MultiPoint
 from ..util import coordinateHashToGridPointList
-from ..containers.inverse_edgepoint import InverseEdgePointContainer
+from ..containers.perimeter import Perimeter
 
 def equalHeightBlob(datamap, x, y, elevation):
     """
@@ -25,7 +25,7 @@ def equalHeightBlob(datamap, x, y, elevation):
     masterGridPoint = GridPoint(x, y, elevation)
     exploredEqualHeight = defaultdict(dict)
     exploredEqualHeight[x][y] = True
-    inverseEdgeHash = defaultdict(dict)
+    perimeterPointHash = defaultdict(dict)
     toBeAnalyzed = [masterGridPoint]
 
     # Loop until pool of equalHeight neighbors has been exhausted.
@@ -44,15 +44,15 @@ def equalHeightBlob(datamap, x, y, elevation):
                 exploredEqualHeight[_x][_y] = True
                 toBeAnalyzed.append(branch)
             # If elevation >  master grid point, stash away as
-            # an inverse edge point. Only keep track of edgepoints
+            # a perimeter point. Only keep track of edgepoints
             # higher!
             elif elevation > masterGridPoint.elevation:
-                if not inverseEdgeHash[_x].get(_y, False):
-                    inverseEdgeHash[_x][_y] = \
-                        InverseEdgePoint(_x, _y, elevation)
+                if not perimeterPointHash[_x].get(_y, False):
+                    perimeterPointHash[_x][_y] = \
+                        PerimeterPoint(_x, _y, elevation)
     return MultiPoint(coordinateHashToGridPointList(exploredEqualHeight),
                       masterGridPoint.elevation, datamap,
-                      inverseEdgePoints=InverseEdgePointContainer(
-                          inverseEdgePointIndex=inverseEdgeHash,
+                      perimeterPoints=Perimeter(
+                          pointIndex=perimeterPointHash,
                           datamap=datamap, mapEdge=edge)
                       )
