@@ -1,6 +1,15 @@
 Release History
 ---------------
 
+0.5.0 (July,  2018)
++++++++++++++++++++
+* Elimination of InverseEdgePoints and InverseEdgePointContainer.
+* Introduction of Perimeter as a replacement
+* Very large addition of Unit tests
+* Adding __getItems__, setItems, eq, ne, lt, repr and other magic functions to Container Objects.
+* Made points from objects inherited from BaseGridPoint sortable
+
+
 0.4.0 (January 11, 2018)
 ++++++++++++++++++++++++
 * Walk now leverages equalHeightBlobs, but no longer keeps track of walk paths.
