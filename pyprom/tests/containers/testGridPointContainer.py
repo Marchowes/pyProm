@@ -139,6 +139,19 @@ class GridPointContainerTests(unittest.TestCase):
         result = (self.p24, GridPoint(3, 3, 3), 1.4142135623730951)
         self.assertTupleEqual(closest, result)
 
+    def testSortGridPointContainer(self):
+        """
+        Ensure pass through to sort() works as expected.
+        """
+        originalPoints = [self.p11, self.p12, self.p13, self.p14,
+                          self.p24, self.p25, self.p26]
+        self.assertEqual(self.gpc.points, originalPoints)
+
+        self.gpc.sort(key=lambda x: x.elevation, reverse=True)
+        orderedPoints = [self.p24, self.p12, self.p13, self.p25,
+                         self.p11, self.p14, self.p26]
+        self.assertEqual(self.gpc.points, orderedPoints)
+
     def testGridPointContainerLen(self):
         """
         Ensure __len__ produces the expected result.

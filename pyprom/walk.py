@@ -169,8 +169,7 @@ class Walk(object):
                 highNeighbors =\
                     multipoint.perimeter.findHighPerimeter(
                         multipoint.elevation)
-                highNeighbors.points.sort(key=lambda x: x.elevation,
-                                          reverse=True)
+                highNeighbors.sort(key=lambda x: x.elevation, reverse=True)
                 # Mark multipoint components as explored.
                 for mp in multipoint:
                     explored[mp.x][mp.y] = True

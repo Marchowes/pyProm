@@ -30,6 +30,14 @@ class BaseGridPointContainer(object):
         isGridPoint(gridPoint)
         self.points.append(gridPoint)
 
+    def sort(self, **kwargs):
+        """
+        Sort points using kwargs passed in.
+        :param kwargs:
+        :return:
+        """
+        self.points.sort(**kwargs)
+
     def __len__(self):
         """
         :return: integer - number of items in self.points
