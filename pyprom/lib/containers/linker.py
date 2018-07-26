@@ -60,28 +60,47 @@ class Linker(object):
         if self not in self.saddle.summits:
             self.saddle.addSummitLinker(self)
 
-
-    def __repr__(self):
-        return "<Linker> {} -> {} {}promFt {}promM".format(
-                self.saddle,
-                self.summit,
-                self.prom_ft,
-                self.prom)
-
     def __hash__(self):
+        """
+        Generates hash based on points.
+        :return: string representation of hash
+        """
         return hash((round(self.summit.latitude, 6),
                      round(self.summit.longitude, 6),
                      round(self.saddle.latitude, 6),
                      round(self.saddle.longitude, 6)))
 
     def __eq__(self, other):
+        """
+        Determines if Linker is equal to another.
+        :param other: :class:`Linker` to be compared against
+        :return: bool of equality
+        :raises: TypeError if other not of :class:`Linker`
+        """
+        isLinker(other)
         return [self.summit, self.saddle] ==\
                [other.summit, other.saddle]
 
     def __ne__(self, other):
+        """
+        Determines if Linker is not equal to another.
+        :param other: :class:`Linker` to be compared against
+        :return: bool of inequality
+        :raises: TypeError if other not of :class:`Linker`
+        """
+        isLinker(other)
         return [self.summit, self.saddle] !=\
                [other.summit, other.saddle]
 
+    def __repr__(self):
+        """
+        :return: String representation of this object
+        """
+        return "<Linker> {} -> {} {}promFt {}promM".format(
+                self.saddle,
+                self.summit,
+                self.prom_ft,
+                self.prom)
     __unicode__ = __str__ = __repr__
 
 

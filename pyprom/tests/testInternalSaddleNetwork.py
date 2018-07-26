@@ -23,7 +23,7 @@ class InternalSaddleNetworkTests(unittest.TestCase):
         self.datamap = self.datafile.datamap
         self.aziscohos = self.datamap.subset(622, 3275, 457, 325)
         self.aziscohosVicinity = AnalyzeData(self.aziscohos)
-        self.summits, self.saddles = self.aziscohosVicinity.analyze()
+        self.summits, self.saddles, self.runoffs = self.aziscohosVicinity.analyze()
         mp = [x for x in self.saddles.saddles if x.multiPoint]
         self.aziscohosSaddle = [x for x in mp if len(x.multiPoint) > 1000][0]
 

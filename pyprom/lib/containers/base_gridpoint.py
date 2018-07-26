@@ -34,7 +34,6 @@ class BaseGridPointContainer(object):
         """
         Sort points using kwargs passed in.
         :param kwargs:
-        :return:
         """
         self.points.sort(**kwargs)
 
@@ -71,10 +70,10 @@ class BaseGridPointContainer(object):
 
     def __eq__(self, other):
         """
-        Determines if GridPointContainer is equal to another.
-        :param other: :class:`GridPointContainer` to be compared against
+        Determines if BaseGridPointContainer is equal to another.
+        :param other: :class:`BaseGridPointContainer` to be compared against
         :return: bool of equality
-        :raises: TypeError if other not of :class:`GridPointContainer`
+        :raises: TypeError if other not of :class:`BaseGridPointContainer`
         """
         _isBaseGridPointContainer(other)
         return sorted([x for x in self.points]) == \
@@ -82,9 +81,10 @@ class BaseGridPointContainer(object):
 
     def __ne__(self, other):
         """
-        :param other: :class:`GridPointContainer` to be compared against
+        Determines if BaseGridPointContainer is not equal to another.
+        :param other: :class:`BaseGridPointContainer` to be compared against
         :return: bool of inequality
-        :raises: TypeError if other not of :class:`GridPointContainer`
+        :raises: TypeError if other not of :class:`BaseGridPointContainer`
         """
         _isBaseGridPointContainer(other)
         return sorted([x for x in self.points]) != \

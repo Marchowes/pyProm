@@ -24,12 +24,13 @@ class SpotElevationContainerTests(unittest.TestCase):
         datamap = cls.datafile.datamap
         cls.someslice = datamap.subset(65, 55, 100, 100)
         cls.somewhere = AnalyzeData(cls.someslice)
-        cls.summits, cls.saddles = cls.somewhere.run()
+        cls.summits, cls.saddles, cls.runoffs = cls.somewhere.run()
         cls.oneKMradius =  cls.summits.radius(44.954583, -71.957916, 1000)
 
-
     def testSpotElevationContainerLowest(self):
-        """ Make sure the lowest summit is what we expect."""
+        """
+        Make sure the lowest summit is what we expect.
+        """
         self.assertEqual(self.summits.lowest[0].elevation, 501.0)
         self.assertEqual(len(self.summits.lowest), 1)
 
@@ -37,9 +38,10 @@ class SpotElevationContainerTests(unittest.TestCase):
         self.summits.append(Summit(1, 1, self.summits.lowest[0].elevation))
         self.assertEqual(len(self.summits.lowest), 2)
 
-
     def testSpotElevationContainerHighest(self):
-        """ Make sure the highest summit is what we expect."""
+        """
+        Make sure the highest summit is what we expect.
+        """
         self.assertEqual(self.summits.highest[0].elevation, 585.0)
         self.assertEqual(len(self.summits.highest),1)
 
@@ -48,7 +50,9 @@ class SpotElevationContainerTests(unittest.TestCase):
         self.assertEqual(len(self.summits.highest), 2)
 
     def testSpotElevationContainerRadiusMeters(self):
-        """ Make sure radius calculation results are the same for meters. """
+        """
+        Make sure radius calculation results are the same for meters.
+        """
         meters = self.summits.radius(44.954583, -71.957916, 1000)
         self.assertEqual(meters.summits, self.oneKMradius.summits)
         meters = self.summits.radius(44.954583, -71.957916, 1000, "m")
@@ -170,7 +174,6 @@ class SpotElevationContainerTests(unittest.TestCase):
         Ensure appending Different child SpotElevations
         to SpotElevationContainer succeeds.
         """
-
         container = SpotElevationContainer([])
         container.append(Summit(1, 2, 3))
         container.append(Saddle(1, 2, 3))
@@ -185,7 +188,6 @@ class SpotElevationContainerTests(unittest.TestCase):
         container = SpotElevationContainer([sum, sad])
         container[1] = sum2
         self.assertEqual(container[1], sum2)
-
 
     def testSpotElevationContainerSetItemNegative(self):
         """

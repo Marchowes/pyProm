@@ -23,8 +23,8 @@ class MultipointTests(unittest.TestCase):
         cls.datamap = cls.datafile.datamap
         cls.someslice = cls.datamap.subset(1000, 1000, 100, 100)
         cls.somewhere = AnalyzeData(cls.someslice)
-        cls.summits, cls.saddles = cls.somewhere.run()
-        cls.saddle = cls.saddles.saddles[0]
+        cls.summits, cls.saddles, cls.runoffs = cls.somewhere.run()
+        cls.saddle = cls.runoffs.saddles[0]
         cls.summitWithoutMultipointEdge = cls.summits.summits[4]
         cls.bgp11 = BaseGridPoint(1,1)
         cls.bgp22 = BaseGridPoint(2,2)
@@ -120,7 +120,6 @@ class MultipointTests(unittest.TestCase):
         """
         Ensure __setattr__ works as expected.
         """
-
         multipoint = MultiPoint([self.bgp11], 100, self.datamap)
         self.assertEqual(len(multipoint), 1)
         multipoint[0] = self.bgp22
@@ -130,7 +129,6 @@ class MultipointTests(unittest.TestCase):
         """
         Ensure __setattr__ Disallows Non BaseGridpoints to be set.
         """
-
         multipoint = MultiPoint([self.bgp11], 100, self.datamap)
         self.assertEqual(len(multipoint), 1)
         with self.assertRaises(TypeError):
@@ -140,7 +138,6 @@ class MultipointTests(unittest.TestCase):
         """
         Ensure __getattr__ works as expected.
         """
-
         multipoint = MultiPoint([self.bgp11], 100, self.datamap)
         self.assertEqual(len(multipoint), 1)
         self.assertEqual(multipoint[0], self.bgp11)

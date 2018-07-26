@@ -17,13 +17,17 @@ class SummitsContainerTests(unittest.TestCase):
         pass
 
     def testSummitsContainerBadInitiation(self):
-        """Ensure creating a SummitsContainer with a list of Saddles fails"""
+        """
+        Ensure creating a SummitsContainer with a list of Saddles fails
+        """
         saddles = [Saddle(1,2,3)]
         with self.assertRaises(TypeError):
             SummitsContainer(saddles)
 
     def testSummitsContainerEmptyInitiation(self):
-        """Ensure creating a SaddlesContainer with an empty list is OK"""
+        """
+        Ensure creating a SaddlesContainer with an empty list is OK
+        """
         container = SummitsContainer([])
         self.assertEqual(len(container.summits), 0)
 
@@ -81,7 +85,9 @@ class SummitsContainerTests(unittest.TestCase):
             container[1] = saddle567
 
     def testSummitsContainerRepr(self):
-        """ Ensure __repr__ yields expected result"""
+        """
+        Ensure __repr__ yields expected result
+        """
         summits = [Summit(1, 2, 3)]
         container = SummitsContainer(summits)
         self.assertEqual(container.__repr__(),

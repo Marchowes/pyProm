@@ -86,7 +86,7 @@ class MultiPoint(object):
         Gives MultiPoint list like set capabilities
         :param idx: index value
         :param point: :class:`BaseGridPoint`
-        :raises: TypeError if point not of :class:`MultiPoint`
+        :raises: TypeError if point not of :class:`BaseGridPoint`
         """
         isBaseGridPoint(point)
         self.points[idx] = point
@@ -121,10 +121,16 @@ class MultiPoint(object):
                sorted([x for x in other.points])
 
     def __iter__(self):
+        """
+        :return: self.points as iterator
+        """
         for point in self.points:
             yield point
 
     def __repr__(self):
+        """
+        :return: String representation of this object
+        """
         return "<Multipoint> elevation(m): {}, points {}". \
             format(self.elevation,
                    len(self.points))
@@ -133,8 +139,8 @@ class MultiPoint(object):
 
 def _isMultiPoint(mp):
     """
-    :param spotElevationContainer: object under scrutiny
-    :raises: TypeError if other not of :class:`SpotElevationContainer`
+    :param mp: object under scrutiny
+    :raises: TypeError if other not of :class:`MultiPoint`
     """
     if not isinstance(mp, MultiPoint):
         raise TypeError("MultiPoint expected")

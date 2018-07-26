@@ -172,7 +172,6 @@ class PerimeterTests(unittest.TestCase):
         """
         Ensure __setattr__ works as expected.
         """
-
         perimeter = \
             Perimeter(pointList = [self.p11],
                       datamap = self.datamap)
@@ -184,7 +183,6 @@ class PerimeterTests(unittest.TestCase):
         """
         Ensure __setattr__ Disallows Non Gridpoints to be set.
         """
-
         perimeter = \
             Perimeter(pointList = [self.p11],
                       datamap = self.datamap)
@@ -196,7 +194,6 @@ class PerimeterTests(unittest.TestCase):
         """
         Ensure __getattr__ works as expected.
         """
-
         perimeter = \
             Perimeter(pointList = [self.p11],
                       datamap = self.datamap)

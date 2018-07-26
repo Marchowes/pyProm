@@ -15,34 +15,45 @@ from pyprom.lib.errors.errors import NoLinkersError
 
 
 class WalkTests(unittest.TestCase):
-    """Test Walk Object."""
-
+    """
+    Test Walk Object.
+    """
     def setUp(self):
-        """Set Up Tests."""
+        """
+        Set Up Tests.
+        """
         getTestZip()
         self.datafile = GDALLoader('/tmp/N44W072.hgt')
         datamap = self.datafile.datamap
         self.islandpondVT = datamap.subset(602, 353, 260, 260)
         self.islandpondVTVicinity = AnalyzeData(self.islandpondVT)
-        self.summits, self.saddles = self.islandpondVTVicinity.run()
+        self.summits, self.saddles, self.runoffs= self.islandpondVTVicinity.run()
 
     def testWrongSaddles(self):
-        """Ensure saddles param is actually a :class:SaddlesContainer"""
+        """
+        Ensure saddles param is actually a :class:SaddlesContainer
+        """
         with self.assertRaises(TypeError):
             Walk(self.summits, self.summits, self.islandpondVT)
 
     def testWrongSummits(self):
-        """Ensure summits param is actually a :class:SummitsContainer"""
+        """
+        Ensure summits param is actually a :class:SummitsContainer
+        """
         with self.assertRaises(TypeError):
              Walk(self.saddles, self.saddles, self.islandpondVT)
 
     def testWrongDatamap(self):
-        """Ensure datamap param is actually a :class:Datamap"""
+        """
+        Ensure datamap param is actually a :class:Datamap
+        """
         with self.assertRaises(TypeError):
             Walk(self.summits, self.saddles, self.saddles)
 
     def testWalkIslandPond(self):
-        """Test walk around Island Pond VT."""
+        """
+        Test walk around Island Pond VT.
+        """
         islandPondSaddleContainer = self.saddles.radius(44.810833, -71.8676388, 10)
         islandPondSaddle = islandPondSaddleContainer[0]
         walk = Walk(self.summits, islandPondSaddleContainer, self.islandpondVT)

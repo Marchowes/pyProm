@@ -23,17 +23,21 @@ class Perimeter(object):
     """
     def __init__(self, pointList=None,
                  pointIndex=None,
-                 datamap=None, mapEdge=False):
+                 datamap=None,
+                 mapEdge=False,
+                 mapEdgePoints=None):
         super(Perimeter, self).__init__()
         self.points = list()
         if pointIndex:
             self.pointIndex = pointIndex
             self.points = [iep for x, _y in self.pointIndex.items()
                            for y, iep in _y.items()]
+
         if pointList:
             self.points = pointList
         self.datamap = datamap
         self.mapEdge = mapEdge
+        self.mapEdgePoints = mapEdgePoints
 
     def iterNeighborDiagonal(self, point):
         """
@@ -145,7 +149,7 @@ class Perimeter(object):
         """
     `   Gives Perimeter list like get capabilities
         :param idx: index value
-        :return: :class:`SpotElevation` self.point at idx
+        :return: :class:`Gridpoint` self.point at idx
         """
         return self.points[idx]
 
@@ -170,16 +174,19 @@ class Perimeter(object):
         return sorted([x for x in self.points]) != \
                sorted([x for x in other.points])
 
+    def __iter__(self):
+        """
+        :return: iterator for self.points
+        """
+        for point in self.points:
+            yield point
+
     def __repr__(self):
         """
         :return: String representation of this object
         """
         return "<Perimeter>" \
                " {} Objects".format(len(self.points))
-
-    def __iter__(self):
-        for point in self.points:
-            yield point
 
     __unicode__ = __str__ = __repr__
 

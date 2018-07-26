@@ -26,6 +26,9 @@ def equalHeightBlob(datamap, x, y, elevation):
     exploredEqualHeight[x][y] = True
     perimeterPointHash = defaultdict(dict)
     toBeAnalyzed = [masterGridPoint]
+    shoreMapEdge = []
+    x_mapEdge = {0: True, datamap.max_x: True}
+    y_mapEdge = {0: True, datamap.max_y: True}
 
     # Loop until pool of equalHeight neighbors has been exhausted.
     edge = False
@@ -33,9 +36,9 @@ def equalHeightBlob(datamap, x, y, elevation):
         gridPoint = toBeAnalyzed.pop()
         neighbors = datamap.iterateDiagonal(gridPoint.x, gridPoint.y)
         # Determine if edge or not.
-        if gridPoint.x in (datamap.max_x, 0) or gridPoint.y in \
-                (datamap.max_y, 0):
-            edge = True
+        if not edge:
+            if x_mapEdge.get(gridPoint.x) or y_mapEdge.get(gridPoint.y):
+                edge = True
         for _x, _y, elevation in neighbors:
             if elevation == masterGridPoint.elevation and\
                     not exploredEqualHeight[_x].get(_y, False):
@@ -45,13 +48,18 @@ def equalHeightBlob(datamap, x, y, elevation):
             # If elevation >  master grid point, stash away as
             # a perimeter point. Only keep track of edgepoints
             # higher!
-            elif elevation > masterGridPoint.elevation:
+            elif elevation != masterGridPoint.elevation:
                 if not perimeterPointHash[_x].get(_y, False):
-                    perimeterPointHash[_x][_y] = \
-                        GridPoint(_x, _y, elevation)
+                    gp = GridPoint(_x, _y, elevation)
+                    if elevation > masterGridPoint.elevation:
+                        perimeterPointHash[_x][_y] = gp
+                    if x_mapEdge.get(_x) or y_mapEdge.get(_y):
+                        shoreMapEdge.append(gp)
     return MultiPoint(coordinateHashToGridPointList(exploredEqualHeight),
                       masterGridPoint.elevation, datamap,
                       perimeter=Perimeter(
                           pointIndex=perimeterPointHash,
-                          datamap=datamap, mapEdge=edge)
+                          datamap=datamap,
+                          mapEdge=edge,
+                          mapEdgePoints=shoreMapEdge)
                       )

@@ -23,6 +23,8 @@ class Saddle(SpotElevation):
         :param elevation: elevation in meters
         :param multiPoint: :class:`MultiPoint` object
         :param highShores: :class:`HighEdgeContainer` object
+        :param edge: (bool) does this :class:`Saddle` have an edge
+        Effect?
         """
         super(Saddle, self).__init__(latitude, longitude,
                                      elevation, *args, **kwargs)
@@ -100,6 +102,9 @@ class Saddle(SpotElevation):
             return json.dumps(to_json)
 
     def __repr__(self):
+        """
+        :return: string representation of this object.
+        """
         return "<Saddle> lat {} long {} {}ft {}m MultiPoint {}".format(
             self.latitude,
             self.longitude,

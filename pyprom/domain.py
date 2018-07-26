@@ -23,6 +23,7 @@ from .lib.locations.saddle import Saddle
 from .lib.locations.base_gridpoint import BaseGridPoint
 from .lib.containers.multipoint import MultiPoint
 from .lib.containers.summits import SummitsContainer
+from .lib.containers.runoffs import RunoffsContainer
 from .lib.containers.saddles import SaddlesContainer
 from .lib.containers.gridpoint import GridPointContainer
 from .lib.locations.gridpoint import GridPoint
@@ -44,6 +45,7 @@ class Domain(object):
                             ' or Loader type object')
         self.saddles = None
         self.summits = None
+        self.runoffs = None
         self.linkers = None
         self.extent = 'LL: {}\n LR: {}\n UL: {}\n UR: {}\n'.format(
              self.datamap.lower_left,
@@ -59,10 +61,11 @@ class Domain(object):
         and :class:`Linkers`.
         """
         # Expunge any existing saddles, summits, and linkers
-        self.saddles = SpotElevationContainer([])
-        self.summits = SpotElevationContainer([])
+        self.saddles = SaddlesContainer([])
+        self.summits = SummitsContainer([])
+        self.runoffs = RunoffsContainer([])
         self.linkers = list()
-        self.summits, self.saddles = AnalyzeData(self.datamap).run()
+        self.summits, self.saddles, self.runoffs = AnalyzeData(self.datamap).run()
 
     def read(self, filename):
         """
@@ -160,10 +163,11 @@ class Domain(object):
 
     def __repr__(self):
         return "<Domain> Lat/Long Extent {} Saddles " \
-               "{} Summits {} Linkers {}".format(
+               "{} Summits {} Runoffs {} Linkers {}".format(
                     self.extent,
                     len(self.saddles),
                     len(self.summits),
+                    len(self.runoffs),
                     len(self.linkers))
 
     __unicode__ = __str__ = __repr__
