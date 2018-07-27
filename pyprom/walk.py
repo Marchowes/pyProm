@@ -20,7 +20,12 @@ from .lib.logic.equalheight import equalHeightBlob
 from .domain import Domain
 from .lib.errors.errors import NoLinkersError
 
+
 class Walk(object):
+    """
+    Walk object
+    """
+
     def __init__(self, summits, saddles, datamap):
         """
         :param summits: summits container
@@ -73,12 +78,12 @@ class Walk(object):
                 split = round(thisTime - lasttime, 2)
                 self.lasttime = default_timer()
                 rt = self.lasttime - start
-                pointsPerSec = round(idx/rt, 2)
+                pointsPerSec = round(idx / rt, 2)
                 self.logger.info(
                     "Saddles per second: {} - {}%"
                     " runtime: {}, split: {}".format(
                         pointsPerSec,
-                        round(idx/len(self.saddles)*100, 2),
+                        round(idx / len(self.saddles) * 100, 2),
                         (str(timedelta(seconds=round(rt, 2)))),
                         split
                     ))
@@ -99,7 +104,10 @@ class Walk(object):
         return d
 
     def walk(self, saddle):
-        # check our high shores
+        """
+        Walk from HighEdge. Appends to self.linkers
+        :param saddle:
+        """
         if not saddle.highShores:
             return
         # Perform walk for the highest point in each highShore.
@@ -186,9 +194,9 @@ class Walk(object):
         - Saddle connects to two or less Summits
         - (Summit, Summit) Pair contains another Saddle which is higher
                     OK
-                 /--995--\
+                 /--995--/
         Summit 1000     1001 Summit
-                 \--990--/
+                 /--990--/
                   tooLow
         """
         count = 0
@@ -219,9 +227,9 @@ class Walk(object):
     def mark_redundant_linkers(self):
         """
         Disqualifies Linkers and Saddles for Single Summit Saddles.
-                  /-----\
+                  /-----/
         Summit 1000    995 Saddle  <-Disqualify
-                  \-----/
+                  /-----/
         """
         count = 0
         for saddle in self.saddles:
@@ -240,18 +248,28 @@ class Walk(object):
         self.logger.info("Saddles with disqualified Linkers: {}".format(count))
 
     def __repr__(self):
+        """
+        :return: String representation of this object
+        """
         return "<Walk> Saddles {} Summits {} Linkers {}".format(
-                    len(self.saddles),
-                    len(self.summits),
-                    len(self.linkers))
+            len(self.saddles),
+            len(self.summits),
+            len(self.linkers))
 
     __unicode__ = __str__ = __repr__
 
 
-
 class BetaWalk(object):
-    def __init__(self, summits, saddles, datamap):
+    """
+    Doomed Walk to be deleted...
+    """
 
+    def __init__(self, summits, saddles, datamap):
+        """
+        :param summits:
+        :param saddles:
+        :param datamap:
+        """
         self.logger = logging.getLogger('{}'.format(__name__))
         self.logger.info("Initiating Walk")
         self.summits = summits
@@ -273,17 +291,25 @@ class BetaWalk(object):
                 for mp in point.multiPoint.points:
                     lookupHash[mp.x][mp.y] = point
             else:
-                x,y = self.datamap.latlong_to_xy(point.latitude, point.longitude)
+                x, y = self.datamap.latlong_to_xy(point.latitude,
+                                                  point.longitude)
                 lookupHash[x][y] = point
         return lookupHash
 
     def run(self):
-        # iterate through saddles
+        """
+        Run the walk function on all saddles not disqualified.
+        :return:
+        """
         for saddle in self.saddles.points:
             if not saddle.disqualified:
                 self.walk(saddle)
 
     def walk(self, saddle):
+        """
+        :param saddle: :class:`Saddle`
+        :return: :class:`Linker`
+        """
         # iterate through high Shores
         linkers = list()
         for highEdge in saddle.highShores:
@@ -347,9 +373,9 @@ class BetaWalk(object):
         - Saddle connects to two or less Summits
         - (Summit, Summit) Pair contains another Saddle which is higher
                     OK
-                 /--995--\
+                 /--995--/
         Summit 1000     1001 Summit
-                 \--990--/
+                 /--990--/
                   tooLow
         """
         count = 0
@@ -377,13 +403,12 @@ class BetaWalk(object):
                     count += 1
         self.logger.info("Linkers Disqualified: {}".format(count))
 
-
     def mark_redundant_linkers(self):
         """
         Disqualifies Linkers and Saddles for Single Summit Saddles.
-                  /-----\
+                  /-----/
         Summit 1000    995 Saddle  <-Disqualify
-                  \-----/
+                  /-----/
         """
         count = 0
         for saddle in self.saddles.points:
@@ -400,4 +425,3 @@ class BetaWalk(object):
                 for linker in saddle.summits:
                     linker.disqualified = True
         self.logger.info("Saddles with disqualified Linkers: {}".format(count))
-

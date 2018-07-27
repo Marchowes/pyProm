@@ -13,6 +13,10 @@ from .lib.containers.spot_elevation import SpotElevationContainer
 
 
 class KMLfileWriter(object):
+    """
+    KML file writer
+    """
+
     def __init__(self, kmlList, outputFile):
         """
         :param kmlList: a list of SpotElevation type objects, or a
@@ -58,6 +62,9 @@ class KMLfileWriter(object):
         return p
 
     def writeFile(self):
+        """
+        Write KML file.
+        """
         output = open(self.outputFile, "w")
         output.write(self.k.to_string(prettyprint=True))
         output.close()

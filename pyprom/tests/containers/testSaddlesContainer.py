@@ -12,6 +12,8 @@ from pyprom.lib.locations.summit import Summit
 
 
 class SaddlesContainerTests(unittest.TestCase):
+    """Test SaddlesContainer."""
+
     def setUp(self):
         """Set Up Tests."""
         pass
@@ -20,7 +22,7 @@ class SaddlesContainerTests(unittest.TestCase):
         """
         Ensure creating a SaddlesContainer with a list of Summits fails
         """
-        summits = [Summit(1,2,3)]
+        summits = [Summit(1, 2, 3)]
         with self.assertRaises(TypeError):
             SaddlesContainer(summits)
 
@@ -35,7 +37,7 @@ class SaddlesContainerTests(unittest.TestCase):
         """
         Ensure creating a SaddlesContainer with a list of Summits succeeds
         """
-        saddles = [Saddle(1,2,3)]
+        saddles = [Saddle(1, 2, 3)]
         container = SaddlesContainer(saddles)
         self.assertEqual(len(container), 1)
         self.assertEqual(len(container.saddles), 1)
@@ -47,20 +49,20 @@ class SaddlesContainerTests(unittest.TestCase):
         saddles = [Saddle(1, 2, 3)]
         container = SaddlesContainer(saddles)
         with self.assertRaises(TypeError):
-            container.append(Summit(1,2,3))
+            container.append(Summit(1, 2, 3))
 
     def testSaddlesContainerGoodAppend(self):
         """
         Ensure adding Saddle to SaddlesContainer succeeds.
         """
         container = SaddlesContainer([])
-        container.append(Saddle(1,2,3))
+        container.append(Saddle(1, 2, 3))
 
     def testSaddlesContainerGetItem(self):
         """
         Ensure getting item index succeeds.
         """
-        saddles = [Saddle(1,2,3)]
+        saddles = [Saddle(1, 2, 3)]
         container = SaddlesContainer(saddles)
         self.assertEqual(container[0], saddles[0])
 
@@ -95,11 +97,8 @@ class SaddlesContainerTests(unittest.TestCase):
 
     def testSaddlesContainerRebuildSaddles(self):
         """
-        see testInternalSaddleNetwork.py::
+        See testInternalSaddleNetwork.py::
         InternalSaddleNetworkTests::
         testInternalSaddleNetworkAziscohosViaContainer
         """
         pass
-
-
-

@@ -12,6 +12,8 @@ from pyprom.lib.locations.summit import Summit
 
 
 class SummitsContainerTests(unittest.TestCase):
+    """Test SummitsContainer."""
+
     def setUp(self):
         """Set Up Tests."""
         pass
@@ -20,7 +22,7 @@ class SummitsContainerTests(unittest.TestCase):
         """
         Ensure creating a SummitsContainer with a list of Saddles fails
         """
-        saddles = [Saddle(1,2,3)]
+        saddles = [Saddle(1, 2, 3)]
         with self.assertRaises(TypeError):
             SummitsContainer(saddles)
 
@@ -35,7 +37,7 @@ class SummitsContainerTests(unittest.TestCase):
         """
         Ensure creating a SummitsContainer with a list of Summits succeeds
         """
-        summits = [Summit(1,2,3)]
+        summits = [Summit(1, 2, 3)]
         container = SummitsContainer(summits)
         self.assertEqual(len(container), 1)
         self.assertEqual(len(container.summits), 1)
@@ -44,23 +46,23 @@ class SummitsContainerTests(unittest.TestCase):
         """
         Ensure adding Saddle to SummitsContainer fails.
         """
-        summits = [Summit(1,2,3)]
+        summits = [Summit(1, 2, 3)]
         container = SummitsContainer(summits)
         with self.assertRaises(TypeError):
-            container.append(Saddle(1,2,3))
+            container.append(Saddle(1, 2, 3))
 
     def testSummitsContainerGoodAppend(self):
         """
         Ensure adding Summit to SummitsContainer succeeds.
         """
         container = SummitsContainer([])
-        container.append(Summit(1,2,3))
+        container.append(Summit(1, 2, 3))
 
     def testSummitsContainerGetItem(self):
         """
         Ensure getting item index succeeds.
         """
-        summits = [Summit(1,2,3)]
+        summits = [Summit(1, 2, 3)]
         container = SummitsContainer(summits)
         self.assertEqual(container[0], summits[0])
 

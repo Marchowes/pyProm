@@ -7,7 +7,7 @@ the LICENSE file that accompanies it.
 
 from __future__ import division
 import unittest
-from pyprom.tests.getData import getTestZip
+from pyprom.tests.getData import gettestzip
 from pyprom.dataload import GDALLoader
 
 
@@ -16,7 +16,7 @@ class DataMapTests(unittest.TestCase):
 
     def setUp(self):
         """Set Up Tests."""
-        getTestZip()
+        gettestzip()
         self.datafile = GDALLoader('/tmp/N44W072.hgt')
         self.datamap = self.datafile.datamap
 

@@ -11,11 +11,13 @@ type location objects.
 from .spot_elevation import SpotElevationContainer
 from ..locations.summit import Summit, isSummit
 
+
 class SummitsContainer(SpotElevationContainer):
     """
     Container for Summits.
     Allows for various list transformations.
     """
+
     def __init__(self, summitList):
         """
         :param summitList: list of :class:`Summit`s

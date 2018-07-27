@@ -8,13 +8,14 @@ This library contains a base container class for storing GridPoint
 type location objects.
 """
 
-from pyprom.lib.locations.gridpoint import GridPoint, isGridPoint
+from pyprom.lib.locations.gridpoint import isGridPoint
 
 
 class BaseGridPointContainer(object):
     """
     Base Grid Point Container.
     """
+
     def __init__(self, gridPointList):
         """
         :param gridPointList: list of :class:`GridPoints`
@@ -55,7 +56,7 @@ class BaseGridPointContainer(object):
 
     def __getitem__(self, idx):
         """
-    `   Gives BaseGridpoint list like get capabilities
+        Gives BaseGridpoint list like get capabilities
         :param idx: index value
         :return: :class:`GridPoint` self.point at idx
         """
@@ -77,7 +78,7 @@ class BaseGridPointContainer(object):
         """
         _isBaseGridPointContainer(other)
         return sorted([x for x in self.points]) == \
-               sorted([x for x in other.points])
+            sorted([x for x in other.points])
 
     def __ne__(self, other):
         """
@@ -88,7 +89,7 @@ class BaseGridPointContainer(object):
         """
         _isBaseGridPointContainer(other)
         return sorted([x for x in self.points]) != \
-               sorted([x for x in other.points])
+            sorted([x for x in other.points])
 
     def __repr__(self):
         """

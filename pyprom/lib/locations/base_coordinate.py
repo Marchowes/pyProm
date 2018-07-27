@@ -16,6 +16,7 @@ class BaseCoordinate(object):
     Base Coordinate, intended to be inherited from. This contains
     basic lat/long
     """
+
     def __init__(self, latitude, longitude, *args, **kwargs):
         """
         :param latitude: latitude in dotted decimal
@@ -52,6 +53,11 @@ class BaseCoordinate(object):
         return utm.from_latlon(self.latitude, self.longitude)
 
     def __eq__(self, other):
+        """
+        Determines if :class:`BaseCoordinate` is equal to another.
+        :param other: :class:`BaseCoordinate` to be compared against
+        :return: bool of equality
+        """
         latitude = longitude = olatitude = olongitude = None
         if self.latitude:
             latitude = round(self.latitude, 6)
@@ -65,13 +71,24 @@ class BaseCoordinate(object):
                [olatitude, olongitude]
 
     def __ne__(self, other):
+        """
+        Determines if :class:`BaseCoordinate` is not equal to another.
+        :param other: :class:`BaseCoordinate` to be compared against
+        :return: bool of inequality
+        """
         return [round(self.latitude, 6), round(self.longitude, 6)] != \
                [round(other.latitude, 6), round(other.longitude, 6)]
 
     def __hash__(self):
+        """
+        :return: Hash representation of this object
+        """
         return hash((round(self.latitude, 6), round(self.longitude, 6)))
 
     def __repr__(self):
+        """
+        :return: String representation of this object
+        """
         return "<BaseCoordinate> lat {} long {}".format(self.latitude,
                                                         self.longitude)
 

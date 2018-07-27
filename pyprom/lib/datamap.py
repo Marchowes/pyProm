@@ -18,6 +18,7 @@ ARCMIN_DEG = 60
 
 class DataMap():
     """Base class for Datamap type objects."""
+
     def __init__(self, numpy_map, unit):
         """__init__."""
         self.numpy_map = numpy_map
@@ -77,6 +78,7 @@ class ProjectionDataMap(DataMap):
     ProjectionDataMap is a Datamap object for projection style
     datasets from GDAL.
     """
+
     def __init__(self, numpy_map, upperLeftY, upperLeftX, resolutionY,
                  resolutionX, span_y, span_x, linear_unit, unit, nodata,
                  transform, reverse_transform):
@@ -156,8 +158,8 @@ class ProjectionDataMap(DataMap):
         coordinate = self.reverse_transform.TransformPoint(longitude, latitude)
         x = coordinate[1]
         y = coordinate[0]
-        rel_x = round((x - self._uppermost_absolute())/self.res_x)
-        rel_y = round((y - self._leftmost_absolute())/self.res_y)
+        rel_x = round((x - self._uppermost_absolute()) / self.res_x)
+        rel_y = round((y - self._leftmost_absolute()) / self.res_y)
         return (rel_x, rel_y)
 
     def elevation(self, latitude, longitude):
@@ -254,7 +256,7 @@ class ProjectionDataMap(DataMap):
         """
         southExtreme = self.x_to_native_x(x)
         westExtreme = self.y_to_native_y(y)
-        numpy_map = (self.numpy_map[x:x+xSpan, y:y+ySpan])
+        numpy_map = (self.numpy_map[x:x + xSpan, y:y + ySpan])
         return ProjectionDataMap(numpy_map,
                                  southExtreme,
                                  westExtreme,
@@ -269,12 +271,15 @@ class ProjectionDataMap(DataMap):
                                  self.reverse_transform)
 
     def __repr__(self):
+        """
+        :return: String representation of this object
+        """
         return "<ProjectionDataMap> LowerLeft LatLon {}, LowerLeft Local "\
-                "Coords {}, SpanX {}, SpanY {}, {} Units".format(
-                 self.lower_left,
-                 (self._leftmost_absolute(), self._lowermost_absolute()),
-                 self.span_x,
-                 self.span_y,
-                 self.unit)
+            "Coords {}, SpanX {}, SpanY {}, {} Units".format(
+                self.lower_left,
+                (self._leftmost_absolute(), self._lowermost_absolute()),
+                self.span_x,
+                self.span_y,
+                self.unit)
 
     __unicode__ = __str__ = __repr__

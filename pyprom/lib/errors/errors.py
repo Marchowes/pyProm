@@ -9,11 +9,10 @@ type location objects.
 """
 
 
-
 class NoLinkersError(Exception):
     """
     Raised when the expected action expects linkers to exist. Usually
     this means walk was not executed.
     """
-    pass
 
+    pass

@@ -8,17 +8,19 @@ the LICENSE file that accompanies it.
 import unittest
 from collections import defaultdict
 
-from pyprom.tests.getData import getTestZip
+from pyprom.tests.getData import gettestzip
 from pyprom.dataload import GDALLoader
 from pyprom.lib.locations.gridpoint import GridPoint
 from pyprom.lib.containers.perimeter import Perimeter
 
+
 class PerimeterTests(unittest.TestCase):
+    """Test Perimeter Container."""
 
     @classmethod
     def setUpClass(cls):
         """Set Up Tests."""
-        getTestZip()
+        gettestzip()
         cls.datafile = GDALLoader('/tmp/N44W072.hgt')
         cls.datamap = cls.datafile.datamap
         cls.someslice = cls.datamap.subset(1000, 1000, 10, 10)
@@ -43,7 +45,7 @@ class PerimeterTests(unittest.TestCase):
         count = 0
         # Should have two results.
         for point in self.perimeter.iterNeighborDiagonal(self.p12):
-            count+=1
+            count += 1
             self.assertIn(point, [self.p11,
                                   self.p13])
         self.assertEqual(count, 2)
@@ -79,7 +81,7 @@ class PerimeterTests(unittest.TestCase):
         count = 0
         # Should have two results.
         for point in self.perimeter.iterNeighborOrthogonal(self.p12):
-            count+=1
+            count += 1
             self.assertIn(point, [self.p11,
                                   self.p13])
         self.assertEqual(count, 2)
@@ -106,7 +108,7 @@ class PerimeterTests(unittest.TestCase):
 
     def testPerimeterFindHighEdges(self):
         """
-        test findHighEdges on a discontigous GridPoint set
+        Test findHighEdges on a discontigous GridPoint set
         """
         perimeterId = defaultdict(dict)
         perimeterId[1][1] = self.p11
@@ -119,8 +121,8 @@ class PerimeterTests(unittest.TestCase):
             Perimeter(pointIndex=perimeterId,
                       datamap=self.datamap)
         highEdges = perimeterDiscontigous.findHighEdges(552)
-        self.assertEqual(2,len(highEdges))
-        self.assertEqual(highEdges[0].points, [self.p11,self.p12])
+        self.assertEqual(2, len(highEdges))
+        self.assertEqual(highEdges[0].points, [self.p11, self.p12])
         self.assertEqual(highEdges[1].points, [self.p14, self.p24,
                                                self.p25, self.p26])
 
@@ -140,8 +142,8 @@ class PerimeterTests(unittest.TestCase):
             Perimeter(pointIndex=perimeterId,
                       datamap=self.datamap)
         highEdges = perimeterOrthogonallyDiscontigous.findHighEdges(552)
-        self.assertEqual(1,len(highEdges))
-        self.assertEqual(6,len(highEdges[0].points))
+        self.assertEqual(1, len(highEdges))
+        self.assertEqual(6, len(highEdges[0].points))
 
     def testPerimeterfindHighPerimeter(self):
         """
@@ -173,8 +175,8 @@ class PerimeterTests(unittest.TestCase):
         Ensure __setattr__ works as expected.
         """
         perimeter = \
-            Perimeter(pointList = [self.p11],
-                      datamap = self.datamap)
+            Perimeter(pointList=[self.p11],
+                      datamap=self.datamap)
         self.assertEqual(len(perimeter), 1)
         perimeter[0] = self.p12
         self.assertEqual(perimeter[0], self.p12)
@@ -184,8 +186,8 @@ class PerimeterTests(unittest.TestCase):
         Ensure __setattr__ Disallows Non Gridpoints to be set.
         """
         perimeter = \
-            Perimeter(pointList = [self.p11],
-                      datamap = self.datamap)
+            Perimeter(pointList=[self.p11],
+                      datamap=self.datamap)
         self.assertEqual(len(perimeter), 1)
         with self.assertRaises(TypeError):
             perimeter[0] = "wtf"
@@ -195,8 +197,8 @@ class PerimeterTests(unittest.TestCase):
         Ensure __getattr__ works as expected.
         """
         perimeter = \
-            Perimeter(pointList = [self.p11],
-                      datamap = self.datamap)
+            Perimeter(pointList=[self.p11],
+                      datamap=self.datamap)
         self.assertEqual(len(perimeter), 1)
         self.assertEqual(perimeter[0], self.p11)
 
@@ -205,8 +207,8 @@ class PerimeterTests(unittest.TestCase):
         Ensure adding string to Perimeter fails.
         """
         perimeter = \
-            Perimeter(pointList = [self.p11],
-                      datamap = self.datamap)
+            Perimeter(pointList=[self.p11],
+                      datamap=self.datamap)
         with self.assertRaises(TypeError):
             perimeter.append("stuff")
 
@@ -215,8 +217,8 @@ class PerimeterTests(unittest.TestCase):
         Ensure adding GridPoint to SummitsContainer succeeds.
         """
         perimeter = \
-            Perimeter(pointList = [self.p11],
-                      datamap = self.datamap)
+            Perimeter(pointList=[self.p11],
+                      datamap=self.datamap)
         perimeter.append(self.p12)
         self.assertEqual(len(perimeter), 2)
 
@@ -225,14 +227,14 @@ class PerimeterTests(unittest.TestCase):
         Ensure __eq__ works as expected.
         """
         perimeter = \
-            Perimeter(pointList = [self.p11],
-                      datamap = self.datamap)
+            Perimeter(pointList=[self.p11],
+                      datamap=self.datamap)
         perimeter2 = \
-            Perimeter(pointList = [self.p11],
-                      datamap = self.datamap)
+            Perimeter(pointList=[self.p11],
+                      datamap=self.datamap)
         perimeter3 = \
-            Perimeter(pointList = [self.p12],
-                      datamap = self.datamap)
+            Perimeter(pointList=[self.p12],
+                      datamap=self.datamap)
 
         self.assertEqual(perimeter, perimeter2)
         test = perimeter2 == perimeter3

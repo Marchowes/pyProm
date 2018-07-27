@@ -10,6 +10,7 @@ used in Saddle highShores Tree Calculations.
 
 import sys
 
+
 class Feature_Verticies(object):
     """
     Feature_Verticies object stores Feature_Verticies data.
@@ -20,6 +21,7 @@ class Feature_Verticies(object):
     stored in `self.vertex_linkers[:].local` and those verticies
     are all all linked to foreign verticies
     """
+
     def __init__(self, index, vertex_linkers):
         """
         :param index: index of feature
@@ -48,6 +50,7 @@ class Feature_Verticies(object):
         return shortest
 
     def __repr__(self):
+        """String representation of this object"""
         return "<Feature_Verticies> {} ".format(
             self.vertex_linkers)
 

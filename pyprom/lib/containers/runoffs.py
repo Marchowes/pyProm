@@ -17,6 +17,7 @@ class RunoffsContainer(SaddlesContainer):
     Container for Saddles.
     Allows for various list transformations.
     """
+
     def __init__(self, runoffList):
         """
         :param runoffList: list of :class:`Runoff`s
@@ -31,6 +32,5 @@ class RunoffsContainer(SaddlesContainer):
         :return: String representation of this object
         """
         return "<RunoffsContainer> {} Objects".format(len(self.points))
-
 
     __unicode__ = __str__ = __repr__

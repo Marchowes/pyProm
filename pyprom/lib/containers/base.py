@@ -13,5 +13,6 @@ class _Base(object):
     """
     Very Base object, which contains just a logger.
     """
+
     def __init__(self):
         self.logger = logging.getLogger('pyProm.{}'.format(__name__))

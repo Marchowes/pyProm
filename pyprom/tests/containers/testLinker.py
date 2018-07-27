@@ -10,10 +10,12 @@ from pyprom.lib.locations.saddle import Saddle
 from pyprom.lib.locations.summit import Summit
 from pyprom.lib.containers.linker import Linker
 
+
 class LinkerTests(unittest.TestCase):
+    """Test Linker Containers."""
 
     def setUp(self):
-        """ setUp """
+        """Set Up Tests."""
         self.summit1 = Summit(1, 1, 1000)
         self.saddle1 = Saddle(5, 5, 100)
         self.summit2 = Summit(10, 10, 1000)
@@ -106,4 +108,3 @@ class LinkerTests(unittest.TestCase):
         self.linker1.add_to_remote_saddle_and_summit()
         self.assertEqual(len(self.summit1.saddles), 1)
         self.assertEqual(len(self.saddle1.summits), 1)
-

@@ -11,21 +11,24 @@ import json
 from ..locations.base_coordinate import BaseCoordinate
 from ..locations.base_gridpoint import isBaseGridPoint
 
+
 class MultiPoint(object):
-    """
-    This is an "equal height" Multipoint storage container that
-    provides a number of functions for analysis of these blob like
-    locations. An Example of this would be a pond. This object in
-    contains a list of all the points of this pond.
-    :param points: list of BaseGridPoint objects. These are the inside
-        points that make up a Multipoint.
-    :param elevation: elevation in meters
-    :param datamap: :class:`Datamap` object.
-    :param perimeter: :class:`Perimeter` object.
-        These are the points that make up the border of the multipoint
-        outside of the multipoint.
-    """
+    """MultiPoint Container"""
+
     def __init__(self, points, elevation, datamap, perimeter=None):
+        """
+        This is an "equal height" Multipoint storage container that
+        provides a number of functions for analysis of these blob like
+        locations. An Example of this would be a pond. This object in
+        contains a list of all the points of this pond.
+        :param points: list of BaseGridPoint objects. These are the inside
+            points that make up a Multipoint.
+        :param elevation: elevation in meters
+        :param datamap: :class:`Datamap` object.
+        :param perimeter: :class:`Perimeter` object.
+            These are the points that make up the border of the multipoint
+            outside of the multipoint.
+        """
         super(MultiPoint, self).__init__()
         self.points = points  # BaseGridPoint Objects.
         self.elevation = elevation
@@ -93,7 +96,7 @@ class MultiPoint(object):
 
     def __getitem__(self, idx):
         """
-    `   Gives MultiPoint list like get capabilities
+        Gives MultiPoint list like get capabilities
         :param idx: index value
         :return: :class:`GridPoint` self.point at idx
         """
@@ -108,7 +111,7 @@ class MultiPoint(object):
         """
         _isMultiPoint(other)
         return sorted([x for x in self.points]) == \
-               sorted([x for x in other.points])
+            sorted([x for x in other.points])
 
     def __ne__(self, other):
         """
@@ -118,7 +121,7 @@ class MultiPoint(object):
         """
         _isMultiPoint(other)
         return sorted([x for x in self.points]) != \
-               sorted([x for x in other.points])
+            sorted([x for x in other.points])
 
     def __iter__(self):
         """
@@ -136,6 +139,7 @@ class MultiPoint(object):
                    len(self.points))
 
     __unicode__ = __str__ = __repr__
+
 
 def _isMultiPoint(mp):
     """

@@ -25,6 +25,10 @@ from .lib.logic.equalheight import equalHeightBlob
 
 
 class AnalyzeData(object):
+    """
+    Object responsible for discovering features
+    """
+
     def __init__(self, datamap):
         """
         :param datamap: `DataMap` object.
@@ -39,6 +43,10 @@ class AnalyzeData(object):
         self.explored = defaultdict(dict)
 
     def run(self):
+        """
+        Shortcut for running analysis
+        :return: :class:`Summit`s, :class:`Saddle`s and :class:`Runoff`s
+        """
         _, _, _ = self.analyze()
         self.logger.info("Rebuilding Saddles")
         self.saddleObjects = self.saddleObjects.rebuildSaddles(self.datamap)
@@ -48,7 +56,8 @@ class AnalyzeData(object):
         """
         Analyze Routine.
         Looks for :class:`Summit`s, :class:`Saddle`s and :class:`Runoff`s
-        return: (:class:`SummitsContainer`, :class:`SaddlesContainer`, :class:`RunoffsContainer`,)
+        return: (:class:`SummitsContainer`, :class:`SaddlesContainer`,
+         :class:`RunoffsContainer`,)
         """
         self.start = default_timer()
         self.lasttime = self.start
@@ -63,7 +72,7 @@ class AnalyzeData(object):
             x, y = iterator.multi_index
             # core storage is always in metric.
             if self.datamap.unit == "FEET":
-                self.elevation = float(.3048*iterator[0])
+                self.elevation = float(.3048 * iterator[0])
             else:
                 self.elevation = float(iterator[0])
 
@@ -75,12 +84,12 @@ class AnalyzeData(object):
                 split = round(thisTime - self.lasttime, 2)
                 self.lasttime = default_timer()
                 rt = self.lasttime - self.start
-                pointsPerSec = round(index/rt, 2)
+                pointsPerSec = round(index / rt, 2)
                 self.logger.info(
                     "Points per second: {} - {}%"
                     " runtime: {}, split: {}".format(
                         pointsPerSec,
-                        round(index/self.data.size * 100, 2),
+                        round(index / self.data.size * 100, 2),
                         (str(timedelta(seconds=round(rt, 2)))),
                         split
                     ))
@@ -126,7 +135,6 @@ class AnalyzeData(object):
         :param y:
         :return: Summit, Saddle, or None
         """
-
         # Exempt! bail out!
         if self.explored[x].get(y, False):
             return None
@@ -164,8 +172,18 @@ class AnalyzeData(object):
         return self.consolidatedFeatureLogic(x, y, shoreSet, [], edge)
 
     def consolidatedFeatureLogic(self, x, y, perimeter, multipoint, edge):
+        """
+        consolidatedFeatureLogic analyzes the highEdges around a point or
+        multipoint and determines if the pattern matches a
+        :class:`Summit` :class:`Saddle` :class:`Runoff`
 
-
+        :param x: x coordinate.
+        :param y: y coordinate.
+        :param perimeter: :class:`Perimeter` container.
+        :param multipoint: :class:`Multipoint` container
+        :param edge: bool if this is a mapEdge.
+        :return: list of :class:`SpotElevationContainer` child objects.
+        """
         returnableLocations = []
         highPerimeter = perimeter.findHighEdges(
             self.elevation)
@@ -194,14 +212,14 @@ class AnalyzeData(object):
             lat, long = self.datamap.xy_to_latlong(x, y)
 
             # if we're an edge and all edgepoints are lower than our point.
-            if edge and len([x for x in perimeter.mapEdgePoints
-                               if x.elevation < self.elevation]) ==\
+            if edge and len([a for a in perimeter.mapEdgePoints
+                             if a.elevation < self.elevation]) ==\
                     len(perimeter.mapEdgePoints):
                 runOff = Runoff(lat,
-                            long,
-                            self.elevation,
-                            multiPoint=multipoint,
-                            highShores=highPerimeter)
+                                long,
+                                self.elevation,
+                                multiPoint=multipoint,
+                                highShores=highPerimeter)
                 returnableLocations.append(runOff)
                 return returnableLocations
 
@@ -214,14 +232,14 @@ class AnalyzeData(object):
             returnableLocations.append(saddle)
 
         # if we're an edge and all edgepoints are lower than our point.
-        if edge and len([x for x in perimeter.mapEdgePoints
-                           if x.elevation < self.elevation]) ==\
+        if edge and len([a for a in perimeter.mapEdgePoints
+                         if a.elevation < self.elevation]) ==\
                 len(perimeter.mapEdgePoints):
             lat, long = self.datamap.xy_to_latlong(x, y)
             runOff = Runoff(lat,
-                        long,
-                        self.elevation,
-                        multiPoint=multipoint,
-                        highShores=highPerimeter)
+                            long,
+                            self.elevation,
+                            multiPoint=multipoint,
+                            highShores=highPerimeter)
             returnableLocations.append(runOff)
         return returnableLocations

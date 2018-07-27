@@ -6,7 +6,7 @@ the LICENSE file that accompanies it.
 """
 
 import unittest
-from pyprom.tests.getData import getTestZip
+from pyprom.tests.getData import gettestzip
 from pyprom.dataload import GDALLoader
 from pyprom.feature_discovery import AnalyzeData
 from pyprom.lib.containers.summits import SummitsContainer
@@ -14,18 +14,20 @@ from pyprom.lib.containers.spot_elevation import SpotElevationContainer
 from pyprom.lib.locations.summit import Summit
 from pyprom.lib.locations.saddle import Saddle
 
+
 class SpotElevationContainerTests(unittest.TestCase):
+    """Test SpotElevationContainer"""
 
     @classmethod
     def setUpClass(cls):
         """Set Up Tests."""
-        getTestZip()
+        gettestzip()
         cls.datafile = GDALLoader('/tmp/N44W072.hgt')
         datamap = cls.datafile.datamap
         cls.someslice = datamap.subset(65, 55, 100, 100)
         cls.somewhere = AnalyzeData(cls.someslice)
         cls.summits, cls.saddles, cls.runoffs = cls.somewhere.run()
-        cls.oneKMradius =  cls.summits.radius(44.954583, -71.957916, 1000)
+        cls.oneKMradius = cls.summits.radius(44.954583, -71.957916, 1000)
 
     def testSpotElevationContainerLowest(self):
         """
@@ -43,7 +45,7 @@ class SpotElevationContainerTests(unittest.TestCase):
         Make sure the highest summit is what we expect.
         """
         self.assertEqual(self.summits.highest[0].elevation, 585.0)
-        self.assertEqual(len(self.summits.highest),1)
+        self.assertEqual(len(self.summits.highest), 1)
 
         # add another Summit with the same elevation as the highest.
         self.summits.append(Summit(1, 1, self.summits.highest[0].elevation))
@@ -129,10 +131,12 @@ class SpotElevationContainerTests(unittest.TestCase):
         """
         Ensure taking out a rectangle subsection yields expected results.
         """
-        rectangle = self.summits.rectangle(44.954583,-71.957916, 44.98125, -71.9609)
+        rectangle = self.summits.rectangle(44.954583, -71.957916,
+                                           44.98125, -71.9609)
         self.assertEqual(len(rectangle), 6)
         # flip lat/long around, should still be able to figure out rectangle.
-        rectangle = self.summits.rectangle(44.98125, -71.9609, 44.954583,-71.957916, )
+        rectangle = self.summits.rectangle(44.98125, -71.9609,
+                                           44.954583, -71.957916)
         self.assertEqual(len(rectangle), 6)
 
     def testSpotElevationContainerElevationRange(self):
@@ -229,4 +233,5 @@ class SpotElevationContainerTests(unittest.TestCase):
         Ensure __repr__ produces expected results.
         """
         container = SpotElevationContainer([])
-        self.assertEqual(container.__repr__(), "<SpotElevationContainer> 0 Objects")
+        self.assertEqual(container.__repr__(),
+                         "<SpotElevationContainer> 0 Objects")

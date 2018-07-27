@@ -8,12 +8,14 @@ the LICENSE file that accompanies it.
 import unittest
 from pyprom.lib.containers.gridpoint import GridPointContainer
 from pyprom.lib.locations.gridpoint import GridPoint
-from pyprom.lib.locations.summit import Summit
 from collections import defaultdict
 
 
 class GridPointContainerTests(unittest.TestCase):
+    """Test GridPointContainer"""
+
     def setUp(self):
+        """Set Up Tests."""
         self.p11 = GridPoint(1, 1, 553)
         self.p12 = GridPoint(1, 2, 554)
         self.p13 = GridPoint(1, 3, 554)
@@ -59,7 +61,7 @@ class GridPointContainerTests(unittest.TestCase):
         count = 0
         # Should have two results.
         for point in self.gpc.iterNeighborDiagonal(self.p12):
-            count+=1
+            count += 1
             self.assertIn(point, [self.p11,
                                   self.p13])
         self.assertEqual(count, 2)
@@ -86,7 +88,6 @@ class GridPointContainerTests(unittest.TestCase):
                                   self.p24])
         self.assertEqual(count, 3)
 
-
     def testGridPointContainerIterNeighborOrthogonal(self):
         """
         Ensure that iterOrthogonal returns the expected results.
@@ -96,7 +97,7 @@ class GridPointContainerTests(unittest.TestCase):
         count = 0
         # Should have two results.
         for point in self.gpc.iterNeighborOrthogonal(self.p12):
-            count+=1
+            count += 1
             self.assertIn(point, [self.p11,
                                   self.p13])
         self.assertEqual(count, 2)
@@ -126,8 +127,7 @@ class GridPointContainerTests(unittest.TestCase):
         Ensure findPseudoSummits gives the expected result
         """
         ps = self.gpc.findPseudoSummits()
-        self.assertEqual(ps,[self.p12, self.p24])
-
+        self.assertEqual(ps, [self.p12, self.p24])
 
     def testGridPointContainerFindClosestPoints(self):
         """

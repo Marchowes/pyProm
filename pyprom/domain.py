@@ -30,6 +30,11 @@ from .lib.locations.gridpoint import GridPoint
 
 
 class Domain(object):
+    """
+    Domain object, This Object contains all the features required to calculate
+    the Surface Network.
+    """
+
     def __init__(self, data):
         """
         A Domain consumes either a :class:`Datamap` object or
@@ -48,10 +53,10 @@ class Domain(object):
         self.runoffs = None
         self.linkers = None
         self.extent = 'LL: {}\n LR: {}\n UL: {}\n UR: {}\n'.format(
-             self.datamap.lower_left,
-             self.datamap.lower_right,
-             self.datamap.upper_left,
-             self.datamap.upper_right)
+            self.datamap.lower_left,
+            self.datamap.lower_right,
+            self.datamap.upper_left,
+            self.datamap.upper_right)
         self.logger = logging.getLogger('{}'.format(__name__))
         self.logger.info("Domain Object Created: \n{}".format(self.extent))
 
@@ -65,7 +70,8 @@ class Domain(object):
         self.summits = SummitsContainer([])
         self.runoffs = RunoffsContainer([])
         self.linkers = list()
-        self.summits, self.saddles, self.runoffs = AnalyzeData(self.datamap).run()
+        self.summits, self.saddles, self.runoffs =\
+            AnalyzeData(self.datamap).run()
 
     def read(self, filename):
         """
@@ -148,7 +154,7 @@ class Domain(object):
 
     def to_dict(self):
         """
-        dictionary of all :class:`Domain` Data.
+        Dictionary of all :class:`Domain` Data.
         """
         domain_dict = {'domain': self.extent,
                        'date': time.strftime("%m-%d-%Y %H:%M:%S")}
@@ -162,12 +168,15 @@ class Domain(object):
         return domain_dict
 
     def __repr__(self):
+        """
+        :return: String representation of this object
+        """
         return "<Domain> Lat/Long Extent {} Saddles " \
-               "{} Summits {} Runoffs {} Linkers {}".format(
-                    self.extent,
-                    len(self.saddles),
-                    len(self.summits),
-                    len(self.runoffs),
-                    len(self.linkers))
+            "{} Summits {} Runoffs {} Linkers {}".format(
+                self.extent,
+                len(self.saddles),
+                len(self.summits),
+                len(self.runoffs),
+                len(self.linkers))
 
     __unicode__ = __str__ = __repr__

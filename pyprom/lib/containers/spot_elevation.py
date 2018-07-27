@@ -25,6 +25,7 @@ class SpotElevationContainer(_Base):
     Container for Spot Elevation type lists.
     Allows for various list transformations.
     """
+
     def __init__(self, spotElevationList):
         """
         :param spotElevationList: list of :class:`SpotElevation`s
@@ -122,7 +123,7 @@ class SpotElevationContainer(_Base):
         :return: list of all points in range between lower and upper
         """
         return self.__class__([x for x in self.points if
-                                       x.feet > lower and x.feet < upper])
+                               x.feet > lower and x.feet < upper])
 
     def elevationRangeMetric(self, lower=-100000, upper=100000):
         """
@@ -131,8 +132,8 @@ class SpotElevationContainer(_Base):
         :return: list of all points in range between lower and upper
         """
         return self.__class__([x for x in self.points if
-                                       x.elevation > lower and
-                                       x.elevation < upper])
+                              x.elevation > lower and
+                              x.elevation < upper])
 
     def to_json(self, prettyprint=True):
         """
@@ -221,7 +222,7 @@ class SpotElevationContainer(_Base):
 
     def __getitem__(self, idx):
         """
-    `   Gives SpotElevationContainer list like get capabilities
+        Gives SpotElevationContainer list like get capabilities
         :param idx: index value
         :return: :class:`SpotElevation` self.point at idx
         """
@@ -236,7 +237,7 @@ class SpotElevationContainer(_Base):
         """
         _isSpotElevationContainer(other)
         return sorted([x for x in self.points]) == \
-               sorted([x for x in other.points])
+            sorted([x for x in other.points])
 
     def __ne__(self, other):
         """
@@ -246,7 +247,7 @@ class SpotElevationContainer(_Base):
         """
         _isSpotElevationContainer(other)
         return sorted([x for x in self.points]) != \
-               sorted([x for x in other.points])
+            sorted([x for x in other.points])
 
     __unicode__ = __str__ = __repr__
 

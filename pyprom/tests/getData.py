@@ -5,44 +5,31 @@ This software is distributed under a license that is described in
 the LICENSE file that accompanies it.
 """
 
-import sys
 import logging
 import zipfile
 import os.path
-python_version = sys.version_info.major
-
-if python_version == 2:
-    import urllib
-else:
-    import urllib.request
+import urllib.request
 
 
-def getTestZip():
-    """
-    Python 2 and 3 compatible helper function for pulling down the
-    desired test data.
-    """
+def gettestzip():
+    """Function is for pulling down the desired test data."""
     logger = logging.getLogger('pyProm.{}'.format(__name__))
     domain = "https://dds.cr.usgs.gov"
     path = "srtm/version2_1/SRTM1/Region_06"
     nh_north = "N44W072"
     hgtsuffix = ".hgt"
     suffix = ".hgt.zip"
-    nh_north_zip = nh_north+suffix
+    nh_north_zip = nh_north + suffix
     tmp = "/tmp"
-    destination = "{}/{}".format(tmp, nh_north+suffix)
+    destination = "{}/{}".format(tmp, nh_north + suffix)
 
-    extracted = tmp+"/"+nh_north+hgtsuffix
+    extracted = tmp + "/" + nh_north + hgtsuffix
 
     fullPath = ("/".join([domain, path, nh_north_zip]))
 
     if not os.path.isfile(extracted):
         logger.info("Downloading {} to {}".format(nh_north_zip, destination))
-
-        if python_version == 2:
-            urllib.urlretrieve(fullPath, destination)
-        else:
-            urllib.request.urlretrieve(fullPath, destination)
+        urllib.request.urlretrieve(fullPath, destination)
 
         logger.info("Extracting {} to {}".format(destination, extracted))
         zip_ref = zipfile.ZipFile(destination, 'r')

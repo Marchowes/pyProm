@@ -16,16 +16,24 @@ class Perimeter(object):
     """
     Container for :class:`Perimeter` type lists.
     Allows for various list transformations.
-    :param pointList: list of :class:`GridPoint` to
-     self.points
-    :param pointIndex: {X: { Y: :class:`GridPoint`}} passing
-    this will automatically generate self.points
     """
+
     def __init__(self, pointList=None,
                  pointIndex=None,
                  datamap=None,
                  mapEdge=False,
                  mapEdgePoints=None):
+        """
+
+        :param pointList: pointList: list of :class:`GridPoint` to
+        self.points
+        :param pointIndex: pointIndex: {X: { Y: :class:`GridPoint`}} passing
+        this will automatically generate self.points
+        :param datamap: datamap object
+        :param mapEdge: (bool) is this a map edge?
+        :param mapEdgePoints: :class:`GridPoint` list of Points on
+         the map edge.
+        """
         super(Perimeter, self).__init__()
         self.points = list()
         if pointIndex:
@@ -48,8 +56,8 @@ class Perimeter(object):
         shiftList = [[-1, 0], [-1, 1], [0, 1], [1, 1], [1, 0], [1, -1],
                      [0, -1], [-1, -1]]
         for shift in shiftList:
-            x = point.x+shift[0]
-            y = point.y+shift[1]
+            x = point.x + shift[0]
+            y = point.y + shift[1]
             if self.pointIndex[x].get(y, False):
                 if -1 <= x <= self.datamap.max_x + 1\
                         and -1 <= y <= self.datamap.max_y + 1:
@@ -63,7 +71,6 @@ class Perimeter(object):
         neighbors.
         :param point:
         """
-
         shiftList = [[-1, 0], [0, 1], [1, 0], [0, -1]]
         for shift in shiftList:
             x = point.x + shift[0]
@@ -116,7 +123,6 @@ class Perimeter(object):
         :param elevation:
         :return: GridPointContainer
         """
-
         higherPoints = [x for x in self.points if x.elevation > elevation]
         return GridPointContainer(higherPoints)
 
@@ -147,7 +153,7 @@ class Perimeter(object):
 
     def __getitem__(self, idx):
         """
-    `   Gives Perimeter list like get capabilities
+        Gives Perimeter list like get capabilities
         :param idx: index value
         :return: :class:`Gridpoint` self.point at idx
         """
@@ -162,7 +168,7 @@ class Perimeter(object):
         """
         _isPerimeter(other)
         return sorted([x for x in self.points]) == \
-               sorted([x for x in other.points])
+            sorted([x for x in other.points])
 
     def __ne__(self, other):
         """
@@ -172,7 +178,7 @@ class Perimeter(object):
         """
         _isPerimeter(other)
         return sorted([x for x in self.points]) != \
-               sorted([x for x in other.points])
+            sorted([x for x in other.points])
 
     def __iter__(self):
         """

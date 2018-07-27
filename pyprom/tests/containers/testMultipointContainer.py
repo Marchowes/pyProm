@@ -6,19 +6,21 @@ the LICENSE file that accompanies it.
 """
 
 import unittest
-from pyprom.tests.getData import getTestZip
+from pyprom.tests.getData import gettestzip
 from pyprom.dataload import GDALLoader
 from pyprom.feature_discovery import AnalyzeData
 from pyprom.lib.locations.base_coordinate import BaseCoordinate
 from pyprom.lib.locations.base_gridpoint import BaseGridPoint
 from pyprom.lib.containers.multipoint import MultiPoint
 
+
 class MultipointTests(unittest.TestCase):
+    """Test Multipoint Container."""
 
     @classmethod
     def setUpClass(cls):
         """Set Up Tests."""
-        getTestZip()
+        gettestzip()
         cls.datafile = GDALLoader('/tmp/N44W072.hgt')
         cls.datamap = cls.datafile.datamap
         cls.someslice = cls.datamap.subset(1000, 1000, 100, 100)
@@ -26,14 +28,14 @@ class MultipointTests(unittest.TestCase):
         cls.summits, cls.saddles, cls.runoffs = cls.somewhere.run()
         cls.saddle = cls.runoffs.saddles[0]
         cls.summitWithoutMultipointEdge = cls.summits.summits[4]
-        cls.bgp11 = BaseGridPoint(1,1)
-        cls.bgp22 = BaseGridPoint(2,2)
-        cls.bgp33 = BaseGridPoint(3,3)
+        cls.bgp11 = BaseGridPoint(1, 1)
+        cls.bgp22 = BaseGridPoint(2, 2)
+        cls.bgp33 = BaseGridPoint(3, 3)
 
     def testMultipointPointsLatLong(self):
         """
         Test multipoint container ability to convert GridPoints
-        to BaseCoordinates
+        to BaseCoordinates.
         """
         multipoint = self.summitWithoutMultipointEdge.multiPoint
         bc0 = BaseCoordinate(44.70986111111111, -71.71263888888889)
@@ -102,13 +104,15 @@ class MultipointTests(unittest.TestCase):
         Ensure __repr__ returns expected results.
         """
         multipoint = self.saddle.multiPoint
-        self.assertEqual(multipoint.__repr__(), "<Multipoint> elevation(m): 552.0, points 4")
+        self.assertEqual(multipoint.__repr__(),
+                         "<Multipoint> elevation(m): 552.0, points 4")
 
     def testMultipointIterator(self):
         """
         Ensure __iter__ returns expected results.
         """
-        self.assertEqual(len([x for x in self.summitWithoutMultipointEdge.multiPoint]), 2)
+        self.assertEqual(len([x for x in
+                              self.summitWithoutMultipointEdge.multiPoint]), 2)
 
     def testMultipointLen(self):
         """

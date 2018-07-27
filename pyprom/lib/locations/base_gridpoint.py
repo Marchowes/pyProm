@@ -11,6 +11,10 @@ import json
 
 
 class BaseGridPoint(object):
+    """
+    Base Object for GridPoints
+    """
+
     def __init__(self, x, y):
         """
         Basic Gridpoint.
@@ -41,9 +45,15 @@ class BaseGridPoint(object):
             return json.dumps(to_json)
 
     def __hash__(self):
+        """
+        :return: Hash representation of this object
+        """
         return hash((self.x, self.y))
 
     def __repr__(self):
+        """
+        :return: String representation of this object
+        """
         return "<BaseGridPoint> x: {}, y: {}".format(self.x, self.y)
 
     __unicode__ = __str__ = __repr__

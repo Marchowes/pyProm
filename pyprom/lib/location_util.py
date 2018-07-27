@@ -14,4 +14,4 @@ def longitudeArcSec(longitude):
     Accepts longitude in dotted decimal notation, and returns
     Arcsecond distance in meters.
     """
-    return math.cos(math.radians(longitude))*30.87
+    return math.cos(math.radians(longitude)) * 30.87

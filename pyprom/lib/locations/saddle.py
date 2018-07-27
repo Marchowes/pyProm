@@ -12,10 +12,12 @@ import json
 from .spot_elevation import SpotElevation
 from ..containers.linker import isLinker
 
+
 class Saddle(SpotElevation):
     """
     Saddle object stores relevant saddle data.
     """
+
     def __init__(self, latitude, longitude, elevation, *args, **kwargs):
         """
         :param latitude: latitude in dotted decimal
@@ -34,12 +36,12 @@ class Saddle(SpotElevation):
         self.summits = list()
         # If this is set, this saddle was spun out of another
         # Saddle with less data.
-        self.parent = None # Parent
+        self.parent = None  # Parent
         # Saddles that have been spawned off of this one.
         self.children = list()
         self.singleSummit = False  # All Edges lead to One summit.
-        self.tooLow = False # redundant saddle, but too low.
-        self._disqualified = None # Non specific disqualification
+        self.tooLow = False  # redundant saddle, but too low.
+        self._disqualified = None  # Non specific disqualification
         self.lprBoundary = list()
 
     def addSummitLinker(self, linker):

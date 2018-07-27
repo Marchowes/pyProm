@@ -9,10 +9,12 @@ This library contains a class for storing Runoff data.
 
 from .saddle import Saddle
 
+
 class Runoff(Saddle):
     """
     Runoff object stores relevant runoff data.
     """
+
     def __init__(self, latitude, longitude, elevation, *args, **kwargs):
         """
         :param latitude: latitude in dotted decimal

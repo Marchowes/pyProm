@@ -16,6 +16,7 @@ class Summit(SpotElevation):
     """
     Summit object stores relevant summit data.
     """
+
     def __init__(self, latitude, longitude, elevation, *args, **kwargs):
         """
         :param latitude: latitude in dotted decimal
@@ -89,4 +90,3 @@ def isSummit(summit):
     """
     if not isinstance(summit, Summit):
         raise TypeError("Expected Summit Object.")
-

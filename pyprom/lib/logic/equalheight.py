@@ -12,6 +12,7 @@ from ..containers.multipoint import MultiPoint
 from ..util import coordinateHashToGridPointList
 from ..containers.perimeter import Perimeter
 
+
 def equalHeightBlob(datamap, x, y, elevation):
     """
     This function generates a list of coordinates that involve equal height
@@ -20,7 +21,6 @@ def equalHeightBlob(datamap, x, y, elevation):
     :param elevation: elevation
     :return: Multipoint Object containing all x,y coordinates and elevation
     """
-
     masterGridPoint = GridPoint(x, y, elevation)
     exploredEqualHeight = defaultdict(dict)
     exploredEqualHeight[x][y] = True

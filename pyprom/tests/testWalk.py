@@ -7,7 +7,7 @@ the LICENSE file that accompanies it.
 
 from __future__ import division
 import unittest
-from pyprom.tests.getData import getTestZip
+from pyprom.tests.getData import gettestzip
 from pyprom.dataload import GDALLoader
 from pyprom.feature_discovery import AnalyzeData
 from pyprom.walk import Walk
@@ -18,16 +18,18 @@ class WalkTests(unittest.TestCase):
     """
     Test Walk Object.
     """
+
     def setUp(self):
         """
         Set Up Tests.
         """
-        getTestZip()
+        gettestzip()
         self.datafile = GDALLoader('/tmp/N44W072.hgt')
         datamap = self.datafile.datamap
         self.islandpondVT = datamap.subset(602, 353, 260, 260)
         self.islandpondVTVicinity = AnalyzeData(self.islandpondVT)
-        self.summits, self.saddles, self.runoffs= self.islandpondVTVicinity.run()
+        self.summits, self.saddles, self.runoffs =\
+            self.islandpondVTVicinity.run()
 
     def testWrongSaddles(self):
         """
@@ -41,7 +43,7 @@ class WalkTests(unittest.TestCase):
         Ensure summits param is actually a :class:SummitsContainer
         """
         with self.assertRaises(TypeError):
-             Walk(self.saddles, self.saddles, self.islandpondVT)
+            Walk(self.saddles, self.saddles, self.islandpondVT)
 
     def testWrongDatamap(self):
         """
@@ -54,7 +56,9 @@ class WalkTests(unittest.TestCase):
         """
         Test walk around Island Pond VT.
         """
-        islandPondSaddleContainer = self.saddles.radius(44.810833, -71.8676388, 10)
+        islandPondSaddleContainer = self.saddles.radius(44.810833,
+                                                        -71.8676388,
+                                                        10)
         islandPondSaddle = islandPondSaddleContainer[0]
         walk = Walk(self.summits, islandPondSaddleContainer, self.islandpondVT)
         walk.walk(islandPondSaddle)
@@ -65,22 +69,27 @@ class WalkTests(unittest.TestCase):
 
     def testGenerateDomainNoLinkers(self):
         """
-        Test that generating a domain from a Walk fails when the walk has not been executed.
+        Test that generating a domain from a Walk fails when the
+        walk has not been executed.
         """
-        islandPondSaddleContainer = self.saddles.radius(44.810833, -71.8676388, 10)
+        islandPondSaddleContainer = self.saddles.radius(44.810833,
+                                                        -71.8676388,
+                                                        10)
         walk = Walk(self.summits, islandPondSaddleContainer, self.islandpondVT)
         with self.assertRaises(NoLinkersError):
-            domain = walk.domain()
+            walk.domain()
 
     def testGenerateDomain(self):
         """
         Test that generating a domain from a properly executed Walk succeeds
         """
-        islandPondSaddleContainer = self.saddles.radius(44.810833, -71.8676388, 10)
+        islandPondSaddleContainer = self.saddles.radius(44.810833,
+                                                        -71.8676388,
+                                                        10)
         islandPondSaddle = islandPondSaddleContainer[0]
         walk = Walk(self.summits, islandPondSaddleContainer, self.islandpondVT)
         walk.walk(islandPondSaddle)
         d = walk.domain()
-        self.assertEqual(len(d.linkers),2)
+        self.assertEqual(len(d.linkers), 2)
         self.assertEqual(len(d.summits), 342)
         self.assertEqual(len(d.saddles), 1)

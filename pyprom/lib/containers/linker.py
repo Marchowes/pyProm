@@ -16,11 +16,18 @@ class Linker(object):
     :param saddle: :class:`Saddle`
     :param path: data containing the path taken to link this Summit and Saddle
     """
+
     def __init__(self, summit, saddle, path):
+        """
+        :param summit: :class:`Summit`
+        :param saddle: :class:`Saddle`
+        :param path: FUTURE
+        """
         self.summit = summit
         self.saddle = saddle
         self.path = path
-        # disqualified means this Linker has been disqualified from further analysis, but not deleted.
+        # disqualified means this Linker has been disqualified
+        # from further analysis, but not deleted.
         self.disqualified = False
 
     @property
@@ -97,10 +104,10 @@ class Linker(object):
         :return: String representation of this object
         """
         return "<Linker> {} -> {} {}promFt {}promM".format(
-                self.saddle,
-                self.summit,
-                self.prom_ft,
-                self.prom)
+            self.saddle,
+            self.summit,
+            self.prom_ft,
+            self.prom)
     __unicode__ = __str__ = __repr__
 
 

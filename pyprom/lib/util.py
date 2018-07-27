@@ -11,6 +11,11 @@ import itertools
 
 
 def dottedDecimaltoDegrees(coordinate):
+    """
+    Converts dotted Decimal coordinate to a DMS
+    :param coordinate:
+    :return: degree, minute, second
+    """
     minute, second = divmod(coordinate * 3600, 60)
     degree, minute = divmod(minute, 60)
     return degree, minute, second
@@ -59,10 +64,10 @@ def seconds_to_arcseconds(seconds):
     """
     return seconds * 3600
 
+
 def arcseconds_to_seconds(arcseconds):
     """
     :param arcseconds:
     :return: converts arcseconds into seconds.
     """
     return arcseconds / 3600
-

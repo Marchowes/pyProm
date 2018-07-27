@@ -6,7 +6,7 @@ the LICENSE file that accompanies it.
 """
 
 import unittest
-from pyprom.tests.getData import getTestZip
+from pyprom.tests.getData import gettestzip
 from pyprom.dataload import GDALLoader
 from pyprom.feature_discovery import AnalyzeData
 
@@ -18,12 +18,13 @@ class LogicTests(unittest.TestCase):
         """
         Set Up Tests.
         """
-        getTestZip()
+        gettestzip()
         self.datafile = GDALLoader('/tmp/N44W072.hgt')
         self.datamap = self.datafile.datamap
         self.mtWashingtonDM = self.datamap.subset(2600, 2500, 30, 30)
         self.washingtonVicinity = AnalyzeData(self.mtWashingtonDM)
-        self.summits, self.saddles, self.runoffs = self.washingtonVicinity.run()
+        self.summits, self.saddles, self.runoffs =\
+            self.washingtonVicinity.run()
 
     def testFindSummits(self):
         """

@@ -12,6 +12,8 @@ from .base_gridpoint import BaseGridPoint
 
 
 class GridPoint(BaseGridPoint):
+    """Grid Point"""
+
     def __init__(self, x, y, elevation):
         """
         A basic grid point. This maps an elevation to an X,Y coordinate.
@@ -81,6 +83,9 @@ class GridPoint(BaseGridPoint):
         return self.elevation < other.elevation
 
     def __repr__(self):
+        """
+        :return: String representation of this object
+        """
         return "<GridPoint> x: {}, y: {}, elevation(m); {}".\
                format(self.x,
                       self.y,
