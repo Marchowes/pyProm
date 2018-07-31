@@ -12,6 +12,7 @@ from pyprom.dataload import GDALLoader
 from pyprom.feature_discovery import AnalyzeData
 from pyprom.walk import Walk
 from pyprom.lib.errors.errors import NoLinkersError
+from pyprom.lib.containers.runoffs import RunoffsContainer
 
 
 class WalkTests(unittest.TestCase):
@@ -28,7 +29,7 @@ class WalkTests(unittest.TestCase):
         datamap = self.datafile.datamap
         self.islandpondVT = datamap.subset(602, 353, 260, 260)
         self.islandpondVTVicinity = AnalyzeData(self.islandpondVT)
-        self.summits, self.saddles, self.runoffs =\
+        self.summits, self.saddles, self.runoffs = \
             self.islandpondVTVicinity.run()
 
     def testWrongSaddles(self):
@@ -36,21 +37,21 @@ class WalkTests(unittest.TestCase):
         Ensure saddles param is actually a :class:SaddlesContainer
         """
         with self.assertRaises(TypeError):
-            Walk(self.summits, self.summits, self.islandpondVT)
+            Walk(self.summits, self.summits, self.runoffs, self.islandpondVT)
 
     def testWrongSummits(self):
         """
         Ensure summits param is actually a :class:SummitsContainer
         """
         with self.assertRaises(TypeError):
-            Walk(self.saddles, self.saddles, self.islandpondVT)
+            Walk(self.saddles, self.saddles, self.runoffs, self.islandpondVT)
 
     def testWrongDatamap(self):
         """
         Ensure datamap param is actually a :class:Datamap
         """
         with self.assertRaises(TypeError):
-            Walk(self.summits, self.saddles, self.saddles)
+            Walk(self.summits, self.saddles, self.runoffs, self.saddles)
 
     def testWalkIslandPond(self):
         """
@@ -60,7 +61,9 @@ class WalkTests(unittest.TestCase):
                                                         -71.8676388,
                                                         10)
         islandPondSaddle = islandPondSaddleContainer[0]
-        walk = Walk(self.summits, islandPondSaddleContainer, self.islandpondVT)
+        islandPondRunoff = RunoffsContainer([])
+        walk = Walk(self.summits, islandPondSaddleContainer,
+                    islandPondRunoff, self.islandpondVT)
         walk.walk(islandPondSaddle)
         self.assertEqual(len(walk.linkers), 2)
         self.assertEqual(len(islandPondSaddle.summits), 2)
@@ -75,7 +78,8 @@ class WalkTests(unittest.TestCase):
         islandPondSaddleContainer = self.saddles.radius(44.810833,
                                                         -71.8676388,
                                                         10)
-        walk = Walk(self.summits, islandPondSaddleContainer, self.islandpondVT)
+        walk = Walk(self.summits, islandPondSaddleContainer,
+                    self.runoffs, self.islandpondVT)
         with self.assertRaises(NoLinkersError):
             walk.domain()
 
@@ -87,7 +91,8 @@ class WalkTests(unittest.TestCase):
                                                         -71.8676388,
                                                         10)
         islandPondSaddle = islandPondSaddleContainer[0]
-        walk = Walk(self.summits, islandPondSaddleContainer, self.islandpondVT)
+        walk = Walk(self.summits, islandPondSaddleContainer,
+                    self.runoffs, self.islandpondVT)
         walk.walk(islandPondSaddle)
         d = walk.domain()
         self.assertEqual(len(d.linkers), 2)

@@ -9,7 +9,10 @@ This library contains a class for manipulating a pyProm Divide Tree.
 
 import logging
 
+
 class DivideTree(object):
+    """Divide Tree"""
+
     def __init__(self, domain=None, datamap=None):
         """
         A divide tree optionally consumes :class:`Domain`
@@ -22,24 +25,27 @@ class DivideTree(object):
         self.saddles = domain.saddles
         self.linkers = domain.linkers
         self.datamap = datamap
-        self.busted = list() # Temporary!
+        self.busted = list()  # Temporary!
 
     def run(self):
+        """Run"""
         localHighest = self.summits.highest[0]
         localHighest.localHighest = True
         localHighest.parent = localHighest
 
-
     def localProminentRegion(self, summit):
-        exempt = list() #list of locally exempt linkers
+        """Lpr"""
+        exempt = list()  # list of locally exempt linkers
         self.branchChaser(summit, summit, 0, exempt)
 
-
     def branchChaser(self, master, branch, depth, exempt):
+        """Branch chaser"""
         depth += 1
-        #self.logger.info("Assessing {} off Master {} depth {}".format(branch, master, depth))
+        # self.logger.info("Assessing {} off Master {} depth {}"
+        # .format(branch, master, depth))
         if depth > 400:
-            self.logger.info("Near Max Recurse! Bail! Master: {}".format(master))
+            self.logger.info(
+                "Near Max Recurse! Bail! Master: {}".format(master))
             if master not in self.busted:
                 self.busted.append(master)
             return
@@ -55,33 +61,34 @@ class DivideTree(object):
                 key=lambda x: x.elevation)
             for nextSummit in summits:
                 if nextSummit.elevation <= branch.elevation:
-                    #branch.parent = master
+                    # branch.parent = master
                     self.branchChaser(master, nextSummit, depth, exempt)
                 # Neighbor Higher? then this is a LPR Boundary.
                 if nextSummit.elevation > branch.elevation:
-                    #self.logger.info("Boundary At {}".format(linker.saddle))
+                    # self.logger.info("Boundary At {}".format(linker.saddle))
                     if master not in linker.saddle.lprBoundary:
                         linker.saddle.lprBoundary.append(master)
 
     def parentFinder(self, summit):
+        """Nothing"""
         pass
-
-
-
-
-
-
-
-
-
         # for summit in branch.saddles.saddle_summits:
         #     if summit.elevation > branch.elevation:
 
 
-    class LPR(object):
-        def __init__(self, highPoint = None, subsetSaddles = None, boundarySaddles = None):
-            self.highPoint = highPoint
-            self.subsetSaddles = subsetSaddles
-            self.boundarySaddles = boundarySaddles
+class LPR(object):
+    """
+    LPR
+    """
 
-
+    def __init__(self, highPoint=None,
+                 subsetSaddles=None,
+                 boundarySaddles=None):
+        """
+        :param highPoint: hp
+        :param subsetSaddles: sad
+        :param boundarySaddles: bdry
+        """
+        self.highPoint = highPoint
+        self.subsetSaddles = subsetSaddles
+        self.boundarySaddles = boundarySaddles

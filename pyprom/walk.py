@@ -26,7 +26,7 @@ class Walk(object):
     Walk object
     """
 
-    def __init__(self, summits, saddles, datamap):
+    def __init__(self, summits, saddles, runoffs, datamap):
         """
         :param summits: summits container
         :param saddles: saddles container
@@ -38,10 +38,13 @@ class Walk(object):
             raise TypeError("summits param must be type SummitsContainer")
         if not isinstance(saddles, SaddlesContainer):
             raise TypeError("saddles param must be type SaddlesContainer")
+        if not isinstance(runoffs, SaddlesContainer):
+            raise TypeError("runoffs param must be type SaddlesContainer")
         if not isinstance(datamap, DataMap):
             raise TypeError("datamap param must be type DataMap")
         self.summits = summits
         self.saddles = saddles
+        self.runoffs = runoffs
         self.datamap = datamap
         self.linkers = list()
 
@@ -72,7 +75,7 @@ class Walk(object):
         self.logger.info("Initiating Walk")
         start = default_timer()
         lasttime = start
-        for idx, saddle in enumerate(self.saddles):
+        for idx, saddle in enumerate(self.saddles + self.runoffs):
             if not idx % 2000:
                 thisTime = default_timer()
                 split = round(thisTime - lasttime, 2)
@@ -100,6 +103,7 @@ class Walk(object):
         d = Domain(self.datamap)
         d.saddles = self.saddles
         d.summits = self.summits
+        d.runoffs = self.runoffs
         d.linkers = self.linkers
         return d
 
@@ -232,7 +236,7 @@ class Walk(object):
                   /-----/
         """
         count = 0
-        for saddle in self.saddles:
+        for saddle in self.saddles + self.runoffs:
             uniqueSummits = set(saddle.summits)
 
             # More than one summit to begin with, but only one unique?
@@ -251,8 +255,9 @@ class Walk(object):
         """
         :return: String representation of this object
         """
-        return "<Walk> Saddles {} Summits {} Linkers {}".format(
+        return "<Walk> Saddles {} Runoffs {} Summits {} Linkers {}".format(
             len(self.saddles),
+            len(self.runoffs),
             len(self.summits),
             len(self.linkers))
 

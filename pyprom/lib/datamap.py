@@ -14,6 +14,9 @@ import logging
 
 ARCSEC_DEG = 3600
 ARCMIN_DEG = 60
+DIAGONAL_SHIFT_LIST = ((-1, 0), (-1, 1), (0, 1), (1, 1), (1, 0), (1, -1),
+                       (0, -1), (-1, -1))
+ORTHOGONAL_SHIFT_LIST = ((-1, 0), (0, 1), (1, 0), (0, -1))
 
 
 class DataMap():
@@ -36,11 +39,8 @@ class DataMap():
         Generator returns 8 closest neighbors to a raster grid location,
         that is, all points touching including the diagonals.
         """
-        shiftList = [[-1, 0], [-1, 1], [0, 1], [1, 1], [1, 0], [1, -1],
-                     [0, -1], [-1, -1]]
         # 0, 45, 90, 135, 180, 225, 270, 315
-
-        for shift in shiftList:
+        for shift in DIAGONAL_SHIFT_LIST:
             _x = x + shift[0]
             _y = y + shift[1]
             if 0 <= _x <= self.max_x and \
@@ -57,10 +57,8 @@ class DataMap():
         Generator returns 4 closest neighbors to a raster grid location,
         that is, all points touching excluding the diagonals.
         """
-        shiftList = [[-1, 0], [0, 1], [1, 0], [0, -1]]
         # 0, 90, 180, 270
-
-        for shift in shiftList:
+        for shift in ORTHOGONAL_SHIFT_LIST:
             _x = x + shift[0]
             _y = y + shift[1]
             if 0 <= _x <= self.max_x and \

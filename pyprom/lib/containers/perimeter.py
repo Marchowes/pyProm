@@ -11,6 +11,10 @@ from collections import defaultdict
 from .gridpoint import GridPointContainer
 from ..locations.gridpoint import isGridPoint
 
+DIAGONAL_SHIFT_LIST = ((-1, 0), (-1, 1), (0, 1), (1, 1), (1, 0), (1, -1),
+                       (0, -1), (-1, -1))
+ORTHOGONAL_SHIFT_LIST = ((-1, 0), (0, 1), (1, 0), (0, -1))
+
 
 class Perimeter(object):
     """
@@ -53,9 +57,7 @@ class Perimeter(object):
         neighbors.
         :param point:
         """
-        shiftList = [[-1, 0], [-1, 1], [0, 1], [1, 1], [1, 0], [1, -1],
-                     [0, -1], [-1, -1]]
-        for shift in shiftList:
+        for shift in DIAGONAL_SHIFT_LIST:
             x = point.x + shift[0]
             y = point.y + shift[1]
             if self.pointIndex[x].get(y, False):
@@ -71,8 +73,7 @@ class Perimeter(object):
         neighbors.
         :param point:
         """
-        shiftList = [[-1, 0], [0, 1], [1, 0], [0, -1]]
-        for shift in shiftList:
+        for shift in ORTHOGONAL_SHIFT_LIST:
             x = point.x + shift[0]
             y = point.y + shift[1]
             if self.pointIndex[x].get(y, False):

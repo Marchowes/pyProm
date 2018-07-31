@@ -173,7 +173,7 @@ class AnalyzeData(object):
 
     def consolidatedFeatureLogic(self, x, y, perimeter, multipoint, edge):
         """
-        consolidatedFeatureLogic analyzes the highEdges around a point or
+        Consolidated Feature Logic analyzes the highEdges around a point or
         multipoint and determines if the pattern matches a
         :class:`Summit` :class:`Saddle` :class:`Runoff`
 
