@@ -11,7 +11,7 @@ import math
 import sys
 
 from .base_gridpoint import BaseGridPointContainer
-from pyprom.lib.locations.gridpoint import GridPoint
+from pyprom.lib.locations.gridpoint import GridPoint, isGridPoint
 from collections import defaultdict
 
 
@@ -20,8 +20,16 @@ class GridPointContainer(BaseGridPointContainer):
     Container for GridPoint type lists.
     Allows for various list transformations and functions.
     """
+
     def __init__(self, gridPointList):
+        """
+        :param gridPointList: list of :class:`GridPoint`
+        """
         super(GridPointContainer, self).__init__(gridPointList)
+        if len([x for x in gridPointList if not isinstance(x, GridPoint)]):
+            raise TypeError("gridPointList passed to GridPointContainer"
+                            " can only contain GridPoint objects.")
+
         self.fastLookup = defaultdict(dict)
         # Generate a fast lookup table.
         self.genFastLookup()
@@ -45,8 +53,8 @@ class GridPointContainer(BaseGridPointContainer):
         shiftList = [[-1, 0], [-1, 1], [0, 1], [1, 1], [1, 0], [1, -1],
                      [0, -1], [-1, -1]]
         for shift in shiftList:
-            x = point.x+shift[0]
-            y = point.y+shift[1]
+            x = point.x + shift[0]
+            y = point.y + shift[1]
             if self.fastLookup[x].get(y, False):
                 yield self.fastLookup[x][y]
             else:
@@ -60,17 +68,18 @@ class GridPointContainer(BaseGridPointContainer):
         """
         if not len(self.fastLookup):
             self.genFastLookup()
-        shiftList = [[-1, 0], [0, 1], [1, 0],  [0, -1]]
+        shiftList = [[-1, 0], [0, 1], [1, 0], [0, -1]]
         for shift in shiftList:
-            x = point.x+shift[0]
-            y = point.y+shift[1]
+            x = point.x + shift[0]
+            y = point.y + shift[1]
             if self.fastLookup[x].get(y, False):
                 yield self.fastLookup[x][y]
             else:
                 continue
 
     def findPseudoSummits(self):
-        """ Similiar in concept to finding summits and multipoint blobs,
+        """
+         Similiar in concept to finding summits and multipoint blobs,
          but smaller in scope.
 
         Essentially this returns locally scoped Summit points, that is,
@@ -165,7 +174,20 @@ class GridPointContainer(BaseGridPointContainer):
                     closest_distance = distance
         return myClosest, theirClosest, closest_distance
 
+    def append(self, gridPoint):
+        """
+        Append a gridpoint to the container.
+        :param gridPoint: :class:`GridPoint`
+        :raises: TypeError if gridPoint not of :class:`GridPoint`
+        """
+        isGridPoint(gridPoint)
+        self.points.append(gridPoint)
+        self.genFastLookup()
+
     def __repr__(self):
+        """
+        :return: String representation of this object
+        """
         return "<GridPointContainer> {} Objects".format(len(self.points))
 
     __unicode__ = __str__ = __repr__

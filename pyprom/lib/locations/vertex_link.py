@@ -8,11 +8,13 @@ This library contains a location class for storing a Vertex_Link
 used in Saddle highShores Tree Calculations.
 """
 
-class Vertex_Link(object):
+
+class Vertex_Link:
     """
     Vertex_Link connects a vertex (:class`GridPoint`) from one feature to
     a vertex from another
     """
+
     def __init__(self, localPoint, remotePoint,
                  distance, remote_container=None):
         """
@@ -33,8 +35,11 @@ class Vertex_Link(object):
             return "None"
 
     def __repr__(self):
+        """
+        :return: String representation of this object
+        """
         return "<Vertex_Link> local {} remote {} " \
-               "distance {} remote_container_idx {}".format(
+            "distance {} remote_container_idx {}".format(
                 self.local,
                 self.remote,
                 self.distance,

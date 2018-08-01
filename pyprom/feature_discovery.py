@@ -16,15 +16,19 @@ from datetime import timedelta
 from .lib.locations.gridpoint import GridPoint
 from .lib.locations.saddle import Saddle
 from .lib.locations.summit import Summit
+from .lib.locations.runoff import Runoff
 from .lib.containers.saddles import SaddlesContainer
 from .lib.containers.summits import SummitsContainer
-from .lib.containers.high_edge import HighEdgeContainer
-from .lib.containers.gridpoint import GridPointContainer
-from .lib.util import compressRepetetiveChars
+from .lib.containers.runoffs import RunoffsContainer
+from .lib.containers.perimeter import Perimeter
 from .lib.logic.equalheight import equalHeightBlob
 
 
-class AnalyzeData(object):
+class AnalyzeData:
+    """
+    Object responsible for discovering features
+    """
+
     def __init__(self, datamap):
         """
         :param datamap: `DataMap` object.
@@ -32,29 +36,35 @@ class AnalyzeData(object):
         self.logger = logging.getLogger('{}'.format(__name__))
         self.datamap = datamap
         self.data = self.datamap.numpy_map
-        self.edge = False
         self.max_y = self.datamap.max_y
         self.max_x = self.datamap.max_x
-        self.cardinalGrid = dict()
+        self.x_mapEdge = {0: True, self.max_x: True}
+        self.y_mapEdge = {0: True, self.max_y: True}
         self.explored = defaultdict(dict)
 
     def run(self):
+        """
+        Shortcut for running analysis
+        :return: :class:`Summit`s, :class:`Saddle`s and :class:`Runoff`s
+        """
+        _, _, _ = self.analyze()
         self.logger.info("Rebuilding Saddles")
-        _, _ = self.analyze()
         self.saddleObjects = self.saddleObjects.rebuildSaddles(self.datamap)
-        return self.summitObjects, self.saddleObjects
+        return self.summitObjects, self.saddleObjects, self.runoffObjects
 
     def analyze(self):
         """
         Analyze Routine.
-        Looks for :class:`Summit`s, and :class:`Saddle`s
-        return: (:class:`SpotElevationContainer`,SpotElevationContainer)
+        Looks for :class:`Summit`s, :class:`Saddle`s and :class:`Runoff`s
+        return: (:class:`SummitsContainer`, :class:`SaddlesContainer`,
+         :class:`RunoffsContainer`,)
         """
         self.start = default_timer()
         self.lasttime = self.start
-        self.logger.info("Initiating Analysis")
+        self.logger.info("Initiating Saddle, Summit, Runoff Identification")
         self.summitObjects = SummitsContainer([])
         self.saddleObjects = SaddlesContainer([])
+        self.runoffObjects = RunoffsContainer([])
         iterator = numpy.nditer(self.data, flags=['multi_index'])
         index = 0
         # Iterate through numpy grid, and keep track of gridpoint coordinates.
@@ -62,7 +72,7 @@ class AnalyzeData(object):
             x, y = iterator.multi_index
             # core storage is always in metric.
             if self.datamap.unit == "FEET":
-                self.elevation = float(.3048*iterator[0])
+                self.elevation = float(.3048 * iterator[0])
             else:
                 self.elevation = float(iterator[0])
 
@@ -74,12 +84,12 @@ class AnalyzeData(object):
                 split = round(thisTime - self.lasttime, 2)
                 self.lasttime = default_timer()
                 rt = self.lasttime - self.start
-                pointsPerSec = round(index/rt, 2)
+                pointsPerSec = round(index / rt, 2)
                 self.logger.info(
                     "Points per second: {} - {}%"
                     " runtime: {}, split: {}".format(
                         pointsPerSec,
-                        round(index/self.data.size * 100, 2),
+                        round(index / self.data.size * 100, 2),
                         (str(timedelta(seconds=round(rt, 2)))),
                         split
                     ))
@@ -88,56 +98,35 @@ class AnalyzeData(object):
             if self.elevation == self.datamap.nodata:
                 iterator.iternext()
                 continue
-            # Check for summit or saddle
-            result = self.summit_and_saddle(x, y)
-            if result:
-                if isinstance(result, Saddle):
-                    self.saddleObjects.points.append(result)
-                if isinstance(result, Summit):
-                    self.summitObjects.points.append(result)
+            # Check for summit, saddle, or runoff
+            results = self.summit_and_saddle(x, y)
+            if results:
+                for result in results:
+                    if isinstance(result, Summit):
+                        self.summitObjects.append(result)
+                    if isinstance(result, Runoff):
+                        self.runoffObjects.append(result)
+                    elif isinstance(result, Saddle):
+                        self.saddleObjects.append(result)
             # Reset variables, and go to next gridpoint.
-            self.edge = False
-            self.blob = None
             iterator.iternext()
         # Free some memory.
         del(self.explored)
-        return self.summitObjects, self.saddleObjects
+        return self.summitObjects, self.saddleObjects, self.runoffObjects
 
-    def analyze_multipoint(self, x, y, ptElevation):
+    def analyze_multipoint(self, x, y, ptElevation, edge):
         """
         :param x:
         :param y:
         :param ptElevation: Elevation of Multipoint Blob
         :return: Summit, Saddle, or None
         """
-        self.blob = equalHeightBlob(self.datamap, x, y, ptElevation)
-        self.edge = self.blob.inverseEdgePoints.mapEdge
-
-        highInverseEdge = self.blob.inverseEdgePoints.findHighEdges(
-            self.elevation)
-
-        for exemptPoint in self.blob.points:
+        blob = equalHeightBlob(self.datamap, x, y, ptElevation)
+        edge = blob.perimeter.mapEdge
+        for exemptPoint in blob:
             self.explored[exemptPoint.x][exemptPoint.y] = True
-        if not len(highInverseEdge):
-            lat, long = self.datamap.xy_to_latlong(x, y)
-            summit = Summit(lat,
-                            long,
-                            self.elevation,
-                            edge=self.edge,
-                            multiPoint=self.blob
-                            )
-            return summit
-        if (len(highInverseEdge) > 1) or\
-                (len(highInverseEdge) == 1 and self.edge):
-            lat, long = self.datamap.xy_to_latlong(x, y)
-            saddle = Saddle(lat,
-                            long,
-                            self.elevation,
-                            edge=self.edge,
-                            multiPoint=self.blob,
-                            highShores=highInverseEdge)
-            return saddle
-        return None
+
+        return self.consolidatedFeatureLogic(x, y, blob.perimeter, blob, edge)
 
     def summit_and_saddle(self, x, y):
         """
@@ -146,55 +135,111 @@ class AnalyzeData(object):
         :param y:
         :return: Summit, Saddle, or None
         """
-
         # Exempt! bail out!
         if self.explored[x].get(y, False):
             return None
-
-        saddleProfile = ["HLHL", "LHLH"]
-        summitProfile = "L"
+        edge = False
 
         # Label this as an mapEdge under the following condition
-        if not self.edge:
-            if x in (self.max_x, 0) or y in (self.max_y, 0):
-                self.edge = True
+        if self.x_mapEdge.get(x) or self.y_mapEdge.get(y):
+            edge = True
 
         # Begin the ardous task of analyzing points and multipoints
         neighbor = self.datamap.iterateDiagonal(x, y)
-        shoreSet = GridPointContainer([])
-        neighborProfile = ""
+        shoreSetIndex = defaultdict(dict)
+        shoreMapEdge = []
         for _x, _y, elevation in neighbor:
 
-            # If we have equal neighbors, we need to kick off analysis to
-            # a special MultiPoint analysis function.
-            if not elevation:
+            # Nothing there? move along.
+            if elevation == self.datamap.nodata:
                 continue
+            # If we have equal neighbors, we need to kick off analysis to
+            # a special MultiPoint analysis function and return the result.
             if elevation == self.elevation and\
                     not self.explored[_x].get(_y, False):
-                return self.analyze_multipoint(_x, _y, elevation)
-            if elevation > self.elevation:
-                neighborProfile += "H"
-            if elevation < self.elevation:
-                neighborProfile += "L"
-            shoreSet.points.append(GridPoint(_x, _y, elevation))
+                return self.analyze_multipoint(_x, _y, elevation, edge)
 
-        reducedNeighborProfile = compressRepetetiveChars(neighborProfile)
-        if reducedNeighborProfile == summitProfile:
+            gp = GridPoint(_x, _y, elevation)
+            if elevation > self.elevation:
+                shoreSetIndex[_x][_y] = gp
+            if self.x_mapEdge.get(_x) or self.y_mapEdge.get(_y):
+                shoreMapEdge.append(gp)
+
+        shoreSet = Perimeter(pointIndex=shoreSetIndex,
+                             datamap=self.datamap,
+                             mapEdge=edge,
+                             mapEdgePoints=shoreMapEdge)
+        return self.consolidatedFeatureLogic(x, y, shoreSet, [], edge)
+
+    def consolidatedFeatureLogic(self, x, y, perimeter, multipoint, edge):
+        """
+        Consolidated Feature Logic analyzes the highEdges around a point or
+        multipoint and determines if the pattern matches a
+        :class:`Summit` :class:`Saddle` :class:`Runoff`
+
+        :param x: x coordinate.
+        :param y: y coordinate.
+        :param perimeter: :class:`Perimeter` container.
+        :param multipoint: :class:`Multipoint` container
+        :param edge: bool if this is a mapEdge.
+        :return: list of :class:`SpotElevationContainer` child objects.
+        """
+        returnableLocations = []
+        highPerimeter = perimeter.findHighEdges(
+            self.elevation)
+
+        if not len(highPerimeter):
             lat, long = self.datamap.xy_to_latlong(x, y)
             summit = Summit(lat,
                             long,
                             self.elevation,
-                            edge=self.edge)
-            return summit
+                            multiPoint=multipoint,
+                            edge=edge
+                            )
+            returnableLocations.append(summit)
+            # edge summits are inherently Runoffs
+            if edge:
+                runOff = Runoff(lat,
+                                long,
+                                self.elevation,
+                                multiPoint=multipoint,
+                                edge=edge,
+                                highShores=highPerimeter)
+                returnableLocations.append(runOff)
+            return returnableLocations
 
-        elif any(x in reducedNeighborProfile for x in saddleProfile):
-            shores = HighEdgeContainer(shoreSet, self.elevation)
+        elif (len(highPerimeter) > 1):
             lat, long = self.datamap.xy_to_latlong(x, y)
+
+            # if we're an edge and all edgepoints are lower than our point.
+            if edge and len([a for a in perimeter.mapEdgePoints
+                             if a.elevation < self.elevation]) ==\
+                    len(perimeter.mapEdgePoints):
+                runOff = Runoff(lat,
+                                long,
+                                self.elevation,
+                                multiPoint=multipoint,
+                                highShores=highPerimeter)
+                returnableLocations.append(runOff)
+                return returnableLocations
+
             saddle = Saddle(lat,
                             long,
                             self.elevation,
-                            edge=self.edge,
-                            highShores=[GridPointContainer(g)
-                                        for g in shores.highPoints])
-            return saddle
-        return None
+                            multiPoint=multipoint,
+                            edge=edge,
+                            highShores=highPerimeter)
+            returnableLocations.append(saddle)
+
+        # if we're an edge and all edgepoints are lower than our point.
+        if edge and len([a for a in perimeter.mapEdgePoints
+                         if a.elevation < self.elevation]) ==\
+                len(perimeter.mapEdgePoints):
+            lat, long = self.datamap.xy_to_latlong(x, y)
+            runOff = Runoff(lat,
+                            long,
+                            self.elevation,
+                            multiPoint=multipoint,
+                            highShores=highPerimeter)
+            returnableLocations.append(runOff)
+        return returnableLocations

@@ -24,6 +24,7 @@ class InternalSaddleNetwork(object):
     """
     InternalSaddleNetwork object for computing internal saddle networks.
     """
+
     def __init__(self, saddle, datamap):
         """
         :param saddle: :class:`Saddle` object
@@ -36,16 +37,18 @@ class InternalSaddleNetwork(object):
 
     def treeExploration(self, toBeExplored, toBeExploredIndex,
                         explored_nodes_index, first):
-        # Loop until toBeExplored is exhausted. This continues until all
-        # conventionally accessible high shores are connected via Vertex
-        # Links.
-        #
-        # This loop works by looking at all `remote_container`s (a node)
-        # that are linked to the `node` under exploration. Whatever
-        # unexplored remote node has the node under exploration as it's
-        # shortest link is added to the toBeExplored queue and that
-        # :class:`Vertex_Link` is added to the unordered `shortest_path`
-        # list.
+        """
+        Loop until toBeExplored is exhausted. This continues until all
+        conventionally accessible high shores are connected via Vertex
+        Links.
+
+        This loop works by looking at all `remote_container`s (a node)
+        that are linked to the `node` under exploration. Whatever
+        unexplored remote node has the node under exploration as it's
+        shortest link is added to the toBeExplored queue and that
+        :class:`Vertex_Link` is added to the unordered `shortest_path`
+        list.
+        """
         while toBeExplored:
             node = toBeExplored.pop(0)
             toBeExploredIndex[node.index] = False
@@ -90,7 +93,6 @@ class InternalSaddleNetwork(object):
         highShores (nodes) together.
         :return: list() of :class:`Linker`s
         """
-
         # Calculate all shortest paths.
         self.find_shortest_paths_between_high_shores()
         # Index for keeping track of explored nodes.
@@ -192,7 +194,6 @@ class InternalSaddleNetwork(object):
                 self.saddle.children.append(newSaddle)
             saddles.append(newSaddle)
         return saddles
-
 
     def find_shortest_paths_between_high_shores(self):
         """

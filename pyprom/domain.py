@@ -23,12 +23,18 @@ from .lib.locations.saddle import Saddle
 from .lib.locations.base_gridpoint import BaseGridPoint
 from .lib.containers.multipoint import MultiPoint
 from .lib.containers.summits import SummitsContainer
+from .lib.containers.runoffs import RunoffsContainer
 from .lib.containers.saddles import SaddlesContainer
 from .lib.containers.gridpoint import GridPointContainer
 from .lib.locations.gridpoint import GridPoint
 
 
-class Domain(object):
+class Domain:
+    """
+    Domain object, This Object contains all the features required to calculate
+    the Surface Network.
+    """
+
     def __init__(self, data):
         """
         A Domain consumes either a :class:`Datamap` object or
@@ -44,12 +50,13 @@ class Domain(object):
                             ' or Loader type object')
         self.saddles = None
         self.summits = None
+        self.runoffs = None
         self.linkers = None
         self.extent = 'LL: {}\n LR: {}\n UL: {}\n UR: {}\n'.format(
-             self.datamap.lower_left,
-             self.datamap.lower_right,
-             self.datamap.upper_left,
-             self.datamap.upper_right)
+            self.datamap.lower_left,
+            self.datamap.lower_right,
+            self.datamap.upper_left,
+            self.datamap.upper_right)
         self.logger = logging.getLogger('{}'.format(__name__))
         self.logger.info("Domain Object Created: \n{}".format(self.extent))
 
@@ -59,10 +66,12 @@ class Domain(object):
         and :class:`Linkers`.
         """
         # Expunge any existing saddles, summits, and linkers
-        self.saddles = SpotElevationContainer([])
-        self.summits = SpotElevationContainer([])
+        self.saddles = SaddlesContainer([])
+        self.summits = SummitsContainer([])
+        self.runoffs = RunoffsContainer([])
         self.linkers = list()
-        self.summits, self.saddles = AnalyzeData(self.datamap).run()
+        self.summits, self.saddles, self.runoffs =\
+            AnalyzeData(self.datamap).run()
 
     def read(self, filename):
         """
@@ -145,25 +154,29 @@ class Domain(object):
 
     def to_dict(self):
         """
-        dictionary of all :class:`Domain` Data.
+        Dictionary of all :class:`Domain` Data.
         """
         domain_dict = {'domain': self.extent,
                        'date': time.strftime("%m-%d-%Y %H:%M:%S")}
 
         domain_dict['summits'] = [x.to_dict(recurse=True)
-                                  for x in self.summits.points]
+                                  for x in self.summits]
         domain_dict['saddles'] = [x.to_dict(recurse=True)
-                                  for x in self.saddles.points]
-        # domain_dict['linkers'] = ???Later???
+                                  for x in self.saddles]
+        # domain_dict['linkers'] = ?TODO
 
         return domain_dict
 
     def __repr__(self):
+        """
+        :return: String representation of this object
+        """
         return "<Domain> Lat/Long Extent {} Saddles " \
-               "{} Summits {} Linkers {}".format(
-                    self.extent,
-                    len(self.saddles.points),
-                    len(self.summits.points),
-                    len(self.linkers))
+            "{} Summits {} Runoffs {} Linkers {}".format(
+                self.extent,
+                len(self.saddles),
+                len(self.summits),
+                len(self.runoffs),
+                len(self.linkers))
 
     __unicode__ = __str__ = __repr__

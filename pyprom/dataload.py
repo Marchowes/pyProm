@@ -8,21 +8,23 @@ the LICENSE file that accompanies it.
 import os
 import numpy
 import logging
-
-from osgeo import gdal, osr
+import gdal
+import osr
 
 from .lib.datamap import ProjectionDataMap
 
 EPSGMap = {
-            "WGS84": 4326,  # http://spatialreference.org/ref/epsg/4326/
-            "NAD83": 4269,  # http://spatialreference.org/ref/epsg/4269/
+    "WGS84": 4326,  # http://spatialreference.org/ref/epsg/4326/
+    "NAD83": 4269,  # http://spatialreference.org/ref/epsg/4269/
 }
 
 
-class Loader(object):
+class Loader:
+    """Base class for data loaders."""
+
     def __init__(self, filename):
         """
-        Base class for data loaders.
+        :param filename: name of file to be loaded.
         """
         self.filename = os.path.expanduser(filename)
         self.logger = logging.getLogger('{}'.format(__name__))
@@ -30,6 +32,7 @@ class Loader(object):
 
 class GDALLoader(Loader):
     """General GDAL datasets."""
+
     def __init__(self, filename, epsg_alias="WGS84"):
         """
         :param filename: full or relative file location.
@@ -58,7 +61,7 @@ class GDALLoader(Loader):
 
         # Load Raster File into GDAL
         self.gdal_dataset = gdal.Open(self.filename)
-        if self.gdal_dataset == None:
+        if self.gdal_dataset is None:
             raise Exception("GDAL failed to load {}".format(filename))
         # Load Raster Data into numpy array
         raster_band = self.gdal_dataset.GetRasterBand(1)

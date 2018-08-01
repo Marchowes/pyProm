@@ -6,7 +6,7 @@ the LICENSE file that accompanies it.
 """
 
 import unittest
-from pyprom.tests.getData import getTestZip
+from pyprom.tests.getData import gettestzip
 from pyprom.dataload import GDALLoader
 
 
@@ -15,7 +15,7 @@ class GDALDataTests(unittest.TestCase):
 
     def setUp(self):
         """Download datafile."""
-        getTestZip()
+        gettestzip()
         self.datafile = GDALLoader('/tmp/N44W072.hgt')
 
     def testGDALLoad(self):

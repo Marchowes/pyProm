@@ -12,11 +12,17 @@ type location objects.
 class HighEdgeContainer(object):
     """
     Container for High Edge Lists -- Specifically for the purpose of storing
-     high edge sections around Saddles.
-    :param shore: ordered list of :class:`GridPoint` type objects
-    :param blobElevation: elevation (m) of blob.
+    high edge sections around Saddles.
+
+    The object takes a gridPoint container which represents all Perimeter
+    points around a point. And breaks it down into distinct highEdge regions.
     """
+
     def __init__(self, shore, blobElevation):
+        """
+        :param shore: :class:`GridPointCointer`
+        :param blobElevation: elevation (m) of blob.
+        """
         # list of list of high edges.
         self._highPoints = list()
         highEdgePoints = list()
@@ -48,15 +54,17 @@ class HighEdgeContainer(object):
                     and firstPoint.elevation > blobElevation\
                     and not first:
                 self._highPoints[0] = \
-                     highEdgePoints + self._highPoints[0]
+                    highEdgePoints + self._highPoints[0]
             elif highEdgePoints:
                 self._highPoints.append(highEdgePoints)
 
     @property
     def highPoints(self):
+        """Getter for highPoints."""
         return self._highPoints
 
     def __repr__(self):
+        """String representation of this object"""
         return "<HighEdgeContainer> {} Lists".format(len(self.highPoints))
 
     __unicode__ = __str__ = __repr__

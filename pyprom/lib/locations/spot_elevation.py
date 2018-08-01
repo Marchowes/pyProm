@@ -15,6 +15,7 @@ class SpotElevation(BaseCoordinate):
     """
     SpotElevation -- Intended to be inherited from. lat/long/elevation
     """
+
     def __init__(self, latitude, longitude, elevation, *args, **kwargs):
         """
         :param latitude: latitude in dotted decimal
@@ -49,7 +50,7 @@ class SpotElevation(BaseCoordinate):
 
     def toGridPoint(self, datamap):
         """
-        return this :class:`SpotElevation object` as
+        Return this :class:`SpotElevation object` as
          a :class:`GridPoint object`
         :param datamap: :class:`Datamap` object
         :return: :class:`GridPoint object`
@@ -69,6 +70,11 @@ class SpotElevation(BaseCoordinate):
             return None
 
     def __eq__(self, other):
+        """
+        Determines if :class:`SpotElevation` is equal to another.
+        :param other: :class:`SpotElevation` to be compared against
+        :return: bool of inequality
+        """
         latitude = longitude = olatitude = olongitude = None
         if self.latitude:
             latitude = round(self.latitude, 6)
@@ -82,16 +88,27 @@ class SpotElevation(BaseCoordinate):
                [olatitude, olongitude, other.elevation]
 
     def __ne__(self, other):
+        """
+        Determines if :class:`SpotElevation` is not equal to another.
+        :param other: :class:`SpotElevation` to be compared against
+        :return: bool of inequality
+        """
         return [round(self.latitude, 6), round(self.longitude, 6),
                 self.elevation] != \
                [round(other.latitude, 6), round(other.longitude, 6),
                 other.elevation]
 
     def __hash__(self):
+        """
+        :return: Hash representation of this object
+        """
         return hash((round(self.latitude, 6), round(self.longitude, 6),
                      self.elevation))
 
     def __repr__(self):
+        """
+        :return: String representation of this object
+        """
         return "<SpotElevation> lat {} long" \
                " {} {}ft, {}m".format(self.latitude,
                                       self.longitude,
@@ -99,3 +116,13 @@ class SpotElevation(BaseCoordinate):
                                       self.elevation)
 
     __unicode__ = __str__ = __repr__
+
+
+def isSpotElevation(spotElevation):
+    """
+    :param spotElevation: object under scrutiny
+    :raises: TypeError if other not of :class:`SpotElevation`
+    """
+    if not isinstance(spotElevation, SpotElevation):
+        raise TypeError("Expected SpotElevation or child"
+                        " of SpotElevation Object.")

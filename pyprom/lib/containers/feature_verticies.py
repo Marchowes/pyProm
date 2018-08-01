@@ -10,7 +10,8 @@ used in Saddle highShores Tree Calculations.
 
 import sys
 
-class Feature_Verticies(object):
+
+class Feature_Verticies:
     """
     Feature_Verticies object stores Feature_Verticies data.
     :class:`Vertex_Link`s connect a vertex from one feature to
@@ -20,6 +21,7 @@ class Feature_Verticies(object):
     stored in `self.vertex_linkers[:].local` and those verticies
     are all all linked to foreign verticies
     """
+
     def __init__(self, index, vertex_linkers):
         """
         :param index: index of feature
@@ -28,7 +30,7 @@ class Feature_Verticies(object):
         self.index = index
         self.vertex_linkers = vertex_linkers
 
-    def shortest_link(self, ignored_link_index=dict()):
+    def shortest_link(self, ignored_link_index={}):
         """
         shortest_link returns the shortest link found in `self.vertex_linkers`
         but ignores any links connecting to a foreign index container in
@@ -48,6 +50,7 @@ class Feature_Verticies(object):
         return shortest
 
     def __repr__(self):
+        """String representation of this object"""
         return "<Feature_Verticies> {} ".format(
             self.vertex_linkers)
 

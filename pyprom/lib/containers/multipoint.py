@@ -9,34 +9,34 @@ type location objects as well as a number of functions.
 """
 import json
 from ..locations.base_coordinate import BaseCoordinate
+from ..locations.base_gridpoint import isBaseGridPoint
 
 
-class MultiPoint(object):
-    """
-    This is an "equal height" Multipoint storage container that
-    provides a number of functions for analysis of these blob like
-    locations. An Example of this would be a pond. This object in
-    contains a list of all the points of this pond.
-    :param points: list of BaseGridPoint objects
-    :param elevation: elevation in meters
-    :param datamap: :class:`Datamap` object.
-    :param edgePoints: :class:`EdgePointContainer` object
-    :param inverseEdgePoints: :class:`InverseEdgePointContainer` object
-    """
-    def __init__(self, points, elevation, datamap,
-                 edgePoints=None, inverseEdgePoints=None):
+class MultiPoint:
+    """MultiPoint Container"""
+
+    def __init__(self, points, elevation, datamap, perimeter=None):
+        """
+        This is an "equal height" Multipoint storage container that
+        provides a number of functions for analysis of these blob like
+        locations. An Example of this would be a pond. This object in
+        contains a list of all the points of this pond.
+        :param points: list of BaseGridPoint objects. These are the inside
+            points that make up a Multipoint.
+        :param elevation: elevation in meters
+        :param datamap: :class:`Datamap` object.
+        :param perimeter: :class:`Perimeter` object.
+            These are the points that make up the border of the multipoint
+            outside of the multipoint.
+        """
         super(MultiPoint, self).__init__()
-        self.points = points  # BaseGridPoint Object.
+        self.points = points  # BaseGridPoint Objects.
         self.elevation = elevation
         self.datamap = datamap  # data analysis object.
-        self.edgePoints = edgePoints
-        self.inverseEdgePoints = inverseEdgePoints
-        self.mapEdge = []
+        self.perimeter = perimeter
 
-    def to_dict(self, verbose=True):
+    def to_dict(self):
         """
-        :param verbose: returns extra data like `InverseEdgePoint`
-        and `EdgePoint` (future)
         :return: list of dicts.
         """
         plist = list()
@@ -49,19 +49,17 @@ class MultiPoint(object):
             plist.append(pdict)
         return plist
 
-    def to_json(self, verbose=False, prettyprint=True):
+    def to_json(self, prettyprint=True):
         """
         :param prettyprint: human readable,
          but takes more space when written to a file.
-        :param verbose: returns extra data like `InverseEdgePoint`
-        and `EdgePoint` (future)
         :return: json data
         """
         if prettyprint:
-            return json.dumps(self.to_dict(verbose=verbose), sort_keys=True,
+            return json.dumps(self.to_dict(), sort_keys=True,
                               indent=4, separators=(',', ': '))
         else:
-            return json.dumps(self.to_dict(verbose=verbose))
+            return json.dumps(self.to_dict())
 
     @property
     def pointsLatLong(self):
@@ -71,9 +69,82 @@ class MultiPoint(object):
         return [BaseCoordinate(*self.datamap.xy_to_latlong(coord.x, coord.y))
                 for coord in self.points]
 
+    def append(self, point):
+        """
+        Add a BaseGridPoint to the container.
+        :param point: :class:`BaseGridPoint`
+        :raises: TypeError if point not of :class:`BaseGridPoint`
+        """
+        isBaseGridPoint(point)
+        self.points.append(point)
+
+    def __len__(self):
+        """
+        :return: integer - number of items in self.points
+        """
+        return len(self.points)
+
+    def __setitem__(self, idx, point):
+        """
+        Gives MultiPoint list like set capabilities
+        :param idx: index value
+        :param point: :class:`BaseGridPoint`
+        :raises: TypeError if point not of :class:`BaseGridPoint`
+        """
+        isBaseGridPoint(point)
+        self.points[idx] = point
+
+    def __getitem__(self, idx):
+        """
+        Gives MultiPoint list like get capabilities
+        :param idx: index value
+        :return: :class:`GridPoint` self.point at idx
+        """
+        return self.points[idx]
+
+    def __eq__(self, other):
+        """
+        Determines if MultiPoint is equal to another.
+        :param other: :class:`MultiPoint`
+        :return: bool of equality
+        :raises: TypeError if other not of :class:`MultiPoint`
+        """
+        _isMultiPoint(other)
+        return sorted([x for x in self.points]) == \
+            sorted([x for x in other.points])
+
+    def __ne__(self, other):
+        """
+        :param other: :class:`MultiPoint`
+        :return: bool of inequality
+        :raises: TypeError if other not of :class:`MultiPoint`
+        """
+        _isMultiPoint(other)
+        return sorted([x for x in self.points]) != \
+            sorted([x for x in other.points])
+
+    def __iter__(self):
+        """
+        :return: self.points as iterator
+        """
+        for point in self.points:
+            yield point
+
     def __repr__(self):
+        """
+        :return: String representation of this object
+        """
         return "<Multipoint> elevation(m): {}, points {}". \
             format(self.elevation,
                    len(self.points))
 
     __unicode__ = __str__ = __repr__
+
+
+def _isMultiPoint(mp):
+    """
+    :param mp: object under scrutiny
+    :raises: TypeError if other not of :class:`MultiPoint`
+    """
+    if not isinstance(mp, MultiPoint):
+        raise TypeError("MultiPoint expected")

@@ -10,11 +10,14 @@ This library contains a class for storing Saddle data.
 import json
 
 from .spot_elevation import SpotElevation
+from ..containers.linker import isLinker
+
 
 class Saddle(SpotElevation):
     """
     Saddle object stores relevant saddle data.
     """
+
     def __init__(self, latitude, longitude, elevation, *args, **kwargs):
         """
         :param latitude: latitude in dotted decimal
@@ -22,6 +25,8 @@ class Saddle(SpotElevation):
         :param elevation: elevation in meters
         :param multiPoint: :class:`MultiPoint` object
         :param highShores: :class:`HighEdgeContainer` object
+        :param edge: (bool) does this :class:`Saddle` have an edge
+        Effect?
         """
         super(Saddle, self).__init__(latitude, longitude,
                                      elevation, *args, **kwargs)
@@ -31,13 +36,20 @@ class Saddle(SpotElevation):
         self.summits = list()
         # If this is set, this saddle was spun out of another
         # Saddle with less data.
-        self.parent = None # Parent
+        self.parent = None  # Parent
         # Saddles that have been spawned off of this one.
         self.children = list()
         self.singleSummit = False  # All Edges lead to One summit.
-        self.tooLow = False # redundant saddle, but too low.
-        self._disqualified = None # Non specific disqualification
+        self.tooLow = False  # redundant saddle, but too low.
+        self._disqualified = None  # Non specific disqualification
         self.lprBoundary = list()
+
+    def addSummitLinker(self, linker):
+        """
+        :param linker: :class:`Linker`
+        """
+        isLinker(linker)
+        self.summits.append(linker)
 
     @property
     def disqualified(self):
@@ -66,6 +78,7 @@ class Saddle(SpotElevation):
         to_dict = {'latitude': self.latitude,
                    'longitude': self.longitude,
                    'elevation': self.elevation,
+                   'type': 'Saddle',
                    'edge': self.edgeEffect}
         if self.multiPoint and recurse:
             to_dict['multipoint'] = self.multiPoint.to_dict()
@@ -91,6 +104,9 @@ class Saddle(SpotElevation):
             return json.dumps(to_json)
 
     def __repr__(self):
+        """
+        :return: string representation of this object.
+        """
         return "<Saddle> lat {} long {} {}ft {}m MultiPoint {}".format(
             self.latitude,
             self.longitude,
@@ -99,3 +115,12 @@ class Saddle(SpotElevation):
             bool(self.multiPoint))
 
     __unicode__ = __str__ = __repr__
+
+
+def isSaddle(saddle):
+    """
+    :param saddle: object under scrutiny
+    :raises: TypeError if other not of :class:`Saddle`
+    """
+    if not isinstance(saddle, Saddle):
+        raise TypeError("Expected Saddle Object.")

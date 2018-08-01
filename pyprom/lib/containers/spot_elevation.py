@@ -11,7 +11,7 @@ import json
 
 from ..locations.saddle import Saddle
 from ..locations.summit import Summit
-from ..locations.spot_elevation import SpotElevation
+from ..locations.spot_elevation import SpotElevation, isSpotElevation
 from ..locations.base_gridpoint import BaseGridPoint
 from ..locations.gridpoint import GridPoint
 from .multipoint import MultiPoint
@@ -25,6 +25,7 @@ class SpotElevationContainer(_Base):
     Container for Spot Elevation type lists.
     Allows for various list transformations.
     """
+
     def __init__(self, spotElevationList):
         """
         :param spotElevationList: list of :class:`SpotElevation`s
@@ -44,6 +45,8 @@ class SpotElevationContainer(_Base):
                 low = spot_elevation.elevation
                 lowest = list()
                 lowest.append(spot_elevation)
+            elif spot_elevation.elevation == low:
+                lowest.append(spot_elevation)
         return lowest
 
     @property
@@ -57,6 +60,8 @@ class SpotElevationContainer(_Base):
             if spot_elevation.elevation > high:
                 high = spot_elevation.elevation
                 highest = list()
+                highest.append(spot_elevation)
+            elif spot_elevation.elevation == high:
                 highest.append(spot_elevation)
         return highest
 
@@ -90,7 +95,7 @@ class SpotElevationContainer(_Base):
                                 (point.latitude, point.longitude)).meters
             if distance < convertedDist:
                 positive.append(point)
-        return SpotElevationContainer(positive)
+        return self.__class__(positive)
 
     def rectangle(self, lat1, long1, lat2, long2):
         """
@@ -107,18 +112,9 @@ class SpotElevationContainer(_Base):
         upperlong = max(long1, long2)
         lowerlat = min(lat1, lat2)
         lowerlong = min(long1, long2)
-        return SpotElevationContainer(
+        return self.__class__(
             [x for x in self.points if lowerlat < x.latitude < upperlat and
                 lowerlong < x.longitude < upperlong])
-
-    def byType(self, string):
-        """
-        :param string: Object type (as String). ex: Saddle, Summit
-        :return: SpotElevationContainer of objects by type.
-        """
-        name = string.upper()
-        return SpotElevationContainer([x for x in self.points
-                                       if type(x).__name__.upper() == name])
 
     def elevationRange(self, lower=-100000, upper=100000):
         """
@@ -126,8 +122,8 @@ class SpotElevationContainer(_Base):
         :param upper: upper limit in feet
         :return: list of all points in range between lower and upper
         """
-        return SpotElevationContainer([x for x in self.points if
-                                       x.feet > lower and x.feet < upper])
+        return self.__class__([x for x in self.points if
+                               x.feet > lower and x.feet < upper])
 
     def elevationRangeMetric(self, lower=-100000, upper=100000):
         """
@@ -135,9 +131,9 @@ class SpotElevationContainer(_Base):
         :param upper: upper limit in Meters
         :return: list of all points in range between lower and upper
         """
-        return SpotElevationContainer([x for x in self.points if
-                                       x.elevation > lower and
-                                       x.elevation < upper])
+        return self.__class__([x for x in self.points if
+                              x.elevation > lower and
+                              x.elevation < upper])
 
     def to_json(self, prettyprint=True):
         """
@@ -193,10 +189,73 @@ class SpotElevationContainer(_Base):
             feature.edgeEffect = point['edge']
             self.points.append(feature)
 
+    def append(self, spotElevation):
+        """
+        Add a SpotElevation to the container.
+        :param spotElevation: :class:`SpotElevation`
+        :raises: TypeError if point not of :class:`SpotElevation`
+        """
+        isSpotElevation(spotElevation)
+        self.points.append(spotElevation)
+
     def __len__(self):
+        """
+        :return: integer - number of items in self.points
+        """
         return len(self.points)
 
     def __repr__(self):
-        return "<SpotElevationContainer> {} Objects".format(len(self.points))
+        """
+        :return: String representation of this object
+        """
+        return "<SpotElevationContainer> {} Objects".format(self.__len__())
+
+    def __setitem__(self, idx, spotElevation):
+        """
+        Gives SpotElevationContainer list like set capabilities
+        :param idx: index value
+        :param spotElevation: :class:`SpotElevation`
+        :raises: TypeError if spotElevation not of :class:`SpotElevation`
+        """
+        isSpotElevation(spotElevation)
+        self.points[idx] = spotElevation
+
+    def __getitem__(self, idx):
+        """
+        Gives SpotElevationContainer list like get capabilities
+        :param idx: index value
+        :return: :class:`SpotElevation` self.point at idx
+        """
+        return self.points[idx]
+
+    def __eq__(self, other):
+        """
+        Determines if SpotElevationContainer is equal to another.
+        :param other: :class:`SpotElevationContainer`
+        :return: bool of equality
+        :raises: TypeError if other not of :class:`SpotElevation`
+        """
+        _isSpotElevationContainer(other)
+        return sorted([x for x in self.points]) == \
+            sorted([x for x in other.points])
+
+    def __ne__(self, other):
+        """
+        :param other: :class:`SpotElevationContainer`
+        :return: bool of inequality
+        :raises: TypeError if other not of :class:`SpotElevationContainer`
+        """
+        _isSpotElevationContainer(other)
+        return sorted([x for x in self.points]) != \
+            sorted([x for x in other.points])
 
     __unicode__ = __str__ = __repr__
+
+
+def _isSpotElevationContainer(spotElevationContainer):
+    """
+    :param spotElevationContainer: object under scrutiny
+    :raises: TypeError if other not of :class:`SpotElevationContainer`
+    """
+    if not isinstance(spotElevationContainer, SpotElevationContainer):
+        raise TypeError("SpotElevationContainer expected")
