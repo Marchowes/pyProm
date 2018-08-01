@@ -10,7 +10,7 @@ This library contains a class for manipulating a pyProm Divide Tree.
 import logging
 
 
-class DivideTree(object):
+class DivideTree:
     """Divide Tree"""
 
     def __init__(self, domain=None, datamap=None):
@@ -76,7 +76,7 @@ class DivideTree(object):
         #     if summit.elevation > branch.elevation:
 
 
-class LPR(object):
+class LPR:
     """
     LPR
     """

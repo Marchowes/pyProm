@@ -19,7 +19,7 @@ EPSGMap = {
 }
 
 
-class Loader(object):
+class Loader:
     """Base class for data loaders."""
 
     def __init__(self, filename):

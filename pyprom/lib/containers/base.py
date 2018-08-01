@@ -9,7 +9,7 @@ Base object for containers includes logging
 import logging
 
 
-class _Base(object):
+class _Base:
     """
     Very Base object, which contains just a logger.
     """

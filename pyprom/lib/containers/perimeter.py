@@ -16,7 +16,7 @@ DIAGONAL_SHIFT_LIST = ((-1, 0), (-1, 1), (0, 1), (1, 1), (1, 0), (1, -1),
 ORTHOGONAL_SHIFT_LIST = ((-1, 0), (0, 1), (1, 0), (0, -1))
 
 
-class Perimeter(object):
+class Perimeter:
     """
     Container for :class:`Perimeter` type lists.
     Allows for various list transformations.
@@ -61,9 +61,7 @@ class Perimeter(object):
             x = point.x + shift[0]
             y = point.y + shift[1]
             if self.pointIndex[x].get(y, False):
-                if -1 <= x <= self.datamap.max_x + 1\
-                        and -1 <= y <= self.datamap.max_y + 1:
-                    yield self.pointIndex[x].get(y, False)
+                yield self.pointIndex[x].get(y, False)
             else:
                 continue
 
@@ -77,9 +75,7 @@ class Perimeter(object):
             x = point.x + shift[0]
             y = point.y + shift[1]
             if self.pointIndex[x].get(y, False):
-                if -1 <= x <= self.datamap.max_x + 1 \
-                        and -1 <= y <= self.datamap.max_y + 1:
-                    yield self.pointIndex[x].get(y, False)
+                yield self.pointIndex[x].get(y, False)
             else:
                 continue
 

@@ -1,13 +1,16 @@
 Release History
 ---------------
 
-0.5.0 (July,  2018)
-+++++++++++++++++++
+0.5.0 (July 31, 2018)
++++++++++++++++++++++
 * Elimination of InverseEdgePoints and InverseEdgePointContainer.
 * Introduction of Perimeter as a replacement
 * Very large addition of Unit tests
 * Adding __getItems__, setItems, eq, ne, lt, repr and other magic functions to Container Objects.
 * Made points from objects inherited from BaseGridPoint sortable
+* Introduction of Runoffs, which are essentially saddles, but at the edge with a little looser restrictions.
+* Elimination of "EdgePoints" and their container.
+
 
 
 0.4.0 (January 11, 2018)

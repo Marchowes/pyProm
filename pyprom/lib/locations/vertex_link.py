@@ -9,7 +9,7 @@ used in Saddle highShores Tree Calculations.
 """
 
 
-class Vertex_Link(object):
+class Vertex_Link:
     """
     Vertex_Link connects a vertex (:class`GridPoint`) from one feature to
     a vertex from another

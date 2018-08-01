@@ -21,7 +21,7 @@ from .domain import Domain
 from .lib.errors.errors import NoLinkersError
 
 
-class Walk(object):
+class Walk:
     """
     Walk object
     """

@@ -24,7 +24,7 @@ from .lib.containers.perimeter import Perimeter
 from .lib.logic.equalheight import equalHeightBlob
 
 
-class AnalyzeData(object):
+class AnalyzeData:
     """
     Object responsible for discovering features
     """

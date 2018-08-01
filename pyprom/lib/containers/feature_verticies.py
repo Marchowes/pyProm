@@ -11,7 +11,7 @@ used in Saddle highShores Tree Calculations.
 import sys
 
 
-class Feature_Verticies(object):
+class Feature_Verticies:
     """
     Feature_Verticies object stores Feature_Verticies data.
     :class:`Vertex_Link`s connect a vertex from one feature to

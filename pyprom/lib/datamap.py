@@ -19,7 +19,7 @@ DIAGONAL_SHIFT_LIST = ((-1, 0), (-1, 1), (0, 1), (1, 1), (1, 0), (1, -1),
 ORTHOGONAL_SHIFT_LIST = ((-1, 0), (0, 1), (1, 0), (0, -1))
 
 
-class DataMap():
+class DataMap:
     """Base class for Datamap type objects."""
 
     def __init__(self, numpy_map, unit):

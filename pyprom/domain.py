@@ -29,7 +29,7 @@ from .lib.containers.gridpoint import GridPointContainer
 from .lib.locations.gridpoint import GridPoint
 
 
-class Domain(object):
+class Domain:
     """
     Domain object, This Object contains all the features required to calculate
     the Surface Network.

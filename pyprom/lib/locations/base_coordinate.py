@@ -11,7 +11,7 @@ import json
 import utm
 
 
-class BaseCoordinate(object):
+class BaseCoordinate:
     """
     Base Coordinate, intended to be inherited from. This contains
     basic lat/long

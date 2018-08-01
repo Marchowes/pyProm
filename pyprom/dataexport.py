@@ -12,7 +12,7 @@ from shapely.geometry import Point
 from .lib.containers.spot_elevation import SpotElevationContainer
 
 
-class KMLfileWriter(object):
+class KMLfileWriter:
     """
     KML file writer
     """

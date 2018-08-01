@@ -10,7 +10,7 @@ This library contains a base class for x,y oriented objects.
 import json
 
 
-class BaseGridPoint(object):
+class BaseGridPoint:
     """
     Base Object for GridPoints
     """

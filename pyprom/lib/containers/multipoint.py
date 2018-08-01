@@ -12,7 +12,7 @@ from ..locations.base_coordinate import BaseCoordinate
 from ..locations.base_gridpoint import isBaseGridPoint
 
 
-class MultiPoint(object):
+class MultiPoint:
     """MultiPoint Container"""
 
     def __init__(self, points, elevation, datamap, perimeter=None):

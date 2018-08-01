@@ -9,7 +9,7 @@ type location objects.
 """
 
 
-class Linker(object):
+class Linker:
     """
     A Linker links 1 :class:`Summit` with 1 :class:`Saddle`
     :param summit: :class:`Summit`

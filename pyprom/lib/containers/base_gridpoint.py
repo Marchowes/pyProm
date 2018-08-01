@@ -11,7 +11,7 @@ type location objects.
 from pyprom.lib.locations.gridpoint import isGridPoint
 
 
-class BaseGridPointContainer(object):
+class BaseGridPointContainer:
     """
     Base Grid Point Container.
     """
