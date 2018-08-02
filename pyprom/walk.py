@@ -13,6 +13,7 @@ from datetime import timedelta
 from .lib.locations.gridpoint import GridPoint
 from .lib.locations.summit import Summit
 from .lib.containers.linker import Linker
+from .lib.containers.walkpath import WalkPath
 from .lib.containers.summits import SummitsContainer
 from .lib.containers.saddles import SaddlesContainer
 from .lib.datamap import DataMap
@@ -75,7 +76,8 @@ class Walk:
         self.logger.info("Initiating Walk")
         start = default_timer()
         lasttime = start
-        for idx, saddle in enumerate(self.saddles + self.runoffs):
+        for idx, saddle in enumerate(
+                self.saddles.points + self.runoffs.points):
             if not idx % 2000:
                 thisTime = default_timer()
                 split = round(thisTime - lasttime, 2)
@@ -120,6 +122,8 @@ class Walk:
             # Sort High Shores from high to low
             highShore.points.sort(key=lambda x: x.elevation, reverse=True)
             explored = defaultdict(dict)
+            orderedExploredPoints = []
+            orderedOrderedExploredPoints = []
             summits = set()
             toBeAnalyzed = [highShore.points[0]]
             # loop through pool of GridPoints to be analyzied.
@@ -130,14 +134,20 @@ class Walk:
                                                       False):
                     continue
                 explored[pointUnderAnalysis.x][pointUnderAnalysis.y] = True
+                orderedExploredPoints.append(self.datamap.xy_to_latlong(
+                    pointUnderAnalysis.x,
+                    pointUnderAnalysis.y))
                 # call the climb up function and see what
                 # we got for out next Candidate
-                newCandidate, summit, explored =\
-                    self._climb_up(pointUnderAnalysis, explored)
+                newCandidate, summit, explored, orderedExploredPoints =\
+                    self._climb_up(pointUnderAnalysis, explored,
+                                   orderedExploredPoints)
                 if newCandidate:
                     toBeAnalyzed.append(newCandidate)
                 # If we got a summit as a result add it to the summits list.
                 if summit:
+                    orderedOrderedExploredPoints.append(orderedExploredPoints)
+                    orderedExploredPoints = []
                     summits.add(summit)
             # Done walking, stash these summits away.
             highShoreSummits = list(summits)
@@ -146,13 +156,14 @@ class Walk:
             # Summit
             # add that linker to the saddles list of the :class:`Summit`
             # and the summit list of the :class:`Saddle`
-            for hs in highShoreSummits:
-                linker = Linker(hs, saddle, [])
+            for idx, hs in enumerate(highShoreSummits):
+                walkpath = WalkPath(orderedOrderedExploredPoints[idx])
+                linker = Linker(hs, saddle, walkpath)
                 hs.saddles.append(linker)
                 saddle.summits.append(linker)
                 self.linkers.append(linker)
 
-    def _climb_up(self, point, explored):
+    def _climb_up(self, point, explored, orderedExploredPoints):
         """
         _climb_up finds the next higher neighbor to walk up to.
         :param point: Gridpoint to climb up from.
@@ -163,7 +174,8 @@ class Walk:
         """
         # Is it a summit? Good job! return that Summit!
         if self.summitHash[point.x].get(point.y, None):
-            return None, self.summitHash[point.x][point.y], explored
+            return None, self.summitHash[point.x][point.y],\
+                explored, orderedExploredPoints
 
         startingElevation = point.elevation
         lastElevation = point.elevation
@@ -185,12 +197,15 @@ class Walk:
                 # Mark multipoint components as explored.
                 for mp in multipoint:
                     explored[mp.x][mp.y] = True
-                return highNeighbors.points[0], None, explored
+                    orderedExploredPoints.append(
+                        self.datamap.xy_to_latlong(mp.x, mp.y))
+                return highNeighbors.points[0], None,\
+                    explored, orderedExploredPoints
             # Higher than current highest neighbor? Then this is
             # the new candidate.
             if elevation > currentHigh:
                 candidates = GridPoint(x, y, elevation)
-        return candidates, None, explored
+        return candidates, None, explored, orderedExploredPoints
 
     def disqualify_lower_linkers(self):
         """
@@ -236,7 +251,7 @@ class Walk:
                   /-----/
         """
         count = 0
-        for saddle in self.saddles + self.runoffs:
+        for saddle in self.saddles.points + self.runoffs.points:
             uniqueSummits = set(saddle.summits)
 
             # More than one summit to begin with, but only one unique?
