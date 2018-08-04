@@ -35,7 +35,7 @@ class WalkPath:
     def iterateSpotElevation(self, datamap):
         """
         Iterator for SpotElevation representation of the Walk Path.
-        :param: :class:`Datamap`
+        :param: :class:`Datamap` datamap used to look up elevation of point.
         :return: :class:`SpotElevation`
         """
         for point in self.points:
@@ -46,7 +46,7 @@ class WalkPath:
     def iterateBaseGridPoint(self, datamap):
         """
         Iterator for BaseGridPoint representation of the Walk Path.
-        :param: :class:`Datamap`
+        :param: :class:`Datamap` datamap used to look up elevation of point.
         :return: :class:`BaseGridPoint`
         """
         for point in self.points:
@@ -56,7 +56,7 @@ class WalkPath:
     def iterateGridPoint(self, datamap):
         """
         Iterator for GridPoint representation of the Walk Path.
-        :param: :class:`Datamap`
+        :param: :class:`Datamap` datamap used to look up elevation of point.
         :return: :class:`GridPoint`
         """
         for point in self.points:
@@ -72,18 +72,21 @@ class WalkPath:
 
     def spotElevation(self, datamap):
         """
+        :param: :class:`Datamap` datamap used to look up elevation of point.
         :return: List of points as :class:`SpotElevation`
         """
         return [x for x in self.iterateSpotElevation(datamap)]
 
     def baseGridPoint(self, datamap):
         """
+        :param: :class:`Datamap` datamap used to look up elevation of point.
         :return: List of points as :class:`BaseGridPoint`
         """
         return [x for x in self.iterateBaseGridPoint(datamap)]
 
     def gridPoint(self, datamap):
         """
+        :param: :class:`Datamap` datamap used to look up elevation of point.
         :return: List of points as :class:`GridPoint`
         """
         return [x for x in self.iterateGridPoint(datamap)]
