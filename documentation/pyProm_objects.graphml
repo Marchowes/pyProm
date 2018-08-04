@@ -704,6 +704,31 @@ __repr__()</y:MethodLabel>
             </y:ShapeNode>
           </data>
         </node>
+        <node id="n1::n17">
+          <data key="d4" xml:space="preserve"/>
+          <data key="d6">
+            <y:UMLClassNode>
+              <y:Geometry height="248.73451941052622" width="230.0" x="1256.676331576955" y="561.3400994009025"/>
+              <y:Fill color="#666699" transparent="false"/>
+              <y:BorderStyle color="#000000" type="line" width="1.0"/>
+              <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="13" fontStyle="bold" hasBackgroundColor="false" hasLineColor="false" height="19.1328125" horizontalTextPosition="center" iconTextGap="4" modelName="custom" textColor="#000000" verticalTextPosition="bottom" visible="true" width="73.98291015625" x="78.008544921875" xml:space="preserve" y="25.96875">WalkPath<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:LabelModel><y:ModelParameter><y:SmartNodeLabelModelParameter labelRatioX="0.0" labelRatioY="0.0" nodeRatioX="0.0" nodeRatioY="-0.03703090122767855" offsetX="0.0" offsetY="0.0" upX="0.0" upY="-1.0"/></y:ModelParameter></y:NodeLabel>
+              <y:UML clipContent="true" constraint="" hasDetailsColor="false" omitDetails="false" stereotype="lib/containers/walkpath.py" use3DEffect="true">
+                <y:AttributeLabel xml:space="preserve">self.points</y:AttributeLabel>
+                <y:MethodLabel xml:space="preserve">__init__(index, points)
+@path
+iterateBaseCoordinate(self)
+iterateSpotElevation(self, datamap)
+iterateBaseGridPoint(self, datamap)
+iterateGridPoint(self, datamap)
+baseCoordinate(self)
+spotElevation(self, datamap)
+    def baseGridPoint(self, datamap):
+gridPoint(self, datamap)
+__repr__(self)</y:MethodLabel>
+              </y:UML>
+            </y:UMLClassNode>
+          </data>
+        </node>
       </graph>
     </node>
     <node id="n2" yfiles.foldertype="group">
@@ -966,7 +991,7 @@ self.linkers
 self.extent
 self.logger
 </y:AttributeLabel>
-                <y:MethodLabel xml:space="preserve">__init__(data)
+                <y:MethodLabel xml:space="preserve">__init__(data, summits, saddles, runoffs, linkers)
 run()
 read()
 write()

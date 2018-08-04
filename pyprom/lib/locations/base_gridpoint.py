@@ -56,6 +56,16 @@ class BaseGridPoint:
         """
         return "<BaseGridPoint> x: {}, y: {}".format(self.x, self.y)
 
+    def __eq__(self, other):
+        """
+        :param other: object which we compare against.
+        :return: bool if self is equal to other
+        :raises: TypeError if other not of :class:`BaseGridPoint`
+        """
+        isBaseGridPoint(other)
+        return [self.x, self.y] ==\
+               [other.x, other.y]
+
     __unicode__ = __str__ = __repr__
 
 

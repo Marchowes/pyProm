@@ -1,6 +1,13 @@
 Release History
 ---------------
 
+0.5.1 (August 3, 2018)
++++++++++++++++++++++
+* Track Walk path - introduces WalkPath container.
+* Move walk() to Domain where it is more useful.
+* Move disqualify_lower_linkers() to Domain.
+* Move mark_redundant_linkers() to Domain.
+
 0.5.0 (July 31, 2018)
 +++++++++++++++++++++
 * Elimination of InverseEdgePoints and InverseEdgePointContainer.
@@ -10,8 +17,6 @@ Release History
 * Made points from objects inherited from BaseGridPoint sortable
 * Introduction of Runoffs, which are essentially saddles, but at the edge with a little looser restrictions.
 * Elimination of "EdgePoints" and their container.
-
-
 
 0.4.0 (January 11, 2018)
 ++++++++++++++++++++++++
