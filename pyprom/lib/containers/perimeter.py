@@ -24,7 +24,6 @@ class Perimeter:
 
     def __init__(self, pointList=None,
                  pointIndex=None,
-                 datamap=None,
                  mapEdge=False,
                  mapEdgePoints=None):
         """
@@ -33,7 +32,6 @@ class Perimeter:
         self.points
         :param pointIndex: pointIndex: {X: { Y: :class:`GridPoint`}} passing
         this will automatically generate self.points
-        :param datamap: datamap object
         :param mapEdge: (bool) is this a map edge?
         :param mapEdgePoints: :class:`GridPoint` list of Points on
          the map edge.
@@ -47,7 +45,6 @@ class Perimeter:
 
         if pointList:
             self.points = pointList
-        self.datamap = datamap
         self.mapEdge = mapEdge
         self.mapEdgePoints = mapEdgePoints
 
@@ -90,23 +87,25 @@ class Perimeter:
         explored = defaultdict(dict)
         highLists = list()
         for point in self.points:
-            if explored[point.x].get(point.y, False):
+            if explored[point.x].get(point.y):
                 continue
             if point.elevation > elevation:
                 toBeAnalyzed = [point]
                 highList = list()
                 while True:
+                    # If to be analyzed is empty, add highList to highLists
+                    # and break from loop.
                     if not toBeAnalyzed:
                         highLists.append(highList)
                         break
                     else:
                         gridPoint = toBeAnalyzed.pop()
-                    if not explored[gridPoint.x].get(gridPoint.y, False):
+                    if not explored[gridPoint.x].get(gridPoint.y):
                         highList.append(gridPoint)
                         neighbors = [x for x in
                                      self.iterNeighborDiagonal(gridPoint)
                                      if x.elevation > elevation and
-                                     not explored[x.x].get(x.y, False)]
+                                     not explored[x.x].get(x.y)]
                         toBeAnalyzed += neighbors
                         explored[gridPoint.x][gridPoint.y] = True
             else:
