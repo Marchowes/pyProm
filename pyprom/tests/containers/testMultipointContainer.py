@@ -185,3 +185,39 @@ class MultipointTests(unittest.TestCase):
         self.assertNotEqual(multipoint, multipoint3)
         test = multipoint != multipoint2
         self.assertFalse(test)
+
+    def testMultipointEdgePointsGetterEdgeWithMulti(self):
+        """
+        Ensure edge effect Saddle-like multipoint objects
+        generate an edgePoint list.
+        """
+        edgePoint = BaseGridPoint(99, 49)
+        edgeMulti = self.saddles[20]
+        self.assertTrue(edgeMulti.edgeEffect)
+        self.assertEqual(edgeMulti.edgePoints, [edgePoint])
+
+    def testMultipointEdgePointsGetterEdgeSinglePoint(self):
+        """
+        Ensure edge effect Saddle-like objects generate an edgePoint list.
+        """
+        edgePoint = BaseGridPoint(37, 0)
+        edgeMulti = self.runoffs[9]
+        self.assertTrue(edgeMulti.edgeEffect)
+        self.assertEqual(edgeMulti.edgePoints, [edgePoint])
+
+    def testMultipointEdgePointsGetterWithMulti(self):
+        """
+        Ensure non edge effect Saddle-like multipoint objects
+        generate an edgePoint list.
+        """
+        edgeMulti = self.saddles[19]
+        self.assertFalse(edgeMulti.edgeEffect)
+        self.assertEqual(edgeMulti.edgePoints, [])
+
+    def testMultipointEdgePointsGetterSinglePoint(self):
+        """
+        Ensure non edge effect Saddle-like objects generate an edgePoint list.
+        """
+        edgeMulti = self.saddles[6]
+        self.assertFalse(edgeMulti.edgeEffect)
+        self.assertEqual(edgeMulti.edgePoints, [])

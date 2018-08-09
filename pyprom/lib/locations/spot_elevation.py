@@ -23,10 +23,13 @@ class SpotElevation(BaseCoordinate):
         :param elevation: elevation in meters
         :param edge: (bool) does this :class:`SpotElevation` have an edge
          Effect?
+        :param edgePoints: list of :class:`BaseGridPoint` which are on
+         the map edge.
         """
         super(SpotElevation, self).__init__(latitude, longitude)
         self.elevation = elevation
-        self.edgeEffect = kwargs.get('edge', None)
+        self.edgeEffect = kwargs.get('edge', False)
+        self.edgePoints = kwargs.get('edgePoints', [])
 
     def to_dict(self):
         """

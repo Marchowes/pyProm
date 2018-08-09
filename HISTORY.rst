@@ -1,8 +1,12 @@
 Release History
 ---------------
 
+0.5.2 (August 9, 2018)
+++++++++++++++++++++++
+Track edgePoints inside SpotElevations.
+
 0.5.1 (August 3, 2018)
-+++++++++++++++++++++
+++++++++++++++++++++++
 * Track Walk path - introduces WalkPath container.
 * Move walk() to Domain where it is more useful.
 * Move disqualify_lower_linkers() to Domain.
@@ -127,5 +131,5 @@ Release History
 
 
 0.0.0 (August 2016)
-+++++++++++++++++
++++++++++++++++++++
 * Initial Base Release

@@ -1,10 +1,10 @@
-### pyProm v0.5.1
+### pyProm v0.5.2
 
 ![pyProm](https://github.com/marchowes/pyProm/raw/master/images/pyProm-logo-500px.png "pyProm")
 
 This library is still under development. Do not expect full functionality, or documentation until release 1.0.0
 
-**Warning** There will be breaking changes to how domains are exported. You've been warned.
+**Warning** There will be breaking changes to how domains are exported starting in 0.5.3
 
 pyProm
 ======

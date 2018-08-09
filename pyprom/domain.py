@@ -328,7 +328,7 @@ class Domain:
 
             # Oh fuck no, we've got an equalHeightBlob. Better check that out.
             if elevation == startingElevation:
-                multipoint = equalHeightBlob(self.datamap, x, y, elevation)
+                multipoint, _ = equalHeightBlob(self.datamap, x, y, elevation)
                 # Find all perimeter points higher than
                 # the multiPointBlob elevation
                 highNeighbors =\

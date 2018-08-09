@@ -17,6 +17,7 @@ from .lib.locations.gridpoint import GridPoint
 from .lib.locations.saddle import Saddle
 from .lib.locations.summit import Summit
 from .lib.locations.runoff import Runoff
+from .lib.locations.base_gridpoint import BaseGridPoint
 from .lib.containers.saddles import SaddlesContainer
 from .lib.containers.summits import SummitsContainer
 from .lib.containers.runoffs import RunoffsContainer
@@ -121,12 +122,13 @@ class AnalyzeData:
         :param ptElevation: Elevation of Multipoint Blob
         :return: Summit, Saddle, or None
         """
-        blob = equalHeightBlob(self.datamap, x, y, ptElevation)
+        blob, edgePoints = equalHeightBlob(self.datamap, x, y, ptElevation)
         edge = blob.perimeter.mapEdge
         for exemptPoint in blob:
             self.explored[exemptPoint.x][exemptPoint.y] = True
 
-        return self.consolidatedFeatureLogic(x, y, blob.perimeter, blob, edge)
+        return self.consolidatedFeatureLogic(x, y, blob.perimeter,
+                                             blob, edge, edgePoints)
 
     def summit_and_saddle(self, x, y):
         """
@@ -141,8 +143,10 @@ class AnalyzeData:
         edge = False
 
         # Label this as an mapEdge under the following condition
+        edgePoints = []
         if self.x_mapEdge.get(x) or self.y_mapEdge.get(y):
             edge = True
+            edgePoints = [BaseGridPoint(x, y)]
 
         # Begin the ardous task of analyzing points and multipoints
         neighbor = self.datamap.iterateDiagonal(x, y)
@@ -169,9 +173,11 @@ class AnalyzeData:
                              datamap=self.datamap,
                              mapEdge=edge,
                              mapEdgePoints=shoreMapEdge)
-        return self.consolidatedFeatureLogic(x, y, shoreSet, [], edge)
+        return self.consolidatedFeatureLogic(x, y, shoreSet, [],
+                                             edge, edgePoints)
 
-    def consolidatedFeatureLogic(self, x, y, perimeter, multipoint, edge):
+    def consolidatedFeatureLogic(self, x, y, perimeter,
+                                 multipoint, edge, edgePoints):
         """
         Consolidated Feature Logic analyzes the highEdges around a point or
         multipoint and determines if the pattern matches a
@@ -194,7 +200,8 @@ class AnalyzeData:
                             long,
                             self.elevation,
                             multiPoint=multipoint,
-                            edge=edge
+                            edge=edge,
+                            edgePoints=edgePoints
                             )
             returnableLocations.append(summit)
             # edge summits are inherently Runoffs
@@ -204,7 +211,8 @@ class AnalyzeData:
                                 self.elevation,
                                 multiPoint=multipoint,
                                 edge=edge,
-                                highShores=highPerimeter)
+                                highShores=highPerimeter,
+                                edgePoints=edgePoints)
                 returnableLocations.append(runOff)
             return returnableLocations
 
@@ -219,7 +227,8 @@ class AnalyzeData:
                                 long,
                                 self.elevation,
                                 multiPoint=multipoint,
-                                highShores=highPerimeter)
+                                highShores=highPerimeter,
+                                edgePoints=edgePoints)
                 returnableLocations.append(runOff)
                 return returnableLocations
 
@@ -228,7 +237,8 @@ class AnalyzeData:
                             self.elevation,
                             multiPoint=multipoint,
                             edge=edge,
-                            highShores=highPerimeter)
+                            highShores=highPerimeter,
+                            edgePoints=edgePoints)
             returnableLocations.append(saddle)
 
         # if we're an edge and all edgepoints are lower than our point.
@@ -240,6 +250,7 @@ class AnalyzeData:
                             long,
                             self.elevation,
                             multiPoint=multipoint,
-                            highShores=highPerimeter)
+                            highShores=highPerimeter,
+                            edgePoints=edgePoints)
             returnableLocations.append(runOff)
         return returnableLocations
