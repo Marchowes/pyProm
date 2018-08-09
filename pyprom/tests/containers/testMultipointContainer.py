@@ -188,7 +188,8 @@ class MultipointTests(unittest.TestCase):
 
     def testMultipointEdgePointsGetterEdgeWithMulti(self):
         """
-        Ensure edge effect Saddle-like multipoint objects generate an edgePoint list.
+        Ensure edge effect Saddle-like multipoint objects
+        generate an edgePoint list.
         """
         edgePoint = BaseGridPoint(99, 49)
         edgeMulti = self.saddles[20]
@@ -206,7 +207,8 @@ class MultipointTests(unittest.TestCase):
 
     def testMultipointEdgePointsGetterWithMulti(self):
         """
-        Ensure non edge effect Saddle-like multipoint objects generate an edgePoint list.
+        Ensure non edge effect Saddle-like multipoint objects
+        generate an edgePoint list.
         """
         edgeMulti = self.saddles[19]
         self.assertFalse(edgeMulti.edgeEffect)

@@ -127,7 +127,8 @@ class AnalyzeData:
         for exemptPoint in blob:
             self.explored[exemptPoint.x][exemptPoint.y] = True
 
-        return self.consolidatedFeatureLogic(x, y, blob.perimeter, blob, edge, edgePoints)
+        return self.consolidatedFeatureLogic(x, y, blob.perimeter,
+                                             blob, edge, edgePoints)
 
     def summit_and_saddle(self, x, y):
         """
@@ -145,7 +146,7 @@ class AnalyzeData:
         edgePoints = []
         if self.x_mapEdge.get(x) or self.y_mapEdge.get(y):
             edge = True
-            edgePoints = [BaseGridPoint(x,y)]
+            edgePoints = [BaseGridPoint(x, y)]
 
         # Begin the ardous task of analyzing points and multipoints
         neighbor = self.datamap.iterateDiagonal(x, y)
@@ -172,9 +173,11 @@ class AnalyzeData:
                              datamap=self.datamap,
                              mapEdge=edge,
                              mapEdgePoints=shoreMapEdge)
-        return self.consolidatedFeatureLogic(x, y, shoreSet, [], edge, edgePoints)
+        return self.consolidatedFeatureLogic(x, y, shoreSet, [],
+                                             edge, edgePoints)
 
-    def consolidatedFeatureLogic(self, x, y, perimeter, multipoint, edge, edgePoints):
+    def consolidatedFeatureLogic(self, x, y, perimeter,
+                                 multipoint, edge, edgePoints):
         """
         Consolidated Feature Logic analyzes the highEdges around a point or
         multipoint and determines if the pattern matches a
