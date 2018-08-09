@@ -57,8 +57,8 @@ class Perimeter:
         for shift in DIAGONAL_SHIFT_LIST:
             x = point.x + shift[0]
             y = point.y + shift[1]
-            if self.pointIndex[x].get(y, False):
-                yield self.pointIndex[x].get(y, False)
+            if self.pointIndex[x].get(y):
+                yield self.pointIndex[x][y]
             else:
                 continue
 
@@ -71,8 +71,8 @@ class Perimeter:
         for shift in ORTHOGONAL_SHIFT_LIST:
             x = point.x + shift[0]
             y = point.y + shift[1]
-            if self.pointIndex[x].get(y, False):
-                yield self.pointIndex[x].get(y, False)
+            if self.pointIndex[x].get(y):
+                yield self.pointIndex[x][y]
             else:
                 continue
 

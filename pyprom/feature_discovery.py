@@ -40,7 +40,6 @@ class AnalyzeData:
         self.max_x = self.datamap.max_x
         self.x_mapEdge = {0: True, self.max_x: True}
         self.y_mapEdge = {0: True, self.max_y: True}
-        self.explored = defaultdict(dict)
 
     def run(self):
         """
@@ -65,7 +64,8 @@ class AnalyzeData:
         self.summitObjects = SummitsContainer([])
         self.saddleObjects = SaddlesContainer([])
         self.runoffObjects = RunoffsContainer([])
-        iterator = numpy.nditer(self.data, flags=['multi_index'])
+        self.disposableData = self.data.copy()
+        iterator = numpy.nditer(self.disposableData, flags=['multi_index'])
         index = 0
         # Iterate through numpy grid, and keep track of gridpoint coordinates.
         while not iterator.finished:
@@ -95,7 +95,7 @@ class AnalyzeData:
                     ))
 
             # skip if this is a nodata point.
-            if self.elevation == self.datamap.nodata:
+            if iterator[0] == self.datamap.nodata:
                 iterator.iternext()
                 continue
             # Check for summit, saddle, or runoff
@@ -109,9 +109,10 @@ class AnalyzeData:
                     elif isinstance(result, Saddle):
                         self.saddleObjects.append(result)
             # Reset variables, and go to next gridpoint.
+            self.disposableData[x, y] = self.datamap.nodata
             iterator.iternext()
         # Free some memory.
-        del(self.explored)
+        self.disposableData = None
         return self.summitObjects, self.saddleObjects, self.runoffObjects
 
     def analyze_multipoint(self, x, y, ptElevation, edge):
@@ -124,7 +125,8 @@ class AnalyzeData:
         blob = equalHeightBlob(self.datamap, x, y, ptElevation)
         edge = blob.perimeter.mapEdge
         for exemptPoint in blob:
-            self.explored[exemptPoint.x][exemptPoint.y] = True
+            self.disposableData[exemptPoint.x, exemptPoint.y] =\
+                self.datamap.nodata
 
         return self.consolidatedFeatureLogic(x, y, blob.perimeter, blob, edge)
 
@@ -135,9 +137,6 @@ class AnalyzeData:
         :param y:
         :return: Summit, Saddle, or None
         """
-        # Exempt! bail out!
-        if self.explored[x].get(y, False):
-            return None
         edge = False
 
         # Label this as an mapEdge under the following condition
@@ -155,8 +154,7 @@ class AnalyzeData:
                 continue
             # If we have equal neighbors, we need to kick off analysis to
             # a special MultiPoint analysis function and return the result.
-            if elevation == self.elevation and\
-                    not self.explored[_x].get(_y, False):
+            if elevation == self.elevation:
                 return self.analyze_multipoint(_x, _y, elevation, edge)
 
             gp = GridPoint(_x, _y, elevation)
@@ -166,7 +164,6 @@ class AnalyzeData:
                 shoreMapEdge.append(gp)
 
         shoreSet = Perimeter(pointIndex=shoreSetIndex,
-                             datamap=self.datamap,
                              mapEdge=edge,
                              mapEdgePoints=shoreMapEdge)
         return self.consolidatedFeatureLogic(x, y, shoreSet, [], edge)

@@ -7,6 +7,7 @@ the LICENSE file that accompanies it.
 
 from collections import defaultdict
 
+from ..locations.base_gridpoint import BaseGridPoint
 from ..locations.gridpoint import GridPoint
 from ..containers.multipoint import MultiPoint
 from ..util import coordinateHashToGridPointList
@@ -21,11 +22,12 @@ def equalHeightBlob(datamap, x, y, elevation):
     :param elevation: elevation
     :return: Multipoint Object containing all x,y coordinates and elevation
     """
-    masterXY = (x, y)
+    masterGridPoint = BaseGridPoint(x, y)
     exploredEqualHeight = defaultdict(dict)
     exploredEqualHeight[x][y] = True
     perimeterPointHash = defaultdict(dict)
-    toBeAnalyzed = [masterXY]
+    toBeAnalyzed = [masterGridPoint]
+    analyzed = []
     perimeterMapEdge = []
     x_mapEdge = {0: True, datamap.max_x: True}
     y_mapEdge = {0: True, datamap.max_y: True}
@@ -33,18 +35,18 @@ def equalHeightBlob(datamap, x, y, elevation):
     # Loop until pool of equalHeight neighbors has been exhausted.
     edge = False
     while toBeAnalyzed:
-        x, y = toBeAnalyzed.pop()
-        neighbors = datamap.iterateDiagonal(x, y)
+        gridpoint = toBeAnalyzed.pop()
+        analyzed.append(gridpoint)
+        neighbors = datamap.iterateDiagonal(gridpoint.x, gridpoint.y)
         # Determine if edge or not.
         if not edge:
-            if x_mapEdge.get(x) or y_mapEdge.get(y):
+            if x_mapEdge.get(gridpoint.x) or y_mapEdge.get(gridpoint.y):
                 edge = True
         for _x, _y, ele in neighbors:
-            if ele == elevation and\
-                    not exploredEqualHeight[_x].get(_y):
-                branch = (_x, _y)
-                exploredEqualHeight[_x][_y] = True
-                toBeAnalyzed.append(branch)
+            if exploredEqualHeight[_x].get(_y):
+                continue
+            if ele == elevation:
+                toBeAnalyzed.append(BaseGridPoint(_x, _y))
             # If elevation >  master grid point, stash away as
             # a perimeter point. Only keep track of edgepoints
             # higher!
@@ -55,7 +57,8 @@ def equalHeightBlob(datamap, x, y, elevation):
                         perimeterPointHash[_x][_y] = gp
                     if x_mapEdge.get(_x) or y_mapEdge.get(_y):
                         perimeterMapEdge.append(gp)
-    return MultiPoint(coordinateHashToGridPointList(exploredEqualHeight),
+            exploredEqualHeight[_x][_y] = True
+    return MultiPoint(analyzed,
                       elevation, datamap,
                       perimeter=Perimeter(
                           pointIndex=perimeterPointHash,
