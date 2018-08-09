@@ -53,7 +53,8 @@
               <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="13" fontStyle="bold" hasBackgroundColor="false" hasLineColor="false" height="19.1328125" horizontalTextPosition="center" iconTextGap="4" modelName="custom" textColor="#000000" verticalTextPosition="bottom" visible="true" width="106.0703125" x="85.71484375" xml:space="preserve" y="25.96875">SpotElevation<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:LabelModel><y:ModelParameter><y:SmartNodeLabelModelParameter labelRatioX="0.0" labelRatioY="0.0" nodeRatioX="0.0" nodeRatioY="-0.03703090122767855" offsetX="0.0" offsetY="0.0" upX="0.0" upY="-1.0"/></y:ModelParameter></y:NodeLabel>
               <y:UML clipContent="true" constraint="" hasDetailsColor="false" omitDetails="false" stereotype="lib/locations/spot_elevation.py" use3DEffect="true">
                 <y:AttributeLabel xml:space="preserve">self.elevation
-self.edgeEffect</y:AttributeLabel>
+self.edgeEffect
+self.edgePoints</y:AttributeLabel>
                 <y:MethodLabel xml:space="preserve">__init__()
 to_dict()
 to_json()
@@ -425,7 +426,8 @@ __repr__()
                 <y:AttributeLabel xml:space="preserve">self.points
 self.elevation
 self.datamap
-self.perimeter</y:AttributeLabel>
+self.perimeter
+</y:AttributeLabel>
                 <y:MethodLabel xml:space="preserve">__init__()
 to_dict()
 to_json()
