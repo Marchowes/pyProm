@@ -23,7 +23,6 @@ class PerimeterTests(unittest.TestCase):
         gettestzip()
         cls.datafile = GDALLoader('/tmp/N44W072.hgt')
         cls.datamap = cls.datafile.datamap
-        cls.someslice = cls.datamap.subset(1000, 1000, 10, 10)
         # contigous Perimeter
         cls.perimeterI = defaultdict(dict)
         cls.perimeterI[1][1] = cls.p11 = GridPoint(1, 1, 553)
@@ -264,3 +263,20 @@ class PerimeterTests(unittest.TestCase):
         """
         self.assertEqual(self.perimeter.__repr__(),
                          "<Perimeter> 7 Objects")
+
+    def testPerimeterFromDict(self):
+        """
+        Ensure From Dict works as expected.
+        """
+        self.perimeter.mapEdge=True
+        self.perimeter.mapEdgePoints=[self.p11]
+
+        perimeterDict = self.perimeter.to_dict()
+
+        newPerimeter = Perimeter.from_dict(perimeterDict,
+                                           datamap=self.datamap)
+        self.assertEqual(newPerimeter.points, self.perimeter.points)
+        self.assertEqual(newPerimeter.mapEdge, self.perimeter.mapEdge)
+        self.assertEqual(newPerimeter.mapEdgePoints,
+                         self.perimeter.mapEdgePoints)
+        self.assertEqual(newPerimeter.pointIndex, self.perimeter.pointIndex)

@@ -9,7 +9,7 @@ type location objects. and various transforms.
 """
 from collections import defaultdict
 from .gridpoint import GridPointContainer
-from ..locations.gridpoint import isGridPoint
+from ..locations.gridpoint import isGridPoint, GridPoint
 
 DIAGONAL_SHIFT_LIST = ((-1, 0), (-1, 1), (0, 1), (1, 1), (1, 0), (1, -1),
                        (0, -1), (-1, -1))
@@ -78,6 +78,36 @@ class Perimeter:
                 yield self.pointIndex[x].get(y, False)
             else:
                 continue
+
+    def to_dict(self):
+        """
+        :return: dict() representation of :class:`Perimeter`
+        """
+        perimeterDict = dict()
+        perimeterDict['points'] = [x.to_dict() for x in self.points]
+        perimeterDict['mapEdge'] = self.mapEdge
+        perimeterDict['mapEdgePoints'] = [x.to_dict()
+                                          for x in self.mapEdgePoints]
+        return perimeterDict
+
+    @classmethod
+    def from_dict(cls, perimeterDict, datamap=None):
+        """
+        :param perimeterDict: dict() representation of this object.
+        :param datamap: :class:`Datamap`
+        :return: :class:`Perimeter`
+        """
+        perimeterPointHash = defaultdict(dict)
+        for pt in perimeterDict['points']:
+            perimeterPointHash[pt['x']][pt['y']] =\
+                GridPoint(pt['x'], pt['y'], pt['elevation'])
+        mapEdge = perimeterDict['mapEdge']
+        mapEdgePoints = [GridPoint(x['x'], x['y'], x['elevation'])
+                         for x in perimeterDict['mapEdgePoints']]
+        return cls(pointIndex=perimeterPointHash,
+                   datamap=datamap,
+                   mapEdge=mapEdge,
+                   mapEdgePoints=mapEdgePoints)
 
     def findHighEdges(self, elevation):
         """

@@ -8,6 +8,8 @@ This library contains a base container class for storing GridPoint
 type location objects.
 """
 
+from .walkpath import WalkPath
+from ..util import randomString
 
 class Linker:
     """
@@ -17,15 +19,20 @@ class Linker:
     :param path: data containing the path taken to link this Summit and Saddle
     """
 
-    def __init__(self, summit, saddle, path):
+    def __init__(self, summit, saddle, path, id=None):
         """
         :param summit: :class:`Summit`
         :param saddle: :class:`Saddle`
-        :param path: FUTURE
+        :param path: :class:`WalkPath`
+        :param id: id for this object.
         """
         self.summit = summit
         self.saddle = saddle
         self.path = path
+        if id:
+            self.id = id
+        else:
+            self.id = 'li:' + randomString()
         # disqualified means this Linker has been disqualified
         # from further analysis, but not deleted.
         self.disqualified = False
@@ -66,6 +73,52 @@ class Linker:
             self.summit.addSaddleLinker(self)
         if self not in self.saddle.summits:
             self.saddle.addSummitLinker(self)
+
+    def to_dict(self, referenceById=True):
+        """
+        :return: dict() representation of :class:`Linker`
+        """
+        to_dict = dict()
+        to_dict['id'] = self.id
+        if self.path:
+            to_dict['path'] = self.path.to_dict()
+        if self.disqualified:
+            to_dict['disqualified'] = self.disqualified
+        if referenceById:
+            to_dict['saddle'] = self.saddle.id
+            to_dict['summit'] = self.summit.id
+        # else:
+        #    to_dict['saddle'] =
+        return to_dict
+
+    @classmethod
+    def from_dict(cls, linkerDict, saddlesContainer, summitsContainer):
+        """
+        :return: :class:`Linker`
+        """
+        pathDict = linkerDict.get('path', None)
+        if pathDict:
+            path = WalkPath.from_dict(pathDict)
+        else:
+            path = None
+        saddles = [x for x in saddlesContainer if x.id == linkerDict['saddle']]
+        if len(saddles) < 1:
+            raise IndexError("Failed to find Saddle by ID")
+        if len(saddles) > 1:
+            raise IndexError("Found too many matching saddles by ID")
+
+        summits = [x for x in summitsContainer if x.id == linkerDict['summit']]
+        if len(summits) < 1:
+            raise IndexError("Failed to find Summit by ID")
+        if len(summits) > 1:
+            raise IndexError("Found too many matching summits by ID")
+
+        # create linker
+        linker = cls(summits[0], saddles[0], path)
+        # add linker to foreign saddles/summits
+        linker.add_to_remote_saddle_and_summit()
+        linker.disqualified = linkerDict.get('disqualified', False)
+        return linker
 
     def __hash__(self):
         """

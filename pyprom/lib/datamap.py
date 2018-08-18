@@ -22,9 +22,10 @@ ORTHOGONAL_SHIFT_LIST = ((-1, 0), (0, 1), (1, 0), (0, -1))
 class DataMap:
     """Base class for Datamap type objects."""
 
-    def __init__(self, numpy_map, unit):
+    def __init__(self, numpy_map, unit, filename):
         """__init__."""
         self.numpy_map = numpy_map
+        self.filename = filename
         unit_and_substrings = {"METERS": ["meter"], "FEET": ["foot", "feet"]}
         self.unit = None
         for unitname, unit_options in unit_and_substrings.items():
@@ -79,7 +80,7 @@ class ProjectionDataMap(DataMap):
 
     def __init__(self, numpy_map, upperLeftY, upperLeftX, resolutionY,
                  resolutionX, span_y, span_x, linear_unit, unit, nodata,
-                 transform, reverse_transform):
+                 transform, reverse_transform, filename):
         """
         :param numpy_map: numpy_array multidimensional array of data
          numpy_map[x][y]
@@ -115,7 +116,7 @@ class ProjectionDataMap(DataMap):
         called like:
         numpy_map[x][y]
         """
-        super(ProjectionDataMap, self).__init__(numpy_map, unit)
+        super(ProjectionDataMap, self).__init__(numpy_map, unit, filename)
         self.logger = logging.getLogger('{}'.format(__name__))
         self.logger.info("ProjectedDataMap Object Created")
         # These are deliberately flipped, yes I know it's confusing.
@@ -266,7 +267,8 @@ class ProjectionDataMap(DataMap):
                                  self.unit,
                                  self.nodata,
                                  self.transform,
-                                 self.reverse_transform)
+                                 self.reverse_transform,
+                                 "UnknownSubset")
 
     def __repr__(self):
         """

@@ -14,7 +14,7 @@ from ..locations.runoff import Runoff
 
 class RunoffsContainer(SaddlesContainer):
     """
-    Container for Saddles.
+    Container for Runoffs.
     Allows for various list transformations.
     """
 
@@ -26,6 +26,27 @@ class RunoffsContainer(SaddlesContainer):
             raise TypeError("runoffList passed to RunoffsContainer"
                             " can only contain Runoff objects.")
         super(RunoffsContainer, self).__init__(runoffList)
+
+    def to_dict(self):
+        """
+        :return: dict() representation of :class:`RunoffsContainer`
+        """
+        return {'runoffs': [x.to_dict() for x in self.points]}
+
+    @classmethod
+    def from_dict(cls, runoffContainerDict, datamap=None):
+        """
+        Load this object and child objects from a dict.
+        :param runoffsContainerDict: dict() representation of this object.
+        :param datamap: :class:`Datamap`
+        :return:
+        """
+        runoffs = []
+        for runoff in runoffContainerDict['runoffs']:
+            runoffs.append(Runoff.from_dict(runoff, datamap))
+        runoffsContainer = cls(runoffs)
+
+        return runoffsContainer
 
     def __repr__(self):
         """

@@ -4,11 +4,11 @@ pyProm: Copyright 2016.
 This software is distributed under a license that is described in
 the LICENSE file that accompanies it.
 """
-
-from __future__ import division
-from .locations.base_gridpoint import BaseGridPoint
+import random
 import itertools
+import string
 
+from .locations.base_gridpoint import BaseGridPoint
 
 def dottedDecimaltoDegrees(coordinate):
     """
@@ -71,3 +71,13 @@ def arcseconds_to_seconds(arcseconds):
     :return: converts arcseconds into seconds.
     """
     return arcseconds / 3600
+
+def randomString(length=12):
+    """
+    :param length: string length
+    :return: string
+    """
+    return ''.join(random.choice(
+        string.ascii_lowercase +
+        string.ascii_uppercase +
+        string.digits) for _ in range(length))

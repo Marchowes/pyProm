@@ -8,8 +8,10 @@ This library contains a base class for Coordinate oriented objects with
 Elevation data.
 """
 import json
-from .base_coordinate import BaseCoordinate
 
+from .base_coordinate import BaseCoordinate
+from .base_gridpoint import BaseGridPoint
+from ..util import randomString
 
 class SpotElevation(BaseCoordinate):
     """
@@ -30,14 +32,37 @@ class SpotElevation(BaseCoordinate):
         self.elevation = elevation
         self.edgeEffect = kwargs.get('edge', False)
         self.edgePoints = kwargs.get('edgePoints', [])
+        self.id = kwargs.get('id', 'se:' + randomString())
 
     def to_dict(self):
         """
-        :return: dict of :class:`SpotElevation`
+        :return: dict() representation of :class:`SpotElevation`
         """
         return {'latitude': self.latitude,
                 'longitude': self.longitude,
-                'elevation': self.elevation}
+                'elevation': self.elevation,
+                'edge': self.edgeEffect,
+                'edgepoints': [x.to_dict() for x in self.edgePoints],
+                'id': self.id
+                }
+
+    @classmethod
+    def from_dict(cls, spotElevationDict):
+        """
+        Create :class:`SpotElevation` from dictionary representation
+        :return: :class:`SpotElevation`
+        """
+        lat = spotElevationDict['lat']
+        long = spotElevationDict['lon']
+        elevation = spotElevationDict['ele']
+        edge = spotElevationDict['edge']
+        edgePoints = [BaseGridPoint(pt['x'], pt['y']) for pt in spotElevationDict['edgepoints']]
+        id = spotElevationDict['id']
+        multipoint = spotElevationDict.get('multipoint', [])
+        return cls(lat, long, elevation,
+                   edge=edge,
+                   edgePoints=edgePoints,
+                   id=id)
 
     def to_json(self, prettyprint=True):
         """
@@ -100,6 +125,15 @@ class SpotElevation(BaseCoordinate):
                 self.elevation] != \
                [round(other.latitude, 6), round(other.longitude, 6),
                 other.elevation]
+
+    def __lt__(self, other):
+        """
+        :param other: object which we compare against.
+        :return: bool of if self is of lower elevation than other.
+        :raises: TypeError if other not of :class:`BaseCoordinate`
+        """
+        isSpotElevation(other)
+        return self.elevation < other.elevation
 
     def __hash__(self):
         """

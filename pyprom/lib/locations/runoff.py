@@ -8,6 +8,7 @@ This library contains a class for storing Runoff data.
 """
 
 from .saddle import Saddle
+from ..util import randomString
 
 
 class Runoff(Saddle):
@@ -27,6 +28,7 @@ class Runoff(Saddle):
         """
         super(Runoff, self).__init__(latitude, longitude,
                                      elevation, *args, **kwargs)
+        self.id = kwargs.get('id', 'ru:' + randomString())
 
     def __repr__(self):
         """

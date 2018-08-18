@@ -132,8 +132,28 @@ class SpotElevationContainer(_Base):
         :return: list of all points in range between lower and upper
         """
         return self.__class__([x for x in self.points if
-                              x.elevation > lower and
-                              x.elevation < upper])
+                              upper > x.elevation > lower])
+
+    def to_dict(self):
+        """
+        :return: dict() representation of :class:`SpotElevationContainer`
+        """
+        return {"spotelevations": [x for x in self.points.to_dict()]}
+
+    @classmethod
+    def from_dict(cls, spotElevationContainerDict, datamap=None):
+        """
+        Load this object and child objects from a dict.
+        :param spotElevationContainerDict: dict() representation of this object.
+        :param datamap: :class:`Datamap`
+        :return:
+        """
+        spotelevations = []
+        for spotelevation in spotElevationContainerDict['spotelevations']:
+            spotelevations.append(Summit.from_dict(spotelevation, datamap))
+        spotElevationContainer = cls(spotelevations)
+
+        return spotElevationContainer
 
     def to_json(self, prettyprint=True):
         """
@@ -146,48 +166,6 @@ class SpotElevationContainer(_Base):
                               sort_keys=True, indent=4, separators=(',', ': '))
         else:
             return json.dumps([x.to_dict(recurse=True) for x in self.points])
-
-    def from_json(self, jsonData, datamap):
-        """
-        :param jsonData: json string of data to be loaded in this container
-        :param datamap:
-        :return:
-        """
-        hash = json.loads(jsonData)
-        self.points = list()
-        for point in hash:
-            objType = point.get('type', 'SpotElevation')
-            if objType == 'Summit':
-                feature = Summit(point['latitude'],
-                                 point['longitude'],
-                                 point['elevation'])
-            elif objType == 'Saddle':
-                feature = Saddle(point['latitude'],
-                                 point['longitude'],
-                                 point['elevation'])
-            elif objType == 'SpotElevation':
-                feature = SpotElevation(point['latitude'],
-                                        point['longitude'],
-                                        point['elevation'])
-            else:
-                raise Exception('Cannot import unknown type:'.format(objType))
-            mpPoints = list()
-            if point.get('multipoint', None):
-                for mp in point['multipoint']:
-                    mpPoints.append(BaseGridPoint(mp['gridpoint']['x'],
-                                                  mp['gridpoint']['y']))
-                feature.multiPoint = MultiPoint(mpPoints,
-                                                point['elevation'],
-                                                datamap)
-            if point.get('highShores', None):
-                feature.highShores = list()
-                for hs in point['highShores']:
-                    feature.highShores.append(
-                        GridPointContainer(
-                            [GridPoint(x['x'], x['y'], x['elevation'])
-                             for x in hs]))
-            feature.edgeEffect = point['edge']
-            self.points.append(feature)
 
     def append(self, spotElevation):
         """

@@ -157,15 +157,15 @@ class SpotElevationContainerTests(unittest.TestCase):
         elevationRange = self.summits.elevationRangeMetric(500, 580)
         self.assertEqual(len(elevationRange.summits), 53)
 
-    def testSpotElevationContainerJSON(self):
-        """
-        Ensure basic json encoding works.
-        """
-        jsonString = self.summits.to_json()
-
-        summits = SummitsContainer([])
-        summits.from_json(jsonString, self.someslice)
-        self.assertEqual(self.summits.summits, summits.summits)
+    # def testSpotElevationContainerJSON(self):
+    #     """
+    #     Ensure basic json encoding works.
+    #     """
+    #     jsonString = self.summits.to_json()
+    #
+    #     summits = SummitsContainer([])
+    #     summits.from_json(jsonString, self.someslice)
+    #     self.assertEqual(self.summits.summits, summits.summits)
 
     def testSpotElevationContainerLen(self):
         """

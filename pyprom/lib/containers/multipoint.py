@@ -8,14 +8,16 @@ This library contains a container class for storing Multipoint
 type location objects as well as a number of functions.
 """
 import json
-from ..locations.base_coordinate import BaseCoordinate
-from ..locations.base_gridpoint import isBaseGridPoint
 
+from ..locations.base_coordinate import BaseCoordinate
+from ..locations.base_gridpoint import isBaseGridPoint, BaseGridPoint
+from .perimeter import Perimeter
 
 class MultiPoint:
     """MultiPoint Container"""
 
-    def __init__(self, points, elevation, datamap, perimeter=None):
+    def __init__(self, points, elevation, datamap,
+                 perimeter=None):
         """
         This is an "equal height" Multipoint storage container that
         provides a number of functions for analysis of these blob like
@@ -35,20 +37,6 @@ class MultiPoint:
         self.datamap = datamap  # data analysis object.
         self.perimeter = perimeter
 
-    def to_dict(self):
-        """
-        :return: list of dicts.
-        """
-        plist = list()
-        for point in self.points:
-            pdict = dict()
-            pdict['gridpoint'] = point.to_dict()
-            lat, long = self.datamap.xy_to_latlong(point.x, point.y)
-            pdict['coordinate'] = \
-                BaseCoordinate(lat, long).to_dict()
-            plist.append(pdict)
-        return plist
-
     def to_json(self, prettyprint=True):
         """
         :param prettyprint: human readable,
@@ -60,6 +48,28 @@ class MultiPoint:
                               indent=4, separators=(',', ': '))
         else:
             return json.dumps(self.to_dict())
+
+    def to_dict(self):
+        """
+        :return: dict() representation of :class:`MultiPoint`
+        """
+        multiPointDict = dict()
+        multiPointDict['points'] = [x.to_dict() for x in self.points]
+        multiPointDict['perimeter'] = self.perimeter.to_dict()
+        multiPointDict['elevation'] = self.elevation
+        return multiPointDict
+
+    @classmethod
+    def from_dict(cls, multiPointDict, datamap=None):
+        """
+        :param multiPointDict: dict() representation of this object.
+        :param datamap: :class:`Datamap`
+        :return: :class:`MultiPoint`
+        """
+        points = [BaseGridPoint(x['x'], x['y']) for x in multiPointDict['points']]
+        perimeter = Perimeter.from_dict(multiPointDict['perimeter'], datamap)
+        elevation = multiPointDict['elevation']
+        return cls(points, elevation, datamap, perimeter=perimeter)
 
     @property
     def pointsLatLong(self):

@@ -44,6 +44,27 @@ class SummitsContainer(SpotElevationContainer):
         isSummit(summit)
         self.points.append(summit)
 
+    def to_dict(self):
+        """
+        :return: dict() representation of :class:`SummitsContainer`
+        """
+        return {'summits': [x.to_dict() for x in self.points]}
+
+    @classmethod
+    def from_dict(cls, summitContainerDict, datamap=None):
+        """
+        Load this object and child objects from a dict.
+        :param summitContainerDict: dict() representation of this object.
+        :param datamap: :class:`Datamap`
+        :return:
+        """
+        summits = []
+        for summit in summitContainerDict['summits']:
+            summits.append(Summit.from_dict(summit, datamap))
+        summitsContainer = cls(summits)
+
+        return summitsContainer
+
     def __setitem__(self, idx, summit):
         """
         Gives SummitsContainer list like set capabilities

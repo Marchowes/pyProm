@@ -32,7 +32,6 @@ class WalkTests(unittest.TestCase):
         self.domain = Domain(self.islandpondVT, summits=self.summits,
                              saddles=self.saddles, runoffs=self.runoffs,
                              linkers=[])
-        self.no = None
 
     def testWalkSingleSaddleIslandPond(self):
         """
