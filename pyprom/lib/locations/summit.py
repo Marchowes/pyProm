@@ -9,7 +9,10 @@ This library contains a class for storing Summit data.
 
 import json
 from .spot_elevation import SpotElevation
+from .base_gridpoint import BaseGridPoint
+from ..containers.multipoint import MultiPoint
 from ..containers.linker import isLinker
+from ..util import randomString
 
 
 class Summit(SpotElevation):
@@ -27,6 +30,7 @@ class Summit(SpotElevation):
         super(Summit, self).__init__(latitude, longitude,
                                      elevation, *args, **kwargs)
         self.multiPoint = kwargs.get('multiPoint', None)
+        self.id = kwargs.get('id', 'su:' + randomString())
         # saddles contains a list of linker objects linking this summit to a
         # saddle. These are populated by :class:`Walk`
         self.saddles = list()
@@ -41,28 +45,56 @@ class Summit(SpotElevation):
         isLinker(linker)
         self.saddles.append(linker)
 
-    def to_dict(self, recurse=False):
+    def to_dict(self, referenceById=True):
         """
-        :param recurse: include multipoint
-        :return: dict of :class:`Summit`
+        :param referenceById: reference Saddles by ID.
+        :return: dict() representation of :class:`Summit`
         """
-        to_dict = {'latitude': self.latitude,
-                   'longitude': self.longitude,
-                   'elevation': self.elevation,
-                   'type': 'Summit',
-                   'edge': self.edgeEffect}
-        if self.multiPoint and recurse:
+        to_dict = {'lat': self.latitude,
+                   'lon': self.longitude,
+                   'ele': self.elevation,
+                   'edge': self.edgeEffect,
+                   'edgepoints': [x.to_dict() for x in self.edgePoints],
+                   'id': self.id
+                   }
+        # TODO: localhighest (for divide tree time)
+        if self.multiPoint:
             to_dict['multipoint'] = self.multiPoint.to_dict()
+        # These values are not unloaded by from_dict()
+        if referenceById:
+            to_dict['saddles'] = [x.id for x in self.saddles]  # linker by ID
         return to_dict
 
-    def to_json(self, recurse=False, prettyprint=True):
+    @classmethod
+    def from_dict(cls, summitDict, datamap=None):
         """
-        :param recurse: include multipoint
+        Create :class:`Summit` from dictionary representation
+        :return: :class:`Summit`
+        """
+        lat = summitDict['lat']
+        long = summitDict['lon']
+        elevation = summitDict['ele']
+        edge = summitDict['edge']
+        edgePoints = [BaseGridPoint(pt['x'], pt['y'])
+                      for pt in summitDict['edgepoints']]
+        id = summitDict['id']
+        multipoint = summitDict.get('multipoint', [])
+        if multipoint:
+            multipoint = MultiPoint.from_dict(multipoint, datamap=datamap)
+        return cls(lat, long, elevation,
+                   multiPoint=multipoint,
+                   edge=edge,
+                   edgePoints=edgePoints,
+                   id=id)
+
+    def to_json(self, prettyprint=True, referenceById=True):
+        """
         :param prettyprint: human readable,
          but takes more space when written to a file.
+        :param referenceById: link external objects by ID
         :return: json string of :class:`Summit`
         """
-        to_json = self.to_dict(recurse=recurse)
+        to_json = self.to_dict(referenceById=referenceById)
         if prettyprint:
             return json.dumps(to_json, sort_keys=True,
                               indent=4, separators=(',', ': '))

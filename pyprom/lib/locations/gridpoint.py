@@ -26,7 +26,7 @@ class GridPoint(BaseGridPoint):
 
     def to_dict(self):
         """
-        :return: dict of :class:`GridPoint`
+        :return: dict() representation of :class:`GridPoint`
         """
         return {'x': self.x,
                 'y': self.y,
@@ -43,6 +43,15 @@ class GridPoint(BaseGridPoint):
                               indent=4, separators=(',', ': '))
         else:
             return json.dumps(to_json)
+
+    @classmethod
+    def from_dict(self, gridPointDict):
+        """
+        :return: dict of :class:`GridPoint`
+        """
+        return self(gridPointDict['x'],
+                    gridPointDict['y'],
+                    gridPointDict['elevation'])
 
     def toSpotElevation(self, datamap):
         """

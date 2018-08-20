@@ -173,7 +173,7 @@ class AnalyzeData:
                              datamap=self.datamap,
                              mapEdge=edge,
                              mapEdgePoints=shoreMapEdge)
-        return self.consolidatedFeatureLogic(x, y, shoreSet, [],
+        return self.consolidatedFeatureLogic(x, y, shoreSet, None,
                                              edge, edgePoints)
 
     def consolidatedFeatureLogic(self, x, y, perimeter,

@@ -87,12 +87,13 @@ class GDALLoader(Loader):
             target.ImportFromEPSG(epsg_code)
             transform = osr.CoordinateTransformation(spatialRef, target)
             # create a reverse transform for translating back
-            #  into Native GDAL coordiantes
+            #  into Native GDAL coordinates
             reverse_transform = osr.CoordinateTransformation(target,
                                                              spatialRef)
             self.linear_unit = spatialRef.GetLinearUnits()
             self.linear_unit_name = spatialRef.GetLinearUnitsName()
 
+            trimmed_file_name = filename.split("/")[-1]
             # Create out DataMap Object.
             self.datamap = ProjectionDataMap(self.raster_data,
                                              self.upperLeftY,
@@ -105,6 +106,7 @@ class GDALLoader(Loader):
                                              self.linear_unit_name,
                                              nodata,
                                              transform,
-                                             reverse_transform)
+                                             reverse_transform,
+                                             trimmed_file_name)
         else:
             raise Exception("Unsupported, non projected map")

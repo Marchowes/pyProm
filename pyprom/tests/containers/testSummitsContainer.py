@@ -9,14 +9,13 @@ import unittest
 from pyprom.lib.containers.summits import SummitsContainer
 from pyprom.lib.locations.saddle import Saddle
 from pyprom.lib.locations.summit import Summit
+from pyprom.tests.getData import gettestzip
+from pyprom.domain import Domain
+from pyprom.dataload import GDALLoader
 
 
 class SummitsContainerTests(unittest.TestCase):
     """Test SummitsContainer."""
-
-    def setUp(self):
-        """Set Up Tests."""
-        pass
 
     def testSummitsContainerBadInitiation(self):
         """
@@ -94,3 +93,29 @@ class SummitsContainerTests(unittest.TestCase):
         container = SummitsContainer(summits)
         self.assertEqual(container.__repr__(),
                          "<SummitsContainer> 1 Objects")
+
+    def testSummitsContainerFromDictEdge(self):
+        """
+        Ensure from_dict() produces expected
+        results on a saddle which has a child.
+        """
+        gettestzip()
+        datafile = GDALLoader('/tmp/N44W072.hgt')
+        datamap = datafile.datamap
+        someslice = datamap.subset(0, 0, 30, 30)
+        domain = Domain(someslice)
+        domain.run()
+        domain.walk()
+        summits = domain.summits
+        summit = summits[3]
+        summitDict = summit.to_dict()
+        newSummit = Summit.from_dict(summitDict, datamap=someslice)
+
+        self.assertEqual(newSummit, summit)
+        self.assertEqual(newSummit.latitude, summit.latitude)
+        self.assertEqual(newSummit.longitude, summit.longitude)
+        self.assertEqual(newSummit.elevation, summit.elevation)
+        self.assertEqual(newSummit.multiPoint, summit.multiPoint)
+        self.assertEqual(newSummit.edgeEffect, summit.edgeEffect)
+        self.assertEqual(newSummit.edgePoints, summit.edgePoints)
+        self.assertEqual(newSummit.id, summit.id)

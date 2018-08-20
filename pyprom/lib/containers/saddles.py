@@ -69,6 +69,37 @@ class SaddlesContainer(SpotElevationContainer):
         isSaddle(saddle)
         self.points.append(saddle)
 
+    def to_dict(self):
+        """
+        :return: dict() representation of :class:`SaddlesContainer`
+        """
+        return {'saddles': [x.to_dict() for x in self.points]}
+
+    @classmethod
+    def from_dict(cls, saddleContainerDict, datamap=None):
+        """
+        Load this object and child objects from a dict.
+        :param saddleContainerDict: dict() representation of this object.
+        :param datamap: :class:`Datamap`
+        :return:
+        """
+        saddles = []
+        saddleHash = dict()
+        for saddle in saddleContainerDict['saddles']:
+            saddleObj = Saddle.from_dict(saddle, datamap)
+            saddles.append(saddleObj)
+            saddleHash[saddleObj.id] = saddleObj
+        saddlesContainer = cls(saddles)
+        for saddle in saddleContainerDict['saddles']:
+            children = saddle.get('children', None)
+            if children:
+                for child in children:
+                    saddleHash[saddle['id']].children.append(saddleHash[child])
+            parent = saddle.get('parent', None)
+            if parent:
+                saddleHash[saddle['id']].parent = saddleHash[parent]
+        return saddlesContainer
+
     def __repr__(self):
         """
         :return: String representation of this object

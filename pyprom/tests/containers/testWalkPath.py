@@ -88,3 +88,11 @@ class WalkPathTests(unittest.TestCase):
             elevation = self.datamap.numpy_map[x, y]
             gp.append(GridPoint(x, y, elevation))
         self.assertEqual(self.walkpath.gridPoint(self.datamap), gp)
+
+    def testWalkPathFromDict(self):
+        """
+        Ensure to_dict() and from_dict() produce the expected results.
+        """
+        wpDict = self.walkpath.to_dict()
+        newWp = WalkPath.from_dict(wpDict)
+        self.assertEqual(self.walkpath, newWp)

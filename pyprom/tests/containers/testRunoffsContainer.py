@@ -9,6 +9,9 @@ import unittest
 from pyprom.lib.containers.runoffs import RunoffsContainer
 from pyprom.lib.locations.runoff import Runoff
 from pyprom.lib.locations.summit import Summit
+from pyprom.domain import Domain
+from pyprom.tests.getData import gettestzip
+from pyprom.dataload import GDALLoader
 
 
 class RunoffsContainerTests(unittest.TestCase):
@@ -94,3 +97,19 @@ class RunoffsContainerTests(unittest.TestCase):
         container = RunoffsContainer(runoffs)
         self.assertEqual(container.__repr__(),
                          "<RunoffsContainer> 1 Objects")
+
+    def testSaddlesContainerFromDictAll(self):
+        """
+        Ensure from_dict() produces expected results
+        """
+        gettestzip()
+        datafile = GDALLoader('/tmp/N44W072.hgt')
+        datamap = datafile.datamap
+        someslice = datamap.subset(0, 0, 30, 30)
+        domain = Domain(someslice)
+        domain.run()
+        domain.walk()
+        runoffs = domain.runoffs
+        runoffsDict = runoffs.to_dict()
+        newRunoffs = RunoffsContainer.from_dict(runoffsDict, datamap=someslice)
+        self.assertEqual(newRunoffs, runoffs)

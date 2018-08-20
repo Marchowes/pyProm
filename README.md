@@ -1,4 +1,4 @@
-### pyProm v0.5.2
+### pyProm v0.5.3
 
 ![pyProm](https://github.com/marchowes/pyProm/raw/master/images/pyProm-logo-500px.png "pyProm")
 

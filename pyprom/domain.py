@@ -23,14 +23,9 @@ from .lib.datamap import DataMap
 from .lib.logic.equalheight import equalHeightBlob
 from .dataload import Loader
 from .lib.containers.spot_elevation import SpotElevationContainer
-from .lib.locations.summit import Summit
-from .lib.locations.saddle import Saddle
-from .lib.locations.base_gridpoint import BaseGridPoint
-from .lib.containers.multipoint import MultiPoint
 from .lib.containers.summits import SummitsContainer
 from .lib.containers.runoffs import RunoffsContainer
 from .lib.containers.saddles import SaddlesContainer
-from .lib.containers.gridpoint import GridPointContainer
 from .lib.containers.linker import Linker
 from .lib.containers.walkpath import WalkPath
 from .lib.locations.gridpoint import GridPoint
@@ -88,19 +83,18 @@ class Domain:
         self.summits, self.saddles, self.runoffs =\
             AnalyzeData(self.datamap).run()
 
-    def read(self, filename):
+    @classmethod
+    def read(cls, filename, datamap):
         """
         :param filename: name of file (including path) to read
         """
         # Expunge any existing saddles, summits, and linkers
         filename = os.path.expanduser(filename)
-        self.logger.info("Loading Domain Dataset from {}.".format(filename))
         incoming = gzip.open(filename, 'r')
-        self.saddles = SpotElevationContainer([])
-        self.summits = SpotElevationContainer([])
-        self.linkers = list()
-        self.from_json(incoming.read())
+        domain = cls.from_json(incoming.read().decode("utf-8"), datamap)
+        domain.logger.info("Loaded Domain Dataset from {}.".format(filename))
         incoming.close()
+        return domain
 
     def write(self, filename):
         """
@@ -114,52 +108,11 @@ class Domain:
         outgoing.write(self.to_json(prettyprint=False).encode('utf-8'))
         outgoing.close()
 
-    def from_json(self, jsonString):
-        """
-        :param jsonString: json string of :class:`Domain` data
-        """
-        hash = json.loads(jsonString.decode("utf-8"))
-
-        def _loader(point, otype):
-
-            if otype == 'Summit':
-                feature = Summit(point['latitude'],
-                                 point['longitude'],
-                                 point['elevation'])
-            elif otype == 'Saddle':
-                feature = Saddle(point['latitude'],
-                                 point['longitude'],
-                                 point['elevation'])
-            else:
-                raise Exception('Cannot import unknown type:'.format(otype))
-            mpPoints = list()
-            if point.get('multipoint', None):
-                for mp in point['multipoint']:
-                    mpPoints.append(BaseGridPoint(mp['gridpoint']['x'],
-                                                  mp['gridpoint']['y']))
-                feature.multiPoint = MultiPoint(mpPoints,
-                                                point['elevation'],
-                                                self.datamap)
-            if point.get('highShores', None):
-                feature.highShores = list()
-                for hs in point['highShores']:
-                    feature.highShores.append(
-                        GridPointContainer(
-                            [GridPoint(x['x'], x['y'], x['elevation'])
-                             for x in hs]))
-            feature.edgeEffect = point['edge']
-            return feature
-        self.summits = SummitsContainer(
-            [_loader(x, 'Summit') for x in hash['summits']])
-        self.saddles = SaddlesContainer(
-            [_loader(x, 'Saddle') for x in hash['saddles']])
-        # self.linkers = ????
-
     def to_json(self, prettyprint=True):
         """
         :param prettyprint: human readable,
          but takes more space when written to a file.
-        :return: json string of :class:`Domain` Data.
+        :return: json string of :class:`Domain`
         """
         if prettyprint:
             return json.dumps(self.to_dict(), sort_keys=True,
@@ -167,19 +120,54 @@ class Domain:
         else:
             return json.dumps(self.to_dict())
 
+    @classmethod
+    def from_json(cls, jsonString, datamap):
+        """
+        :param jsonString: json string of :class:`Domain` data
+        :param datamap: :class:`Datamap`
+        :return: :class:`Domain`
+        """
+        domainDict = json.loads(jsonString)
+        return cls.from_dict(domainDict, datamap)
+
+    @classmethod
+    def from_dict(cls, domainDict, datamap):
+        """
+        :param domainDict: dict() representation of :class:`Domain`
+        :param datamap: :class:`Datamap`
+        :return: :class:`Domain`
+        """
+        saddlesContainer = SaddlesContainer.from_dict(domainDict['saddles'],
+                                                      datamap=datamap)
+        summitsContainer = SummitsContainer.from_dict(domainDict['summits'],
+                                                      datamap=datamap)
+        runoffsContainer = RunoffsContainer.from_dict(domainDict['runoffs'],
+                                                      datamap=datamap)
+        linkers = [
+            Linker.from_dict(linkerDict,
+                             SpotElevationContainer(saddlesContainer.points +
+                                                    runoffsContainer.points),
+                             summitsContainer)
+            for linkerDict in domainDict['linkers']]
+        return cls(datamap, summitsContainer,
+                   saddlesContainer, runoffsContainer, linkers)
+
     def to_dict(self):
         """
-        Dictionary of all :class:`Domain` Data.
+        :return: dict() representation of :class:`Domain`
         """
-        domain_dict = {'domain': self.extent,
-                       'date': time.strftime("%m-%d-%Y %H:%M:%S")}
+        domain_dict = dict()
+        domain_dict['domain'] = self.extent,
+        domain_dict['datamap'] = self.datamap.filename
+        domain_dict['date'] = time.strftime("%m-%d-%Y %H:%M:%S")
 
-        domain_dict['summits'] = [x.to_dict(recurse=True)
-                                  for x in self.summits]
-        domain_dict['saddles'] = [x.to_dict(recurse=True)
-                                  for x in self.saddles]
-        # domain_dict['linkers'] = ?TODO
+        # Our main event...
+        domain_dict['summits'] = self.summits.to_dict()
+        domain_dict['saddles'] = self.saddles.to_dict()
+        domain_dict['runoffs'] = self.runoffs.to_dict()
 
+        # Linkers if this domain has been walked.
+        domain_dict['linkers'] = [x.to_dict() for x in self.linkers]
         return domain_dict
 
     def __repr__(self):

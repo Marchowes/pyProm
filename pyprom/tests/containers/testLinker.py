@@ -9,6 +9,9 @@ import unittest
 from pyprom.lib.locations.saddle import Saddle
 from pyprom.lib.locations.summit import Summit
 from pyprom.lib.containers.linker import Linker
+from pyprom.lib.containers.walkpath import WalkPath
+from pyprom.lib.containers.saddles import SaddlesContainer
+from pyprom.lib.containers.summits import SummitsContainer
 
 
 class LinkerTests(unittest.TestCase):
@@ -21,9 +24,11 @@ class LinkerTests(unittest.TestCase):
         self.summit2 = Summit(10, 10, 1000)
         self.saddle2 = Saddle(15, 15, 100)
 
-        self.linker1 = Linker(self.summit1, self.saddle1, None)
-        self.linker2 = Linker(self.summit1, self.saddle2, None)
-        self.linker3 = Linker(self.summit2, self.saddle2, None)
+        self.path1 = WalkPath([(0, 0), (0, 1), (0, 2)])
+
+        self.linker1 = Linker(self.summit1, self.saddle1, self.path1)
+        self.linker2 = Linker(self.summit1, self.saddle2, self.path1)
+        self.linker3 = Linker(self.summit2, self.saddle2, self.path1)
 
         self.summit1.saddles = [self.linker1, self.linker2]
         self.summit2.saddles = [self.linker3]
@@ -108,3 +113,19 @@ class LinkerTests(unittest.TestCase):
         self.linker1.add_to_remote_saddle_and_summit()
         self.assertEqual(len(self.summit1.saddles), 1)
         self.assertEqual(len(self.saddle1.summits), 1)
+
+    def testLinkerFromDict(self):
+        """
+        Ensure from_dict produces expected results.
+        """
+        linkerDict = self.linker1.to_dict()
+        saddlesContainer = SaddlesContainer([self.saddle1, self.saddle2])
+        summitsContainer = SummitsContainer([self.summit1, self.summit2])
+        newLinker = Linker.from_dict(linkerDict,
+                                     saddlesContainer,
+                                     summitsContainer)
+
+        self.assertEqual(newLinker, self.linker1)
+        self.assertEqual(newLinker.saddle, self.saddle1)
+        self.assertEqual(newLinker.summit, self.summit1)
+        self.assertEqual(newLinker.path, self.path1)

@@ -258,3 +258,11 @@ class GridPointContainerTests(unittest.TestCase):
         container = GridPointContainer([self.p11, self.p12])
         self.assertEqual(container.__repr__(),
                          "<GridPointContainer> 2 Objects")
+
+    def testGridPointContainerFromDict(self):
+        """
+        Ensure from_dict() produces expected results
+        """
+        gpcDict = self.gpc.to_dict()
+        newGpc = GridPointContainer.from_dict(gpcDict)
+        self.assertEqual(newGpc, self.gpc)

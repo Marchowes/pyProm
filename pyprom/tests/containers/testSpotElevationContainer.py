@@ -9,7 +9,6 @@ import unittest
 from pyprom.tests.getData import gettestzip
 from pyprom.dataload import GDALLoader
 from pyprom.feature_discovery import AnalyzeData
-from pyprom.lib.containers.summits import SummitsContainer
 from pyprom.lib.containers.spot_elevation import SpotElevationContainer
 from pyprom.lib.locations.summit import Summit
 from pyprom.lib.locations.saddle import Saddle
@@ -156,16 +155,6 @@ class SpotElevationContainerTests(unittest.TestCase):
         self.assertEqual(len(elevationRange.summits), 39)
         elevationRange = self.summits.elevationRangeMetric(500, 580)
         self.assertEqual(len(elevationRange.summits), 53)
-
-    def testSpotElevationContainerJSON(self):
-        """
-        Ensure basic json encoding works.
-        """
-        jsonString = self.summits.to_json()
-
-        summits = SummitsContainer([])
-        summits.from_json(jsonString, self.someslice)
-        self.assertEqual(self.summits.summits, summits.summits)
 
     def testSpotElevationContainerLen(self):
         """

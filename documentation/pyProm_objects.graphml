@@ -57,6 +57,7 @@ self.edgeEffect
 self.edgePoints</y:AttributeLabel>
                 <y:MethodLabel xml:space="preserve">__init__()
 to_dict()
+from_dict()
 to_json()
 toGridPoint()
 @feet
@@ -149,6 +150,7 @@ __repr__()</y:MethodLabel>
 toSpotElevation()
 
 to_dict()
+from_dict()
 to_json()
 
 __eq__()
@@ -183,6 +185,7 @@ self.lprBoundary</y:AttributeLabel>
 addSummitLinker()
 @disqualified
 to_dict()
+from_dict()
 to_json()
 
 __repr__()</y:MethodLabel>
@@ -205,6 +208,7 @@ self.saddles</y:AttributeLabel>
 
 addSaddleLinker()
 to_dict()
+from_dict()
 to_json()
 
 __repr__()</y:MethodLabel>
@@ -290,6 +294,7 @@ self.lprBoundary</y:AttributeLabel>
 addSummitLinker()
 @disqualified
 to_dict()
+from_dict()
 to_json()
 
 __repr__()</y:MethodLabel>
@@ -345,7 +350,7 @@ __repr__()</y:MethodLabel>
               <y:Shape type="roundrectangle"/>
               <y:State closed="false" closedHeight="50.0" closedWidth="50.0" innerGraphDisplayEnabled="false"/>
               <y:Insets bottom="15" bottomF="15.0" left="15" leftF="15.0" right="15" rightF="15.0" top="15" topF="15.0"/>
-              <y:BorderInsets bottom="227" bottomF="227.41537484875175" left="0" leftF="0.0" right="104" rightF="104.1609186903479" top="0" topF="0.0"/>
+              <y:BorderInsets bottom="104" bottomF="104.23691930890664" left="0" leftF="0.0" right="104" rightF="104.1609186903479" top="0" topF="0.0"/>
             </y:GroupNode>
             <y:GroupNode>
               <y:Geometry height="50.0" width="50.0" x="0.0" y="60.0"/>
@@ -365,7 +370,7 @@ __repr__()</y:MethodLabel>
           <data key="d4" xml:space="preserve"/>
           <data key="d6">
             <y:UMLClassNode>
-              <y:Geometry height="220.5000000000001" width="230.0" x="656.3441567617466" y="-355.06361213546325"/>
+              <y:Geometry height="236.3189655172414" width="230.0" x="656.3441567617466" y="-355.06361213546325"/>
               <y:Fill color="#C0C0C0" transparent="false"/>
               <y:BorderStyle color="#000000" type="line" width="1.0"/>
               <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="13" fontStyle="bold" hasBackgroundColor="false" hasLineColor="false" height="19.1328125" horizontalTextPosition="center" iconTextGap="4" modelName="custom" textColor="#000000" verticalTextPosition="bottom" visible="true" width="180.11572265625" x="24.942138671875" xml:space="preserve" y="25.96875">BaseGridPointContainer<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:LabelModel><y:ModelParameter><y:SmartNodeLabelModelParameter labelRatioX="0.0" labelRatioY="0.0" nodeRatioX="0.0" nodeRatioY="-0.03703090122767855" offsetX="0.0" offsetY="0.0" upX="0.0" upY="-1.0"/></y:ModelParameter></y:NodeLabel>
@@ -392,7 +397,7 @@ __repr__()
           <data key="d4" xml:space="preserve"/>
           <data key="d6">
             <y:UMLClassNode>
-              <y:Geometry height="248.73451941052622" width="230.0" x="656.3441567617466" y="112.65063091482659"/>
+              <y:Geometry height="282.12859898612305" width="230.0" x="656.3441567617466" y="112.65063091482659"/>
               <y:Fill color="#FF6600" transparent="false"/>
               <y:BorderStyle color="#000000" type="line" width="1.0"/>
               <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="13" fontStyle="bold" hasBackgroundColor="false" hasLineColor="false" height="19.1328125" horizontalTextPosition="center" iconTextGap="4" modelName="custom" textColor="#000000" verticalTextPosition="bottom" visible="true" width="144.8798828125" x="42.56005859375" xml:space="preserve" y="25.96875">GridPointContainer<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:LabelModel><y:ModelParameter><y:SmartNodeLabelModelParameter labelRatioX="0.0" labelRatioY="0.0" nodeRatioX="0.0" nodeRatioY="-0.03703090122767855" offsetX="0.0" offsetY="0.0" upX="0.0" upY="-1.0"/></y:ModelParameter></y:NodeLabel>
@@ -406,6 +411,9 @@ iterNeighborOrthogonal()
 
 findPseudoSummits()
 findClosestPoints()
+
+to_dict()
+from_dict()
 
 append()
 __repr__()
@@ -430,6 +438,7 @@ self.perimeter
 </y:AttributeLabel>
                 <y:MethodLabel xml:space="preserve">__init__()
 to_dict()
+from_dict()
 to_json()
 @pointsLatLong
 append()
@@ -448,7 +457,7 @@ __repr__()</y:MethodLabel>
           <data key="d4" xml:space="preserve"/>
           <data key="d6">
             <y:UMLClassNode>
-              <y:Geometry height="174.39527530058" width="230.0" x="7.693302016572716" y="347.11216727822796"/>
+              <y:Geometry height="199.89917811344787" width="230.0" x="7.693302016572716" y="347.11216727822796"/>
               <y:Fill color="#FF00FF" color2="#C0C0C0" transparent="false"/>
               <y:BorderStyle hasColor="false" type="line" width="1.0"/>
               <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="13" fontStyle="bold" hasBackgroundColor="false" hasLineColor="false" height="19.1328125" horizontalTextPosition="center" iconTextGap="4" modelName="custom" textColor="#000000" verticalTextPosition="bottom" visible="true" width="133.40966796875" x="48.295166015625" xml:space="preserve" y="25.96875">SaddlesContainer<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:LabelModel><y:ModelParameter><y:SmartNodeLabelModelParameter labelRatioX="0.0" labelRatioY="0.0" nodeRatioX="0.0" nodeRatioY="-0.03703090122767855" offsetX="0.0" offsetY="0.0" upX="0.0" upY="-1.0"/></y:ModelParameter></y:NodeLabel>
@@ -456,6 +465,8 @@ __repr__()</y:MethodLabel>
                 <y:AttributeLabel xml:space="preserve"/>
                 <y:MethodLabel xml:space="preserve">__init__()
 rebuildSaddles()
+to_dict()
+from_dict()
 @saddles
 
 append()
@@ -469,13 +480,15 @@ __repr__()</y:MethodLabel>
           <data key="d4" xml:space="preserve"/>
           <data key="d6">
             <y:UMLClassNode>
-              <y:Geometry height="165.40308092631574" width="230.0" x="344.4247696578825" y="351.6082644653601"/>
+              <y:Geometry height="184.8725769475359" width="230.0" x="344.4247696578825" y="351.6082644653601"/>
               <y:Fill color="#FF0000" color2="#C0C0C0" transparent="false"/>
               <y:BorderStyle hasColor="false" type="line" width="1.0"/>
               <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="13" fontStyle="bold" hasBackgroundColor="false" hasLineColor="false" height="19.1328125" horizontalTextPosition="center" iconTextGap="4" modelName="custom" textColor="#000000" verticalTextPosition="bottom" visible="true" width="139.77001953125" x="45.114990234375" xml:space="preserve" y="25.96875">SummitsContainer<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:LabelModel><y:ModelParameter><y:SmartNodeLabelModelParameter labelRatioX="0.0" labelRatioY="0.0" nodeRatioX="0.0" nodeRatioY="-0.03703090122767855" offsetX="0.0" offsetY="0.0" upX="0.0" upY="-1.0"/></y:ModelParameter></y:NodeLabel>
               <y:UML clipContent="true" constraint="" hasDetailsColor="false" omitDetails="false" stereotype="lib/containers/summits.py" use3DEffect="true">
                 <y:AttributeLabel xml:space="preserve"/>
                 <y:MethodLabel xml:space="preserve">__init__()
+to_dict()
+from_dict()
 @summits
 
 append()
@@ -612,6 +625,8 @@ iterNeighborDiagonal(inverseEdgePoint)
 iterNeighborOrthogonal(inverseEdgePoint)
 findHighEdges(elevation)
 findHighPerimeter(elevation)
+to_dict()
+from_dict()
 append()
 __len__()
 __repr__()
@@ -628,7 +643,7 @@ __ne__()</y:MethodLabel>
           <data key="d4" xml:space="preserve"/>
           <data key="d6">
             <y:UMLClassNode>
-              <y:Geometry height="282.12859898612305" width="230.0" x="176.0590358372276" y="547.0113453916758"/>
+              <y:Geometry height="322.2844345298896" width="230.0" x="176.0590358372276" y="656.5272605110392"/>
               <y:Fill color="#FFCC99" transparent="false"/>
               <y:BorderStyle color="#000000" type="line" width="1.0"/>
               <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="13" fontStyle="bold" hasBackgroundColor="false" hasLineColor="false" height="19.1328125" horizontalTextPosition="center" iconTextGap="4" modelName="custom" textColor="#000000" verticalTextPosition="bottom" visible="true" width="49.8681640625" x="90.06591796875" xml:space="preserve" y="25.96875">Linker<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:LabelModel><y:ModelParameter><y:SmartNodeLabelModelParameter labelRatioX="0.0" labelRatioY="0.0" nodeRatioX="0.0" nodeRatioY="-0.03703090122767855" offsetX="0.0" offsetY="0.0" upX="0.0" upY="-1.0"/></y:ModelParameter></y:NodeLabel>
@@ -642,6 +657,8 @@ self.disqualified</y:AttributeLabel>
 @prom_ft
 @summit_saddles
 @saddle_summits
+to_dict()
+from_dict()
 add_to_remote_saddle_and_summit()
 __repr__()
 __hash__
@@ -678,7 +695,7 @@ __ne__(other)
           <data key="d4" xml:space="preserve"/>
           <data key="d6">
             <y:UMLClassNode>
-              <y:Geometry height="174.39527530058" width="230.0" x="-303.07321958120417" y="347.11216727822796"/>
+              <y:Geometry height="199.89917811344787" width="230.0" x="-303.07321958120417" y="347.11216727822796"/>
               <y:Fill color="#800000" color2="#C0C0C0" transparent="false"/>
               <y:BorderStyle hasColor="false" type="line" width="1.0"/>
               <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="13" fontStyle="bold" hasBackgroundColor="false" hasLineColor="false" height="19.1328125" horizontalTextPosition="center" iconTextGap="4" modelName="custom" textColor="#000000" verticalTextPosition="bottom" visible="true" width="132.15283203125" x="48.923583984375" xml:space="preserve" y="25.96875">RunoffsContainer<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:LabelModel><y:ModelParameter><y:SmartNodeLabelModelParameter labelRatioX="0.0" labelRatioY="0.0" nodeRatioX="0.0" nodeRatioY="-0.03703090122767855" offsetX="0.0" offsetY="0.0" upX="0.0" upY="-1.0"/></y:ModelParameter></y:NodeLabel>
@@ -686,6 +703,8 @@ __ne__(other)
                 <y:AttributeLabel xml:space="preserve"/>
                 <y:MethodLabel xml:space="preserve">__init__()
 rebuildSaddles()
+to_dict()
+from_dict()
 @saddles
 
 append()
@@ -710,7 +729,7 @@ __repr__()</y:MethodLabel>
           <data key="d4" xml:space="preserve"/>
           <data key="d6">
             <y:UMLClassNode>
-              <y:Geometry height="248.73451941052622" width="230.0" x="1256.676331576955" y="561.3400994009025"/>
+              <y:Geometry height="282.12859898612305" width="230.0" x="1256.676331576955" y="561.3400994009025"/>
               <y:Fill color="#666699" transparent="false"/>
               <y:BorderStyle color="#000000" type="line" width="1.0"/>
               <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="13" fontStyle="bold" hasBackgroundColor="false" hasLineColor="false" height="19.1328125" horizontalTextPosition="center" iconTextGap="4" modelName="custom" textColor="#000000" verticalTextPosition="bottom" visible="true" width="73.98291015625" x="78.008544921875" xml:space="preserve" y="25.96875">WalkPath<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:LabelModel><y:ModelParameter><y:SmartNodeLabelModelParameter labelRatioX="0.0" labelRatioY="0.0" nodeRatioX="0.0" nodeRatioY="-0.03703090122767855" offsetX="0.0" offsetY="0.0" upX="0.0" upY="-1.0"/></y:ModelParameter></y:NodeLabel>
@@ -726,6 +745,8 @@ baseCoordinate(self)
 spotElevation(self, datamap)
     def baseGridPoint(self, datamap):
 gridPoint(self, datamap)
+to_dict()
+from_dict()
 __repr__(self)</y:MethodLabel>
               </y:UML>
             </y:UMLClassNode>
@@ -1145,7 +1166,7 @@ parentFinder(summit)
       <data key="d8" xml:space="preserve"/>
       <data key="d10">
         <y:PolyLineEdge>
-          <y:Path sx="-24.360223273886504" sy="-87.18704701527122" tx="0.0" ty="0.0">
+          <y:Path sx="-24.360223273886504" sy="-99.93744962672903" tx="0.0" ty="0.0">
             <y:Point x="99.56265251989396" y="-859.7231830238726"/>
           </y:Path>
           <y:LineStyle color="#000000" type="line" width="1.0"/>
@@ -1230,7 +1251,7 @@ parentFinder(summit)
     <edge id="e7" source="n1::n4" target="n0::n5">
       <data key="d10">
         <y:PolyLineEdge>
-          <y:Path sx="109.46964975192327" sy="-82.68776641396244" tx="0.0" ty="0.0">
+          <y:Path sx="109.46964975192327" sy="-92.42089308962215" tx="0.0" ty="0.0">
             <y:Point x="558.9894921417049" y="-1001.9895615474798"/>
           </y:Path>
           <y:LineStyle color="#000000" type="line" width="1.0"/>

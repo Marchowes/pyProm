@@ -10,7 +10,11 @@ This library contains a class for storing Saddle data.
 import json
 
 from .spot_elevation import SpotElevation
+from .base_gridpoint import BaseGridPoint
+from ..containers.multipoint import MultiPoint
+from ..containers.gridpoint import GridPointContainer
 from ..containers.linker import isLinker
+from ..util import randomString
 
 
 class Saddle(SpotElevation):
@@ -32,16 +36,20 @@ class Saddle(SpotElevation):
                                      elevation, *args, **kwargs)
         self.multiPoint = kwargs.get('multiPoint', None)
         self.highShores = kwargs.get('highShores', [])
+        self.id = kwargs.get('id', 'sa:' + randomString())
         # Temporary until I've build a linker
         self.summits = list()
         # If this is set, this saddle was spun out of another
         # Saddle with less data.
         self.parent = None  # Parent
         # Saddles that have been spawned off of this one.
-        self.children = list()
-        self.singleSummit = False  # All Edges lead to One summit.
-        self.tooLow = False  # redundant saddle, but too low.
-        self._disqualified = None  # Non specific disqualification
+        self.children = kwargs.get('children', [])
+        # All Edges lead to One summit.
+        self.singleSummit = kwargs.get('singleSummit', False)
+        # redundant saddle, but too low.
+        self.tooLow = kwargs.get('tooLow', False)
+        # Non specific disqualification
+        self._disqualified = kwargs.get('disqualified', None)
         self.lprBoundary = list()
 
     def addSummitLinker(self, linker):
@@ -70,33 +78,84 @@ class Saddle(SpotElevation):
         """
         self._disqualified = value
 
-    def to_dict(self, recurse=False):
+    def to_dict(self, referenceById=True):
         """
-        :param recurse: include multipoint
-        :return: dict of :class:`Saddle`
+        :param referenceById: reference Summits by ID.
+        :return: dict() representation of :class:`Saddle`
         """
-        to_dict = {'latitude': self.latitude,
-                   'longitude': self.longitude,
-                   'elevation': self.elevation,
-                   'type': 'Saddle',
-                   'edge': self.edgeEffect}
-        if self.multiPoint and recurse:
+        to_dict = {'lat': self.latitude,
+                   'lon': self.longitude,
+                   'ele': self.elevation,
+                   'edge': self.edgeEffect,
+                   'edgepoints': [x.to_dict() for x in self.edgePoints],
+                   'id': self.id}
+        if self.singleSummit:
+            to_dict['singlesummit'] = self.singleSummit
+        if self.tooLow:
+            to_dict['toolow'] = self.tooLow
+        if self._disqualified:
+            to_dict['disqualified'] = self._disqualified
+
+        # TODO: lprBoundary will be needed someday.
+
+        if self.multiPoint:
             to_dict['multipoint'] = self.multiPoint.to_dict()
         if self.highShores:
             to_dict['highShores'] = list()
             for shore in self.highShores:
-                hs = [x.to_dict() for x in shore.points]
+                hs = shore.to_dict()
                 to_dict['highShores'].append(hs)
+        # These values are not unloaded by from_dict()
+        if referenceById:
+            to_dict['children'] =\
+                [x.id for x in self.children]  # saddles by ID
+            to_dict['summits'] =\
+                [x.id for x in self.summits]  # linker by ID
+            if self.parent:
+                to_dict['parent'] = self.parent.id
         return to_dict
 
-    def to_json(self, recurse=False, prettyprint=True):
+    @classmethod
+    def from_dict(cls, saddleDict, datamap=None):
         """
-        :param recurse: include multipoint
+        Create :class:`Saddle` from dictionary representation
+        :return: :class:`Saddle`
+        """
+        lat = saddleDict['lat']
+        long = saddleDict['lon']
+        elevation = saddleDict['ele']
+        edge = saddleDict['edge']
+        edgePoints = [BaseGridPoint(pt['x'], pt['y'])
+                      for pt in saddleDict['edgepoints']]
+        id = saddleDict['id']
+        singleSummit = saddleDict.get('singleSummit', False)
+        tooLow = saddleDict.get('tooLow', False)
+        disqualified = saddleDict.get('disqualified', None)
+
+        multipoint = saddleDict.get('multipoint', None)
+        if multipoint:
+            multipoint = MultiPoint.from_dict(multipoint, datamap=datamap)
+        highshores = saddleDict.get('highShores', [])
+        if highshores:
+            highshores = [GridPointContainer.from_dict(x) for x in highshores]
+        return cls(lat, long, elevation,
+                   multiPoint=multipoint,
+                   highShores=highshores,
+                   edge=edge,
+                   edgePoints=edgePoints,
+                   id=id,
+                   singleSummit=singleSummit,
+                   tooLow=tooLow,
+                   disqualified=disqualified)
+
+    def to_json(self, prettyprint=True, referenceById=True):
+        """
         :param prettyprint: human readable,
          but takes more space when written to a file.
+        :param referenceById: link external objects by ID
         :return: json string of :class:`Saddle`
         """
-        to_json = self.to_dict(recurse=recurse)
+        to_json = self.to_dict(referenceById=referenceById)
         if prettyprint:
             return json.dumps(to_json, sort_keys=True,
                               indent=4, separators=(',', ': '))

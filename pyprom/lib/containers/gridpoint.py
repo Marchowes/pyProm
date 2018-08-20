@@ -34,6 +34,25 @@ class GridPointContainer(BaseGridPointContainer):
         # Generate a fast lookup table.
         self.genFastLookup()
 
+    def to_dict(self):
+        """
+        :return: dict() representation of :class:`GridPointContainer`
+        """
+        gpcDict = {"points": [x.to_dict() for x in self.points]}
+        return gpcDict
+
+    @classmethod
+    def from_dict(cls, gpcDict):
+        """
+        :param gpcDict: dict() representation of :class:`GridPoint`
+        :return: :class:`GridPoint`
+        """
+        points = [GridPoint(pt['x'], pt['y'], pt['elevation'])
+                  for pt in gpcDict['points']]
+        obj = cls(points)
+        obj.genFastLookup()
+        return obj
+
     def genFastLookup(self):
         """
         Generates a fast lookup hash of all gridpoints

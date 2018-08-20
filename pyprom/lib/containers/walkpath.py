@@ -91,6 +91,29 @@ class WalkPath:
         """
         return [x for x in self.iterateGridPoint(datamap)]
 
+    def to_dict(self):
+        """
+        :return: dict() representation of :class:`WalkPath`
+        """
+        to_dict = dict()
+        to_dict['path'] = self.points
+        return to_dict
+
+    @classmethod
+    def from_dict(cls, pathDict):
+        """
+        :return: :class:`WalkPath`
+        """
+        return cls(pathDict['path'])
+
+    def __eq__(self, other):
+        """
+        Determines if :class:`WalkPath` is equal to another.
+        :param other: :class:`WalkPath` to be compared against
+        :return: bool of inequality
+        """
+        return self.points == other.points
+
     def __repr__(self):
         """
         :return: String representation of this object

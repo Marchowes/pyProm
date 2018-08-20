@@ -27,7 +27,7 @@ class BaseGridPoint:
 
     def to_dict(self):
         """
-        :return: dict of :class:`BaseGridPoint`)
+        :return: dict() representation of :class:`BaseGridPoint`
         """
         return {'x': self.x,
                 'y': self.y}
@@ -55,6 +55,16 @@ class BaseGridPoint:
         :return: String representation of this object
         """
         return "<BaseGridPoint> x: {}, y: {}".format(self.x, self.y)
+
+    def __lt__(self, other):
+        """
+        :param other: object which we compare against.
+        :return: bool of if self is arbitrarily regarded as
+         lower than the other
+        :raises: TypeError if other not of :class:`GridPoint`
+        """
+        isBaseGridPoint(other)
+        return self.x + self.y < other.x + other.y
 
     def __eq__(self, other):
         """

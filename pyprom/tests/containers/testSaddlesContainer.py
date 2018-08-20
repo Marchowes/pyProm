@@ -9,6 +9,9 @@ import unittest
 from pyprom.lib.containers.saddles import SaddlesContainer
 from pyprom.lib.locations.saddle import Saddle
 from pyprom.lib.locations.summit import Summit
+from pyprom.domain import Domain
+from pyprom.tests.getData import gettestzip
+from pyprom.dataload import GDALLoader
 
 
 class SaddlesContainerTests(unittest.TestCase):
@@ -102,3 +105,19 @@ class SaddlesContainerTests(unittest.TestCase):
         testInternalSaddleNetworkAziscohosViaContainer
         """
         pass
+
+    def testSaddlesContainerFromDictAll(self):
+        """
+        Ensure from_dict() produces expected results
+        """
+        gettestzip()
+        datafile = GDALLoader('/tmp/N44W072.hgt')
+        datamap = datafile.datamap
+        someslice = datamap.subset(0, 0, 30, 30)
+        domain = Domain(someslice)
+        domain.run()
+        domain.walk()
+        saddles = domain.saddles
+        saddleDict = saddles.to_dict()
+        newSaddles = SaddlesContainer.from_dict(saddleDict, datamap=someslice)
+        self.assertEqual(newSaddles, saddles)
