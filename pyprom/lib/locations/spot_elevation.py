@@ -13,6 +13,7 @@ from .base_coordinate import BaseCoordinate
 from .base_gridpoint import BaseGridPoint
 from ..util import randomString
 
+
 class SpotElevation(BaseCoordinate):
     """
     SpotElevation -- Intended to be inherited from. lat/long/elevation
@@ -56,9 +57,9 @@ class SpotElevation(BaseCoordinate):
         long = spotElevationDict['lon']
         elevation = spotElevationDict['ele']
         edge = spotElevationDict['edge']
-        edgePoints = [BaseGridPoint(pt['x'], pt['y']) for pt in spotElevationDict['edgepoints']]
+        edgePoints = [BaseGridPoint(pt['x'], pt['y'])
+                      for pt in spotElevationDict['edgepoints']]
         id = spotElevationDict['id']
-        multipoint = spotElevationDict.get('multipoint', [])
         return cls(lat, long, elevation,
                    edge=edge,
                    edgePoints=edgePoints,

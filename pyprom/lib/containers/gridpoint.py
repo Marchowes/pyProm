@@ -43,7 +43,12 @@ class GridPointContainer(BaseGridPointContainer):
 
     @classmethod
     def from_dict(cls, gpcDict):
-        points = [GridPoint(pt['x'], pt['y'], pt['elevation']) for pt in gpcDict['points']]
+        """
+        :param gpcDict: dict() representation of :class:`GridPoint`
+        :return: :class:`GridPoint`
+        """
+        points = [GridPoint(pt['x'], pt['y'], pt['elevation'])
+                  for pt in gpcDict['points']]
         obj = cls(points)
         obj.genFastLookup()
         return obj

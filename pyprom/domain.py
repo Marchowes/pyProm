@@ -23,14 +23,9 @@ from .lib.datamap import DataMap
 from .lib.logic.equalheight import equalHeightBlob
 from .dataload import Loader
 from .lib.containers.spot_elevation import SpotElevationContainer
-from .lib.locations.summit import Summit
-from .lib.locations.saddle import Saddle
-from .lib.locations.base_gridpoint import BaseGridPoint
-from .lib.containers.multipoint import MultiPoint
 from .lib.containers.summits import SummitsContainer
 from .lib.containers.runoffs import RunoffsContainer
 from .lib.containers.saddles import SaddlesContainer
-from .lib.containers.gridpoint import GridPointContainer
 from .lib.containers.linker import Linker
 from .lib.containers.walkpath import WalkPath
 from .lib.locations.gridpoint import GridPoint
@@ -129,37 +124,42 @@ class Domain:
     def from_json(cls, jsonString, datamap):
         """
         :param jsonString: json string of :class:`Domain` data
+        :param datamap: :class:`Datamap`
         :return: :class:`Domain`
         """
         domainDict = json.loads(jsonString)
         return cls.from_dict(domainDict, datamap)
 
-
     @classmethod
     def from_dict(cls, domainDict, datamap):
         """
-        :param domainDict: dict() representation of this object.
+        :param domainDict: dict() representation of :class:`Domain`
         :param datamap: :class:`Datamap`
         :return: :class:`Domain`
         """
-        saddlesContainer = SaddlesContainer.from_dict(domainDict['saddles'], datamap=datamap)
-        summitsContainer = SummitsContainer.from_dict(domainDict['summits'], datamap=datamap)
-        runoffsContainer = RunoffsContainer.from_dict(domainDict['runoffs'], datamap=datamap)
-        linkers = [Linker.from_dict(linkerDict, SpotElevationContainer(saddlesContainer.points+runoffsContainer.points), summitsContainer) for linkerDict in domainDict['linkers']]
-
-        # deal with parents and children
-
-
-
-        return cls(datamap, summitsContainer, saddlesContainer, runoffsContainer, linkers)
+        saddlesContainer = SaddlesContainer.from_dict(domainDict['saddles'],
+                                                      datamap=datamap)
+        summitsContainer = SummitsContainer.from_dict(domainDict['summits'],
+                                                      datamap=datamap)
+        runoffsContainer = RunoffsContainer.from_dict(domainDict['runoffs'],
+                                                      datamap=datamap)
+        linkers = [
+            Linker.from_dict(linkerDict,
+                             SpotElevationContainer(saddlesContainer.points +
+                                                    runoffsContainer.points),
+                             summitsContainer)
+            for linkerDict in domainDict['linkers']]
+        return cls(datamap, summitsContainer,
+                   saddlesContainer, runoffsContainer, linkers)
 
     def to_dict(self):
         """
         :return: dict() representation of :class:`Domain`
         """
-        domain_dict = {'domain': self.extent,
-                       'datamap': self.datamap.filename,
-                       'date': time.strftime("%m-%d-%Y %H:%M:%S")}
+        domain_dict = dict()
+        domain_dict['domain'] = self.extent,
+        domain_dict['datamap'] = self.datamap.filename
+        domain_dict['date'] = time.strftime("%m-%d-%Y %H:%M:%S")
 
         # Our main event...
         domain_dict['summits'] = self.summits.to_dict()

@@ -11,6 +11,7 @@ type location objects.
 from .walkpath import WalkPath
 from ..util import randomString
 
+
 class Linker:
     """
     A Linker links 1 :class:`Summit` with 1 :class:`Saddle`

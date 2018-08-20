@@ -268,8 +268,8 @@ class PerimeterTests(unittest.TestCase):
         """
         Ensure From Dict works as expected.
         """
-        self.perimeter.mapEdge=True
-        self.perimeter.mapEdgePoints=[self.p11]
+        self.perimeter.mapEdge = True
+        self.perimeter.mapEdgePoints = [self.p11]
 
         perimeterDict = self.perimeter.to_dict()
 

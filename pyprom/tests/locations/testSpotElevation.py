@@ -17,14 +17,12 @@ class SpotElevationTests(unittest.TestCase):
         """
         Ensure we can create a SpotElevation Object
         """
-
         se = SpotElevation(1, 10, 100,
                            edge=True,
-                           edgePoints=[BaseGridPoint(1,1)])
-
+                           edgePoints=[BaseGridPoint(1, 1)])
         self.assertEqual(se.latitude, 1)
         self.assertEqual(se.longitude, 10)
         self.assertEqual(se.elevation, 100)
         self.assertEqual(se.edgeEffect, True)
-        self.assertEqual(se.edgePoints, [BaseGridPoint(1,1)])
+        self.assertEqual(se.edgePoints, [BaseGridPoint(1, 1)])
         self.assertEqual(len(se.id), 15)

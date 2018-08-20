@@ -98,11 +98,6 @@ class SaddlesContainer(SpotElevationContainer):
             parent = saddle.get('parent', None)
             if parent:
                 saddleHash[saddle['id']].parent = saddleHash[parent]
-
-
-
-
-
         return saddlesContainer
 
     def __repr__(self):

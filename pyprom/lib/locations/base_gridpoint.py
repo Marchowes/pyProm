@@ -59,7 +59,8 @@ class BaseGridPoint:
     def __lt__(self, other):
         """
         :param other: object which we compare against.
-        :return: bool of if self is arbitrarily regarded as lower than the other
+        :return: bool of if self is arbitrarily regarded as
+         lower than the other
         :raises: TypeError if other not of :class:`GridPoint`
         """
         isBaseGridPoint(other)

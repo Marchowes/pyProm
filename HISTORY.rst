@@ -1,9 +1,14 @@
 Release History
 ---------------
 
+0.5.3 (August 19, 2018)
++++++++++++++++++++++++
+* to_dict() for all Domain child objects.
+* from_dict() for all Domain child objects
+
 0.5.2 (August 9, 2018)
 ++++++++++++++++++++++
-Track edgePoints inside SpotElevations.
+* Track edgePoints inside SpotElevations.
 
 0.5.1 (August 3, 2018)
 ++++++++++++++++++++++

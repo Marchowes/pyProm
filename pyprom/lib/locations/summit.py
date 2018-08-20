@@ -45,7 +45,6 @@ class Summit(SpotElevation):
         isLinker(linker)
         self.saddles.append(linker)
 
-
     def to_dict(self, referenceById=True):
         """
         :param referenceById: reference Saddles by ID.
@@ -63,7 +62,7 @@ class Summit(SpotElevation):
             to_dict['multipoint'] = self.multiPoint.to_dict()
         # These values are not unloaded by from_dict()
         if referenceById:
-            to_dict['saddles'] = [x.id for x in self.saddles] # linker by ID
+            to_dict['saddles'] = [x.id for x in self.saddles]  # linker by ID
         return to_dict
 
     @classmethod
@@ -76,7 +75,8 @@ class Summit(SpotElevation):
         long = summitDict['lon']
         elevation = summitDict['ele']
         edge = summitDict['edge']
-        edgePoints = [BaseGridPoint(pt['x'], pt['y']) for pt in summitDict['edgepoints']]
+        edgePoints = [BaseGridPoint(pt['x'], pt['y'])
+                      for pt in summitDict['edgepoints']]
         id = summitDict['id']
         multipoint = summitDict.get('multipoint', [])
         if multipoint:
@@ -94,7 +94,7 @@ class Summit(SpotElevation):
         :param referenceById: link external objects by ID
         :return: json string of :class:`Summit`
         """
-        to_json = self.to_dict(referenceById)
+        to_json = self.to_dict(referenceById=referenceById)
         if prettyprint:
             return json.dumps(to_json, sort_keys=True,
                               indent=4, separators=(',', ': '))

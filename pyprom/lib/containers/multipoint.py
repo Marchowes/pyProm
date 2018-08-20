@@ -13,6 +13,7 @@ from ..locations.base_coordinate import BaseCoordinate
 from ..locations.base_gridpoint import isBaseGridPoint, BaseGridPoint
 from .perimeter import Perimeter
 
+
 class MultiPoint:
     """MultiPoint Container"""
 
@@ -66,7 +67,8 @@ class MultiPoint:
         :param datamap: :class:`Datamap`
         :return: :class:`MultiPoint`
         """
-        points = [BaseGridPoint(x['x'], x['y']) for x in multiPointDict['points']]
+        points = [BaseGridPoint(x['x'], x['y'])
+                  for x in multiPointDict['points']]
         perimeter = Perimeter.from_dict(multiPointDict['perimeter'], datamap)
         elevation = multiPointDict['elevation']
         return cls(points, elevation, datamap, perimeter=perimeter)

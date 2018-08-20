@@ -24,7 +24,7 @@ class LinkerTests(unittest.TestCase):
         self.summit2 = Summit(10, 10, 1000)
         self.saddle2 = Saddle(15, 15, 100)
 
-        self.path1 = WalkPath([(0,0),(0,1),(0,2)])
+        self.path1 = WalkPath([(0, 0), (0, 1), (0, 2)])
 
         self.linker1 = Linker(self.summit1, self.saddle1, self.path1)
         self.linker2 = Linker(self.summit1, self.saddle2, self.path1)
@@ -121,7 +121,9 @@ class LinkerTests(unittest.TestCase):
         linkerDict = self.linker1.to_dict()
         saddlesContainer = SaddlesContainer([self.saddle1, self.saddle2])
         summitsContainer = SummitsContainer([self.summit1, self.summit2])
-        newLinker = Linker.from_dict(linkerDict, saddlesContainer, summitsContainer)
+        newLinker = Linker.from_dict(linkerDict,
+                                     saddlesContainer,
+                                     summitsContainer)
 
         self.assertEqual(newLinker, self.linker1)
         self.assertEqual(newLinker.saddle, self.saddle1)

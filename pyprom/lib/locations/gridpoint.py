@@ -49,7 +49,9 @@ class GridPoint(BaseGridPoint):
         """
         :return: dict of :class:`GridPoint`
         """
-        return self(gridPointDict['x'], gridPointDict['y'], gridPointDict['elevation'])
+        return self(gridPointDict['x'],
+                    gridPointDict['y'],
+                    gridPointDict['elevation'])
 
     def toSpotElevation(self, datamap):
         """

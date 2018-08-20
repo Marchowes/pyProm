@@ -44,9 +44,12 @@ class Saddle(SpotElevation):
         self.parent = None  # Parent
         # Saddles that have been spawned off of this one.
         self.children = kwargs.get('children', [])
-        self.singleSummit = kwargs.get('singleSummit', False)  # All Edges lead to One summit.
-        self.tooLow = kwargs.get('tooLow', False)  # redundant saddle, but too low.
-        self._disqualified = kwargs.get('disqualified', None)  # Non specific disqualification
+        # All Edges lead to One summit.
+        self.singleSummit = kwargs.get('singleSummit', False)
+        # redundant saddle, but too low.
+        self.tooLow = kwargs.get('tooLow', False)
+        # Non specific disqualification
+        self._disqualified = kwargs.get('disqualified', None)
         self.lprBoundary = list()
 
     def addSummitLinker(self, linker):
@@ -104,8 +107,10 @@ class Saddle(SpotElevation):
                 to_dict['highShores'].append(hs)
         # These values are not unloaded by from_dict()
         if referenceById:
-            to_dict['children'] = [x.id for x in self.children] # saddles by ID
-            to_dict['summits'] = [x.id for x in self.summits] # linker by ID
+            to_dict['children'] =\
+                [x.id for x in self.children]  # saddles by ID
+            to_dict['summits'] =\
+                [x.id for x in self.summits]  # linker by ID
             if self.parent:
                 to_dict['parent'] = self.parent.id
         return to_dict
@@ -120,7 +125,8 @@ class Saddle(SpotElevation):
         long = saddleDict['lon']
         elevation = saddleDict['ele']
         edge = saddleDict['edge']
-        edgePoints = [BaseGridPoint(pt['x'], pt['y']) for pt in saddleDict['edgepoints']]
+        edgePoints = [BaseGridPoint(pt['x'], pt['y'])
+                      for pt in saddleDict['edgepoints']]
         id = saddleDict['id']
         singleSummit = saddleDict.get('singleSummit', False)
         tooLow = saddleDict.get('tooLow', False)
@@ -149,7 +155,7 @@ class Saddle(SpotElevation):
         :param referenceById: link external objects by ID
         :return: json string of :class:`Saddle`
         """
-        to_json = self.to_dict(referenceById)
+        to_json = self.to_dict(referenceById=referenceById)
         if prettyprint:
             return json.dumps(to_json, sort_keys=True,
                               indent=4, separators=(',', ': '))

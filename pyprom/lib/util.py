@@ -10,6 +10,7 @@ import string
 
 from .locations.base_gridpoint import BaseGridPoint
 
+
 def dottedDecimaltoDegrees(coordinate):
     """
     Converts dotted Decimal coordinate to a DMS
@@ -71,6 +72,7 @@ def arcseconds_to_seconds(arcseconds):
     :return: converts arcseconds into seconds.
     """
     return arcseconds / 3600
+
 
 def randomString(length=12):
     """

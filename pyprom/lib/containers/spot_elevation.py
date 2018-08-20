@@ -9,13 +9,8 @@ type location objects.
 """
 import json
 
-from ..locations.saddle import Saddle
 from ..locations.summit import Summit
-from ..locations.spot_elevation import SpotElevation, isSpotElevation
-from ..locations.base_gridpoint import BaseGridPoint
-from ..locations.gridpoint import GridPoint
-from .multipoint import MultiPoint
-from .gridpoint import GridPointContainer
+from ..locations.spot_elevation import isSpotElevation
 from .base import _Base
 from geopy.distance import vincenty
 
@@ -144,9 +139,10 @@ class SpotElevationContainer(_Base):
     def from_dict(cls, spotElevationContainerDict, datamap=None):
         """
         Load this object and child objects from a dict.
-        :param spotElevationContainerDict: dict() representation of this object.
+        :param spotElevationContainerDict: dict() representation of
+            :class:`SpotElevation`.
         :param datamap: :class:`Datamap`
-        :return:
+        :return: :class:`SpotElevation`
         """
         spotelevations = []
         for spotelevation in spotElevationContainerDict['spotelevations']:
