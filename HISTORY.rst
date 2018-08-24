@@ -1,6 +1,11 @@
 Release History
 ---------------
 
+0.5.4 (August 23, 2018)
++++++++++++++++++++++++
+* Fix performance problems while reading domain files
+* Add fast_lookup hash of various SpotElevationContainers.
+
 0.5.3 (August 19, 2018)
 +++++++++++++++++++++++
 * to_dict() for all Domain child objects.

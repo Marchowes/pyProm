@@ -58,7 +58,6 @@ self.edgePoints</y:AttributeLabel>
                 <y:MethodLabel xml:space="preserve">__init__()
 to_dict()
 from_dict()
-to_json()
 toGridPoint()
 @feet
 
@@ -101,7 +100,6 @@ __repr__()
 self.longitude</y:AttributeLabel>
                 <y:MethodLabel xml:space="preserve">__init__()
 to_dict()
-to_json()
 @utm()
 
 __eq__()
@@ -128,7 +126,6 @@ self.y</y:AttributeLabel>
                 <y:MethodLabel xml:space="preserve">__init__()
 
 to_dict()
-to_json()
 __hash__()
 __repr__()</y:MethodLabel>
               </y:UML>
@@ -151,7 +148,6 @@ toSpotElevation()
 
 to_dict()
 from_dict()
-to_json()
 
 __eq__()
 __ne__()
@@ -186,7 +182,6 @@ addSummitLinker()
 @disqualified
 to_dict()
 from_dict()
-to_json()
 
 __repr__()</y:MethodLabel>
               </y:UML>
@@ -209,7 +204,6 @@ self.saddles</y:AttributeLabel>
 addSaddleLinker()
 to_dict()
 from_dict()
-to_json()
 
 __repr__()</y:MethodLabel>
               </y:UML>
@@ -295,7 +289,6 @@ addSummitLinker()
 @disqualified
 to_dict()
 from_dict()
-to_json()
 
 __repr__()</y:MethodLabel>
               </y:UML>
@@ -439,7 +432,6 @@ self.perimeter
                 <y:MethodLabel xml:space="preserve">__init__()
 to_dict()
 from_dict()
-to_json()
 @pointsLatLong
 append()
 __len__()
@@ -508,7 +500,8 @@ __repr__()
               <y:BorderStyle color="#000000" type="line" width="1.0"/>
               <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="13" fontStyle="bold" hasBackgroundColor="false" hasLineColor="false" height="19.1328125" horizontalTextPosition="center" iconTextGap="4" modelName="custom" textColor="#000000" verticalTextPosition="bottom" visible="true" width="177.72265625" x="26.138671875" xml:space="preserve" y="25.96875">SpotElevationContainer<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:LabelModel><y:ModelParameter><y:SmartNodeLabelModelParameter labelRatioX="0.0" labelRatioY="0.0" nodeRatioX="0.0" nodeRatioY="-0.03703090122767855" offsetX="0.0" offsetY="0.0" upX="0.0" upY="-1.0"/></y:ModelParameter></y:NodeLabel>
               <y:UML clipContent="true" constraint="" hasDetailsColor="false" omitDetails="false" stereotype="lib/containers/spot_elevation.py" use3DEffect="true">
-                <y:AttributeLabel xml:space="preserve">self.points</y:AttributeLabel>
+                <y:AttributeLabel xml:space="preserve">self.points
+self.fast_lookup</y:AttributeLabel>
                 <y:MethodLabel xml:space="preserve">__init__()
 lowest
 highest
@@ -518,8 +511,6 @@ rectangle()
 elevationRange()
 elevationRangeMetric()
 
-to_json()
-from_json()
 
 append()
 __len__()
@@ -1018,9 +1009,10 @@ self.logger
 run()
 read()
 write()
-from_json()
-to_json()
 to_dict()
+from_dict()
+to_cbor()
+from_cbor()
 __repr__()</y:MethodLabel>
               </y:UML>
             </y:UMLClassNode>
@@ -1262,7 +1254,6 @@ parentFinder(summit)
     </edge>
     <edge id="n0::e4" source="n0::n10" target="n0::n4">
       <data key="d8" xml:space="preserve"/>
-      <data key="d9"/>
       <data key="d10">
         <y:PolyLineEdge>
           <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
@@ -1318,7 +1309,6 @@ parentFinder(summit)
     </edge>
     <edge id="n1::e4" source="n1::n15" target="n1::n3">
       <data key="d8" xml:space="preserve"/>
-      <data key="d9"/>
       <data key="d10">
         <y:PolyLineEdge>
           <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0">
@@ -1333,7 +1323,6 @@ parentFinder(summit)
     </edge>
     <edge id="e8" source="n1::n15" target="n0::n10">
       <data key="d8" xml:space="preserve"/>
-      <data key="d9"/>
       <data key="d10">
         <y:PolyLineEdge>
           <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>

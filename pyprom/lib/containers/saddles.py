@@ -68,6 +68,7 @@ class SaddlesContainer(SpotElevationContainer):
         """
         isSaddle(saddle)
         self.points.append(saddle)
+        self.fast_lookup[saddle.id] = saddle
 
     def to_dict(self):
         """

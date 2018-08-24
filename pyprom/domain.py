@@ -10,9 +10,9 @@ This library contains a class for creating a pyProm Domain.
 
 import os
 import time
-import json
 import logging
 import gzip
+import cbor
 
 from timeit import default_timer
 from datetime import timedelta
@@ -91,44 +91,38 @@ class Domain:
         # Expunge any existing saddles, summits, and linkers
         filename = os.path.expanduser(filename)
         incoming = gzip.open(filename, 'r')
-        domain = cls.from_json(incoming.read().decode("utf-8"), datamap)
+        domain = cls.from_cbor(incoming.read(), datamap)
         domain.logger.info("Loaded Domain Dataset from {}.".format(filename))
         incoming.close()
         return domain
 
     def write(self, filename):
         """
-        :param filename: name of file (including path) to write json data to
-        compressed json data from
+        :param filename: name of file (including path) to write cbor data to
+        compressed cbor data from
         """
         filename = os.path.expanduser(filename)
         self.logger.info("Writing Domain Dataset to {}.".format(filename))
-        outgoing = gzip.open(filename, 'w', 5)
+        outgoing = gzip.open(filename, 'wb', 5)
         # ^^ ('filename', 'read/write mode', compression level)
-        outgoing.write(self.to_json(prettyprint=False).encode('utf-8'))
+        outgoing.write(self.to_cbor())
         outgoing.close()
 
-    def to_json(self, prettyprint=True):
-        """
-        :param prettyprint: human readable,
-         but takes more space when written to a file.
-        :return: json string of :class:`Domain`
-        """
-        if prettyprint:
-            return json.dumps(self.to_dict(), sort_keys=True,
-                              indent=4, separators=(',', ': '))
-        else:
-            return json.dumps(self.to_dict())
-
     @classmethod
-    def from_json(cls, jsonString, datamap):
+    def from_cbor(cls, cborBinary, datamap):
         """
-        :param jsonString: json string of :class:`Domain` data
+        :param cborBinary: cbor of :class:`Domain` data
         :param datamap: :class:`Datamap`
         :return: :class:`Domain`
         """
-        domainDict = json.loads(jsonString)
+        domainDict = cbor.loads(cborBinary)
         return cls.from_dict(domainDict, datamap)
+
+    def to_cbor(self):
+        """
+        :return: cbor binary of :class:`Domain`
+        """
+        return cbor.dumps(self.to_dict())
 
     @classmethod
     def from_dict(cls, domainDict, datamap):
@@ -143,16 +137,18 @@ class Domain:
                                                       datamap=datamap)
         runoffsContainer = RunoffsContainer.from_dict(domainDict['runoffs'],
                                                       datamap=datamap)
+
+        combined = SpotElevationContainer(saddlesContainer.points +
+                                          runoffsContainer.points)
         linkers = [
             Linker.from_dict(linkerDict,
-                             SpotElevationContainer(saddlesContainer.points +
-                                                    runoffsContainer.points),
+                             combined,
                              summitsContainer)
             for linkerDict in domainDict['linkers']]
         return cls(datamap, summitsContainer,
                    saddlesContainer, runoffsContainer, linkers)
 
-    def to_dict(self):
+    def to_dict(self, noWalkPath=True):
         """
         :return: dict() representation of :class:`Domain`
         """
@@ -167,7 +163,7 @@ class Domain:
         domain_dict['runoffs'] = self.runoffs.to_dict()
 
         # Linkers if this domain has been walked.
-        domain_dict['linkers'] = [x.to_dict() for x in self.linkers]
+        domain_dict['linkers'] = [x.to_dict(noWalkPath=True) for x in self.linkers]
         return domain_dict
 
     def __repr__(self):

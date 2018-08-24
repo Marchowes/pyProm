@@ -7,7 +7,6 @@ the LICENSE file that accompanies it.
 This library contains a container class for storing SpotElevation
 type location objects.
 """
-import json
 
 from ..locations.summit import Summit
 from ..locations.spot_elevation import isSpotElevation
@@ -27,6 +26,7 @@ class SpotElevationContainer(_Base):
         """
         super(SpotElevationContainer, self).__init__()
         self.points = spotElevationList
+        self.fast_lookup = {point.id: point for point in self.points}
 
     @property
     def lowest(self):
@@ -151,18 +151,6 @@ class SpotElevationContainer(_Base):
 
         return spotElevationContainer
 
-    def to_json(self, prettyprint=True):
-        """
-        :param prettyprint: human readable,
-         but takes more space when written to a file.
-        :return: json string of all points in this container.
-        """
-        if prettyprint:
-            return json.dumps([x.to_dict(recurse=True) for x in self.points],
-                              sort_keys=True, indent=4, separators=(',', ': '))
-        else:
-            return json.dumps([x.to_dict(recurse=True) for x in self.points])
-
     def append(self, spotElevation):
         """
         Add a SpotElevation to the container.
@@ -171,6 +159,7 @@ class SpotElevationContainer(_Base):
         """
         isSpotElevation(spotElevation)
         self.points.append(spotElevation)
+        self.fast_lookup[spotElevation.id] = spotElevation
 
     def __len__(self):
         """

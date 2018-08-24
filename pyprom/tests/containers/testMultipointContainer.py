@@ -43,61 +43,12 @@ class MultipointTests(unittest.TestCase):
         self.assertEqual(multipoint.pointsLatLong[0], bc0)
         self.assertEqual(multipoint.pointsLatLong[1], bc1)
 
-    def testMultipointJsonNoEdge(self):
+    def testMultipointPerimeterNoEdge(self):
         """
         Test multipoint container perimeter count is as expected.
         """
         multipoint = self.saddle.multiPoint
         self.assertEqual(len(multipoint.perimeter), 7)
-
-#     def testMultipointToJSON(self):
-#         """
-#         Test multipoint to json produces expected results.
-#         """
-#         result = """[
-#     {
-#         "coordinate": {
-#             "latitude": 44.72236111111111,
-#             "longitude": -71.72180555555556
-#         },
-#         "gridpoint": {
-#             "x": 0,
-#             "y": 2
-#         }
-#     },
-#     {
-#         "coordinate": {
-#             "latitude": 44.72236111111111,
-#             "longitude": -71.72152777777778
-#         },
-#         "gridpoint": {
-#             "x": 0,
-#             "y": 3
-#         }
-#     },
-#     {
-#         "coordinate": {
-#             "latitude": 44.72236111111111,
-#             "longitude": -71.72125
-#         },
-#         "gridpoint": {
-#             "x": 0,
-#             "y": 4
-#         }
-#     },
-#     {
-#         "coordinate": {
-#             "latitude": 44.72208333333334,
-#             "longitude": -71.72097222222223
-#         },
-#         "gridpoint": {
-#             "x": 1,
-#             "y": 5
-#         }
-#     }
-# ]"""
-#         multipoint = self.saddle.multiPoint
-#         self.assertEqual(result, multipoint.to_json())
 
     def testMultipointRepr(self):
         """

@@ -75,21 +75,19 @@ class Linker:
         if self not in self.saddle.summits:
             self.saddle.addSummitLinker(self)
 
-    def to_dict(self, referenceById=True):
+    def to_dict(self, referenceById=True, noWalkPath=True):
         """
         :return: dict() representation of :class:`Linker`
         """
         to_dict = dict()
         to_dict['id'] = self.id
-        if self.path:
+        if self.path and not noWalkPath:
             to_dict['path'] = self.path.to_dict()
         if self.disqualified:
             to_dict['disqualified'] = self.disqualified
         if referenceById:
             to_dict['saddle'] = self.saddle.id
             to_dict['summit'] = self.summit.id
-        # else:
-        #    to_dict['saddle'] =
         return to_dict
 
     @classmethod
@@ -102,20 +100,12 @@ class Linker:
             path = WalkPath.from_dict(pathDict)
         else:
             path = None
-        saddles = [x for x in saddlesContainer if x.id == linkerDict['saddle']]
-        if len(saddles) < 1:
-            raise IndexError("Failed to find Saddle by ID")
-        if len(saddles) > 1:
-            raise IndexError("Found too many matching saddles by ID")
+        saddle = saddlesContainer.fast_lookup[linkerDict['saddle']]
 
-        summits = [x for x in summitsContainer if x.id == linkerDict['summit']]
-        if len(summits) < 1:
-            raise IndexError("Failed to find Summit by ID")
-        if len(summits) > 1:
-            raise IndexError("Found too many matching summits by ID")
+        summit = summitsContainer.fast_lookup[linkerDict['summit']]
 
         # create linker
-        linker = cls(summits[0], saddles[0], path)
+        linker = cls(summit, saddle, path)
         # add linker to foreign saddles/summits
         linker.add_to_remote_saddle_and_summit()
         linker.disqualified = linkerDict.get('disqualified', False)

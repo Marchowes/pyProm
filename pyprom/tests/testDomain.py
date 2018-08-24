@@ -37,20 +37,20 @@ class DomainTests(unittest.TestCase):
         self.assertEqual(newDomain.runoffs, self.domain.runoffs)
         self.assertEqual(newDomain.linkers, self.domain.linkers)
 
-    def testDomainFromJson(self):
+    def testDomainFromCbor(self):
         """
-        Ensure loading json into :class:`Domain`
+        Ensure loading cbor binary into :class:`Domain`
         """
-        domainJSON = self.domain.to_json()
-        newDomain = Domain.from_json(domainJSON, self.someslice)
+        domainCbor = self.domain.to_cbor()
+        newDomain = Domain.from_cbor(domainCbor, self.someslice)
         self.assertEqual(newDomain.saddles, self.domain.saddles)
         self.assertEqual(newDomain.summits, self.domain.summits)
         self.assertEqual(newDomain.runoffs, self.domain.runoffs)
         self.assertEqual(newDomain.linkers, self.domain.linkers)
 
-    def testDomainreadWriteFile(self):
+    def testDomainReadWriteFile(self):
         """
-        Ensure loading json into :class:`Domain`
+        Ensure loading cbor into :class:`Domain`
         """
         self.domain.write('/tmp/deletemePyPromTest')
         newDomain = Domain.read('/tmp/deletemePyPromTest', self.someslice)
