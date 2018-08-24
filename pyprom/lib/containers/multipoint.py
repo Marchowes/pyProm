@@ -7,7 +7,6 @@ the LICENSE file that accompanies it.
 This library contains a container class for storing Multipoint
 type location objects as well as a number of functions.
 """
-import json
 
 from ..locations.base_coordinate import BaseCoordinate
 from ..locations.base_gridpoint import isBaseGridPoint, BaseGridPoint
@@ -37,18 +36,6 @@ class MultiPoint:
         self.elevation = elevation
         self.datamap = datamap  # data analysis object.
         self.perimeter = perimeter
-
-    def to_json(self, prettyprint=True):
-        """
-        :param prettyprint: human readable,
-         but takes more space when written to a file.
-        :return: json data
-        """
-        if prettyprint:
-            return json.dumps(self.to_dict(), sort_keys=True,
-                              indent=4, separators=(',', ': '))
-        else:
-            return json.dumps(self.to_dict())
 
     def to_dict(self):
         """

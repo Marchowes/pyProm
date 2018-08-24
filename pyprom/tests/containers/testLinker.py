@@ -118,7 +118,7 @@ class LinkerTests(unittest.TestCase):
         """
         Ensure from_dict produces expected results.
         """
-        linkerDict = self.linker1.to_dict()
+        linkerDict = self.linker1.to_dict(noWalkPath=False)
         saddlesContainer = SaddlesContainer([self.saddle1, self.saddle2])
         summitsContainer = SummitsContainer([self.summit1, self.summit2])
         newLinker = Linker.from_dict(linkerDict,

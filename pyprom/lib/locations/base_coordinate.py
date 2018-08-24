@@ -7,7 +7,6 @@ the LICENSE file that accompanies it.
 This library contains a base class for Coordinate oriented objects.
 """
 
-import json
 import utm
 
 
@@ -32,17 +31,6 @@ class BaseCoordinate:
         """
         return {'latitude': self.latitude,
                 'longitude': self.longitude}
-
-    def to_json(self, prettyprint=True):
-        """
-        :param prettyprint: human readable,
-        :return: json string of :class:`BaseCoordinate`
-        """
-        if prettyprint:
-            return json.dumps(self.to_dict(), sort_keys=True,
-                              indent=4, separators=(',', ': '))
-        else:
-            return json.dumps(self.to_dict())
 
     @property
     def utm(self):

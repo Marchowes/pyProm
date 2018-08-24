@@ -7,8 +7,6 @@ the LICENSE file that accompanies it.
 This library contains a base class for x,y oriented objects.
 """
 
-import json
-
 
 class BaseGridPoint:
     """
@@ -31,18 +29,6 @@ class BaseGridPoint:
         """
         return {'x': self.x,
                 'y': self.y}
-
-    def to_json(self, prettyprint=True):
-        """
-        :param prettyprint: human readable,
-        :return: json string of :class:`BaseGridPoint`
-        """
-        to_json = self.to_dict()
-        if prettyprint:
-            return json.dumps(to_json, sort_keys=True,
-                              indent=4, separators=(',', ': '))
-        else:
-            return json.dumps(to_json)
 
     def __hash__(self):
         """

@@ -43,6 +43,7 @@ class SummitsContainer(SpotElevationContainer):
         """
         isSummit(summit)
         self.points.append(summit)
+        self.fast_lookup[summit.id] = summit
 
     def to_dict(self):
         """

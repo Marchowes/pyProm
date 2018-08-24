@@ -1,10 +1,10 @@
-### pyProm v0.5.3
+### pyProm v0.5.4
 
 ![pyProm](https://github.com/marchowes/pyProm/raw/master/images/pyProm-logo-500px.png "pyProm")
 
 This library is still under development. Do not expect full functionality, or documentation until release 1.0.0
 
-**Warning** There will be breaking changes to how domains are exported starting in 0.5.3
+**Warning** There will be breaking changes to how domains are exported starting in 0.5.4
 
 pyProm
 ======
@@ -72,7 +72,7 @@ newdomain.read('YOURPATHHERE/mydomain.dom')
 
 Installation
 ------------
-Warning! JSON data or saved Domains will almost certainly fail to load in future version. There WILL be breaking changes. You've been warned! (twice!)
+Warning! Cbor data or saved Domains will almost certainly fail to load in future version. There WILL be breaking changes. You've been warned! (twice!)
 
 
 Download zip from github, or clone.

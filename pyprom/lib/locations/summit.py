@@ -7,7 +7,6 @@ the LICENSE file that accompanies it.
 This library contains a class for storing Summit data.
 """
 
-import json
 from .spot_elevation import SpotElevation
 from .base_gridpoint import BaseGridPoint
 from ..containers.multipoint import MultiPoint
@@ -86,20 +85,6 @@ class Summit(SpotElevation):
                    edge=edge,
                    edgePoints=edgePoints,
                    id=id)
-
-    def to_json(self, prettyprint=True, referenceById=True):
-        """
-        :param prettyprint: human readable,
-         but takes more space when written to a file.
-        :param referenceById: link external objects by ID
-        :return: json string of :class:`Summit`
-        """
-        to_json = self.to_dict(referenceById=referenceById)
-        if prettyprint:
-            return json.dumps(to_json, sort_keys=True,
-                              indent=4, separators=(',', ': '))
-        else:
-            return json.dumps(to_json)
 
     def __repr__(self):
         """
