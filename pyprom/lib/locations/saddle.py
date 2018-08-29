@@ -32,7 +32,7 @@ class Saddle(SpotElevation):
         """
         super(Saddle, self).__init__(latitude, longitude,
                                      elevation, *args, **kwargs)
-        self.multiPoint = kwargs.get('multiPoint', None)
+        self.multiPoint = kwargs.get('multiPoint', [])
         self.highShores = kwargs.get('highShores', [])
         self.id = kwargs.get('id', 'sa:' + randomString())
         # Temporary until I've build a linker
@@ -48,7 +48,7 @@ class Saddle(SpotElevation):
         self.tooLow = kwargs.get('tooLow', False)
         # Non specific disqualification
         self._disqualified = kwargs.get('disqualified', None)
-        self.lprBoundary = list()
+        self.lprBoundary = []
 
     def addSummitLinker(self, linker):
         """
@@ -130,7 +130,7 @@ class Saddle(SpotElevation):
         tooLow = saddleDict.get('tooLow', False)
         disqualified = saddleDict.get('disqualified', None)
 
-        multipoint = saddleDict.get('multipoint', None)
+        multipoint = saddleDict.get('multipoint', [])
         if multipoint:
             multipoint = MultiPoint.from_dict(multipoint, datamap=datamap)
         highshores = saddleDict.get('highShores', [])
