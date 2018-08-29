@@ -1,5 +1,9 @@
 Release History
 ---------------
+0.5.5 (August 29, 2018)
++++++++++++++++++++++++
+* Change Multipoint to default empty list
+* add LPRboundary to saddle/summit objects.
 
 0.5.4 (August 23, 2018)
 +++++++++++++++++++++++

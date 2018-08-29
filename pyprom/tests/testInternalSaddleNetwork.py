@@ -39,7 +39,7 @@ class InternalSaddleNetworkTests(unittest.TestCase):
         self.assertEqual(len(new_saddles), 6)
         for saddle in new_saddles:
             self.assertEqual(len(saddle.highShores), 2)
-            self.assertEqual(saddle.multiPoint, None)
+            self.assertEqual(saddle.multiPoint, [])
             self.assertEqual(saddle.disqualified, False)
 
     def testInternalSaddleNetworkAziscohosViaContainer(self):
