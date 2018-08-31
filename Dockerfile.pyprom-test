@@ -2,4 +2,4 @@ FROM marchowes/pyprom:2.2
 
 ENV PATH "$PATH:/root/miniconda3/bin"
 
-ENTRYPOINT ["ipython"]
+ENTRYPOINT ["make", "test"]

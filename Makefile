@@ -8,6 +8,10 @@ test:
 lint:
 	flake8 --exclude=_dumpster,_not* --ignore=D200,D205,D400,D401,E731
 
-,PHONY: test-docker
+.PHONY: test-docker
 test-docker:
 	docker-compose run --rm test-pyprom
+
+.PHONY: pyprom-docker
+pyprom-docker:
+	docker-compose run --rm pyprom
