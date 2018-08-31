@@ -1,5 +1,9 @@
 Release History
 ---------------
+0.5.6 (August 30, 2018)
++++++++++++++++++++++++
+* Dockerized tests
+
 0.5.5 (August 29, 2018)
 +++++++++++++++++++++++
 * Change Multipoint to default empty list
