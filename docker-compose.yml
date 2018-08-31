@@ -3,6 +3,15 @@ services:
   test-pyprom:
     build:
       context: .
+      dockerfile: Dockerfile.pyprom-test
+    volumes:
+      - ./:/pyProm
+    working_dir:
+      /pyProm
+
+  pyprom:
+    build:
+      context: .
       dockerfile: Dockerfile.pyprom
     volumes:
       - ./:/pyProm

@@ -1,0 +1,7 @@
+docker run -i -t marchowes/pyprom:2.2 /bin/bash
+root@ff7429783ea6:/# ~make modifications~
+docker commit ff7429783ea6 pyprom
+docker tag pyprom marchowes/pyprom:2.3
+docker tag pyprom marchowes/pyprom:latest
+docker push marchowes/pyprom:2.3
+docker push marchowes/pyprom:latest

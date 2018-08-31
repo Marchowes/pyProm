@@ -1,4 +1,4 @@
-### pyProm v0.5.6
+### pyProm v0.5.7
 
 ![pyProm](https://github.com/marchowes/pyProm/raw/master/images/pyProm-logo-500px.png "pyProm")
 
@@ -95,5 +95,25 @@ More resources:
 
 If all else fails, I've had good luck getting it to work with conda. You're on your own with that one.
 
+Running Unit Tests
+------------------
+Unit tests can be run in two ways:
+
+Your own local env:
+`make test`
+
+Inside a docker container:
+`make test-docker`
+
+Docker tests requires you to have docker installed on your system, and may require privilege escalation.
+The advantage of running tests in docker is for dependency consistency.
+
+Running pyprom inside Docker
+----------------------------
+As of 0.5.7 you can run pyprom inside a Docker container!
+
+`make pyprom-docker`
+
+Will put you inside an ipython instance.
 
 

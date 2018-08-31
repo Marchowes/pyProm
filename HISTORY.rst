@@ -1,4 +1,8 @@
 Release History
+0.5.7 (August 31, 2018)
++++++++++++++++++++++++
+* Dockerized ipython terminal
+
 ---------------
 0.5.6 (August 30, 2018)
 +++++++++++++++++++++++
