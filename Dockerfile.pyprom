@@ -1,0 +1,3 @@
+FROM marchowes/pyprom:2.1
+
+ENTRYPOINT ["make", "test"]

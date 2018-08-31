@@ -1,0 +1,10 @@
+version: '3'
+services:
+  test-pyprom:
+    build:
+      context: .
+      dockerfile: Dockerfile.pyprom
+    volumes:
+      - ./:/pyProm
+    working_dir:
+      /pyProm
