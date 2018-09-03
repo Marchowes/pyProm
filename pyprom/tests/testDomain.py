@@ -30,7 +30,7 @@ class DomainTests(unittest.TestCase):
         """
         Ensure loading dict into :class:`Domain`
         """
-        domainDict = self.domain.to_dict()
+        domainDict = self.domain.to_dict(noWalkPath=False)
         newDomain = Domain.from_dict(domainDict, self.someslice)
         self.assertEqual(newDomain.saddles, self.domain.saddles)
         self.assertEqual(newDomain.summits, self.domain.summits)
@@ -41,7 +41,7 @@ class DomainTests(unittest.TestCase):
         """
         Ensure loading cbor binary into :class:`Domain`
         """
-        domainCbor = self.domain.to_cbor()
+        domainCbor = self.domain.to_cbor(noWalkPath=False)
         newDomain = Domain.from_cbor(domainCbor, self.someslice)
         self.assertEqual(newDomain.saddles, self.domain.saddles)
         self.assertEqual(newDomain.summits, self.domain.summits)
@@ -52,7 +52,7 @@ class DomainTests(unittest.TestCase):
         """
         Ensure loading cbor into :class:`Domain`
         """
-        self.domain.write('/tmp/deletemePyPromTest')
+        self.domain.write('/tmp/deletemePyPromTest', noWalkPath=False)
         newDomain = Domain.read('/tmp/deletemePyPromTest', self.someslice)
         self.assertEqual(newDomain.saddles, self.domain.saddles)
         self.assertEqual(newDomain.summits, self.domain.summits)

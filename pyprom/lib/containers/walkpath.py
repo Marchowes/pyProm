@@ -104,7 +104,11 @@ class WalkPath:
         """
         :return: :class:`WalkPath`
         """
-        return cls(pathDict['path'])
+        path = pathDict.get('path', [])
+        pathTuples = []
+        for point in path:
+            pathTuples.append((point[0],point[1]))
+        return cls(pathTuples)
 
     def __eq__(self, other):
         """

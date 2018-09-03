@@ -9,6 +9,7 @@ This library contains a class for manipulating a pyProm Divide Tree.
 
 import logging
 
+from timeit import default_timer
 
 class DivideTree:
     """Divide Tree"""
@@ -24,6 +25,8 @@ class DivideTree:
         self.summits = domain.summits
         self.saddles = domain.saddles
         self.linkers = domain.linkers
+        if not datamap:
+            self.datamap = domain.datamap
         self.datamap = datamap
         self.busted = list()  # Temporary!
 
@@ -32,6 +35,18 @@ class DivideTree:
         localHighest = self.summits.highest[0]
         localHighest.localHighest = True
         localHighest.parent = localHighest
+        start = default_timer()
+        then = start
+        index = 0
+        for summit in self.summits:
+            index += 1
+            if not index % 1000:
+                now = default_timer()
+                self.logger.info("{}% split: {} duration: {}".format(index/len(self.summits)*100, round(now-then,2), round(now-start,2)))
+                then = now
+            self.localProminentRegion(summit)
+
+
 
     def localProminentRegion(self, summit):
         """Lpr"""
@@ -68,6 +83,8 @@ class DivideTree:
                     # self.logger.info("Boundary At {}".format(linker.saddle))
                     if master not in linker.saddle.lprBoundary:
                         linker.saddle.lprBoundary.append(master)
+                    if linker.saddle not in master.lprBoundary:
+                        master.lprBoundary.append(linker.saddle)
 
     def parentFinder(self, summit):
         """Nothing"""

@@ -1,4 +1,4 @@
-### pyProm v0.5.7
+### pyProm v0.5.8
 
 ![pyProm](https://github.com/marchowes/pyProm/raw/master/images/pyProm-logo-500px.png "pyProm")
 
@@ -53,7 +53,7 @@ logging.basicConfig(level=logging.DEBUG)
 data = GDALLoader('YOURPATHHERE/N44W072.hgt')
 domain = Domain(data)
 domain.run()
-# ^This will run the Saddle/Summit discovery, it'll take a while..
+# ^ This will run the Saddle/RunOff/Summit discovery as well as saddle walk and saddle disqualifiers, it'll take a while..
 
 # Find all summits above 4000 feet
 _4ks = domain.summits.elevationRange(4000)
@@ -66,8 +66,7 @@ mykml.writeFile()
 domain.write('YOURPATHHERE/mydomain.dom')
 
 # Load your Domain you you don't need to wait forever for analysis.
-newdomain = Domain(data)
-newdomain.read('YOURPATHHERE/mydomain.dom')
+newDomain = Domain.read('YOURPATHHERE/mydomain.dom', data.datamap)
 ```
 
 Installation

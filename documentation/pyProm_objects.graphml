@@ -924,7 +924,7 @@ __repr__()
               <y:Shape type="roundrectangle"/>
               <y:State closed="false" closedHeight="50.0" closedWidth="50.0" innerGraphDisplayEnabled="false"/>
               <y:Insets bottom="15" bottomF="15.0" left="15" leftF="15.0" right="15" rightF="15.0" top="15" topF="15.0"/>
-              <y:BorderInsets bottom="150" bottomF="150.3199525062687" left="0" leftF="0.0" right="129" rightF="129.19109026963633" top="0" topF="0.0"/>
+              <y:BorderInsets bottom="48" bottomF="48.051121505192214" left="0" leftF="0.0" right="129" rightF="129.19109026963633" top="0" topF="0.0"/>
             </y:GroupNode>
             <y:GroupNode>
               <y:Geometry height="50.0" width="50.0" x="0.0" y="60.0"/>
@@ -994,7 +994,7 @@ writeFile()</y:MethodLabel>
           <data key="d4" xml:space="preserve"/>
           <data key="d6">
             <y:UMLClassNode>
-              <y:Geometry height="303.625" width="176.27133969907413" x="-1145.104015163637" y="86.37709381512911"/>
+              <y:Geometry height="405.8938310010765" width="176.27133969907413" x="-1145.104015163637" y="86.37709381512911"/>
               <y:Fill color="#99CC00" transparent="false"/>
               <y:BorderStyle color="#000000" type="line" width="1.0"/>
               <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="13" fontStyle="bold" hasBackgroundColor="false" hasLineColor="false" height="19.1328125" horizontalTextPosition="center" iconTextGap="4" modelName="custom" textColor="#000000" verticalTextPosition="bottom" visible="true" width="59.75146484375" x="58.25993742766207" xml:space="preserve" y="25.96875">Domain<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:LabelModel><y:ModelParameter><y:SmartNodeLabelModelParameter labelRatioX="0.0" labelRatioY="0.0" nodeRatioX="0.0" nodeRatioY="-0.03703090122767855" offsetX="0.0" offsetY="0.0" upX="0.0" upY="-1.0"/></y:ModelParameter></y:NodeLabel>
@@ -1014,31 +1014,9 @@ to_dict()
 from_dict()
 to_cbor()
 from_cbor()
-__repr__()</y:MethodLabel>
-              </y:UML>
-            </y:UMLClassNode>
-          </data>
-        </node>
-        <node id="n4::n3">
-          <data key="d4" xml:space="preserve"/>
-          <data key="d6">
-            <y:UMLClassNode>
-              <y:Geometry height="303.625" width="176.27133969907413" x="-924.3250316400713" y="86.37709381512911"/>
-              <y:Fill color="#FF0000" transparent="false"/>
-              <y:BorderStyle color="#000000" type="line" width="1.0"/>
-              <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="13" fontStyle="bold" hasBackgroundColor="false" hasLineColor="false" height="19.1328125" horizontalTextPosition="center" iconTextGap="4" modelName="custom" textColor="#000000" verticalTextPosition="bottom" visible="true" width="40.21337890625" x="68.02898039641207" xml:space="preserve" y="25.96875">Walk<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:LabelModel><y:ModelParameter><y:SmartNodeLabelModelParameter labelRatioX="0.0" labelRatioY="0.0" nodeRatioX="0.0" nodeRatioY="-0.03703090122767855" offsetX="0.0" offsetY="0.0" upX="0.0" upY="-1.0"/></y:ModelParameter></y:NodeLabel>
-              <y:UML clipContent="true" constraint="" hasDetailsColor="false" omitDetails="false" stereotype="walk.py" use3DEffect="true">
-                <y:AttributeLabel xml:space="preserve">self.datamap
-self.saddles
-self.summits
-self.linkers
-self.logger
-</y:AttributeLabel>
-                <y:MethodLabel xml:space="preserve">__init__(summits, saddles, datamap)
-_to_hash(container)
-run()
-domain()
 walk()
+_walk()
+walkSingleSaddle()
 _climb_up()
 disqualify_lower_linkers()
 mark_redundant_linkers()
@@ -1047,7 +1025,7 @@ __repr__()</y:MethodLabel>
             </y:UMLClassNode>
           </data>
         </node>
-        <node id="n4::n4">
+        <node id="n4::n3">
           <data key="d4" xml:space="preserve"/>
           <data key="d6">
             <y:UMLClassNode>
