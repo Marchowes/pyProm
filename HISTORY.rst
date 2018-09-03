@@ -1,4 +1,11 @@
 Release History
+0.5.8 (September 3, 2018)
++++++++++++++++++++++++++
+* Fixed Bug within the walk function
+* Improved equality operator in Linker object
+* Cleaned up some of the progress displays.
+* WalkPath from_dict converts to tuple.
+
 0.5.7 (August 31, 2018)
 +++++++++++++++++++++++
 * Dockerized ipython terminal

@@ -70,18 +70,29 @@ class Domain:
         self.logger = logging.getLogger('{}'.format(__name__))
         self.logger.info("Domain Object Created: \n{}".format(self.extent))
 
-    def run(self):
+    def run(self, sparse=False):
         """
         Performs discovery of :class:`Saddle`, :class:`Summits`
         and :class:`Linkers`.
+        Runs walk() and disqualifies known problem linkers.
+        :param sparse: just do feature discovery, skip walk() and linker logic.
         """
-        # Expunge any existing saddles, summits, and linkers
+        # Expunge any existing saddles, runoffs, summits, and linkers
         self.saddles = SaddlesContainer([])
         self.summits = SummitsContainer([])
         self.runoffs = RunoffsContainer([])
         self.linkers = list()
+        # Find Features
         self.summits, self.saddles, self.runoffs =\
             AnalyzeData(self.datamap).run()
+        # if we're in sparse mode, bail.
+        if sparse:
+            return
+        # Perform Walk
+        self.walk()
+        # Deal with redundant and low saddles
+        self.mark_redundant_linkers()
+        self.disqualify_lower_linkers()
 
     @classmethod
     def read(cls, filename, datamap):
@@ -96,7 +107,7 @@ class Domain:
         incoming.close()
         return domain
 
-    def write(self, filename):
+    def write(self, filename, noWalkPath=True):
         """
         :param filename: name of file (including path) to write cbor data to
         compressed cbor data from
@@ -105,7 +116,7 @@ class Domain:
         self.logger.info("Writing Domain Dataset to {}.".format(filename))
         outgoing = gzip.open(filename, 'wb', 5)
         # ^^ ('filename', 'read/write mode', compression level)
-        outgoing.write(self.to_cbor())
+        outgoing.write(self.to_cbor(noWalkPath=noWalkPath))
         outgoing.close()
 
     @classmethod
@@ -118,11 +129,11 @@ class Domain:
         domainDict = cbor.loads(cborBinary)
         return cls.from_dict(domainDict, datamap)
 
-    def to_cbor(self):
+    def to_cbor(self, noWalkPath=True):
         """
         :return: cbor binary of :class:`Domain`
         """
-        return cbor.dumps(self.to_dict())
+        return cbor.dumps(self.to_dict(noWalkPath=noWalkPath))
 
     @classmethod
     def from_dict(cls, domainDict, datamap):
@@ -163,7 +174,7 @@ class Domain:
         domain_dict['runoffs'] = self.runoffs.to_dict()
 
         # Linkers if this domain has been walked.
-        domain_dict['linkers'] = [x.to_dict(noWalkPath=True) for x in self.linkers]
+        domain_dict['linkers'] = [x.to_dict(noWalkPath=noWalkPath) for x in self.linkers]
         return domain_dict
 
     def __repr__(self):
@@ -196,23 +207,21 @@ class Domain:
 
         self.logger.info("Initiating Walk")
         start = default_timer()
-        lasttime = start
+        then = start
         for idx, saddle in enumerate(
                 self.saddles.points + self.runoffs.points):
             if not idx % 2000:
-                thisTime = default_timer()
-                split = round(thisTime - lasttime, 2)
-                self.lasttime = default_timer()
-                rt = self.lasttime - start
-                pointsPerSec = round(idx / rt, 2)
+                now = default_timer()
+                pointsPerSec = round(idx / (now - start), 2)
                 self.logger.info(
                     "Saddles per second: {} - {}%"
                     " runtime: {}, split: {}".format(
                         pointsPerSec,
                         round(idx / len(self.saddles) * 100, 2),
-                        (str(timedelta(seconds=round(rt, 2)))),
-                        split
+                        (str(timedelta(seconds=round(now - start, 2)))),
+                        round(now - then, 2)
                     ))
+                then = now
             if not saddle.disqualified:
                 self._walk(saddle, summitHash)
 
@@ -330,11 +339,12 @@ class Domain:
             # the new candidate.
             if elevation > currentHigh:
                 candidates = GridPoint(x, y, elevation)
+                currentHigh = elevation
         return candidates, None, explored, orderedExploredPoints
 
     def disqualify_lower_linkers(self):
         """
-        Disqualifies Linkers and Saddles if these conditions are met:
+        Disqualifies Linkers and Saddles if all these conditions are met:
         - Saddle connects to two or less Summits
         - (Summit, Summit) Pair contains another Saddle which is higher
                     OK
@@ -343,12 +353,15 @@ class Domain:
                  /--990--/
                   tooLow
         """
+        self.logger.info("Disqualifying Lower Linkers...")
         count = 0
         for summit in self.summits:
             found = list()
             for linker in summit.saddles:
                 if len(linker.saddle.summits) > 2:
                     # More than 2? Bail!
+                    # No saddle should have more than 2 summits
+                    # so long as AnalyzeData.rebuildSaddles() was run.
                     continue
                 found += [x for x in linker.saddle_summits if x != summit]
             redundants = set([x for x in found if found.count(x) > 1])
@@ -359,9 +372,9 @@ class Domain:
                     if redundant in [x for x in linker.saddle_summits]:
                         if linker.saddle.elevation > highest:
                             highest = linker.saddle.elevation
-            # Disqualify Saddle and Linkers if not the highest.
+            # Disqualify Saddle and Linkers if not the highest or not already marked.
             for linker in summit.saddles:
-                if linker.saddle.elevation < highest:
+                if linker.saddle.elevation < highest and not linker.saddle.tooLow:
                     for link in linker.saddle.summits:
                         link.disqualified = True
                     linker.saddle.tooLow = True
@@ -375,9 +388,10 @@ class Domain:
         Summit 1000    995 Saddle  <-Disqualify
                   /-----/
         """
+        self.logger.info("Marking Redundant Linkers to Saddles")
         count = 0
         for saddle in self.saddles.points + self.runoffs.points:
-            uniqueSummits = set(saddle.summits)
+            uniqueSummits = set([x.summit for x in saddle.summits])
 
             # More than one summit to begin with, but only one unique?
             # Thats not really a Saddle now is it? Why check if there is more

@@ -20,7 +20,7 @@ class Linker:
     :param path: data containing the path taken to link this Summit and Saddle
     """
 
-    def __init__(self, summit, saddle, path, id=None):
+    def __init__(self, summit, saddle, path=WalkPath([]), id=None):
         """
         :param summit: :class:`Summit`
         :param saddle: :class:`Saddle`
@@ -99,7 +99,7 @@ class Linker:
         if pathDict:
             path = WalkPath.from_dict(pathDict)
         else:
-            path = None
+            path = WalkPath([])
         saddle = saddlesContainer.fast_lookup[linkerDict['saddle']]
 
         summit = summitsContainer.fast_lookup[linkerDict['summit']]
@@ -129,8 +129,8 @@ class Linker:
         :raises: TypeError if other not of :class:`Linker`
         """
         isLinker(other)
-        return [self.summit, self.saddle] ==\
-               [other.summit, other.saddle]
+        return [self.summit, self.saddle, self.path] ==\
+               [other.summit, other.saddle, other.path]
 
     def __ne__(self, other):
         """
@@ -140,8 +140,8 @@ class Linker:
         :raises: TypeError if other not of :class:`Linker`
         """
         isLinker(other)
-        return [self.summit, self.saddle] !=\
-               [other.summit, other.saddle]
+        return [self.summit, self.saddle, self.path] !=\
+               [other.summit, other.saddle, other.path]
 
     def __repr__(self):
         """

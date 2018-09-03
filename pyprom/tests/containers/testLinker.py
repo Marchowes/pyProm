@@ -86,7 +86,7 @@ class LinkerTests(unittest.TestCase):
         Ensure __eq__ feature works as expected
         """
         self.assertEqual(self.linker1, self.linker1)
-        testLinker = Linker(self.summit1, self.saddle1, None)
+        testLinker = Linker(self.summit1, self.saddle1, self.path1)
         self.assertEqual(self.linker1, testLinker)
 
     def testLinkerNe(self):

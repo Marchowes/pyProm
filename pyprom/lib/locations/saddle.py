@@ -90,7 +90,7 @@ class Saddle(SpotElevation):
         if self.singleSummit:
             to_dict['singlesummit'] = self.singleSummit
         if self.tooLow:
-            to_dict['toolow'] = self.tooLow
+            to_dict['tooLow'] = self.tooLow
         if self._disqualified:
             to_dict['disqualified'] = self._disqualified
 

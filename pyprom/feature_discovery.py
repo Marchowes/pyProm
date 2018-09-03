@@ -60,14 +60,14 @@ class AnalyzeData:
         return: (:class:`SummitsContainer`, :class:`SaddlesContainer`,
          :class:`RunoffsContainer`,)
         """
-        self.start = default_timer()
-        self.lasttime = self.start
         self.logger.info("Initiating Saddle, Summit, Runoff Identification")
         self.summitObjects = SummitsContainer([])
         self.saddleObjects = SaddlesContainer([])
         self.runoffObjects = RunoffsContainer([])
         iterator = numpy.nditer(self.data, flags=['multi_index'])
         index = 0
+        start = default_timer()
+        then = start
         # Iterate through numpy grid, and keep track of gridpoint coordinates.
         while not iterator.finished:
             x, y = iterator.multi_index
@@ -80,20 +80,17 @@ class AnalyzeData:
             # Quick Progress Meter. Needs refinement,
             index += 1
             if not index % 100000:
-
-                thisTime = default_timer()
-                split = round(thisTime - self.lasttime, 2)
-                self.lasttime = default_timer()
-                rt = self.lasttime - self.start
-                pointsPerSec = round(index / rt, 2)
+                now = default_timer()
+                pointsPerSec = round(index / (now - start), 2)
                 self.logger.info(
                     "Points per second: {} - {}%"
                     " runtime: {}, split: {}".format(
                         pointsPerSec,
                         round(index / self.data.size * 100, 2),
-                        (str(timedelta(seconds=round(rt, 2)))),
-                        split
+                        (str(timedelta(seconds=round(now - start, 2)))),
+                        round(now - then, 2)
                     ))
+                then = now
 
             # skip if this is a nodata point.
             if self.elevation == self.datamap.nodata:
