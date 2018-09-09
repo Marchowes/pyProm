@@ -1,4 +1,4 @@
-### pyProm v0.5.8
+### pyProm v0.5.9
 
 ![pyProm](https://github.com/marchowes/pyProm/raw/master/images/pyProm-logo-500px.png "pyProm")
 
@@ -45,7 +45,7 @@ In your favorite Python interpreter on a Unix system (I use `ipython` in `Linux`
 ```
 from dataload import GDALLoader
 from domain import Domain
-from dataexport import KMLfileWriter
+from lib.kmlwriter import KMLFileWriter
 import logging
 logging.basicConfig(level=logging.DEBUG)
 
@@ -59,7 +59,7 @@ domain.run()
 _4ks = domain.summits.elevationRange(4000)
 
 # Write your fancy list of 4ks to a KML file
-mykml = KMLfileWriter(_4ks, 'YOURPATHHERE/myfile.kml')
+mykml = KMLfileWriter('YOURPATHHERE/myfile.kml', features=_4ks')
 mykml.writeFile()
 
 # Save your Domain
