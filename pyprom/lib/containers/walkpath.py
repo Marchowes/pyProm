@@ -107,7 +107,7 @@ class WalkPath:
         path = pathDict.get('path', [])
         pathTuples = []
         for point in path:
-            pathTuples.append((point[0],point[1]))
+            pathTuples.append((point[0], point[1]))
         return cls(pathTuples)
 
     def __eq__(self, other):

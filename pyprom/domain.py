@@ -174,7 +174,8 @@ class Domain:
         domain_dict['runoffs'] = self.runoffs.to_dict()
 
         # Linkers if this domain has been walked.
-        domain_dict['linkers'] = [x.to_dict(noWalkPath=noWalkPath) for x in self.linkers]
+        domain_dict['linkers'] = [x.to_dict(noWalkPath=noWalkPath)
+                                  for x in self.linkers]
         return domain_dict
 
     def __repr__(self):
@@ -354,32 +355,57 @@ class Domain:
                   tooLow
         """
         self.logger.info("Disqualifying Lower Linkers...")
-        count = 0
+        saddleCount = 0
+        linkerCount = 0
+
+        def disqualifySaddleAndLinkers(saddle, saddleCount, linkerCount):
+            saddle.tooLow = True
+            for linker in saddle.summits:
+                linker.disqualified = True
+                linkerCount += 1
+            saddleCount += 1
+            return saddleCount, linkerCount
+
+        # Iterate through Every Summit.
         for summit in self.summits:
-            found = list()
-            for linker in summit.saddles:
-                if len(linker.saddle.summits) > 2:
-                    # More than 2? Bail!
-                    # No saddle should have more than 2 summits
-                    # so long as AnalyzeData.rebuildSaddles() was run.
-                    continue
-                found += [x for x in linker.saddle_summits if x != summit]
+
+            # Find all summits connected via a single saddle.
+            found = [x for x in summit.all_neighbors() if x != summit]
+
+            # Find all summits which are linked by more than a single saddle.
             redundants = set([x for x in found if found.count(x) > 1])
-            highest = -32768
-            # figure out what the highest Saddle is.
+
+            # For each summit found to have more than a single
+            # connecting saddle, mark each saddle found not to be the highest
+            # as "tooLow" and disqualify any connecting linkers.
             for redundant in redundants:
+                currentHighestRedundantSaddle = None
+                # run through all linkers.
                 for linker in summit.saddles:
+                    # does the saddle on the other end of the linker
+                    # lead to one of our redundant summits?
                     if redundant in [x for x in linker.saddle_summits]:
-                        if linker.saddle.elevation > highest:
-                            highest = linker.saddle.elevation
-            # Disqualify Saddle and Linkers if not the highest or not already marked.
-            for linker in summit.saddles:
-                if linker.saddle.elevation < highest and not linker.saddle.tooLow:
-                    for link in linker.saddle.summits:
-                        link.disqualified = True
-                    linker.saddle.tooLow = True
-                    count += 1
-        self.logger.info("Linkers Disqualified: {}".format(count))
+                        # No current highest? set the first one and continue.
+                        if not currentHighestRedundantSaddle:
+                            currentHighestRedundantSaddle = linker.saddle
+                            continue
+                        # current
+                        if linker.saddle.elevation >\
+                                currentHighestRedundantSaddle.elevation:
+                            saddleCount, linkerCount =\
+                                disqualifySaddleAndLinkers(
+                                    currentHighestRedundantSaddle,
+                                    saddleCount,
+                                    linkerCount)
+                            currentHighestRedundantSaddle = linker.saddle
+                        else:
+                            saddleCount, linkerCount =\
+                                disqualifySaddleAndLinkers(linker.saddle,
+                                                           saddleCount,
+                                                           linkerCount)
+
+        self.logger.info("Linkers Disqualified: {}".format(linkerCount))
+        self.logger.info("Saddles Disqualified: {}".format(saddleCount))
 
     def mark_redundant_linkers(self):
         """

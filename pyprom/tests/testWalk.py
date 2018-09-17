@@ -74,10 +74,11 @@ class WalkTests(unittest.TestCase):
         self.domain.walk()
         self.domain.disqualify_lower_linkers()
         self.assertEqual(len([x for x in self.domain.linkers
-                              if x.disqualified]), 348)
+                              if x.disqualified]), 78)
         self.domain.disqualify_lower_linkers()
         self.assertEqual(len([x for x in self.domain.linkers
-                              if x.disqualified]), 348)
+                              if x.disqualified]), 78)
+
 
 class WalkTestsReal(unittest.TestCase):
     """
@@ -94,13 +95,13 @@ class WalkTestsReal(unittest.TestCase):
 
     def testWalkPathSingleSummit(self):
         """
-        Ensure that a walk path from a saddle which both side leads to washington
-        produces the expected results.
+        Ensure that a walk path from a saddle which both side leads to
+        Washington produces the expected results.
         """
         washingtonVicinityDatamap = self.datamap.subset(2608, 2417, 99, 145)
         washingtonVicinity = AnalyzeData(washingtonVicinityDatamap)
         summits, saddles, runoffs = washingtonVicinity.run()
-        saddleUnderTest=saddles[2]
+        saddleUnderTest = saddles[2]
         d = Domain(washingtonVicinityDatamap, summits, saddles, runoffs)
         d.walkSingleSaddle(saddleUnderTest)
         summits = [x.summit for x in saddleUnderTest.summits]
