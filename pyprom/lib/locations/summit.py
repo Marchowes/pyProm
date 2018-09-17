@@ -37,6 +37,7 @@ class Summit(SpotElevation):
         self.localHighest = None
         self.parent = None
         self.lprBoundary = []
+        self.lprPaths = None
 
     def addSaddleLinker(self, linker):
         """

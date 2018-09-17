@@ -66,6 +66,24 @@ class Linker:
         """
         return [x.summit for x in self.saddle.summits]
 
+    @property
+    def saddle_summit_linkers(self, exclude=True):
+        """
+        :return: list of linkers to summits connected to the saddle the linker links
+        """
+        if exclude:
+            return [x for x in self.saddle.summits if x.summit != self.summit]
+        return [x for x in self.saddle.summits]
+
+    @property
+    def summit_saddle_linkers(self, exclude=True):
+        """
+        :return: list of linkers to saddles connected to the summit the linker links
+        """
+        if exclude:
+            return [x for x in self.summit.saddles if x.saddle != self.saddle]
+        return [x for x in self.summit.saddles]
+
     def add_to_remote_saddle_and_summit(self):
         """
         Adds this linker to the remote :class:`Saddle` and :class:`Summit`

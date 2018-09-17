@@ -70,7 +70,7 @@ class Domain:
         self.logger = logging.getLogger('{}'.format(__name__))
         self.logger.info("Domain Object Created: \n{}".format(self.extent))
 
-    def run(self, sparse=False):
+    def run(self, sparse=False, superSparse=False):
         """
         Performs discovery of :class:`Saddle`, :class:`Summits`
         and :class:`Linkers`.
@@ -85,11 +85,17 @@ class Domain:
         # Find Features
         self.summits, self.saddles, self.runoffs =\
             AnalyzeData(self.datamap).run()
-        # if we're in sparse mode, bail.
-        if sparse:
+        # If we're in superSparse mode, bail.
+        if superSparse:
             return
+
         # Perform Walk
         self.walk()
+
+        # If we're in sparse mode, bail.
+        if sparse:
+            return
+
         # Deal with redundant and low saddles
         self.mark_redundant_linkers()
         self.disqualify_lower_linkers()
@@ -343,69 +349,70 @@ class Domain:
                 currentHigh = elevation
         return candidates, None, explored, orderedExploredPoints
 
-    def disqualify_lower_linkers(self):
-        """
-        Disqualifies Linkers and Saddles if all these conditions are met:
-        - Saddle connects to two or less Summits
-        - (Summit, Summit) Pair contains another Saddle which is higher
-                    OK
-                 /--995--/
-        Summit 1000     1001 Summit
-                 /--990--/
-                  tooLow
-        """
-        self.logger.info("Disqualifying Lower Linkers...")
-        saddleCount = 0
-        linkerCount = 0
+        def disqualify_lower_linkers(self):
+            """
+            Disqualifies Linkers and Saddles if all these conditions are met:
+            - Saddle connects to two or less Summits
+            - (Summit, Summit) Pair contains another Saddle which is higher
+                        OK
+                     /--995--/
+            Summit 1000     1001 Summit
+                     /--990--/
+                      tooLow
+            """
+            self.logger.info("Disqualifying Lower Linkers...")
+            saddleCount = 0
+            linkerCount = 0
 
-        def disqualifySaddleAndLinkers(saddle, saddleCount, linkerCount):
-            saddle.tooLow = True
-            for linker in saddle.summits:
-                linker.disqualified = True
-                linkerCount += 1
-            saddleCount += 1
-            return saddleCount, linkerCount
+            def disqualifySaddleAndLinkers(saddle, saddleCount, linkerCount):
+                saddle.tooLow = True
+                for linker in saddle.summits:
+                    linker.disqualified = True
+                    linkerCount += 1
+                saddleCount += 1
+                return saddleCount, linkerCount
 
-        # Iterate through Every Summit.
-        for summit in self.summits:
+            # Iterate through Every Summit.
+            for summit in self.summits:
 
-            # Find all summits connected via a single saddle.
-            found = [x for x in summit.all_neighbors() if x != summit]
+                # Find all summits connected via a single saddle.
+                found = [x for x in summit.all_neighbors() if x != summit]
 
-            # Find all summits which are linked by more than a single saddle.
-            redundants = set([x for x in found if found.count(x) > 1])
+                # Find all summits which are linked by more than a single saddle.
+                redundants = set([x for x in found if found.count(x) > 1])
 
-            # For each summit found to have more than a single
-            # connecting saddle, mark each saddle found not to be the highest
-            # as "tooLow" and disqualify any connecting linkers.
-            for redundant in redundants:
-                currentHighestRedundantSaddle = None
-                # run through all linkers.
-                for linker in summit.saddles:
-                    # does the saddle on the other end of the linker
-                    # lead to one of our redundant summits?
-                    if redundant in [x for x in linker.saddle_summits]:
-                        # No current highest? set the first one and continue.
-                        if not currentHighestRedundantSaddle:
-                            currentHighestRedundantSaddle = linker.saddle
-                            continue
-                        # current
-                        if linker.saddle.elevation >\
-                                currentHighestRedundantSaddle.elevation:
-                            saddleCount, linkerCount =\
-                                disqualifySaddleAndLinkers(
-                                    currentHighestRedundantSaddle,
-                                    saddleCount,
-                                    linkerCount)
-                            currentHighestRedundantSaddle = linker.saddle
-                        else:
-                            saddleCount, linkerCount =\
-                                disqualifySaddleAndLinkers(linker.saddle,
-                                                           saddleCount,
-                                                           linkerCount)
+                # For each summit found to have more than a single
+                # connecting saddle, mark each saddle found not to be the highest
+                # as "tooLow" and disqualify any connecting linkers.
+                for redundant in redundants:
+                    currentHighestRedundantSaddle = None
+                    # run through all linkers.
+                    for linker in summit.saddles:
+                        # does the saddle on the other end of the linker
+                        # lead to one of our redundant summits?
+                        if redundant in [x for x in linker.saddle_summits]:
+                            # No current highest? set the first one and continue.
+                            if not currentHighestRedundantSaddle:
+                                currentHighestRedundantSaddle = linker.saddle
+                                continue
+                            # current
+                            if linker.saddle.elevation > \
+                                    currentHighestRedundantSaddle.elevation:
+                                saddleCount, linkerCount = \
+                                    disqualifySaddleAndLinkers(
+                                        currentHighestRedundantSaddle,
+                                        saddleCount,
+                                        linkerCount)
+                                currentHighestRedundantSaddle = linker.saddle
+                            else:
+                                saddleCount, linkerCount = \
+                                    disqualifySaddleAndLinkers(linker.saddle,
+                                                               saddleCount,
+                                                               linkerCount)
 
-        self.logger.info("Linkers Disqualified: {}".format(linkerCount))
-        self.logger.info("Saddles Disqualified: {}".format(saddleCount))
+            self.logger.info("Linkers Disqualified: {}".format(linkerCount))
+
+    self.logger.info("Saddles Disqualified: {}".format(saddleCount))
 
     def mark_redundant_linkers(self):
         """
@@ -430,3 +437,61 @@ class Domain:
                 for linker in saddle.summits:
                     linker.disqualified = True
         self.logger.info("Saddles with disqualified Linkers: {}".format(count))
+
+
+    def detect_tree_loops(self):
+        disqualifiedSaddles = []
+        for idx, saddle in enumerate(self.saddles):
+            exempt = {} # list of saddles
+            path = list()
+            while self.branchChaser(saddle, saddle, 0, exempt, path, disqualifiedSaddles) == True:
+                pass
+        self.logger.info("Disqualified: {} Loop Saddles".format(len(disqualifiedSaddles)))
+
+    #Dumb Branch Chaser, restarts when loop is detected then tries again.
+    def branchChaser(self, master, saddleUnderInspection, depth, exempt, path, disqualifiedSaddles):
+        # print(depth)
+        depth += 1
+        if depth > 500:
+            return False
+        path_for_recurse = path.copy()
+        path_for_recurse.append(saddleUnderInspection)
+
+        for linker in saddleUnderInspection.summits:
+            if linker.disqualified:
+                continue
+            #exempt[linker.id] = True
+            exempt[linker.saddle.id] = True
+            for nextSaddleLinker in linker.summit_saddle_linkers:
+                if exempt.get(nextSaddleLinker.saddle.id) or linker.disqualified:
+                    continue
+                if nextSaddleLinker.saddle == master:
+                    #found a loop!
+                    disqualifiedSaddles.append(self.loopMarker(path))
+                    return True
+                val = self.branchChaser(master, nextSaddleLinker.saddle, depth, exempt, path_for_recurse, disqualifiedSaddles)
+                if val:
+                    return val
+        return False
+
+
+    def loopMarker(self, path):
+        low = 10000
+        lowest = list()
+        for saddle in path:
+            if saddle.elevation < low:
+                low = saddle.elevation
+                lowest = list()
+                lowest.append(saddle)
+            elif saddle.elevation == low:
+                lowest.append(saddle)
+        if len(lowest) > 1:
+            print("contention!")
+            #do something, like, mark other candidate as a swappable or something...
+        lowest[0].disqualify_self_and_linkers(tooLow=True)
+        return lowest[0]
+
+
+
+
+

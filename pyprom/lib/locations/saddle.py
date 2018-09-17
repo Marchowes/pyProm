@@ -36,7 +36,7 @@ class Saddle(SpotElevation):
         self.highShores = kwargs.get('highShores', [])
         self.id = kwargs.get('id', 'sa:' + randomString())
         # Temporary until I've build a linker
-        self.summits = list()
+        self.summits = []
         # If this is set, this saddle was spun out of another
         # Saddle with less data.
         self.parent = None  # Parent
@@ -75,6 +75,22 @@ class Saddle(SpotElevation):
         :param value: True or False. Override system disqualification
         """
         self._disqualified = value
+
+    def disqualify_self_and_linkers(self, tooLow=False, singleSummit=False):
+        """
+        Disqualify this :class:`Saddle` and linked :class:`Linker`s.
+        :param tooLow: set tooLow
+        :param singleSummit: set singleSummit
+        """
+
+        if tooLow:
+            self.tooLow = tooLow
+        if singleSummit:
+            self.singleSummit = singleSummit
+        if not (tooLow | singleSummit):
+            self.disqualified = True
+        for linker in self.summits:
+            linker.disqualified = True
 
     def to_dict(self, referenceById=True):
         """

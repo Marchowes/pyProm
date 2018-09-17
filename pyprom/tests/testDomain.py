@@ -12,7 +12,7 @@ from pyprom.domain import Domain
 
 
 class DomainTests(unittest.TestCase):
-    """Test Logic."""
+    """Test Domain."""
 
     def setUp(self):
         """
