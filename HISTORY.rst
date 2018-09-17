@@ -1,5 +1,9 @@
 Release History
 
+0.5.10 (September 17, 2018)
++++++++++++++++++++++++++++
+* Fix bug in disqualify_lower_linkers()
+
 0.5.9 (September 16, 2018)
 ++++++++++++++++++++++++++
 * Rebuild the KMLFileWriter

@@ -45,6 +45,28 @@ class Summit(SpotElevation):
         isLinker(linker)
         self.saddles.append(linker)
 
+    @property
+    def neighbors(self):
+        """
+        :return: list of directly neighboring summits.
+        """
+        neighborSet = set(self.all_neighbors())
+        neighborSet.discard(self)
+        return list(neighborSet)
+
+    def all_neighbors(self, filterDisqualified=True):
+        """
+        :return: list of directly neighboring summits including self.
+        """
+        neighbors = []
+        if filterDisqualified:
+            [neighbors.extend(linker.saddle_summits)
+                for linker in self.saddles if not linker.disqualified]
+        else:
+            [neighbors.extend(linker.saddle_summits)
+                for linker in self.saddles]
+        return neighbors
+
     def to_dict(self, referenceById=True):
         """
         :param referenceById: reference Saddles by ID.

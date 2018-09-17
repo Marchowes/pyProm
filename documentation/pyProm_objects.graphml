@@ -203,6 +203,8 @@ self.lprBoundary</y:AttributeLabel>
                 <y:MethodLabel xml:space="preserve">__init__()
 
 addSaddleLinker()
+@neighbors()
+all_neighbors()
 to_dict()
 from_dict()
 
@@ -823,10 +825,10 @@ self.logger</y:AttributeLabel>
         <y:ProxyAutoBoundsNode>
           <y:Realizers active="0">
             <y:GroupNode>
-              <y:Geometry height="519.0006415329011" width="766.7422739099916" x="-2252.898022446746" y="-401.7153815303396"/>
+              <y:Geometry height="519.0006415329011" width="766.7422739099918" x="-2252.898022446746" y="-401.7153815303396"/>
               <y:Fill color="#F5F5F5" transparent="false"/>
               <y:BorderStyle color="#000000" type="dashed" width="1.0"/>
-              <y:NodeLabel alignment="right" autoSizePolicy="node_width" backgroundColor="#EBEBEB" borderDistance="0.0" fontFamily="Dialog" fontSize="15" fontStyle="plain" hasLineColor="false" height="21.4609375" horizontalTextPosition="center" iconTextGap="4" modelName="internal" modelPosition="t" textColor="#000000" verticalTextPosition="bottom" visible="true" width="766.7422739099916" x="0.0" xml:space="preserve" y="0.0">DataMap</y:NodeLabel>
+              <y:NodeLabel alignment="right" autoSizePolicy="node_width" backgroundColor="#EBEBEB" borderDistance="0.0" fontFamily="Dialog" fontSize="15" fontStyle="plain" hasLineColor="false" height="21.4609375" horizontalTextPosition="center" iconTextGap="4" modelName="internal" modelPosition="t" textColor="#000000" verticalTextPosition="bottom" visible="true" width="766.7422739099918" x="0.0" xml:space="preserve" y="0.0">DataMap</y:NodeLabel>
               <y:Shape type="roundrectangle"/>
               <y:State closed="false" closedHeight="50.0" closedWidth="50.0" innerGraphDisplayEnabled="false"/>
               <y:Insets bottom="15" bottomF="15.0" left="15" leftF="15.0" right="15" rightF="15.0" top="15" topF="15.0"/>
@@ -870,10 +872,10 @@ iterateOrthogonal(x, y)
           <data key="d4" xml:space="preserve"/>
           <data key="d6">
             <y:UMLClassNode>
-              <y:Geometry height="467.5397040329011" width="414.78094976849866" x="-1915.936698305253" y="-365.2544440303396"/>
+              <y:Geometry height="467.5397040329011" width="442.6785456350219" x="-1943.834294171776" y="-365.2544440303396"/>
               <y:Fill color="#FF6600" transparent="false"/>
               <y:BorderStyle color="#000000" type="line" width="1.0"/>
-              <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="13" fontStyle="bold" hasBackgroundColor="false" hasLineColor="false" height="19.1328125" horizontalTextPosition="center" iconTextGap="4" modelName="custom" textColor="#000000" verticalTextPosition="bottom" visible="true" width="144.2705078125" x="135.25522097799933" xml:space="preserve" y="25.96875">ProjectionDataMap<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:LabelModel><y:ModelParameter><y:SmartNodeLabelModelParameter labelRatioX="0.0" labelRatioY="0.0" nodeRatioX="0.0" nodeRatioY="-0.03703090122767855" offsetX="0.0" offsetY="0.0" upX="0.0" upY="-1.0"/></y:ModelParameter></y:NodeLabel>
+              <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="13" fontStyle="bold" hasBackgroundColor="false" hasLineColor="false" height="19.1328125" horizontalTextPosition="center" iconTextGap="4" modelName="custom" textColor="#000000" verticalTextPosition="bottom" visible="true" width="144.2705078125" x="149.20401891126096" xml:space="preserve" y="25.96875">ProjectionDataMap<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:LabelModel><y:ModelParameter><y:SmartNodeLabelModelParameter labelRatioX="0.0" labelRatioY="0.0" nodeRatioX="0.0" nodeRatioY="-0.03703090122767855" offsetX="0.0" offsetY="0.0" upX="0.0" upY="-1.0"/></y:ModelParameter></y:NodeLabel>
               <y:UML clipContent="true" constraint="" hasDetailsColor="false" omitDetails="false" stereotype="lib.datamap.py" use3DEffect="true">
                 <y:AttributeLabel xml:space="preserve">self.logger
 self.upperLeftY
@@ -976,16 +978,28 @@ summit_and_saddle()
               <y:Fill color="#CC99FF" transparent="false"/>
               <y:BorderStyle color="#000000" type="line" width="1.0"/>
               <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="13" fontStyle="bold" hasBackgroundColor="false" hasLineColor="false" height="19.1328125" horizontalTextPosition="center" iconTextGap="4" modelName="custom" textColor="#000000" verticalTextPosition="bottom" visible="true" width="105.32763671875" x="35.47185149016207" xml:space="preserve" y="25.96875">KMLfileWriter<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:LabelModel><y:ModelParameter><y:SmartNodeLabelModelParameter labelRatioX="0.0" labelRatioY="0.0" nodeRatioX="0.0" nodeRatioY="-0.03703090122767855" offsetX="0.0" offsetY="0.0" upX="0.0" upY="-1.0"/></y:ModelParameter></y:NodeLabel>
-              <y:UML clipContent="true" constraint="" hasDetailsColor="false" omitDetails="false" stereotype="dataexport.py" use3DEffect="true">
+              <y:UML clipContent="true" constraint="" hasDetailsColor="false" omitDetails="false" stereotype="kmlwriter.py" use3DEffect="true">
                 <y:AttributeLabel xml:space="preserve">self.logger
-self.kml
-self.outputFile
-self.kmlPoints
-self.k
-self.kmlFolder</y:AttributeLabel>
-                <y:MethodLabel xml:space="preserve">__init__(kmlList, outputFile)
-generateKMLPlacemark(spotElevation)
-writeFile()</y:MethodLabel>
+self.filename
+self.spotElevation_wkt
+self.linkers_wkt
+self.documentName
+self.linkers
+self.saddles
+self.summits
+self.runOffs
+self.spotElevations</y:AttributeLabel>
+                <y:MethodLabel xml:space="preserve">__init__(outputFileName, documentName=None, features=[])
+extend(features)
+append(feature)
+_append_spotElevation_derivative(feature, feature_type)
+_append_linker(linker)
+generateDocument()
+generateKML()
+write()
+
+
+</y:MethodLabel>
               </y:UML>
             </y:UMLClassNode>
           </data>
