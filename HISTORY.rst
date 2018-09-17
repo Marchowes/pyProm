@@ -1,4 +1,9 @@
 Release History
+
+0.5.9 (September 16, 2018)
+++++++++++++++++++++++++++
+* Rebuild the KMLFileWriter
+
 0.5.8 (September 3, 2018)
 +++++++++++++++++++++++++
 * Fixed Bug within the walk function
@@ -10,7 +15,6 @@ Release History
 +++++++++++++++++++++++
 * Dockerized ipython terminal
 
----------------
 0.5.6 (August 30, 2018)
 +++++++++++++++++++++++
 * Dockerized tests
