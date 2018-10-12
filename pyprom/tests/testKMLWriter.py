@@ -6,6 +6,10 @@ the LICENSE file that accompanies it.
 """
 import unittest
 
+from pyprom.tests.getData import gettestzip
+from pyprom.dataload import GDALLoader
+
+from pyprom.domain import Domain
 from pyprom.lib.locations.saddle import Saddle
 from pyprom.lib.locations.summit import Summit
 from pyprom.lib.containers.linker import Linker
@@ -41,6 +45,29 @@ class KMLFileWriterTest(unittest.TestCase):
         self.spotelevationcontainer =\
             SpotElevationContainer([self.spotelevation1, self.spotelevation2])
         self.kfw = KMLFileWriter("someFile.kml", documentName="myDocument")
+
+    def testDomainAppendKML(self):
+        """
+        Ensure Appending a single :class:`Domain` object works as expected.
+        """
+        gettestzip()
+        domain = Domain(GDALLoader('/tmp/N44W072.hgt'), self.summitscontainer,
+                        self.saddlescontainer, self.runoffscontainer,
+                        [self.linker1])
+        self.kfw.append(domain)
+        self.assertTrue(self.kfw.spotElevation_wkt['SaddlePOINT (1 1)'])
+        self.assertTrue(self.kfw.spotElevation_wkt['SaddlePOINT (2 2)'])
+        self.assertTrue(self.kfw.spotElevation_wkt['SummitPOINT (1 1)'])
+        self.assertTrue(self.kfw.spotElevation_wkt['SummitPOINT (2 2)'])
+        self.assertTrue(self.kfw.spotElevation_wkt['RunOffPOINT (1 1)'])
+        self.assertTrue(self.kfw.spotElevation_wkt['RunOffPOINT (2 2)'])
+        self.assertTrue(self.kfw.linkers_wkt['LINESTRING (1 1, 1 1)'])
+        self.assertEqual(len(self.kfw.spotElevation_wkt.items()), 6)
+        self.assertEqual(len(self.kfw.linkers_wkt.items()), 1)
+        self.assertEqual(len(self.kfw.linkers._features), 1)
+        self.assertEqual(len(self.kfw.saddles._features), 2)
+        self.assertEqual(len(self.kfw.summits._features), 2)
+        self.assertEqual(len(self.kfw.runOffs._features), 2)
 
     def testSaddlesAppendKML(self):
         """
@@ -352,3 +379,10 @@ class KMLFileWriterTest(unittest.TestCase):
         self.assertEqual(len(kfw.spotElevation_wkt.items()), 3)
         self.assertEqual(len(kfw.saddles._features), 2)
         self.assertEqual(len(kfw.summits._features), 1)
+
+    def testRaisesErrorOnInvalidElement(self):
+        """
+        Create KMLFileWriter with containers and locations
+        """
+        with self.assertRaises(Exception):
+            self.kfw.append(dict())

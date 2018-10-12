@@ -1,5 +1,9 @@
 Release History
 
+0.6.0 (????)
+++++++++++++
+* More robustness in KMLWriter
+
 0.5.10 (September 17, 2018)
 +++++++++++++++++++++++++++
 * Fix bug in disqualify_lower_linkers()
