@@ -249,7 +249,7 @@ class GridPointContainerTests(unittest.TestCase):
         """
         gridpoints = [self.p11, self.p12]
         container = GridPointContainer(gridpoints)
-        self.assertEqual(container.__hash__(), 3713081631935493181)
+        self.assertEqual(container.__hash__(), 4150162461373869217)
 
     def testGridPointContainerRepr(self):
         """
@@ -266,3 +266,9 @@ class GridPointContainerTests(unittest.TestCase):
         gpcDict = self.gpc.to_dict()
         newGpc = GridPointContainer.from_dict(gpcDict)
         self.assertEqual(newGpc, self.gpc)
+
+    def testGridPointContainerIndex(self):
+        """
+        Ensure index() returns expected results.
+        """
+        self.assertEqual(self.gpc.index(self.p14), 3)

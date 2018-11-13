@@ -38,6 +38,19 @@ class BaseGridPointContainer:
         """
         self.points.sort(**kwargs)
 
+    def index(self, gridPoint):
+        """
+        Returns the index that this :class:`BaseGridPoint` or child object occurs.
+        if none, return None
+        :param gridPoint: :class:`BaseGridPoint`
+        :return: index in points list where this baseGridPoint exists
+        """
+        try:
+            return self.points.index(gridPoint)
+        except:
+            return None
+
+
     def __len__(self):
         """
         :return: integer - number of items in self.points
@@ -67,7 +80,7 @@ class BaseGridPointContainer:
         Generates hash based on points.
         :return: string representation of hash
         """
-        return hash(tuple(sorted([x.x for x in self.points])))
+        return hash(tuple(sorted(self.points)))
 
     def __eq__(self, other):
         """
