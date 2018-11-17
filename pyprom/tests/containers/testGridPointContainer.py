@@ -272,3 +272,19 @@ class GridPointContainerTests(unittest.TestCase):
         Ensure index() returns expected results.
         """
         self.assertEqual(self.gpc.index(self.p14), 3)
+        # Negative
+        self.assertEqual(self.gpc.index("yolo"), None)
+
+    def testGridPointContainerLowest(self):
+        """
+        Ensure lowest() produces expected results.
+        """
+        lowest = self.gpc.lowest
+        self.assertEqual(lowest, [self.p11, self.p14, self.p26])
+
+    def testGridPointContainerlHighest(self):
+        """
+        Ensure highest() produces expected results.
+        """
+        highest = self.gpc.highest
+        self.assertEqual(highest, [self.p24])
