@@ -192,7 +192,7 @@ __repr__()</y:MethodLabel>
           <data key="d4" xml:space="preserve"/>
           <data key="d6">
             <y:UMLClassNode>
-              <y:Geometry height="189.11935343157893" width="277.5" x="293.13266701463067" y="-1198.6410104540719"/>
+              <y:Geometry height="248.73451941052622" width="277.5" x="293.13266701463067" y="-1198.6410104540719"/>
               <y:Fill color="#FFFF99" transparent="false"/>
               <y:BorderStyle color="#000000" type="line" width="1.0"/>
               <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="13" fontStyle="bold" hasBackgroundColor="false" hasLineColor="false" height="19.1328125" horizontalTextPosition="center" iconTextGap="4" modelName="custom" textColor="#000000" verticalTextPosition="bottom" visible="true" width="60.3798828125" x="108.56005859375" xml:space="preserve" y="25.96875">Summit<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:LabelModel><y:ModelParameter><y:SmartNodeLabelModelParameter labelRatioX="0.0" labelRatioY="0.0" nodeRatioX="0.0" nodeRatioY="-0.03703090122767855" offsetX="0.0" offsetY="0.0" upX="0.0" upY="-1.0"/></y:ModelParameter></y:NodeLabel>
@@ -238,7 +238,7 @@ __repr__()</y:MethodLabel>
         <node id="n0::n8">
           <data key="d6">
             <y:ShapeNode>
-              <y:Geometry height="30.0" width="97.30616185263159" x="293.13266701463067" y="-964.3963212471701"/>
+              <y:Geometry height="30.0" width="97.30616185263159" x="293.13266701463067" y="-916.1270269593351"/>
               <y:Fill color="#FFFF99" transparent="false"/>
               <y:BorderStyle color="#000000" raised="false" type="line" width="1.0"/>
               <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="12" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="17.96875" horizontalTextPosition="center" iconTextGap="4" modelName="custom" textColor="#000000" verticalTextPosition="bottom" visible="true" width="75.58984375" x="10.858159051315795" xml:space="preserve" y="6.015625">_isSummit()<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:LabelModel><y:ModelParameter><y:SmartNodeLabelModelParameter labelRatioX="0.0" labelRatioY="0.0" nodeRatioX="0.0" nodeRatioY="0.0" offsetX="0.0" offsetY="0.0" upX="0.0" upY="-1.0"/></y:ModelParameter></y:NodeLabel>
@@ -346,7 +346,7 @@ __repr__()</y:MethodLabel>
               <y:Shape type="roundrectangle"/>
               <y:State closed="false" closedHeight="50.0" closedWidth="50.0" innerGraphDisplayEnabled="false"/>
               <y:Insets bottom="15" bottomF="15.0" left="15" leftF="15.0" right="15" rightF="15.0" top="15" topF="15.0"/>
-              <y:BorderInsets bottom="104" bottomF="104.23691930890664" left="0" leftF="0.0" right="104" rightF="104.1609186903479" top="0" topF="0.0"/>
+              <y:BorderInsets bottom="57" bottomF="56.85392571407374" left="0" leftF="0.0" right="104" rightF="104.1609186903479" top="0" topF="0.0"/>
             </y:GroupNode>
             <y:GroupNode>
               <y:Geometry height="50.0" width="50.0" x="0.0" y="60.0"/>
@@ -637,10 +637,10 @@ __ne__()</y:MethodLabel>
           <data key="d4" xml:space="preserve"/>
           <data key="d6">
             <y:UMLClassNode>
-              <y:Geometry height="322.2844345298896" width="230.0" x="176.0590358372276" y="656.5272605110392"/>
+              <y:Geometry height="369.6674281247226" width="284.9368041679225" x="134.1697226591867" y="656.5272605110392"/>
               <y:Fill color="#FFCC99" transparent="false"/>
               <y:BorderStyle color="#000000" type="line" width="1.0"/>
-              <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="13" fontStyle="bold" hasBackgroundColor="false" hasLineColor="false" height="19.1328125" horizontalTextPosition="center" iconTextGap="4" modelName="custom" textColor="#000000" verticalTextPosition="bottom" visible="true" width="49.8681640625" x="90.06591796875" xml:space="preserve" y="25.96875">Linker<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:LabelModel><y:ModelParameter><y:SmartNodeLabelModelParameter labelRatioX="0.0" labelRatioY="0.0" nodeRatioX="0.0" nodeRatioY="-0.03703090122767855" offsetX="0.0" offsetY="0.0" upX="0.0" upY="-1.0"/></y:ModelParameter></y:NodeLabel>
+              <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="13" fontStyle="bold" hasBackgroundColor="false" hasLineColor="false" height="19.1328125" horizontalTextPosition="center" iconTextGap="4" modelName="custom" textColor="#000000" verticalTextPosition="bottom" visible="true" width="49.8681640625" x="117.53432005271125" xml:space="preserve" y="25.96875">Linker<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:LabelModel><y:ModelParameter><y:SmartNodeLabelModelParameter labelRatioX="0.0" labelRatioY="0.0" nodeRatioX="0.0" nodeRatioY="-0.03703090122767855" offsetX="0.0" offsetY="0.0" upX="0.0" upY="-1.0"/></y:ModelParameter></y:NodeLabel>
               <y:UML clipContent="true" constraint="" hasDetailsColor="false" omitDetails="false" stereotype="lib/containers/linker.py" use3DEffect="true">
                 <y:AttributeLabel xml:space="preserve">self.summit
 self.saddle
@@ -649,13 +649,18 @@ self.disqualified</y:AttributeLabel>
                 <y:MethodLabel xml:space="preserve">__init__(summit, saddle, path)
 @prom
 @prom_ft
-@summit_saddles
-@saddle_summits
+saddles_connected_via_summit()
+summits_connected_via_saddle()
+linkers_to_saddles_connected_via_summit
+linkers_to_summits_connected_via_saddle
 to_dict()
 from_dict()
 add_to_remote_saddle_and_summit()
+
+
+_help_exclude_self()
 __repr__()
-__hash__
+__hash__()
 __eq__(other)
 __ne__(other)
 </y:MethodLabel>
@@ -744,6 +749,17 @@ from_dict()
 __repr__(self)</y:MethodLabel>
               </y:UML>
             </y:UMLClassNode>
+          </data>
+        </node>
+        <node id="n1::n18">
+          <data key="d6">
+            <y:ShapeNode>
+              <y:Geometry height="30.0" width="145.38199174736872" x="429.0427779105138" y="802.669477775984"/>
+              <y:Fill color="#FFCC99" transparent="false"/>
+              <y:BorderStyle color="#000000" raised="false" type="line" width="1.0"/>
+              <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="12" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="17.96875" horizontalTextPosition="center" iconTextGap="4" modelName="custom" textColor="#000000" verticalTextPosition="bottom" visible="true" width="73.193359375" x="53.93174337282335" xml:space="preserve" y="8.03125">_linker_ok()<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:LabelModel><y:ModelParameter><y:SmartNodeLabelModelParameter labelRatioX="0.0" labelRatioY="0.5" nodeRatioX="0.1226935122586239" nodeRatioY="0.5" offsetX="0.0" offsetY="-4.0" upX="0.0" upY="-1.0"/></y:ModelParameter></y:NodeLabel>
+              <y:Shape type="rectangle"/>
+            </y:ShapeNode>
           </data>
         </node>
       </graph>
@@ -1236,9 +1252,7 @@ parentFinder(summit)
     <edge id="e7" source="n1::n4" target="n0::n5">
       <data key="d10">
         <y:PolyLineEdge>
-          <y:Path sx="109.46964975192327" sy="-92.42089308962215" tx="0.0" ty="0.0">
-            <y:Point x="558.9894921417049" y="-1001.9895615474798"/>
-          </y:Path>
+          <y:Path sx="109.46964975192327" sy="-92.42089308962215" tx="127.10682512707422" ty="84.4485892293544"/>
           <y:LineStyle color="#000000" type="line" width="1.0"/>
           <y:Arrows source="none" target="diamond"/>
           <y:BendStyle smoothed="false"/>
