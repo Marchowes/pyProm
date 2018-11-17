@@ -18,11 +18,32 @@ class LinkerTests(unittest.TestCase):
     """Test Linker Containers."""
 
     def setUp(self):
-        """Set Up Tests."""
+        """Set Up Tests.
+        In practice, a Saddle will never have more than 2 Linkers
+        (Summits) but the objects themselves do support such a thing
+        and we can exploit that for testing.
+
+        Master Topology
+
+        |---[disqualifiedLinker1] (DEAD) -- DisqualifiedSaddle (DEAD)
+        |
+        Summit1--[linker1]--Saddle1
+        |
+        |---[linker2]--Saddle2--[linker3]--Summit2
+                          |
+            [disqualifiedLinkerLocallyDeadSummit] (DEAD)
+                          |
+                     locallyDeadSummit
+        """
         self.summit1 = Summit(1, 1, 1000)
         self.saddle1 = Saddle(5, 5, 100)
         self.summit2 = Summit(10, 10, 1000)
         self.saddle2 = Saddle(15, 15, 100)
+
+        self.disqualifiedSaddle1 = Saddle(100, 100, 1000)
+        self.disqualifiedSaddle1.disqualified = True
+
+        self.locallyDeadSummit = Summit(100, 100, 1000)
 
         self.path1 = WalkPath([(0, 0), (0, 1), (0, 2)])
 
@@ -30,14 +51,23 @@ class LinkerTests(unittest.TestCase):
         self.linker2 = Linker(self.summit1, self.saddle2, self.path1)
         self.linker3 = Linker(self.summit2, self.saddle2, self.path1)
 
-        self.summit1.saddles = [self.linker1, self.linker2]
+        self.disqualifiedLinker1 = Linker(self.summit1, self.disqualifiedSaddle1, self.path1)
+        self.disqualifiedLinker1.disqualified = True
+
+        self.disqualifiedLinkerLocallyDeadSummit = Linker(self.locallyDeadSummit, self.saddle2, self.path1)
+        self.disqualifiedLinkerLocallyDeadSummit.disqualified = True
+
+        self.summit1.saddles = [self.linker1, self.linker2, self.disqualifiedLinker1]
         self.summit2.saddles = [self.linker3]
+        self.locallyDeadSummit.saddles = [self.disqualifiedLinkerLocallyDeadSummit]
+
         self.saddle1.summits = [self.linker1]
-        self.saddle2.summits = [self.linker2, self.linker3]
+        self.saddle2.summits = [self.linker2, self.linker3, self.disqualifiedLinkerLocallyDeadSummit]
+        self.disqualifiedLinker1.summits = [self.disqualifiedLinker1]
 
     def testLinkerProminence(self):
         """
-        Ensure prominence calculation are as expected
+        Ensure prominence calculations are as expected
         """
         self.assertEqual(self.linker1.prom, 900)
 
@@ -47,21 +77,356 @@ class LinkerTests(unittest.TestCase):
         """
         self.assertEqual(self.linker1.prom_ft, 2952.7200000000003)
 
-    def testLinkerSummitSaddles(self):
+    def testLinkerSaddlesConnectedViaSummit(self):
         """
-        Ensure summit saddles calculation are as expected
+        Ensure Saddles Connected Via Summit returns expected results when
+        skipDisqualified = True (default)
+        exemptLinkers = {} (default)
         """
-        self.assertEqual(len(self.linker1.summit_saddles), 2)
-        self.assertIn(self.saddle1, self.linker1.summit_saddles)
-        self.assertIn(self.saddle2, self.linker1.summit_saddles)
+        result = self.linker1.saddles_connected_via_summit()
+        self.assertEqual(len(result), 2)
+        self.assertIn(self.saddle1, result)
+        self.assertIn(self.saddle2, result)
 
-    def testLinkerSaddlesSummit(self):
+    def testLinkerSaddlesConnectedViaSummitSelfExempt(self):
         """
-        Ensure saddle summits calculation are as expected
+        Ensure Saddles Connected Via Summit returns expected results when
+        skipDisqualified = True (default)
+        exemptLinkers = {self.id}
         """
-        self.assertEqual(len(self.linker2.saddle_summits), 2)
-        self.assertIn(self.summit1, self.linker2.saddle_summits)
-        self.assertIn(self.summit2, self.linker2.saddle_summits)
+        result = self.linker1.saddles_connected_via_summit(
+            exemptLinkers={self.linker1.id: True})
+        self.assertEqual(len(result), 0)
+
+    def testLinkerSaddlesConnectedViaSummitSkipDisqualifiedFalse(self):
+        """
+        Ensure Saddles Connected Via Summit returns expected results when
+        skipDisqualified = False
+        exemptLinkers = {} (default)
+        """
+        result = self.linker1.saddles_connected_via_summit(
+            skipDisqualified=False)
+        self.assertEqual(len(result), 3)
+        self.assertIn(self.saddle1, result)
+        self.assertIn(self.saddle2, result)
+        self.assertIn(self.disqualifiedSaddle1, result)
+
+    def testLinkerSaddlesConnectedViaSummitSelfDisqualified(self):
+        """
+        Ensure Saddles Connected Via Summit returns expected results when
+        skipDisqualified = True (default)
+        exemptLinkers = {} (default)
+        and self.linker1.disqualified = True
+        """
+        self.linker1.disqualified = True
+        result = self.linker1.saddles_connected_via_summit()
+        self.assertEqual(len(result), 0)
+
+    def testLinkerSaddlesConnectedViaSummitSelfDisqualifiedSkipDisqualifiedFalse(self):
+        """
+        Ensure Saddles Connected Via Summit returns expected results when
+        skipDisqualified = False
+        exemptLinkers = {} (default)
+        and self.linker1.disqualified = True
+        """
+        self.linker1.disqualified = True
+        result = self.linker1.saddles_connected_via_summit(skipDisqualified=False)
+        self.assertEqual(len(result), 3)
+        self.assertIn(self.saddle1, result)
+        self.assertIn(self.saddle2, result)
+        self.assertIn(self.disqualifiedSaddle1, result)
+
+    def testLinkerSaddlesConnectedViaSummitWithExemptionAndSkipDisqualified(self):
+        """
+        Ensure Saddles Connected Via Summit returns expected results when
+        skipDisqualified = True (default)
+        exemptLinkers = {linkerNew.id: True}
+        """
+        saddleNew = Saddle(1,2,3)
+        linkerNew = Linker(self.summit1, saddleNew, self.path1)
+        saddleNew.summits = [linkerNew]
+        self.summit1.saddles.append(linkerNew)
+
+        # ensure we get all 3, minus the Disqualified one.
+        result = self.linker1.saddles_connected_via_summit()
+        self.assertEqual(len(result), 3)
+        self.assertIn(self.saddle1, result)
+        self.assertIn(self.saddle2, result)
+        self.assertIn(saddleNew, result)
+
+        # exempt our new linker.
+        exemptLinker = {linkerNew.id: True}
+        result = self.linker1.saddles_connected_via_summit(exemptLinkers=exemptLinker)
+        self.assertEqual(len(result), 2)
+        self.assertIn(self.saddle1, result)
+        self.assertIn(self.saddle2, result)
+
+    def testLinkerSaddlesConnectedViaSummitWithExemptionButNoSkipDisqualified(self):
+        """
+        Ensure Saddles Connected Via Summit returns expected results when
+        skipDisqualified = False
+        exemptLinkers = {linkerNew.id: True}
+        """
+        saddleNew = Saddle(1,2,3)
+        linkerNew = Linker(self.summit1, saddleNew, self.path1)
+        saddleNew.summits = [linkerNew]
+        self.summit1.saddles.append(linkerNew)
+
+        # ensure we get all 4.
+        result = self.linker1.saddles_connected_via_summit(skipDisqualified=False)
+        self.assertEqual(len(result), 4)
+        self.assertIn(self.saddle1, result)
+        self.assertIn(self.saddle2, result)
+        self.assertIn(self.disqualifiedSaddle1, result)
+        self.assertIn(saddleNew, result)
+
+        # exempt our new linker.
+        exemptLinker = {linkerNew.id: True}
+        result = self.linker1.saddles_connected_via_summit(exemptLinkers=exemptLinker,
+                                                           skipDisqualified=False)
+        self.assertEqual(len(result), 3)
+        self.assertIn(self.saddle1, result)
+        self.assertIn(self.saddle2, result)
+        self.assertIn(self.disqualifiedSaddle1, result)
+
+    def testLinkerSummitsConnectedViaSaddle(self):
+        """
+        Ensure Summits Connected Via Saddle returns expected results when
+        skipDisqualified = True (default)
+        exemptLinkers = {} (default)
+        """
+        result = self.linker2.summits_connected_via_saddle()
+        self.assertEqual(len(result), 2)
+        self.assertIn(self.summit1, result)
+        self.assertIn(self.summit2, result)
+
+
+    def testLinkerSummitsConnectedViaSaddleSelfExempt(self):
+        """
+        Ensure Summits Connected Via Saddle returns expected results when
+        skipDisqualified = True (default)
+        exemptLinkers = {self.id}
+        """
+        result = self.linker1.summits_connected_via_saddle(
+            exemptLinkers={self.linker1.id: True})
+        self.assertEqual(len(result), 0)
+
+    def testLinkerSummitsConnectedViaSaddleSkipDisqualifiedFalse(self):
+        """
+        Ensure Summits Connected Via Saddle returns expected results when
+        skipDisqualified = False
+        exemptLinkers = {} (default)
+        """
+        result = self.linker2.summits_connected_via_saddle(
+            skipDisqualified=False)
+        self.assertEqual(len(result), 3)
+        self.assertIn(self.summit1, result)
+        self.assertIn(self.summit2, result)
+        self.assertIn(self.locallyDeadSummit, result)
+
+    def testLinkerSummitsConnectedViaSaddleSelfDisqualified(self):
+        """
+        Ensure Summits Connected Via Saddle returns expected results when
+        skipDisqualified = True (default)
+        exemptLinkers = {} (default)
+        and self.linker1.disqualified = True
+        """
+        self.linker1.disqualified = True
+        result = self.linker1.summits_connected_via_saddle()
+        self.assertEqual(len(result), 0)
+
+    def testLinkerSummitsConnectedViaSaddleSelfDisqualifiedSkipDisqualifiedFalse(self):
+        """
+        Ensure Summits Connected Via Saddle returns expected results when
+        skipDisqualified = False
+        exemptLinkers = {} (default)
+        and self.linker1.disqualified = True
+        """
+        self.linker2.disqualified = True
+        result = self.linker2.summits_connected_via_saddle(
+            skipDisqualified=False)
+        self.assertEqual(len(result), 3)
+        self.assertIn(self.summit1, result)
+        self.assertIn(self.summit2, result)
+        self.assertIn(self.locallyDeadSummit, result)
+
+    def testLinkerSummitsConnectedViaSaddleWithExemptionAndSkipDisqualified(self):
+        """
+        Ensure Summits Connected Via Saddle returns expected results when
+        skipDisqualified = True (default)
+        exemptLinkers = {linkerNew.id: True}
+        """
+        summitNew = Summit(1,2,3)
+        linkerNew = Linker(summitNew, self.saddle2, self.path1)
+        self.saddle2.summits.append(linkerNew)
+        summitNew.saddles.append(linkerNew)
+
+        # ensure we get all 3, minus the Disqualified one.
+        result = self.linker2.summits_connected_via_saddle()
+        self.assertEqual(len(result), 3)
+        self.assertIn(self.summit1, result)
+        self.assertIn(self.summit2, result)
+        self.assertIn(summitNew, result)
+
+        # exempt our new linker.
+        exemptLinker = {linkerNew.id: True}
+        result = self.linker2.summits_connected_via_saddle(exemptLinkers=exemptLinker)
+        self.assertEqual(len(result), 2)
+        self.assertIn(self.summit1, result)
+        self.assertIn(self.summit2, result)
+
+    def testLinkerSummitsConnectedViaSaddleWithExemptionButNoSkipDisqualified(self):
+        """
+        Ensure Summits Connected Via Saddle returns expected results when
+        skipDisqualified = False
+        exemptLinkers = {linkerNew.id: True}
+        """
+
+        summitNew = Summit(1,2,3)
+        linkerNew = Linker(summitNew, self.saddle2, self.path1)
+        self.saddle2.summits.append(linkerNew)
+        summitNew.saddles.append(linkerNew)
+
+        # ensure we get all 4.
+        result = self.linker2.summits_connected_via_saddle(skipDisqualified=False)
+        self.assertEqual(len(result), 4)
+        self.assertIn(self.summit1, result)
+        self.assertIn(self.summit2, result)
+        self.assertIn(summitNew, result)
+        self.assertIn(self.locallyDeadSummit, result)
+
+        # exempt our new linker.
+        exemptLinker = {linkerNew.id: True}
+        result = self.linker2.summits_connected_via_saddle(skipDisqualified=False,
+                                                           exemptLinkers=exemptLinker)
+        self.assertEqual(len(result), 3)
+        self.assertIn(self.summit1, result)
+        self.assertIn(self.summit2, result)
+        self.assertIn(self.locallyDeadSummit, result)
+
+
+
+
+
+    def testLinkerLinkersToSaddlesConnectedViaSummit(self):
+        """
+        Ensure Linkers to Saddles Connected Via Summit returns expected
+        results when:
+        skipDisqualified = True (default)
+        excludeSelf = True (default)
+        """
+        result = self.linker1.linkers_to_saddles_connected_via_summit()
+        self.assertEqual(len(result), 1)
+        self.assertIn(self.linker2, result)
+
+    def testLinkerLinkersToSaddlesConnectedViaSummitNoSkipDQ(self):
+        """
+        Ensure Linkers to Saddles Connected Via Summit returns expected
+        results when:
+        skipDisqualified = False
+        excludeSelf = True (default)
+        """
+        result = self.linker1.linkers_to_saddles_connected_via_summit(
+            skipDisqualified=False)
+        self.assertEqual(len(result), 2)
+        self.assertIn(self.linker2, result)
+        self.assertIn(self.disqualifiedLinker1, result)
+
+    def testLinkerLinkersToSaddlesConnectedViaSummitNoSkipSelf(self):
+        """
+        Ensure Linkers to Saddles Connected Via Summit returns expected
+        results when:
+        skipDisqualified = True (default)
+        excludeSelf = False
+        """
+        result = self.linker1.linkers_to_saddles_connected_via_summit(
+            excludeSelf=False)
+        self.assertEqual(len(result), 2)
+        self.assertIn(self.linker2, result)
+        self.assertIn(self.linker1, result)
+
+    def testLinkerLinkersToSaddlesConnectedViaSummitNoSkipSelfOrDQ(self):
+        """
+        Ensure Linkers to Saddles Connected Via Summit returns expected
+        results when:
+        skipDisqualified = False
+        excludeSelf = False
+        """
+        result = self.linker1.linkers_to_saddles_connected_via_summit(
+            excludeSelf=False, skipDisqualified=False)
+        self.assertEqual(len(result), 3)
+        self.assertIn(self.linker1, result)
+        self.assertIn(self.linker2, result)
+        self.assertIn(self.disqualifiedLinker1, result)
+
+    def testLinkerLinkersToSummitsConnectedViaSaddle(self):
+        """
+        Ensure Linkers to Summits Connected Via Saddle returns expected
+        results when:
+        skipDisqualified = True (default)
+        excludeSelf = True (default)
+        """
+        result = self.linker2.linkers_to_summits_connected_via_saddle()
+        self.assertEqual(len(result), 1)
+        self.assertIn(self.linker3, result)
+
+    def testLinkerLinkersToSummitsConnectedViaSaddleNoSkipDQ(self):
+        """
+        Ensure Linkers to Summits Connected Via Saddle returns expected
+        results when:
+        skipDisqualified = False
+        excludeSelf = True (default)
+        """
+        result = self.linker2.linkers_to_summits_connected_via_saddle(
+            skipDisqualified=False)
+        self.assertEqual(len(result), 2)
+        self.assertIn(self.linker3, result)
+        self.assertIn(self.disqualifiedLinkerLocallyDeadSummit, result)
+
+    def testLinkerLinkersToSummitsConnectedViaSaddleNoSkipSelf(self):
+        """
+        Ensure Linkers to Summits Connected Via Saddle returns expected
+        results when:
+        skipDisqualified = True (default)
+        excludeSelf = False
+        """
+        result = self.linker2.linkers_to_summits_connected_via_saddle(
+            excludeSelf=False)
+        self.assertEqual(len(result), 2)
+        self.assertIn(self.linker3, result)
+        self.assertIn(self.linker2, result)
+
+    def testLinkerLinkersToSummitsConnectedViaSaddleNoSkipSelfOrDQ(self):
+        """
+        Ensure Linkers to Summits Connected Via Saddle returns expected
+        results when:
+        skipDisqualified = False
+        excludeSelf = False
+        """
+        result = self.linker2.linkers_to_summits_connected_via_saddle(
+            excludeSelf=False, skipDisqualified=False)
+        self.assertEqual(len(result), 3)
+        self.assertIn(self.linker3, result)
+        self.assertIn(self.linker2, result)
+        self.assertIn(self.disqualifiedLinkerLocallyDeadSummit, result)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     def testLinkerRepr(self):
         """

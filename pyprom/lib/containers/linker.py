@@ -52,37 +52,80 @@ class Linker:
         """
         return self.summit.feet - self.saddle.feet
 
-    @property
-    def summit_saddles(self):
-        """
-        :return: list of saddles connected to the summit this linker links
-        """
-        return [x.saddle for x in self.summit.saddles]
 
-    @property
-    def saddle_summits(self):
+    def saddles_connected_via_summit(self, skipDisqualified=True,
+                                     exemptLinkers={}):
         """
-        :return: list of summits connected to the saddle the linker links
+        Returns all saddles connected to the :class:`Summit` that this
+         :class:`Linker` links.
+        :param skipDisqualified: (bool), if true, disregard disqualified
+         remote linkers.
+        :param exemptLinkers: {linker.id: bool} hash of linkers regarded as
+         dead.
+        :return: list of saddles
         """
-        return [x.summit for x in self.saddle.summits]
+        if exemptLinkers.get(self.id):
+            return []
+        if skipDisqualified and self.disqualified:
+            return []
+        return [linker.saddle for linker in self.summit.saddles if
+                _linker_ok(linker, skipDisqualified, exemptLinkers)]
 
-    @property
-    def saddle_summit_linkers(self, exclude=True):
+    def summits_connected_via_saddle(self, skipDisqualified=True, exemptLinkers={}):
         """
-        :return: list of linkers to summits connected to the saddle the linker links
+        Returns all summits connected to the :class:`Saddle` that this
+         :class:`Linker` links.
+        :param skipDisqualified: (bool), if true, disregard disqualified
+         remote linkers.
+        :param exemptLinkers: {linker.id: bool} hash of linkers regarded as
+         dead.
+        :return: list of summits
         """
-        if exclude:
-            return [x for x in self.saddle.summits if x.summit != self.summit]
-        return [x for x in self.saddle.summits]
+        if exemptLinkers.get(self.id):
+            return []
+        if skipDisqualified and self.disqualified:
+            return []
+        return [linker.summit for linker in self.saddle.summits if
+                _linker_ok(linker, skipDisqualified, exemptLinkers)]
 
-    @property
-    def summit_saddle_linkers(self, exclude=True):
+    def _help_exclude_self(self, linker, excludeSelf):
         """
+        Determine if this linker is to be included in list.
+        :param linker: :class:`Linker`
+        :param excludeSelf: bool
+        :return: bool
+        """
+        if excludeSelf:
+            if self.id == linker.id:
+                return False
+        return True
+
+    def linkers_to_saddles_connected_via_summit(self, excludeSelf=True,
+                                                skipDisqualified=True):
+        """
+        :param: exclude (bool) exclude this linker.
+        :param: skipDisqualified (bool) If true, do not return disqualified
+        linkers
         :return: list of linkers to saddles connected to the summit the linker links
         """
-        if exclude:
-            return [x for x in self.summit.saddles if x.saddle != self.saddle]
-        return [x for x in self.summit.saddles]
+
+
+        return [linker for linker in self.summit.saddles
+                if _linker_ok(linker, skipDisqualified, {})
+                and self._help_exclude_self(linker, excludeSelf)]
+
+    def linkers_to_summits_connected_via_saddle(self, excludeSelf=True,
+                                                skipDisqualified=True):
+        """
+        :param: excludeSelf (bool) exclude self from results
+        :param: skipDisqualified (bool) If true, do not return disqualified
+        linkers
+        :return: list of linkers to summits connected to the saddle the
+        linker links
+        """
+        return [linker for linker in self.saddle.summits
+                if _linker_ok(linker, skipDisqualified, {}) and
+                self._help_exclude_self(linker, excludeSelf)]
 
     def add_to_remote_saddle_and_summit(self):
         """
@@ -111,6 +154,7 @@ class Linker:
     @classmethod
     def from_dict(cls, linkerDict, saddlesContainer, summitsContainer):
         """
+        Loads the dict() representation of :class:`Linker`
         :return: :class:`Linker`
         """
         pathDict = linkerDict.get('path', None)
@@ -134,10 +178,7 @@ class Linker:
         Generates hash based on points.
         :return: string representation of hash
         """
-        return hash((round(self.summit.latitude, 6),
-                     round(self.summit.longitude, 6),
-                     round(self.saddle.latitude, 6),
-                     round(self.saddle.longitude, 6)))
+        return hash(self.saddle.__hash__() + self.summit.__hash__())
 
     def __eq__(self, other):
         """
@@ -180,3 +221,18 @@ def isLinker(linker):
     """
     if not isinstance(linker, Linker):
         raise TypeError("Expected Linker Object.")
+
+def _linker_ok(linker, skipDisqualified, exemptLinkers={}):
+    """
+    :param linker: :class:`Linker` object to be tested
+    :param skipDisqualified: (bool), if we regard Disqualified Links as dead
+    :param exemptLinkers: {linker.id: bool} hash of linkers regarded as dead.
+    :return: bool
+    """
+    if skipDisqualified:
+        if linker.disqualified or exemptLinkers.get(linker.id):
+            return False
+        return True
+    if exemptLinkers.get(linker.id):
+        return False
+    return True
