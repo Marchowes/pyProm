@@ -10,6 +10,7 @@ type location objects as well as a number of functions.
 
 from ..locations.base_coordinate import BaseCoordinate
 from ..locations.base_gridpoint import isBaseGridPoint, BaseGridPoint
+from ..locations.gridpoint import GridPoint
 from .perimeter import Perimeter
 
 
@@ -76,6 +77,30 @@ class MultiPoint:
         """
         isBaseGridPoint(point)
         self.points.append(point)
+
+    def closestPoint(self, gridPoint, asSpotElevation = False):
+        """
+        Returns the closest point in this container to the GridPoint passed in.
+        :param gridPoint: :class:`GridPoint`
+        :param asSpotElevation: bool if True, returns SpotElevation object.
+        :return: :class:`GridPoint` if asSpotElevation == False
+                 :class:`SpotElevation` if asSpotElevation == True
+        """
+        closestDistance = gridPoint.distance(self.points[0])
+        closest = self.points[0]
+        for point in self.points[1:]:
+            distance = gridPoint.distance(point)
+            # well, can't get closer than that. mark it and bail.
+            if distance == 0:
+                closest = point
+                break
+            if distance < closestDistance:
+                closest = point
+                closestDistance = distance
+        gp = GridPoint(closest.x, closest.y, self.elevation)
+        if asSpotElevation:
+            return gp.toSpotElevation(self.datamap)
+        return gp
 
     def __len__(self):
         """
