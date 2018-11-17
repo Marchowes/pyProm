@@ -9,6 +9,8 @@ import unittest
 
 from pyprom.domain import Domain
 from pyprom.lib.locations.saddle import Saddle
+from pyprom.lib.locations.summit import Summit
+from pyprom.lib.containers.linker import Linker
 from pyprom.tests.getData import gettestzip
 from pyprom.dataload import GDALLoader
 from pyprom.feature_discovery import AnalyzeData
@@ -113,3 +115,77 @@ class SaddleTests(unittest.TestCase):
         self.assertEqual(saddleDict['summits'][1], saddle.summits[1].id)
         # Ensure parentage is correct
         self.assertEqual(saddleDict['parent'], saddles[19].id)
+
+
+class SaddleNetworkTests(unittest.TestCase):
+    """Test Saddles with neighbors"""
+
+    def setUp(self):
+        """
+        Set up test topology:
+
+        masterSummit
+        | |
+        | --linker_m1----Saddle1--linker1-------Summit1
+        |---linker_m2----Saddle2--linker2-------Summit2
+                           |------linker_dead---Summit_locally_dead
+                                                      |
+                                        Saddle3-----linker3
+        """
+
+        self.masterSummit = Summit(0, 0, 0)
+
+        self.summit1 = Summit(1, 1, 1)
+        self.summit2 = Summit(2, 2, 2)
+        self.summit_locally_dead = Summit(3, 3, 3)
+
+        self.saddle1 = Saddle(1, 1, 1)
+        self.saddle2 = Saddle(2, 2, 2)
+        self.saddle3 = Saddle(3, 3, 3)
+
+
+        self.linker_m1 = Linker(self.masterSummit, self.saddle1)
+        self.linker_m1.add_to_remote_saddle_and_summit()
+        self.linker_m2 = Linker(self.masterSummit, self.saddle2)
+        self.linker_m2.add_to_remote_saddle_and_summit()
+        self.linker1 = Linker(self.summit1, self.saddle1)
+        self.linker1.add_to_remote_saddle_and_summit()
+        self.linker2 = Linker(self.summit2, self.saddle2)
+        self.linker2.add_to_remote_saddle_and_summit()
+        self.linker3 = Linker(self.summit_locally_dead, self.saddle3)
+        self.linker3.add_to_remote_saddle_and_summit()
+        self.linker_dead = Linker(self.summit_locally_dead, self.saddle2)
+        self.linker_dead.add_to_remote_saddle_and_summit()
+        self.linker_dead.disqualified = True
+
+
+
+    def testSaddleAllNeighbors(self):
+        """
+        Ensure all_neighbors returns expected results
+        filterDisqualified=True (Default)
+        """
+        all = self.saddle2.all_neighbors()
+        self.assertEqual(all, [self.saddle1,
+                               self.saddle2,
+                               self.saddle2])
+
+    def testSaddleAllNeighborsNoFilter(self):
+        """
+        Ensure all_neighbors returns expected results
+        filterDisqualified=False
+        """
+        all = self.saddle2.all_neighbors(filterDisqualified=False)
+        self.assertEqual(all, [self.saddle1,
+                               self.saddle2,
+                               self.saddle2,
+                               self.saddle3,
+                               self.saddle2])
+
+    def testSaddleNeighbors(self):
+        """
+        Ensure neighbors() returns expected results.
+        """
+        self.assertEqual(self.saddle2.neighbors, [self.saddle1])
+
+

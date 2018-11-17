@@ -80,7 +80,7 @@ class SummitTests(unittest.TestCase):
     def testSummitAllNeighbors(self):
         """
         Ensure all_neighbors returns expected results
-        filterDisqualified=True
+        filterDisqualified=True (Default)
         """
         all = self.masterSummit.all_neighbors()
         self.assertEqual(all, [self.masterSummit,

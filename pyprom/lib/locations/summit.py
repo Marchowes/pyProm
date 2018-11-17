@@ -59,11 +59,10 @@ class Summit(SpotElevation):
     def all_neighbors(self, filterDisqualified=True):
         """
         all_neighbors will return all neighboring summits by way of the saddle.
-        This function makes no effort to filter out redundant neighbors.
-
-
+        This function deliberately makes no effort to filter out redundant
+        neighbors.
         :param filterDisqualified: bool Filter out disqualified linkers.
-        :return: list of directly neighboring summits.
+        :return: list of neighboring summits by way of neighboring saddles.
         """
         neighbors = []
         if filterDisqualified:

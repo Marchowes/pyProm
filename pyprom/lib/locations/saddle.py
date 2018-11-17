@@ -35,7 +35,7 @@ class Saddle(SpotElevation):
         self.multiPoint = kwargs.get('multiPoint', [])
         self.highShores = kwargs.get('highShores', [])
         self.id = kwargs.get('id', 'sa:' + randomString())
-        # Temporary until I've build a linker
+        # List of linkers to summits
         self.summits = []
         # If this is set, this saddle was spun out of another
         # Saddle with less data.
@@ -56,6 +56,35 @@ class Saddle(SpotElevation):
         """
         isLinker(linker)
         self.summits.append(linker)
+
+    @property
+    def neighbors(self):
+        """
+        :return: list of unique neighboring saddles by way of
+        neighboring summits excluding self.
+        """
+        neighborSet = set(self.all_neighbors())
+        neighborSet.discard(self)
+        return list(neighborSet)
+
+    def all_neighbors(self, filterDisqualified=True):
+        """
+        all_neighbors will return all neighboring saddles by way of the
+        connected summit.
+        This function deliberately makes no effort to filter out redundant
+        neighbors.
+        :param filterDisqualified: bool Filter out disqualified linkers.
+        :return: list of neighboring saddles by way of neighboring summits.
+        """
+        neighbors = []
+        if filterDisqualified:
+            [neighbors.extend(linker.saddles_connected_via_summit())
+                for linker in self.summits if not linker.disqualified]
+        else:
+            [neighbors.extend(linker.saddles_connected_via_summit(
+                skipDisqualified=False))
+                for linker in self.summits]
+        return neighbors
 
     @property
     def disqualified(self):
@@ -88,7 +117,7 @@ class Saddle(SpotElevation):
         if singleSummit:
             self.singleSummit = singleSummit
         if not (tooLow | singleSummit):
-            self.disqualified = True
+            self._disqualified = True
         for linker in self.summits:
             linker.disqualified = True
 
@@ -161,6 +190,18 @@ class Saddle(SpotElevation):
                    singleSummit=singleSummit,
                    tooLow=tooLow,
                    disqualified=disqualified)
+
+    def __hash__(self):
+        """
+        :return: returns unique hash of this Saddle
+        Takes into account the lat, long, and elevation of the saddle
+        As well as a hash of all the highShores
+        """
+        masterHash = super(SpotElevation, self).__hash__()
+        pointsTuple = tuple(self.highShores)
+        return hash((masterHash, hash(pointsTuple)))
+
+
 
     def __repr__(self):
         """
