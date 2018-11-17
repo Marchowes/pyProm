@@ -3,6 +3,9 @@ Release History
 0.6.0 (????)
 ++++++++++++
 * More robustness in KMLWriter
+* New features for BaseGridPoints, namely index() which returns the index at which that BaseGridpoint exists in the container, and distance() which calculates the distance (in points) from one BaseGridPoint to another.
+* New linker functions for returning remote linkers via conencted Summits or Saddles
+* SpotElevationContainer object now support index()
 
 0.5.10 (September 17, 2018)
 +++++++++++++++++++++++++++

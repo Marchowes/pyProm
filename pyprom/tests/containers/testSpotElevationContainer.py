@@ -217,6 +217,19 @@ class SpotElevationContainerTests(unittest.TestCase):
         self.assertNotEqual(SpotElevationContainer([Summit(1, 2, 3)]),
                             SpotElevationContainer([Summit(2, 2, 3)]))
 
+    def testSpotElevationContainerIndex(self):
+        """
+        Ensure index() returns the expected values.
+        """
+        se0 = Saddle(1, 2, 3)
+        se1 = Summit(4, 5, 6)
+        fake = Summit(7, 8, 9)
+
+        container = SpotElevationContainer([se0, se1])
+        self.assertEqual(container.index(se0), 0)
+        self.assertEqual(container.index(se1), 1)
+        self.assertEqual(container.index(fake), None)
+
     def testSpotElevationContainerRepr(self):
         """
         Ensure __repr__ produces expected results.
