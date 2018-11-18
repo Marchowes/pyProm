@@ -14,17 +14,20 @@ from pyprom.feature_discovery import AnalyzeData
 class LogicTests(unittest.TestCase):
     """Test Logic."""
 
-    def setUp(self):
+    @classmethod
+    def setUpClass(cls):
         """
-        Set Up Tests.
+        Set Up Class.
+        These tests make no modification to the objects,
+        so we can generate them at the Class level.
         """
         gettestzip()
-        self.datafile = GDALLoader('/tmp/N44W072.hgt')
-        self.datamap = self.datafile.datamap
-        self.mtWashingtonDM = self.datamap.subset(2600, 2500, 30, 30)
-        self.washingtonVicinity = AnalyzeData(self.mtWashingtonDM)
-        self.summits, self.saddles, self.runoffs =\
-            self.washingtonVicinity.run()
+        cls.datafile = GDALLoader('/tmp/N44W072.hgt')
+        cls.datamap = cls.datafile.datamap
+        cls.mtWashingtonDM = cls.datamap.subset(2600, 2500, 30, 30)
+        cls.washingtonVicinity = AnalyzeData(cls.mtWashingtonDM)
+        cls.summits, cls.saddles, cls.runoffs =\
+            cls.washingtonVicinity.run()
 
     def testFindSummits(self):
         """

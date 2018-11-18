@@ -117,9 +117,3 @@ class SummitTests(unittest.TestCase):
         # Ensure non linker objects are rejected.
         with self.assertRaises(TypeError):
             self.masterSummit.addSaddleLinker(19)
-
-
-
-
-
-

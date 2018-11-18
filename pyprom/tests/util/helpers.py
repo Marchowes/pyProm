@@ -41,7 +41,7 @@ def generate_MultiPoint(x, y, xSpan, ySpan,
 
 def generate_multiPoint_saddle(x, y, xSpan, ySpan,
                                datamap, elevation,
-                               islands = [],
+                               islands=[],
                                perimeterHighShores = 1):
     """
     Generate a rectangular MultiPoint Saddle, with the ability to exclude
@@ -62,7 +62,7 @@ def generate_multiPoint_saddle(x, y, xSpan, ySpan,
 
     mp = generate_MultiPoint(x, y, xSpan, ySpan,
                              datamap, elevation,
-                             excludeBGPC = islands)
+                             excludeBGPC=islands)
 
     saddle = Saddle(x, y, elevation)
     saddle.multiPoint = mp

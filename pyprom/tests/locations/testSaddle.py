@@ -19,15 +19,18 @@ from pyprom.feature_discovery import AnalyzeData
 class SaddleTests(unittest.TestCase):
     """Test Saddles."""
 
+    @classmethod
+    def setUpClass(cls):
+        gettestzip()
+        datafile = GDALLoader('/tmp/N44W072.hgt')
+        cls.datamap = datafile.datamap
+
     def testSaddleFromDictEdge(self):
         """
         Ensure from_dict() produces expected
         results on a saddle which has a child.
         """
-        gettestzip()
-        datafile = GDALLoader('/tmp/N44W072.hgt')
-        datamap = datafile.datamap
-        someslice = datamap.subset(0, 0, 30, 30)
+        someslice = self.datamap.subset(0, 0, 30, 30)
         somewhere = AnalyzeData(someslice)
         summits, saddles, runoffs = somewhere.run()
         saddle = saddles[10]
@@ -54,10 +57,7 @@ class SaddleTests(unittest.TestCase):
         Ensure from_dict() produces expected results on
         a saddle with linked summits.
         """
-        gettestzip()
-        datafile = GDALLoader('/tmp/N44W072.hgt')
-        datamap = datafile.datamap
-        someslice = datamap.subset(0, 0, 30, 30)
+        someslice = self.datamap.subset(0, 0, 30, 30)
         domain = Domain(someslice)
         domain.run()
         domain.walk()
@@ -87,10 +87,7 @@ class SaddleTests(unittest.TestCase):
         Ensure from_dict() produces expected results on a
          saddle which has a parent.
         """
-        gettestzip()
-        datafile = GDALLoader('/tmp/N44W072.hgt')
-        datamap = datafile.datamap
-        someslice = datamap.subset(0, 0, 30, 30)
+        someslice = self.datamap.subset(0, 0, 30, 30)
         domain = Domain(someslice)
         domain.run()
         domain.walk()
@@ -187,5 +184,3 @@ class SaddleNetworkTests(unittest.TestCase):
         Ensure neighbors() returns expected results.
         """
         self.assertEqual(self.saddle2.neighbors, [self.saddle1])
-
-

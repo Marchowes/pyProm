@@ -20,11 +20,6 @@ class GridPointTests(unittest.TestCase):
         datafile = GDALLoader('/tmp/N44W072.hgt')
         self.datamap = datafile.datamap
 
-    def setUp(self):
-        pass
-
-
-
     def testGridPointCreate(self):
         """
         Ensure we can create a basic :class:`GridPoint`
