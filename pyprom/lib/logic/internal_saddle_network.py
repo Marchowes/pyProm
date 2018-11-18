@@ -183,15 +183,26 @@ class InternalSaddleNetwork(object):
             middlePoint = GridPoint(int(link.local.x + link.remote.x) / 2,
                                     int(link.local.y + link.remote.y) / 2,
                                     self.saddle.elevation)
-            middleSpotElevation = middlePoint.toSpotElevation(self.datamap)
-            newSaddle = Saddle(middleSpotElevation.latitude,
-                               middleSpotElevation.longitude,
-                               middleSpotElevation.elevation)
+
+            if self.saddle.multiPoint:
+                middleSpotElevation = \
+                    self.saddle.multiPoint.closestPoint(middlePoint,
+                                                        asSpotElevation=True)
+                newSaddle = Saddle(middleSpotElevation.latitude,
+                                   middleSpotElevation.longitude,
+                                   middleSpotElevation.elevation)
+            else:
+                newSaddle = Saddle(self.saddle.latitude,
+                                   self.saddle.longitude,
+                                   self.saddle.elevation)
+
             newSaddle.highShores = [GridPointContainer([link.local]),
                                     GridPointContainer([link.remote])]
+
             if self.saddle.edgeEffect:
                 newSaddle.parent = self.saddle
                 self.saddle.children.append(newSaddle)
+
             saddles.append(newSaddle)
         return saddles
 

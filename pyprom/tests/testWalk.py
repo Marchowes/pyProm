@@ -37,7 +37,7 @@ class WalkTests(unittest.TestCase):
         """
         Test walk around Island Pond VT.
         """
-        islandPondSaddleContainer = self.saddles.radius(44.810833,
+        islandPondSaddleContainer = self.saddles.radius(44.8109,
                                                         -71.8676388,
                                                         10)
         islandPondSaddle = islandPondSaddleContainer[0]
@@ -45,7 +45,7 @@ class WalkTests(unittest.TestCase):
         self.assertEqual(len(self.domain.linkers), 2)
         self.assertEqual(len(islandPondSaddle.summits), 2)
         self.assertEqual(islandPondSaddle.summits[0].summit,
-                         self.summits[146])
+                         self.summits[142])
         self.assertEqual(islandPondSaddle.summits[1].summit,
                          self.summits[171])
 
@@ -63,9 +63,9 @@ class WalkTests(unittest.TestCase):
         self.domain.walk()
         self.domain.mark_redundant_linkers()
         self.assertEqual(len([x for x in self.domain.linkers
-                              if x.disqualified]), 90)
+                              if x.disqualified]), 62)
         self.assertEqual(len([x for x in self.domain.linkers
-                              if x.disqualified]), 90)
+                              if x.disqualified]), 62)
 
     def testWalkDisqualifyLowerLinkers(self):
         """
@@ -74,10 +74,10 @@ class WalkTests(unittest.TestCase):
         self.domain.walk()
         self.domain.disqualify_lower_linkers()
         self.assertEqual(len([x for x in self.domain.linkers
-                              if x.disqualified]), 78)
+                              if x.disqualified]), 90)
         self.domain.disqualify_lower_linkers()
         self.assertEqual(len([x for x in self.domain.linkers
-                              if x.disqualified]), 78)
+                              if x.disqualified]), 90)
 
 
 class WalkTestsReal(unittest.TestCase):

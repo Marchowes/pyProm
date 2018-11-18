@@ -17,17 +17,25 @@ from pyprom.lib.containers.saddles import SaddlesContainer
 class InternalSaddleNetworkTests(unittest.TestCase):
     """Test Internal Saddle Network Object."""
 
-    def setUp(self):
-        """Set Up Tests."""
+
+    @classmethod
+    def setUpClass(cls):
         gettestzip()
-        self.datafile = GDALLoader('/tmp/N44W072.hgt')
-        self.datamap = self.datafile.datamap
-        self.aziscohos = self.datamap.subset(622, 3275, 457, 325)
-        self.aziscohosVicinity = AnalyzeData(self.aziscohos)
-        self.summits, self.saddles, self.runoffs =\
-            self.aziscohosVicinity.analyze()
+        datafile = GDALLoader('/tmp/N44W072.hgt')
+        cls.datamap = datafile.datamap
+        cls.aziscohos = cls.datamap.subset(622, 3275, 457, 325)
+        cls.aziscohosVicinity = AnalyzeData(cls.aziscohos)
+        _, saddles, _ = cls.aziscohosVicinity.analyze()
+        cls.masterSaddlesDict = saddles.to_dict()
+
+    def setUp(self):
+        """
+        Set Up Tests.
+        """
+        self.saddles = SaddlesContainer.from_dict(self.masterSaddlesDict, self.aziscohos)
         mp = [x for x in self.saddles.saddles if x.multiPoint]
         self.aziscohosSaddle = [x for x in mp if len(x.multiPoint) > 1000][0]
+
 
     def testInternalSaddleNetworkAziscohos(self):
         """

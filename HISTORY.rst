@@ -9,6 +9,7 @@ Release History
 * GridPointContainer now supports highest() and lowest()
 * GridPoint now Hashable
 * Summit and Saddle Objects now have Neighbor Finding functions
+* improvements to rebuildSaddles such as fast bailouts and fixed several bugs where calculated midpoints were being placed outside of multipoints. This usually happens when two linked high shores are on the same plane.
 
 0.5.10 (September 17, 2018)
 +++++++++++++++++++++++++++
