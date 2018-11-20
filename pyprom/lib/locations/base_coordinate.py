@@ -8,7 +8,7 @@ This library contains a base class for Coordinate oriented objects.
 """
 
 import utm
-
+from ...lib.util import dottedDecimaltoDegrees
 
 class BaseCoordinate:
     """
@@ -39,6 +39,15 @@ class BaseCoordinate:
         :return:
         """
         return utm.from_latlon(self.latitude, self.longitude)
+
+    @property
+    def dms(self):
+        """
+        Show this SpotElevation as degrees minutes seconds
+        :return: tuple (dms, dms)
+        """
+        return ((dottedDecimaltoDegrees(self.latitude)),
+                (dottedDecimaltoDegrees(self.longitude)))
 
     def __eq__(self, other):
         """
