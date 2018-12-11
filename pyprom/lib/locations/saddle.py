@@ -87,6 +87,13 @@ class Saddle(SpotElevation):
         return neighbors
 
     @property
+    def summits_set(self):
+        """
+        :return: set of linked :class:`Summit`s
+        """
+        return set([x.summit for x in self.summits])
+
+    @property
     def disqualified(self):
         """
         :return: if any values that indicate disqualification are set,
@@ -200,8 +207,6 @@ class Saddle(SpotElevation):
         masterHash = super(SpotElevation, self).__hash__()
         pointsTuple = tuple(self.highShores)
         return hash((masterHash, hash(pointsTuple)))
-
-
 
     def __repr__(self):
         """

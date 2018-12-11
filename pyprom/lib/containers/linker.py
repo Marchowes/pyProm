@@ -64,8 +64,6 @@ class Linker:
          dead.
         :return: list of saddles
         """
-        if exemptLinkers.get(self.id):
-            return []
         if skipDisqualified and self.disqualified:
             return []
         return [linker.saddle for linker in self.summit.saddles if
@@ -81,8 +79,6 @@ class Linker:
          dead.
         :return: list of summits
         """
-        if exemptLinkers.get(self.id):
-            return []
         if skipDisqualified and self.disqualified:
             return []
         return [linker.summit for linker in self.saddle.summits if
@@ -101,7 +97,8 @@ class Linker:
         return True
 
     def linkers_to_saddles_connected_via_summit(self, excludeSelf=True,
-                                                skipDisqualified=True):
+                                                skipDisqualified=True,
+                                                highToLow=False):
         """
         :param: exclude (bool) exclude this linker.
         :param: skipDisqualified (bool) If true, do not return disqualified
@@ -109,6 +106,12 @@ class Linker:
         :return: list of linkers to saddles connected to the summit the linker links
         """
 
+        if highToLow:
+            return sorted(
+            [linker for linker in self.summit.saddles
+             if _linker_ok(linker, skipDisqualified, {})
+             and self._help_exclude_self(linker, excludeSelf)],
+                key=lambda x:x.saddle.elevation, reverse=True)
 
         return [linker for linker in self.summit.saddles
                 if _linker_ok(linker, skipDisqualified, {})
