@@ -11,6 +11,7 @@ from pyprom.dataload import GDALLoader
 from pyprom.feature_discovery import AnalyzeData
 from pyprom.lib.locations.base_coordinate import BaseCoordinate
 from pyprom.lib.locations.base_gridpoint import BaseGridPoint
+from pyprom.lib.locations.gridpoint import GridPoint
 from pyprom.lib.containers.multipoint import MultiPoint
 
 
@@ -40,8 +41,8 @@ class MultipointTests(unittest.TestCase):
         multipoint = self.summitWithoutMultipointEdge.multiPoint
         bc0 = BaseCoordinate(44.70986111111111, -71.71263888888889)
         bc1 = BaseCoordinate(44.70986111111111, -71.71236111111111)
-        self.assertEqual(multipoint.pointsLatLong[0], bc0)
-        self.assertEqual(multipoint.pointsLatLong[1], bc1)
+        self.assertIn(bc0, multipoint.pointsLatLong)
+        self.assertIn(bc1, multipoint.pointsLatLong)
 
     def testMultipointPerimeterNoEdge(self):
         """
@@ -185,3 +186,92 @@ class MultipointTests(unittest.TestCase):
         self.assertEqual(newMp.datamap, mp.datamap)
         self.assertEqual(newMp.elevation, mp.elevation)
         self.assertEqual(newMp.perimeter, mp.perimeter)
+
+    def testMultiPointClosest(self):
+        """
+        Ensure closestPoint() returns the expected results
+        asSpotElevation = False (Default)
+        """
+        points = []
+        for x in range(100, 110):
+            for y in range(200, 210):
+                points.append(BaseGridPoint(x, y))
+        mp = MultiPoint(points, 100, self.datamap)
+
+        # Inside the MP
+        expectedResult = GridPoint(105, 205, 100)
+        result = mp.closestPoint(expectedResult)
+        self.assertEqual(expectedResult, result)
+
+        # To the top left corner
+        expectedResult = GridPoint(100, 200, 100)
+        point = GridPoint(1, 1, 1)
+        result = mp.closestPoint(point)
+        self.assertEqual(expectedResult, result)
+
+        # To the left
+        expectedResult = GridPoint(100, 205, 100)
+        point = GridPoint(1, 205, 1)
+        result = mp.closestPoint(point)
+        self.assertEqual(expectedResult, result)
+
+        # To the bottom left corner
+        expectedResult = GridPoint(100, 209, 100)
+        point = GridPoint(1, 500, 1)
+        result = mp.closestPoint(point)
+        self.assertEqual(expectedResult, result)
+
+        # To the bottom
+        expectedResult = GridPoint(105, 209, 100)
+        point = GridPoint(105, 500, 1)
+        result = mp.closestPoint(point)
+        self.assertEqual(expectedResult, result)
+
+        # To the bottom right corner
+        expectedResult = GridPoint(109, 209, 100)
+        point = GridPoint(200, 500, 1)
+        result = mp.closestPoint(point)
+        self.assertEqual(expectedResult, result)
+
+        # To the right
+        expectedResult = GridPoint(109, 205, 100)
+        point = GridPoint(200, 205, 1)
+        result = mp.closestPoint(point)
+        self.assertEqual(expectedResult, result)
+
+        # To the top right
+        expectedResult = GridPoint(109, 200, 100)
+        point = GridPoint(200, 0, 1)
+        result = mp.closestPoint(point)
+        self.assertEqual(expectedResult, result)
+
+        # To the top
+        expectedResult = GridPoint(105, 200, 100)
+        point = GridPoint(105, 0, 1)
+        result = mp.closestPoint(point)
+        self.assertEqual(expectedResult, result)
+
+    def testMultiPointClosestSE(self):
+        """
+        Ensure closestPoint() returns the expected results
+        asSpotElevation = True
+        """
+        points = []
+        for x in range(100, 110):
+            for y in range(200, 210):
+                points.append(BaseGridPoint(x, y))
+        mp = MultiPoint(points, 100, self.datamap)
+
+        # Inside the MP
+        point = GridPoint(105, 205, 100)
+        expectedResult = GridPoint(105, 205, 100)
+        expectedResult = expectedResult.toSpotElevation(mp.datamap)
+        result = mp.closestPoint(point, asSpotElevation=True)
+        self.assertEqual(expectedResult, result)
+
+        # To the top left corner
+        expectedResult = GridPoint(100, 200, 100)
+        expectedResult = expectedResult.toSpotElevation(mp.datamap)
+        point = GridPoint(1, 1, 1)
+        result = mp.closestPoint(point, asSpotElevation=True)
+        self.assertEqual(expectedResult, result)

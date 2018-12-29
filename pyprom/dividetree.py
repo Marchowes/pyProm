@@ -9,6 +9,9 @@ This library contains a class for manipulating a pyProm Divide Tree.
 
 import logging
 
+from fastkml import kml
+from shapely.geometry import Point, LineString
+
 from timeit import default_timer
 
 class DivideTree:
@@ -50,11 +53,22 @@ class DivideTree:
 
     def localProminentRegion(self, summit):
         """Lpr"""
-        exempt = list()  # list of locally exempt linkers
-        self.branchChaser(summit, summit, 0, exempt)
+        exempt = {} # hash of locally exempt linkers
+        path = list() # list of linkers
+        lprPathObj = LPRPaths()
 
-    def branchChaser(self, master, branch, depth, exempt):
-        """Branch chaser"""
+        self.branchChaser(summit, summit, 0, exempt, path, lprPathObj)
+        summit.lprPaths = lprPathObj
+
+        #print("done")
+
+    def branchChaser(self, master, branch, depth, exempt, path, lprPathObj):
+        """Branch chaser
+        :param: master :class:`Summit`
+        :param: branch :class:`Summit`
+        :depth: int
+        :exempt: []:class:`Linkers`
+        """
         depth += 1
         # self.logger.info("Assessing {} off Master {} depth {}"
         # .format(branch, master, depth))
@@ -64,34 +78,103 @@ class DivideTree:
             if master not in self.busted:
                 self.busted.append(master)
             return
+
+        #print("DEPTH: {}".format(depth))
+
+        # Main Loop
         for linker in branch.saddles:
+            # if depth == 1:
+            #     print("top level... bitch")
             if linker.disqualified:
+                # if depth == 1:
+                #     print("Shit, thats a problem...")
                 continue
-            if linker in exempt:
+            if exempt.get(linker.id, False):
+                # if depth == 1:
+                #     print("wtf, why?")
                 continue
-            exempt.append(linker)
-            # sort summits connected to saddle.
-            summits = sorted(
-                [x for x in linker.saddle_summits if x != branch],
-                key=lambda x: x.elevation)
-            for nextSummit in summits:
-                if nextSummit.elevation <= branch.elevation:
+            exempt[linker.id] = True
+
+            if linker.saddle.disqualified:
+                # print("linker disqualified!")
+                continue
+            # did we bump up against an edge?
+            if linker.saddle.edgeEffect:
+                path_terminal = path.copy()
+                path_terminal.append(linker)
+                lprPathObj.LPRpaths.append(LPRpath(path_terminal, linker.saddle))
+                lprPathObj.edge = True
+                continue
+
+            # loop through all summits linked to the saddle linked to the linker in the main loop
+            for nextSummitLinker in linker.linkers_to_summits_connected_via_saddle():
+                # If we've already explored this link, continue.
+                if exempt.get(nextSummitLinker.id) or linker.disqualified:
+                    continue
+
+                # did we bump up against an edge?
+                if nextSummitLinker.summit.elevation <= branch.elevation and nextSummitLinker.summit.edgeEffect:
+                    path_terminal = path.copy()
+                    path_terminal.append(linker)
+                    lprPathObj.LPRpaths.append(LPRpath(path_terminal, linker.saddle))
+                    lprPathObj.edge = True
+                # Linked Summit Lower or equal? chase it.
+                elif nextSummitLinker.summit.elevation <= branch.elevation:
+                    path_for_recurse = path.copy()
+                    path_for_recurse.append(linker)
+                    path_for_recurse.append(nextSummitLinker)
                     # branch.parent = master
-                    self.branchChaser(master, nextSummit, depth, exempt)
-                # Neighbor Higher? then this is a LPR Boundary.
-                if nextSummit.elevation > branch.elevation:
-                    # self.logger.info("Boundary At {}".format(linker.saddle))
-                    if master not in linker.saddle.lprBoundary:
-                        linker.saddle.lprBoundary.append(master)
-                    if linker.saddle not in master.lprBoundary:
-                        master.lprBoundary.append(linker.saddle)
+                    self.branchChaser(master, nextSummitLinker.summit, depth, exempt, path_for_recurse, lprPathObj)
+                # Linked Summit Higher? then this is a LPR Boundary.
+                elif nextSummitLinker.summit.elevation > branch.elevation:
+                    path_terminal = path.copy()
+                    path_terminal.append(linker)
+                    saddle = linker.saddle
+                    lprPathObj.LPRpaths.append(LPRpath(path_terminal, saddle))
+                    #self.logger.info("Boundary At {}".format(linker.saddle))
+                    if master not in saddle.lprBoundary:
+                        saddle.lprBoundary.append(master)
+                    if saddle not in master.lprBoundary:
+                        master.lprBoundary.append(saddle)
+                #print("terminal point {}".format(nextSummitLinker.summit))
+
+
 
     def parentFinder(self, summit):
         """Nothing"""
         pass
-        # for summit in branch.saddles.saddle_summits:
+        # for summit in branch.saddles.summits_connected_via_saddle():
         #     if summit.elevation > branch.elevation:
 
+class LPRPaths:
+    def __init__(self):
+        self.LPRpaths = list()
+        self.edge = False
+
+    def elements_for_kml(self):
+        elements = []
+        for element in self.LPRpaths:
+            elements.extend(element.elements_for_kml())
+        return elements
+
+class LPRpath:
+    def __init__(self, path, saddle):
+        self.path = path
+        self.saddle = saddle
+        self.decline = self.path[0].summit.feet - self.saddle.feet
+
+    def elements_for_kml(self):
+        saddles = []
+        summits = []
+        linkers = []
+        for linker in self.path:
+            saddles.append(linker.saddle)
+            summits.append(linker.summit)
+            linkers.append(linker)
+        return summits + saddles + linkers
+
+    def __repr__(self):
+        return "<LPRPath> Saddle {} Hops {} Decline {}".format(self.saddle, len(self.path), self.decline)
 
 class LPR:
     """

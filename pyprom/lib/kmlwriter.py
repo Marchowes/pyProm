@@ -14,6 +14,7 @@ from shapely.geometry import Point, LineString
 from .locations.summit import Summit
 from .locations.saddle import Saddle
 from .locations.runoff import Runoff
+from ..domain import Domain
 from .locations.spot_elevation import SpotElevation
 from .containers.spot_elevation import SpotElevationContainer
 from .containers.linker import Linker
@@ -102,21 +103,40 @@ class KMLFileWriter:
         # Allow appending of Containers
         if isinstance(feature, SpotElevationContainer):
             self.extend(feature)
+            return
 
         if isinstance(feature, Summit):
             self._append_spotElevation_derivative(feature, "Summit")
+            return
 
         if isinstance(feature, Runoff):
             self._append_spotElevation_derivative(feature, "RunOff")
+            return
 
         elif isinstance(feature, Saddle):
-            self._append_spotElevation_derivative(feature, "Saddle")
+            if feature.disqualified:
+                self._append_spotElevation_derivative(feature, "BasinSaddle")
+            else:
+                self._append_spotElevation_derivative(feature, "Saddle")
+            return
 
         if type(feature) == SpotElevation:
             self._append_spotElevation_derivative(feature, "SpotElevation")
+            return
 
         if isinstance(feature, Linker):
             self._append_linker(feature)
+            return
+
+        if isinstance(feature, Domain):
+            self.extend(feature.linkers)
+            self.extend(feature.saddles)
+            self.extend(feature.summits)
+            self.extend(feature.runoffs)
+            return
+
+        raise Exception("Did not find any valid Datatypes to append."
+                        " Try extend?")
 
     def _append_spotElevation_derivative(self, feature, feature_type):
         """
@@ -132,21 +152,28 @@ class KMLFileWriter:
                                           featurePm.geometry.wkt):
             self.spotElevation_wkt[feature_type +
                                    featurePm.geometry.wkt] = True
-            if feature_type == "Saddle":
-                featurePm.styleUrl = "#saddle"
-                featurePm.description = "Saddle"
+            featurePm.description = " {} {}\n {} meters\n {} feet\n".format(
+                feature.latitude, feature.longitude,
+                feature.elevation, feature.feet)
+            if feature_type == "BasinSaddle":
+                featurePm.styleUrl = "#basinsaddle"
+                featurePm.description = featurePm.description + "BasinSaddle"
                 self.saddles.append(featurePm)
-            if feature_type == "Summit":
+            elif feature_type == "Saddle":
+                featurePm.styleUrl = "#saddle"
+                featurePm.description = featurePm.description + "Saddle"
+                self.saddles.append(featurePm)
+            elif feature_type == "Summit":
                 featurePm.styleUrl = "#summit"
-                featurePm.description = "Summit"
+                featurePm.description = featurePm.description + "Summit"
                 self.summits.append(featurePm)
-            if feature_type == "RunOff":
+            elif feature_type == "RunOff":
                 featurePm.styleUrl = "#runoff"
-                featurePm.description = "RunOff"
+                featurePm.description = featurePm.description + "RunOff"
                 self.runOffs.append(featurePm)
-            if feature_type == "SpotElevation":
+            elif feature_type == "SpotElevation":
                 featurePm.styleUrl = "#spotelevation"
-                featurePm.description = "SpotElevation"
+                featurePm.description = featurePm.description + "SpotElevation"
                 self.spotElevations.append(featurePm)
 
     def _append_linker(self, linker):

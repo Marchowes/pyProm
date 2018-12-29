@@ -7,7 +7,6 @@ the LICENSE file that accompanies it.
 This library contains a container class for storing GridPoint
 type location objects.
 """
-import math
 import sys
 
 from .base_gridpoint import BaseGridPointContainer
@@ -52,6 +51,38 @@ class GridPointContainer(BaseGridPointContainer):
         obj = cls(points)
         obj.genFastLookup()
         return obj
+
+    @property
+    def lowest(self):
+        """
+        :return: list of lowest :class:`GridPoint` object(s)
+        """
+        low = self.points[0].elevation
+        lowest = list()
+        for gridPoint in self.points:
+            if gridPoint.elevation < low:
+                low = gridPoint.elevation
+                lowest = list()
+                lowest.append(gridPoint)
+            elif gridPoint.elevation == low:
+                lowest.append(gridPoint)
+        return lowest
+
+    @property
+    def highest(self):
+        """
+        :return: list of highest :class:`GridPoint` object(s)
+        """
+        high = self.points[0].elevation
+        highest = list()
+        for gridPoint in self.points:
+            if gridPoint.elevation > high:
+                high = gridPoint.elevation
+                highest = list()
+                highest.append(gridPoint)
+            elif gridPoint.elevation == high:
+                highest.append(gridPoint)
+        return highest
 
     def genFastLookup(self):
         """
@@ -183,9 +214,7 @@ class GridPointContainer(BaseGridPointContainer):
         for myPoint in self.points:
             # Loop through all points in `otherGridpointContainer`
             for theirPoint in otherGridpointContainer.points:
-                # Calculate hypotenuse
-                distance = math.sqrt((abs(myPoint.x - theirPoint.x) ** 2) +
-                                     (abs(myPoint.y - theirPoint.y) ** 2))
+                distance = myPoint.distance(theirPoint)
                 # if this is the shortest, set it as such.
                 if distance < closest_distance:
                     myClosest = myPoint

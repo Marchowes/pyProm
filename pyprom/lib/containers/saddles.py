@@ -11,6 +11,8 @@ type location objects.
 from .spot_elevation import SpotElevationContainer
 from ..logic.internal_saddle_network import InternalSaddleNetwork
 from ..locations.saddle import Saddle, isSaddle
+from ..locations.gridpoint import GridPoint
+from ..containers.gridpoint import GridPointContainer
 
 
 class SaddlesContainer(SpotElevationContainer):
@@ -44,13 +46,61 @@ class SaddlesContainer(SpotElevationContainer):
             if len(saddle.highShores) < 2:
                 new_saddles.append(saddle)
                 continue
-            nw = InternalSaddleNetwork(saddle, datamap)
-            new_saddles += nw.generate_child_saddles()
+            # More than 2 high shores? build the network.
+            if len(saddle.highShores) > 2:
+                nw = InternalSaddleNetwork(saddle, datamap)
+                new_saddles += nw.generate_child_saddles()
+            # if we've just got 2 high shores, find all the highest points in
+            # the highShores, and find the midpoint between the first two if
+            # its a multipoint
+            if len(saddle.highShores) == 2:
+                highShores = []
+                for highShore in saddle.highShores:
+                    highShores.append(GridPointContainer(highShore.highest))
+
+                # if multipoint use first of each of the highest high shores
+                # and find the mid point for both. Then find the point within
+                # the multipoint that is closest to that midpoint. Disregard
+                # high shores.
+                if saddle.multiPoint:
+                    hs0, hs1, distance =\
+                        saddle.highShores[0].findClosestPoints(
+                            saddle.highShores[1])
+                    # find the middle GP for the 2 closest opposing shore
+                    # points.
+                    # Note, in some cases this might be outside the multipoint
+                    middleGP = GridPoint(int((hs0.x +
+                                             hs1.x) / 2),
+                                         int((hs0.y +
+                                             hs1.y) / 2),
+                                         saddle.elevation)
+                    # reconcile any points which might be outside the
+                    # multipoint by finding the closest point inside the
+                    # multipoint.
+                    middleSpotElevation =\
+                        saddle.multiPoint.closestPoint(middleGP,
+                                                       asSpotElevation=True)
+                    newSaddle = Saddle(middleSpotElevation.latitude,
+                                       middleSpotElevation.longitude,
+                                       middleSpotElevation.elevation)
+                # if not multipoint, just use that point.
+                else:
+                    newSaddle = Saddle(saddle.latitude,
+                                       saddle.longitude,
+                                       saddle.elevation)
+
+                newSaddle.highShores = [GridPointContainer(highShores[0]),
+                                        GridPointContainer(highShores[1])]
+                new_saddles.append(newSaddle)
+                if saddle.edgeEffect:
+                    newSaddle.parent = saddle
+                    saddle.children.append(newSaddle)
             # If its an edgeEffect, we need to disqualify it and stash that
             # away for later.
             if saddle.edgeEffect:
                 saddle.disqualified = True
                 new_saddles.append(saddle)
+
         return SaddlesContainer(new_saddles)
 
     @property
@@ -100,6 +150,13 @@ class SaddlesContainer(SpotElevationContainer):
             if parent:
                 saddleHash[saddle['id']].parent = saddleHash[parent]
         return saddlesContainer
+
+    @property
+    def disqualified(self):
+        """
+        :return: list of all disqualified :class:`Saddle` in this container.
+        """
+        return [x for x in self.points if x.disqualified]
 
     def __repr__(self):
         """

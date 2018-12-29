@@ -78,11 +78,17 @@ class GridPoint(BaseGridPoint):
         isGridPoint(other)
         return self.elevation < other.elevation
 
+    def __hash__(self):
+        """
+        :return: hash representation of this object.
+        """
+        return hash((self.x, self.y, self.elevation))
+
     def __repr__(self):
         """
         :return: String representation of this object
         """
-        return "<GridPoint> x: {}, y: {}, elevation(m); {}".\
+        return "<GridPoint> x: {}, y: {}, elevation(m): {}".\
                format(self.x,
                       self.y,
                       self.elevation)

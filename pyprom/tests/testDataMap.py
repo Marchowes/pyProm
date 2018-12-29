@@ -58,7 +58,7 @@ class DataMapTests(unittest.TestCase):
         Ensure converting from XY to LATLONG and back returns the same results.
         """
         for x in range(0, 3601, 17):
-            for y in range(0, 3601, 1):
+            for y in range(0, 3601, 17):
                 lat, long = self.datamap.xy_to_latlong(x, y)
                 _x, _y = self.datamap.latlong_to_xy(lat, long)
                 self.assertEqual(_x, x)

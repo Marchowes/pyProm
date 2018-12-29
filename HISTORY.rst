@@ -1,5 +1,22 @@
 Release History
 
+0.6.0 (December 28, 2018)
++++++++++++++++++++++++++
+* More robustness in KMLWriter
+* New features for BaseGridPoints, namely index() which returns the index at which that BaseGridpoint exists in the container, and distance() which calculates the distance (in points) from one BaseGridPoint to another.
+* New linker functions for returning remote linkers via connected Summits or Saddles
+* SpotElevationContainer object now support index()
+* GridPointContainer now supports highest() and lowest()
+* GridPoint now Hashable
+* Summit and Saddle Objects now have Neighbor Finding functions
+* improvements to rebuildSaddles such as fast bailouts and fixed several bugs where calculated midpoints were being placed outside of multipoints. This usually happens when two linked high shores are on the same plane.
+* base_coordinate and child objects now include dms displays.
+* added full Basin saddle detection and thus:
+* removed disqualify_lower_linkers() and mark_redundant_linkers() from Domain
+* domain.run() runs detect_basin_saddles() at the end instead of the old detection algorithms.
+* saddles now have basinSaddleAlternatives feature.
+* saddles and summits now have a feature_neighbors() caller which resolves the distal feature on the linker.
+
 0.5.10 (September 17, 2018)
 +++++++++++++++++++++++++++
 * Fix bug in disqualify_lower_linkers()

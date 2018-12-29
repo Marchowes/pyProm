@@ -34,21 +34,30 @@ class Summit(SpotElevation):
         # saddle. These are populated by :class:`Walk`
         self.saddles = list()
 
+        self.disqualified = False
         self.localHighest = None
         self.parent = None
         self.lprBoundary = []
+        self.lprPaths = None
 
     def addSaddleLinker(self, linker):
         """
+        Adds linker to this :class:`Summit`
         :param linker: :class:`Linker`
         """
         isLinker(linker)
         self.saddles.append(linker)
 
+    def feature_neighbors(self):
+        """
+        :return: returns all Saddles. This is, in effect, an interface.
+        """
+        return [feature.saddle for feature in self.saddles]
+
     @property
     def neighbors(self):
         """
-        :return: list of directly neighboring summits.
+        :return: list of directly neighboring summits excluding self.
         """
         neighborSet = set(self.all_neighbors())
         neighborSet.discard(self)
@@ -56,14 +65,19 @@ class Summit(SpotElevation):
 
     def all_neighbors(self, filterDisqualified=True):
         """
-        :return: list of directly neighboring summits including self.
+        all_neighbors will return all neighboring summits by way of the saddle.
+        This function deliberately makes no effort to filter out redundant
+        neighbors.
+        :param filterDisqualified: bool Filter out disqualified linkers.
+        :return: list of neighboring summits by way of neighboring saddles.
         """
         neighbors = []
         if filterDisqualified:
-            [neighbors.extend(linker.saddle_summits)
+            [neighbors.extend(linker.summits_connected_via_saddle())
                 for linker in self.saddles if not linker.disqualified]
         else:
-            [neighbors.extend(linker.saddle_summits)
+            [neighbors.extend(linker.summits_connected_via_saddle(
+                skipDisqualified=False))
                 for linker in self.saddles]
         return neighbors
 

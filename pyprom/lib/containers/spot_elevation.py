@@ -33,7 +33,7 @@ class SpotElevationContainer(_Base):
         """
         :return: list of lowest spot_elevation object(s)
         """
-        low = 10000
+        low = self.points[0].elevation
         lowest = list()
         for spot_elevation in self.points:
             if spot_elevation.elevation < low:
@@ -49,7 +49,7 @@ class SpotElevationContainer(_Base):
         """
         :return: list of highest spot_elevation object(s)
         """
-        high = -32768
+        high = self.points[0].elevation
         highest = list()
         for spot_elevation in self.points:
             if spot_elevation.elevation > high:
@@ -160,6 +160,19 @@ class SpotElevationContainer(_Base):
         isSpotElevation(spotElevation)
         self.points.append(spotElevation)
         self.fast_lookup[spotElevation.id] = spotElevation
+
+    def index(self, spotElevation):
+        """
+        Returns the index that this :class:`SpotElevation` or child
+        object occurs.
+        if none, return None
+        :param gridPoint: :class:`SpotElevation`
+        :return: index in points list where this spotElevation exists
+        """
+        try:
+            return self.points.index(spotElevation)
+        except:
+            return None
 
     def __len__(self):
         """

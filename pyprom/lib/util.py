@@ -14,12 +14,14 @@ from .locations.base_gridpoint import BaseGridPoint
 def dottedDecimaltoDegrees(coordinate):
     """
     Converts dotted Decimal coordinate to a DMS
-    :param coordinate:
-    :return: degree, minute, second
+    :param coordinate: (float) dd coordinate to convert.
+    :return: degrees, minutes, seconds
     """
-    minute, second = divmod(coordinate * 3600, 60)
-    degree, minute = divmod(minute, 60)
-    return degree, minute, second
+    degrees = int(coordinate)
+    md = abs(coordinate - degrees) * 60
+    minutes = int(md)
+    seconds = (md - minutes) * 60
+    return (degrees, minutes, seconds)
 
 
 def degreesToDottedDecimal(deg, mnt=0, sec=0):
@@ -38,14 +40,14 @@ def coordinateHashToList(coordianteHash):
     return [[x, y] for x, _y in coordianteHash.items() for y, _ in _y.items()]
 
 
-def coordinateHashToGridPointList(coordianteHash):
+def coordinateHashToGridPointList(coordinateHash):
     """
-    :param coordianteHash: a hash using
+    :param coordinateHash: a hash using
     {x1:[y1:True,y2:True..],x1:[y1:True,y2:True..]} format
     :return: list of BaseGridPoint objects.
     """
     return [BaseGridPoint(x, y)
-            for x, _y in coordianteHash.items() for y, _ in _y.items()]
+            for x, _y in coordinateHash.items() for y, _ in _y.items()]
 
 
 def compressRepetetiveChars(string):

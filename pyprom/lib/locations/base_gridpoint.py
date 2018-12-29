@@ -7,6 +7,8 @@ the LICENSE file that accompanies it.
 This library contains a base class for x,y oriented objects.
 """
 
+from math import hypot
+
 
 class BaseGridPoint:
     """
@@ -19,7 +21,6 @@ class BaseGridPoint:
         :param x: x coordinate
         :param y: y coordinate
         """
-        super(BaseGridPoint, self).__init__()
         self.x = x
         self.y = y
 
@@ -29,6 +30,15 @@ class BaseGridPoint:
         """
         return {'x': self.x,
                 'y': self.y}
+
+    def distance(self, other):
+        """
+        :param other: :class:BaseGridPoint to compare for calculating distance.
+        :return: float value of distance.
+        :raises: TypeError if other not of :class:`BaseGridPoint`
+        """
+        isBaseGridPoint(other)
+        return hypot((self.x - other.x), (self.y - other.y))
 
     def __hash__(self):
         """
