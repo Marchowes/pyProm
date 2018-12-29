@@ -151,25 +151,28 @@ class KMLFileWriter:
                                           featurePm.geometry.wkt):
             self.spotElevation_wkt[feature_type +
                                    featurePm.geometry.wkt] = True
+            featurePm.description = " {} {}\n {} meters\n {} feet\n".format(
+                feature.latitude, feature.longitude,
+                feature.elevation, feature.feet)
             if feature_type == "BasinSaddle":
                 featurePm.styleUrl = "#basinsaddle"
-                featurePm.description = "BasinSaddle"
+                featurePm.description = featurePm.description + "BasinSaddle"
                 self.saddles.append(featurePm)
             elif feature_type == "Saddle":
                 featurePm.styleUrl = "#saddle"
-                featurePm.description = "Saddle"
+                featurePm.description = featurePm.description + "Saddle"
                 self.saddles.append(featurePm)
             elif feature_type == "Summit":
                 featurePm.styleUrl = "#summit"
-                featurePm.description = "Summit"
+                featurePm.description = featurePm.description + "Summit"
                 self.summits.append(featurePm)
             elif feature_type == "RunOff":
                 featurePm.styleUrl = "#runoff"
-                featurePm.description = "RunOff"
+                featurePm.description = featurePm.description + "RunOff"
                 self.runOffs.append(featurePm)
             elif feature_type == "SpotElevation":
                 featurePm.styleUrl = "#spotelevation"
-                featurePm.description = "SpotElevation"
+                featurePm.description = featurePm.description + "SpotElevation"
                 self.spotElevations.append(featurePm)
 
     def _append_linker(self, linker):

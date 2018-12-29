@@ -66,6 +66,9 @@ class Linker:
         """
         if skipDisqualified and self.disqualified:
             return []
+        # This linker is already exempt.
+        if exemptLinkers.get(self.id):
+            return []
         return [linker.saddle for linker in self.summit.saddles if
                 _linker_ok(linker, skipDisqualified, exemptLinkers)]
 
@@ -80,6 +83,9 @@ class Linker:
         :return: list of summits
         """
         if skipDisqualified and self.disqualified:
+            return []
+        # This linker is already exempt.
+        if exemptLinkers.get(self.id):
             return []
         return [linker.summit for linker in self.saddle.summits if
                 _linker_ok(linker, skipDisqualified, exemptLinkers)]
@@ -130,14 +136,20 @@ class Linker:
                 if _linker_ok(linker, skipDisqualified, {}) and
                 self._help_exclude_self(linker, excludeSelf)]
 
-    def add_to_remote_saddle_and_summit(self):
+    def add_to_remote_saddle_and_summit(self, ignoreDuplicates=True):
         """
         Adds this linker to the remote :class:`Saddle` and :class:`Summit`
+        :param: ignoreDuplicates (bool) if True, will not add self to
         """
-        if self not in self.summit.saddles:
+        if ignoreDuplicates:
+            if self not in self.summit.saddles:
+                self.summit.addSaddleLinker(self)
+            if self not in self.saddle.summits:
+                self.saddle.addSummitLinker(self)
+        else:
             self.summit.addSaddleLinker(self)
-        if self not in self.saddle.summits:
             self.saddle.addSummitLinker(self)
+
 
     def to_dict(self, referenceById=True, noWalkPath=True):
         """

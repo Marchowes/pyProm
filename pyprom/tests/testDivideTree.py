@@ -25,16 +25,17 @@ class DivideTreeTests(unittest.TestCase):
         #self.someslice = datamap.subset(2594, 2340, 500, 500) # this is fine too apparently... (or not)
         #self.someslice = datamap.subset(2694, 2440, 400, 400)
         self.domain = Domain(self.someslice)
-        #self.domain.run(sparse=True)
-        self.domain.run()
+        self.domain.run(sparse=True)
+        #self.domain.run()
 
     def testDivideTreeInitial(self):
         #self.domain.disqualify_lower_linkers()
         #self.domain.mark_redundant_linkers()
-        self.domain.detect_tree_loops()
+        import logging
+        logging.basicConfig(level=logging.DEBUG)
+        self.domain.detect_basin_saddles()
         dt = DivideTree(domain=self.domain)
         w = self.domain.summits.highest[0]
         dt.localProminentRegion(w)
-        w.lprPaths.to_kml()
         print(w.lprBoundary)
 

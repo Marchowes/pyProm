@@ -46,6 +46,8 @@ class Saddle(SpotElevation):
         self.singleSummit = kwargs.get('singleSummit', False)
         # redundant saddle, but too low.
         self.tooLow = kwargs.get('tooLow', False)
+        # alternative basin saddles
+        self.basinSaddleAlternatives = []
         # Non specific disqualification
         self._disqualified = kwargs.get('disqualified', None)
         self.lprBoundary = []
@@ -56,6 +58,12 @@ class Saddle(SpotElevation):
         """
         isLinker(linker)
         self.summits.append(linker)
+
+    def feature_neighbors(self):
+        """
+        :return: returns all Summits. This is, in effect, an interface.
+        """
+        return [feature.summit for feature in self.summits]
 
     @property
     def neighbors(self):

@@ -113,6 +113,20 @@ class SaddleTests(unittest.TestCase):
         # Ensure parentage is correct
         self.assertEqual(saddleDict['parent'], saddles[19].id)
 
+    def testSaddleFeatureNeighbors(self):
+        """
+        Ensure feature_neighbors() produces expected results on
+        a saddle with linked summits.
+        """
+        summit1 = Summit(1,1,10000)
+        summit2 = Summit(2,2,20000)
+        saddle1000 = Saddle(1000,1000,1000)
+        linkerH1a = Linker(summit1, saddle1000)
+        linkerH1b = Linker(summit2, saddle1000)
+        for linker in [linkerH1a, linkerH1b]:
+            linker.add_to_remote_saddle_and_summit()
+        self.assertEqual(saddle1000.feature_neighbors(), [summit1, summit2])
+
 
 class SaddleNetworkTests(unittest.TestCase):
     """Test Saddles with neighbors"""

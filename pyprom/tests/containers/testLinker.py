@@ -92,7 +92,7 @@ class LinkerTests(unittest.TestCase):
         """
         Ensure Saddles Connected Via Summit returns expected results when
         skipDisqualified = True (default)
-        exemptLinkers = {self.id}
+        exemptLinkers = {self.id: True}
         """
         result = self.linker1.saddles_connected_via_summit(
             exemptLinkers={self.linker1.id: True})
@@ -205,10 +205,10 @@ class LinkerTests(unittest.TestCase):
         """
         Ensure Summits Connected Via Saddle returns expected results when
         skipDisqualified = True (default)
-        exemptLinkers = {self.id}
+        exemptLinkers = {self.id: True}
         """
-        result = self.linker1.summits_connected_via_saddle(
-            exemptLinkers={self.linker1.id: True})
+        result = self.linker3.summits_connected_via_saddle(
+            exemptLinkers={self.linker3.id: True})
         self.assertEqual(len(result), 0)
 
     def testLinkerSummitsConnectedViaSaddleSkipDisqualifiedFalse(self):
@@ -303,10 +303,6 @@ class LinkerTests(unittest.TestCase):
         self.assertIn(self.summit1, result)
         self.assertIn(self.summit2, result)
         self.assertIn(self.locallyDeadSummit, result)
-
-
-
-
 
     def testLinkerLinkersToSaddlesConnectedViaSummit(self):
         """
@@ -410,24 +406,6 @@ class LinkerTests(unittest.TestCase):
         self.assertIn(self.linker2, result)
         self.assertIn(self.disqualifiedLinkerLocallyDeadSummit, result)
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     def testLinkerRepr(self):
         """
         Ensure __repr__ is as expected
@@ -462,7 +440,7 @@ class LinkerTests(unittest.TestCase):
 
     def testLinkerAddToRemoteSaddleAndSummit(self):
         """
-        Ensure addToRemoteSaddleAndSummit() feature works as expected
+        Ensure add_to_remote_saddle_and_summit() feature works as expected
         """
         # Make sure actual function works.
         self.summit1.saddles = []
@@ -478,6 +456,25 @@ class LinkerTests(unittest.TestCase):
         self.linker1.add_to_remote_saddle_and_summit()
         self.assertEqual(len(self.summit1.saddles), 1)
         self.assertEqual(len(self.saddle1.summits), 1)
+
+    def testLinkerAddToRemoteSaddleAndSummitIgnoreDuplicates(self):
+        """
+        Ensure add_to_remote_saddle_and_summit() feature works as expected
+        """
+        # Make sure actual function works.
+        self.summit1.saddles = []
+        self.saddle1.summits = []
+        self.assertEqual(len(self.summit1.saddles), 0)
+        self.assertEqual(len(self.saddle1.summits), 0)
+
+        self.linker1.add_to_remote_saddle_and_summit(ignoreDuplicates=False)
+        self.assertEqual(self.summit1.saddles[0], self.linker1)
+        self.assertEqual(self.saddle1.summits[0], self.linker1)
+
+        # Make sure we do re-add linkers already there.
+        self.linker1.add_to_remote_saddle_and_summit(ignoreDuplicates=False)
+        self.assertEqual(len(self.summit1.saddles), 2)
+        self.assertEqual(len(self.saddle1.summits), 2)
 
     def testLinkerFromDict(self):
         """

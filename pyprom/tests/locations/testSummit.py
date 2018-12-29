@@ -117,3 +117,17 @@ class SummitTests(unittest.TestCase):
         # Ensure non linker objects are rejected.
         with self.assertRaises(TypeError):
             self.masterSummit.addSaddleLinker(19)
+
+    def testSummitFeatureNeighbors(self):
+        """
+        Ensure feature_neighbors() produces expected results on
+        a summit with linked saddles.
+        """
+        summit2 = Summit(2,2,20000)
+        saddle1000 = Saddle(1000,1000,1000)
+        saddle100 = Saddle(100,100,100)
+        linkerL1b = Linker(summit2, saddle100)
+        linkerH1b = Linker(summit2, saddle1000)
+        for linker in [linkerL1b, linkerH1b]:
+            linker.add_to_remote_saddle_and_summit()
+        self.assertEqual(summit2.feature_neighbors(), [saddle100, saddle1000])

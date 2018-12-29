@@ -29,6 +29,7 @@ class Runoff(Saddle):
         super(Runoff, self).__init__(latitude, longitude,
                                      elevation, *args, **kwargs)
         self.id = kwargs.get('id', 'ru:' + randomString())
+        self.edgeEffect = True # Runoffs are, as a rule, edge features.
 
     def __repr__(self):
         """

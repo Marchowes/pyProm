@@ -56,29 +56,6 @@ class WalkTests(unittest.TestCase):
         self.domain.walk()
         self.assertEqual(len(self.domain.linkers), 1067)
 
-    def testWalkMarkRedundantLinkers(self):
-        """
-        Test mark_redundant_linkers()
-        """
-        self.domain.walk()
-        self.domain.mark_redundant_linkers()
-        self.assertEqual(len([x for x in self.domain.linkers
-                              if x.disqualified]), 62)
-        self.assertEqual(len([x for x in self.domain.linkers
-                              if x.disqualified]), 62)
-
-    def testWalkDisqualifyLowerLinkers(self):
-        """
-        Test disqualify_lower_linkers
-        """
-        self.domain.walk()
-        self.domain.disqualify_lower_linkers()
-        self.assertEqual(len([x for x in self.domain.linkers
-                              if x.disqualified]), 90)
-        self.domain.disqualify_lower_linkers()
-        self.assertEqual(len([x for x in self.domain.linkers
-                              if x.disqualified]), 90)
-
 
 class WalkTestsReal(unittest.TestCase):
     """

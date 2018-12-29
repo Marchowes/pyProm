@@ -34,6 +34,7 @@ class Summit(SpotElevation):
         # saddle. These are populated by :class:`Walk`
         self.saddles = list()
 
+        self.disqualified = False
         self.localHighest = None
         self.parent = None
         self.lprBoundary = []
@@ -46,6 +47,12 @@ class Summit(SpotElevation):
         """
         isLinker(linker)
         self.saddles.append(linker)
+
+    def feature_neighbors(self):
+        """
+        :return: returns all Saddles. This is, in effect, an interface.
+        """
+        return [feature.saddle for feature in self.saddles]
 
     @property
     def neighbors(self):

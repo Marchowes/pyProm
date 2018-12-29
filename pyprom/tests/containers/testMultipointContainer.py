@@ -41,8 +41,8 @@ class MultipointTests(unittest.TestCase):
         multipoint = self.summitWithoutMultipointEdge.multiPoint
         bc0 = BaseCoordinate(44.70986111111111, -71.71263888888889)
         bc1 = BaseCoordinate(44.70986111111111, -71.71236111111111)
-        self.assertEqual(multipoint.pointsLatLong[0], bc0)
-        self.assertEqual(multipoint.pointsLatLong[1], bc1)
+        self.assertIn(bc0, multipoint.pointsLatLong)
+        self.assertIn(bc1, multipoint.pointsLatLong)
 
     def testMultipointPerimeterNoEdge(self):
         """
