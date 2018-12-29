@@ -40,8 +40,8 @@ class BaseGridPointContainer:
 
     def index(self, gridPoint):
         """
-        Returns the index that this :class:`BaseGridPoint` or child object occurs.
-        if none, return None
+        Returns the index that this :class:`BaseGridPoint` or child
+        object occurs. If none, return None
         :param gridPoint: :class:`BaseGridPoint`
         :return: index in points list where this baseGridPoint exists
         """
@@ -49,7 +49,6 @@ class BaseGridPointContainer:
             return self.points.index(gridPoint)
         except:
             return None
-
 
     def __len__(self):
         """

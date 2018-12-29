@@ -135,7 +135,8 @@ class KMLFileWriter:
             self.extend(feature.runoffs)
             return
 
-        raise Exception("Did not find any valid Datatypes to append. Try extend?")
+        raise Exception("Did not find any valid Datatypes to append."
+                        " Try extend?")
 
     def _append_spotElevation_derivative(self, feature, feature_type):
         """

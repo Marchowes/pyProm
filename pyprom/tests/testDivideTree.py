@@ -11,6 +11,7 @@ from pyprom.dataload import GDALLoader
 from pyprom.domain import Domain
 from pyprom.dividetree import DivideTree
 
+
 class DivideTreeTests(unittest.TestCase):
     """Test Divide Tree."""
 
@@ -21,16 +22,21 @@ class DivideTreeTests(unittest.TestCase):
         gettestzip()
         datafile = GDALLoader('/tmp/N44W072.hgt')
         datamap = datafile.datamap
-        self.someslice = datamap.subset(2494, 2240, 700, 800) # this is the one we want in the end...
-        #self.someslice = datamap.subset(2594, 2340, 500, 500) # this is fine too apparently... (or not)
-        #self.someslice = datamap.subset(2694, 2440, 400, 400)
+        self.someslice = datamap.subset(2494, 2240, 700, 800)  # this is
+        #  the one we want in the end...
+        # self.someslice = datamap.subset(2594, 2340, 500, 500)
+        # this is fine too apparently... (or not)
+        # self.someslice = datamap.subset(2694, 2440, 400, 400)
         self.domain = Domain(self.someslice)
         self.domain.run(sparse=True)
-        #self.domain.run()
+        # self.domain.run()
 
     def testDivideTreeInitial(self):
-        #self.domain.disqualify_lower_linkers()
-        #self.domain.mark_redundant_linkers()
+        """
+        Test divide tree initial
+        """
+        # self.domain.disqualify_lower_linkers()
+        # self.domain.mark_redundant_linkers()
         import logging
         logging.basicConfig(level=logging.DEBUG)
         self.domain.detect_basin_saddles()
@@ -38,4 +44,3 @@ class DivideTreeTests(unittest.TestCase):
         w = self.domain.summits.highest[0]
         dt.localProminentRegion(w)
         print(w.lprBoundary)
-

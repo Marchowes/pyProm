@@ -17,7 +17,6 @@ def dottedDecimaltoDegrees(coordinate):
     :param coordinate: (float) dd coordinate to convert.
     :return: degrees, minutes, seconds
     """
-
     degrees = int(coordinate)
     md = abs(coordinate - degrees) * 60
     minutes = int(md)

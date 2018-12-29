@@ -10,6 +10,7 @@ This library contains a base class for Coordinate oriented objects.
 import utm
 from ...lib.util import dottedDecimaltoDegrees
 
+
 class BaseCoordinate:
     """
     Base Coordinate, intended to be inherited from. This contains

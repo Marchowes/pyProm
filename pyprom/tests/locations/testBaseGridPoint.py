@@ -31,10 +31,10 @@ class BaseGridPointTests(unittest.TestCase):
         """
         Ensure distance() returns expected results.
         """
-        gp1 = BaseGridPoint(0,0)
-        gp2 = BaseGridPoint(10,0)
+        gp1 = BaseGridPoint(0, 0)
+        gp2 = BaseGridPoint(10, 0)
         distance = gp1.distance(gp2)
-        self.assertEqual(distance,10)
+        self.assertEqual(distance, 10)
 
     def testBaseGridPointHash(self):
         """
@@ -42,15 +42,15 @@ class BaseGridPointTests(unittest.TestCase):
         """
         x = 4
         y = 5
-        test = BaseGridPoint(x,y)
+        test = BaseGridPoint(x, y)
         self.assertEqual(hash((x, y)), test.__hash__())
 
     def testBaseGridPointEq(self):
         """
         Ensure __eq__() returns expected results.
         """
-        gp1 = BaseGridPoint(0,0)
-        gp2 = BaseGridPoint(0,0)
+        gp1 = BaseGridPoint(0, 0)
+        gp2 = BaseGridPoint(0, 0)
         self.assertEqual(gp1, gp2)
 
     def testBaseGridPointLt(self):
@@ -59,8 +59,8 @@ class BaseGridPointTests(unittest.TestCase):
         The concept of lt for a BaseGridPoint is arbitrary and only
         exists for other Python features.
         """
-        gp1 = BaseGridPoint(0,0)
-        gp2 = BaseGridPoint(1,0)
+        gp1 = BaseGridPoint(0, 0)
+        gp2 = BaseGridPoint(1, 0)
         self.assertLess(gp1, gp2)
 
     def testBaseGridPointRepr(self):
@@ -69,5 +69,3 @@ class BaseGridPointTests(unittest.TestCase):
         """
         test = BaseGridPoint(10, 100)
         self.assertEqual(test.__repr__(), "<BaseGridPoint> x: 10, y: 100")
-
-

@@ -193,8 +193,8 @@ class MultipointTests(unittest.TestCase):
         asSpotElevation = False (Default)
         """
         points = []
-        for x in range(100,110):
-            for y in range(200,210):
+        for x in range(100, 110):
+            for y in range(200, 210):
                 points.append(BaseGridPoint(x, y))
         mp = MultiPoint(points, 100, self.datamap)
 
@@ -257,8 +257,8 @@ class MultipointTests(unittest.TestCase):
         asSpotElevation = True
         """
         points = []
-        for x in range(100,110):
-            for y in range(200,210):
+        for x in range(100, 110):
+            for y in range(200, 210):
                 points.append(BaseGridPoint(x, y))
         mp = MultiPoint(points, 100, self.datamap)
 

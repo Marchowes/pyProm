@@ -28,15 +28,14 @@ class SummitTests(unittest.TestCase):
         |---linker_m2----Saddle2--linker2-------Summit2
                            |------linker_dead---Summit_locally_dead
         """
+        self.masterSummit = Summit(0, 0, 0)
 
-        self.masterSummit = Summit(0,0,0)
+        self.summit1 = Summit(1, 1, 1)
+        self.summit2 = Summit(2, 2, 2)
+        self.summit_locally_dead = Summit(3, 3, 3)
 
-        self.summit1 = Summit(1,1,1)
-        self.summit2 = Summit(2,2,2)
-        self.summit_locally_dead = Summit(3,3,3)
-
-        self.saddle1 = Saddle(1,1,1)
-        self.saddle2 = Saddle(2,2,2)
+        self.saddle1 = Saddle(1, 1, 1)
+        self.saddle2 = Saddle(2, 2, 2)
 
         self.linker_m1 = Linker(self.masterSummit, self.saddle1)
         self.linker_m1.add_to_remote_saddle_and_summit()
@@ -49,7 +48,6 @@ class SummitTests(unittest.TestCase):
         self.linker_dead = Linker(self.summit_locally_dead, self.saddle2)
         self.linker_dead.add_to_remote_saddle_and_summit()
         self.linker_dead.disqualified = True
-
 
     def testSummitFromDictEdge(self):
         """
@@ -104,13 +102,14 @@ class SummitTests(unittest.TestCase):
         """
         Ensure neighbors() returns expected results.
         """
-        self.assertEqual(self.masterSummit.neighbors, [self.summit2, self.summit1])
+        self.assertEqual(self.masterSummit.neighbors, [self.summit2,
+                                                       self.summit1])
 
     def testSummitAddSaddleLinker(self):
         """
         Ensure addSaddleLinker adds linker.
         """
-        linker = Linker(self.masterSummit, Saddle(10,10,10))
+        linker = Linker(self.masterSummit, Saddle(10, 10, 10))
         self.masterSummit.addSaddleLinker(linker)
         self.assertIn(linker, self.masterSummit.saddles)
 
@@ -123,9 +122,9 @@ class SummitTests(unittest.TestCase):
         Ensure feature_neighbors() produces expected results on
         a summit with linked saddles.
         """
-        summit2 = Summit(2,2,20000)
-        saddle1000 = Saddle(1000,1000,1000)
-        saddle100 = Saddle(100,100,100)
+        summit2 = Summit(2, 2, 20000)
+        saddle1000 = Saddle(1000, 1000, 1000)
+        saddle100 = Saddle(100, 100, 100)
         linkerL1b = Linker(summit2, saddle100)
         linkerH1b = Linker(summit2, saddle1000)
         for linker in [linkerL1b, linkerH1b]:

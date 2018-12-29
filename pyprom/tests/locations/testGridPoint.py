@@ -11,14 +11,18 @@ from pyprom.dataload import GDALLoader
 from pyprom.lib.locations.gridpoint import GridPoint
 from pyprom.lib.locations.spot_elevation import SpotElevation
 
+
 class GridPointTests(unittest.TestCase):
     """Test BaseGridPoint."""
 
     @classmethod
-    def setUpClass(self):
+    def setUpClass(cls):
+        """
+        Set up shared resources
+        """
         gettestzip()
         datafile = GDALLoader('/tmp/N44W072.hgt')
-        self.datamap = datafile.datamap
+        cls.datamap = datafile.datamap
 
     def testGridPointCreate(self):
         """
@@ -35,7 +39,7 @@ class GridPointTests(unittest.TestCase):
         """
         gp = GridPoint(1, 2, 3)
         gp_dict = gp.to_dict()
-        self.assertEqual(gp_dict,{"x": 1, "y": 2, "elevation": 3})
+        self.assertEqual(gp_dict, {"x": 1, "y": 2, "elevation": 3})
 
     def testGridPointToSpotElevation(self):
         """
@@ -84,4 +88,5 @@ class GridPointTests(unittest.TestCase):
         Ensure __repr__() works as expected
         """
         gp = GridPoint(1, 2, 3)
-        self.assertEqual(gp.__repr__(), "<GridPoint> x: 1, y: 2, elevation(m): 3")
+        self.assertEqual(gp.__repr__(),
+                         "<GridPoint> x: 1, y: 2, elevation(m): 3")

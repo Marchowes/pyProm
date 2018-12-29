@@ -1,3 +1,4 @@
+# flake8: noqa
 """
 pyProm: Copyright 2018.
 
@@ -12,18 +13,20 @@ from pyprom.lib.locations.summit import Summit
 from pyprom.lib.locations.saddle import Saddle
 from pyprom.lib.logic.basin_saddle_finder import BasinSaddleFinder
 
+
 class BasinSaddleFinderTests(unittest.TestCase):
     """Test Basin Saddle Finder."""
 
     def testBasinSaddleFinderSingleSummit(self):
-        """
-        Test disqualification of saddles which has two linkers leading to one summit
+        r"""
+        Test disqualification of saddles which has two
+        linkers leading to one summit
                 /--(L1 - x)--\
         Summit1              Saddle1 (x)
                \--(L2 - x)---/
         """
-        summit1 = Summit(1,1,10000)
-        saddle1 = Saddle(2,2,1000)
+        summit1 = Summit(1, 1, 10000)
+        saddle1 = Saddle(2, 2, 1000)
         linker1 = Linker(summit1, saddle1)
         linker2 = Linker(summit1, saddle1)
         saddle1.summits.extend([linker1, linker2])
@@ -39,17 +42,17 @@ class BasinSaddleFinderTests(unittest.TestCase):
         self.assertTrue(saddle1.singleSummit)
 
     def testBasinSaddleFinderDiamond(self):
-        """
+        r"""
         Ensure lowest Saddle and linkers in a diamond configuration
         are disqualified
                 /--(H1)-------Saddle 1000 -----(H2)-------\
         Summit1                                           Summit2
                \--(L1 - x)----Saddle 100 (x) --(L2 - x)---/
         """
-        summit1 = Summit(1,1,10000)
-        summit2 = Summit(2,2,20000)
-        saddle1000 = Saddle(1,1,1000)
-        saddle100 = Saddle(2,2,100)
+        summit1 = Summit(1, 1, 10000)
+        summit2 = Summit(2, 2, 20000)
+        saddle1000 = Saddle(1, 1, 1000)
+        saddle100 = Saddle(2, 2, 100)
 
         linkerL1 = Linker(summit1, saddle100)
         linkerH1 = Linker(summit1, saddle1000)
@@ -60,27 +63,28 @@ class BasinSaddleFinderTests(unittest.TestCase):
         doomed_saddles = [saddle100]
         ok_linkers = [linkerH1, linkerH2]
         ok_saddles = [saddle1000]
-        self._build_and_validate(doomed_linkers, doomed_saddles, ok_linkers, ok_saddles)
+        self._build_and_validate(doomed_linkers, doomed_saddles,
+                                 ok_linkers, ok_saddles)
 
     def testBasinSaddleFinderDoubleDiamond(self):
-        """
-        Ensure lowest 2 Saddles and linkers in a diamond configuration are disqualified
+        r"""
+        Ensure lowest 2 Saddles and linkers in a diamond
+        configuration are disqualified
                /--(H1)-------Saddle 1000 -----(H2)-------\
         Summit1--(L1 - x)----Saddle 100 (x) --(L2 - x)----Summit2
                \--(Le1 - x)--Saddle 1 (x) ----(Le2 - x)--/
         """
-        summit1 = Summit(1,1,10000)
-        summit2 = Summit(2,2,20000)
-        saddleHigh = Saddle(1000,1000,1000)
-        saddleLow = Saddle(100,100,100)
-        saddleLowest = Saddle(1,1,1)
+        summit1 = Summit(1, 1, 10000)
+        summit2 = Summit(2, 2, 20000)
+        saddleHigh = Saddle(1000, 1000, 1000)
+        saddleLow = Saddle(100, 100, 100)
+        saddleLowest = Saddle(1, 1, 1)
         linkerL1 = Linker(summit1, saddleLow)
         linkerLe1 = Linker(summit1, saddleLowest)
         linkerH1 = Linker(summit1, saddleHigh)
         linkerL2 = Linker(summit2, saddleLow)
         linkerLe2 = Linker(summit2, saddleLowest)
         linkerH2 = Linker(summit2, saddleHigh)
-
 
         doomed_linkers = [linkerL1, linkerL2, linkerLe1, linkerLe2]
         doomed_saddles = [saddleLow, saddleLowest]
@@ -101,17 +105,17 @@ class BasinSaddleFinderTests(unittest.TestCase):
                |--(L7a - x)--Saddle 700 (x) ----(L7b - x)--|
                |--(Le1a- x)--Saddle 1 (x) ----(Le1b - x)---|
         """
-        summit1 = Summit(1,1,10000)
-        summit2 = Summit(2,2,20000)
-        saddle1000 = Saddle(1000,1000,1000)
-        saddle100 = Saddle(100,100,100)
+        summit1 = Summit(1, 1, 10000)
+        summit2 = Summit(2, 2, 20000)
+        saddle1000 = Saddle(1000, 1000, 1000)
+        saddle100 = Saddle(100, 100, 100)
         saddle200 = Saddle(200, 200, 200)
         saddle300 = Saddle(300, 300, 300)
         saddle400 = Saddle(400, 400, 400)
         saddle500 = Saddle(500, 500, 500)
         saddle600 = Saddle(600, 600, 600)
         saddle700 = Saddle(700, 700, 700)
-        saddle1 = Saddle(1,1,1)
+        saddle1 = Saddle(1, 1, 1)
 
         linkerL1a = Linker(summit1, saddle100)
         linkerL1b = Linker(summit2, saddle100)
@@ -142,14 +146,15 @@ class BasinSaddleFinderTests(unittest.TestCase):
                           linkerL6a, linkerL6b,
                           linkerL7a, linkerL7b,
                           linkerLe1a, linkerLe1b,
-                         ]
+                          ]
         doomed_saddles = [saddle1, saddle100, saddle200,
                           saddle300, saddle400, saddle500,
                           saddle600, saddle700]
 
         ok_linkers = [linkerH1a, linkerH1b]
         ok_saddles = [saddle1000]
-        self._build_and_validate(doomed_linkers, doomed_saddles, ok_linkers, ok_saddles)
+        self._build_and_validate(doomed_linkers, doomed_saddles,
+                                 ok_linkers, ok_saddles)
 
     def testBasinSaddleFinderDoubleDiamondWithStubs(self):
         """
@@ -158,10 +163,10 @@ class BasinSaddleFinderTests(unittest.TestCase):
          Summit1--(L1a - x)----Saddle 100 (x) --(L1b - x)----Summit2---(L4a - x)--Saddle 400 (x)
                |--(L2a - x)--Saddle 200 (x) ----(L2b - x)--|        |--(L5a - x)--Saddle 500 (x)
         """
-        summit1 = Summit(1,1,10000)
-        summit2 = Summit(2,2,20000)
-        saddle1000 = Saddle(1000,1000,1000)
-        saddle100 = Saddle(100,100,100)
+        summit1 = Summit(1, 1, 10000)
+        summit2 = Summit(2, 2, 20000)
+        saddle1000 = Saddle(1000, 1000, 1000)
+        saddle100 = Saddle(100, 100, 100)
         saddle200 = Saddle(200, 200, 200)
         saddle300 = Saddle(300, 300, 300)
         saddle400 = Saddle(400, 400, 400)
@@ -183,14 +188,15 @@ class BasinSaddleFinderTests(unittest.TestCase):
                           linkerL3a,
                           linkerL4a,
                           linkerL5a,
-                         ]
+                          ]
         doomed_saddles = [saddle100, saddle200,
                           saddle300, saddle400,
-                          saddle500,]
+                          saddle500]
 
         ok_linkers = [linkerH1a, linkerH1b]
         ok_saddles = [saddle1000]
-        self._build_and_validate(doomed_linkers, doomed_saddles, ok_linkers, ok_saddles)
+        self._build_and_validate(doomed_linkers, doomed_saddles,
+                                 ok_linkers, ok_saddles)
 
     def testBasinSaddleFinderDoubleDiamondWithStubsOnBothSides(self):
         """
@@ -200,10 +206,10 @@ class BasinSaddleFinderTests(unittest.TestCase):
                |--(L2a - x)--Saddle 200 (x) ----(L2b - x)--|        |--(L5a - x)--Saddle 500 (x)
                |--(L4a - x)--Saddle 400 (x) <-- stub
         """
-        summit1 = Summit(1,1,10000)
-        summit2 = Summit(2,2,20000)
-        saddle1000 = Saddle(1000,1000,1000)
-        saddle100 = Saddle(100,100,100)
+        summit1 = Summit(1, 1, 10000)
+        summit2 = Summit(2, 2, 20000)
+        saddle1000 = Saddle(1000, 1000, 1000)
+        saddle100 = Saddle(100, 100, 100)
         saddle200 = Saddle(200, 200, 200)
         saddle300 = Saddle(300, 300, 300)
         saddle400 = Saddle(400, 400, 400)
@@ -225,14 +231,15 @@ class BasinSaddleFinderTests(unittest.TestCase):
                           linkerL3a,
                           linkerL4a,
                           linkerL5a,
-                         ]
+                          ]
         doomed_saddles = [saddle100, saddle200,
                           saddle300, saddle400,
                           saddle500]
 
         ok_linkers = [linkerH1a, linkerH1b]
         ok_saddles = [saddle1000]
-        self._build_and_validate(doomed_linkers, doomed_saddles, ok_linkers, ok_saddles)
+        self._build_and_validate(doomed_linkers, doomed_saddles,
+                                 ok_linkers, ok_saddles)
 
     def testBasinSaddleFinderDoubleDiamondWithLongStub(self):
         """
@@ -241,12 +248,12 @@ class BasinSaddleFinderTests(unittest.TestCase):
          Summit1--(L1a - x)----Saddle 100 (x) --(L1b - x)----Summit2                              |
                |--(L2a - x)--Saddle 200 (x) ----(L2b - x)--|          Saddle 300 (x)-(L3a -x)--Summit100
         """
-        summit1 = Summit(1,1,10000)
-        summit2 = Summit(2,2,20000)
-        summit100 = Summit(100,100,100000)
+        summit1 = Summit(1, 1, 10000)
+        summit2 = Summit(2, 2, 20000)
+        summit100 = Summit(100, 100, 100000)
 
-        saddle1000 = Saddle(1000,1000,1000)
-        saddle100 = Saddle(100,100,100)
+        saddle1000 = Saddle(1000, 1000, 1000)
+        saddle100 = Saddle(100, 100, 100)
         saddle200 = Saddle(200, 200, 200)
         saddle300 = Saddle(300, 300, 300)
         saddle001 = Saddle(1, 1, 1)
@@ -257,7 +264,6 @@ class BasinSaddleFinderTests(unittest.TestCase):
         linkerL2b = Linker(summit2, saddle200)
         linkerL3a = Linker(summit100, saddle300)
 
-
         linkerH0a = Linker(summit2, saddle001)
         linkerH0b = Linker(summit100, saddle001)
         linkerH1a = Linker(summit1, saddle1000)
@@ -266,7 +272,7 @@ class BasinSaddleFinderTests(unittest.TestCase):
         doomed_linkers = [linkerL1a, linkerL1b,
                           linkerL2a, linkerL2b,
                           linkerL3a,
-                         ]
+                          ]
         doomed_saddles = [saddle100, saddle200,
                           saddle300]
 
@@ -274,11 +280,13 @@ class BasinSaddleFinderTests(unittest.TestCase):
                       linkerH0a, linkerH0b]
         ok_saddles = [saddle1000, saddle001]
 
-        self._build_and_validate(doomed_linkers, doomed_saddles, ok_linkers, ok_saddles)
+        self._build_and_validate(doomed_linkers, doomed_saddles,
+                                 ok_linkers, ok_saddles)
 
     def testBasinSaddleFinderTransitive(self):
-        """
-        Ensure lowest 2 Saddles and linkers in a diamond configuration are disqualified
+        r"""
+        Ensure lowest 2 Saddles and linkers in a diamond configuration
+        are disqualified
                /--(H1a)------Saddle 1000 -----(H1b)-----\
         Summit1                                         Summit2
                \                                       /
@@ -290,12 +298,12 @@ class BasinSaddleFinderTests(unittest.TestCase):
                   \                              /
                   Summit3--(L2a-x)--Saddle 1(x)--
         """
-        summit1 = Summit(1,1,10000)
-        summit2 = Summit(2,2,20000)
-        summit3 = Summit(3,3,30000)
-        saddle1 = Saddle(1,1,1)
-        saddle100 = Saddle(100,100,100)
-        saddle1000 = Saddle(1000,1000,1000)
+        summit1 = Summit(1, 1, 10000)
+        summit2 = Summit(2, 2, 20000)
+        summit3 = Summit(3, 3, 30000)
+        saddle1 = Saddle(1, 1, 1)
+        saddle100 = Saddle(100, 100, 100)
+        saddle1000 = Saddle(1000, 1000, 1000)
 
         linkerH1a = Linker(summit1, saddle1000)
         linkerH1b = Linker(summit2, saddle1000)
@@ -305,14 +313,14 @@ class BasinSaddleFinderTests(unittest.TestCase):
         linkerL2a = Linker(summit3, saddle1)
         linkerL2b = Linker(summit2, saddle1)
 
-
         doomed_linkers = [linkerL2a, linkerL2b]
         doomed_saddles = [saddle1]
 
         ok_linkers = [linkerH1a, linkerH1b, linkerL1a, linkerL1b]
         ok_saddles = [saddle100, saddle1000]
 
-        self._build_and_validate(doomed_linkers, doomed_saddles, ok_linkers, ok_saddles)
+        self._build_and_validate(doomed_linkers, doomed_saddles,
+                                 ok_linkers, ok_saddles)
 
     def testBasinSaddleFinderMultiTransitive(self):
         """
@@ -323,16 +331,15 @@ class BasinSaddleFinderTests(unittest.TestCase):
                |--(L5a - x)--Saddle 500 (x) ----(L5b - x)--Summit510--(L5c)--Saddle 501 --(L5d)--|
                |--(H1a - x)--Saddle 1000 (x)----(H1b - x)--Summit1010--(H1c)--Saddle 1001-(H1d)--|
         """
-        summit1 = Summit(1,1,10000)
-        summit2 = Summit(2,2,20000)
-        summit210 = Summit(210,210,21000)
-        summit310 = Summit(310,310,31000)
-        summit410 = Summit(410,410,41000)
-        summit510 = Summit(510,510,51000)
-        summit1010 = Summit(1010,1010,101000)
+        summit1 = Summit(1, 1, 10000)
+        summit2 = Summit(2, 2, 20000)
+        summit210 = Summit(210, 210, 21000)
+        summit310 = Summit(310, 310, 31000)
+        summit410 = Summit(410, 410, 41000)
+        summit510 = Summit(510, 510, 51000)
+        summit1010 = Summit(1010, 1010, 101000)
 
-
-        saddle1000 = Saddle(1000,1000,1000)
+        saddle1000 = Saddle(1000, 1000, 1000)
         saddle200 = Saddle(200, 200, 200)
         saddle300 = Saddle(300, 300, 300)
         saddle400 = Saddle(400, 400, 400)
@@ -372,7 +379,7 @@ class BasinSaddleFinderTests(unittest.TestCase):
                           linkerL3a, linkerL3b,
                           linkerL4a, linkerL4b,
                           linkerL5a, linkerL5b,
-                         ]
+                          ]
         doomed_saddles = [saddle200, saddle300, saddle400, saddle500]
 
         ok_linkers = [linkerH1a, linkerH1b, linkerH1c, linkerH1d,
@@ -383,12 +390,13 @@ class BasinSaddleFinderTests(unittest.TestCase):
                       ]
         ok_saddles = [saddle201, saddle301, saddle401, saddle501,
                       saddle1000, saddle1001]
-        self._build_and_validate(doomed_linkers, doomed_saddles, ok_linkers, ok_saddles)
+        self._build_and_validate(doomed_linkers, doomed_saddles,
+                                 ok_linkers, ok_saddles)
 
     def testBasinSaddleFinderMultiTransitiveWithEqualHeight(self):
         """
-        Ensure Transitive multi loops with equal height candidates (alternative basin saddles)
-        are properly identified.
+        Ensure Transitive multi loops with equal height candidates
+        (alternative basin saddles) are properly identified.
 
                |-(L2a - x)----Saddle 200 (x) --(L2b - x)---Summit210--(L2c)--Saddle 200a --(L2d)--|
                |-(L3a - x)----Saddle 300 (x) --(L3b - x)---Summit310--(L3c)--Saddle 301 --(L3d)--|
@@ -396,16 +404,15 @@ class BasinSaddleFinderTests(unittest.TestCase):
                |--(L5a - x)--Saddle 500 (x) ----(L5b - x)--Summit510--(L5c)--Saddle 501 --(L5d)--|
                |--(H1a - x)--Saddle 1000 (x)----(H1b - x)--Summit1010--(H1c)--Saddle 1001-(H1d)--|
         """
-        summit1 = Summit(1,1,10000)
-        summit2 = Summit(2,2,20000)
-        summit210 = Summit(210,210,21000)
-        summit310 = Summit(310,310,31000)
-        summit410 = Summit(410,410,41000)
-        summit510 = Summit(510,510,51000)
-        summit1010 = Summit(1010,1010,101000)
+        summit1 = Summit(1, 1, 10000)
+        summit2 = Summit(2, 2, 20000)
+        summit210 = Summit(210, 210, 21000)
+        summit310 = Summit(310, 310, 31000)
+        summit410 = Summit(410, 410, 41000)
+        summit510 = Summit(510, 510, 51000)
+        summit1010 = Summit(1010, 1010, 101000)
 
-
-        saddle1000 = Saddle(1000,1000,1000)
+        saddle1000 = Saddle(1000, 1000, 1000)
         saddle200 = Saddle(200, 200, 200)
         saddle300 = Saddle(300, 300, 300)
         saddle400 = Saddle(400, 400, 400)
@@ -445,7 +452,7 @@ class BasinSaddleFinderTests(unittest.TestCase):
                           linkerL3a, linkerL3b,
                           linkerL4a, linkerL4b,
                           linkerL5a, linkerL5b,
-                         ]
+                          ]
         doomed_saddles = [saddle200, saddle300, saddle400, saddle500]
 
         ok_linkers = [linkerH1a, linkerH1b, linkerH1c, linkerH1d,
@@ -456,7 +463,8 @@ class BasinSaddleFinderTests(unittest.TestCase):
                       ]
         ok_saddles = [saddle200a, saddle301, saddle400a, saddle501,
                       saddle1000, saddle1001]
-        self._build_and_validate(doomed_linkers, doomed_saddles, ok_linkers, ok_saddles)
+        self._build_and_validate(doomed_linkers, doomed_saddles,
+                                 ok_linkers, ok_saddles)
 
         # Ensure Basin Saddle alternatives are accounted for.
         self.assertEqual(saddle200a.basinSaddleAlternatives, [saddle200])
@@ -471,10 +479,10 @@ class BasinSaddleFinderTests(unittest.TestCase):
          Summit1                                           Summit2
                |--(L1a)------Saddle 100 (edge)--(L1b)------|
         """
-        summit1 = Summit(1,1,10000)
-        summit2 = Summit(2,2,20000)
-        saddle1000 = Saddle(1000,1000,1000)
-        saddle100 = Saddle(100,100,100)
+        summit1 = Summit(1, 1, 10000)
+        summit2 = Summit(2, 2, 20000)
+        saddle1000 = Saddle(1000, 1000, 1000)
+        saddle100 = Saddle(100, 100, 100)
         saddle100.edgeEffect = True
 
         linkerL1a = Linker(summit1, saddle100)
@@ -488,21 +496,22 @@ class BasinSaddleFinderTests(unittest.TestCase):
 
         ok_linkers = [linkerH1a, linkerH1b, linkerL1a, linkerL1b]
         ok_saddles = [saddle1000, saddle100]
-        self._build_and_validate(doomed_linkers, doomed_saddles, ok_linkers, ok_saddles)
+        self._build_and_validate(doomed_linkers, doomed_saddles,
+                                 ok_linkers, ok_saddles)
 
     def testBasinSaddleFinderDiamondWithStub(self):
-        """
+        r"""
         Ensure lowest 2 Saddles and linkers in a diamond configuration are
         disqualified
                /--(H1)------Saddle 1000 --(H2)-----\   /----(SS1a - x)-\
         Summit1-                                   Summit2     Saddle 100 (x)
                \--(L1 - x)-Saddle 1 (x) -(L2 - x)--/   \----(SS1b -x)-/
         """
-        summit1 = Summit(1,1,10000)
-        summit2 = Summit(2,2,20000)
-        saddle1000 = Saddle(1000,1000,1000)
-        saddle100 = Saddle(100,100,100)
-        saddle1 = Saddle(1,1,1)
+        summit1 = Summit(1, 1, 10000)
+        summit2 = Summit(2, 2, 20000)
+        saddle1000 = Saddle(1000, 1000, 1000)
+        saddle100 = Saddle(100, 100, 100)
+        saddle1 = Saddle(1, 1, 1)
 
         linkerSS1a = Linker(summit1, saddle100)
         linkerSS1b = Linker(summit1, saddle100)
@@ -513,15 +522,16 @@ class BasinSaddleFinderTests(unittest.TestCase):
         linkerH1a = Linker(summit1, saddle1000)
         linkerH1b = Linker(summit2, saddle1000)
 
-
         doomed_linkers = [linkerL1a, linkerL1b, linkerSS1a, linkerSS1b]
         doomed_saddles = [saddle1, saddle100]
 
         ok_linkers = [linkerH1a, linkerH1b]
         ok_saddles = [saddle1000]
-        self._build_and_validate(doomed_linkers, doomed_saddles, ok_linkers, ok_saddles)
+        self._build_and_validate(doomed_linkers, doomed_saddles,
+                                 ok_linkers, ok_saddles)
 
-    def _build_and_validate(self, doomed_linkers, doomed_saddles, ok_linkers, ok_saddles):
+    def _build_and_validate(self, doomed_linkers, doomed_saddles,
+                            ok_linkers, ok_saddles):
 
         all_linkers = ok_linkers + doomed_linkers
 
@@ -535,16 +545,20 @@ class BasinSaddleFinderTests(unittest.TestCase):
 
         for doomed_linker in doomed_linkers:
             self.assertTrue(doomed_linker.disqualified,
-                            "{} produced unexpected results".format(doomed_linker))
+                            "{} produced unexpected results".format(
+                                doomed_linker))
 
         for doomed_saddle in doomed_saddles:
             self.assertTrue(doomed_saddle.disqualified,
-                            "{} produced unexpected results".format(doomed_saddle))
+                            "{} produced unexpected results".format(
+                                doomed_saddle))
 
         for ok_linker in ok_linkers:
             self.assertFalse(ok_linker.disqualified,
-                             "{} produced unexpected results".format(ok_linker))
+                             "{} produced unexpected results".format(
+                                 ok_linker))
 
         for ok_saddle in ok_saddles:
             self.assertFalse(ok_saddle.disqualified,
-                             "{} produced unexpected results".format(ok_saddle))
+                             "{} produced unexpected results".format(
+                                 ok_saddle))

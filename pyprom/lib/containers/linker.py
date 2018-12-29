@@ -52,7 +52,6 @@ class Linker:
         """
         return self.summit.feet - self.saddle.feet
 
-
     def saddles_connected_via_summit(self, skipDisqualified=True,
                                      exemptLinkers={}):
         """
@@ -72,7 +71,8 @@ class Linker:
         return [linker.saddle for linker in self.summit.saddles if
                 _linker_ok(linker, skipDisqualified, exemptLinkers)]
 
-    def summits_connected_via_saddle(self, skipDisqualified=True, exemptLinkers={}):
+    def summits_connected_via_saddle(self, skipDisqualified=True,
+                                     exemptLinkers={}):
         """
         Returns all summits connected to the :class:`Saddle` that this
          :class:`Linker` links.
@@ -103,25 +103,17 @@ class Linker:
         return True
 
     def linkers_to_saddles_connected_via_summit(self, excludeSelf=True,
-                                                skipDisqualified=True,
-                                                highToLow=False):
+                                                skipDisqualified=True):
         """
         :param: exclude (bool) exclude this linker.
         :param: skipDisqualified (bool) If true, do not return disqualified
         linkers
-        :return: list of linkers to saddles connected to the summit the linker links
+        :return: list of linkers to saddles connected to the summit the
+         linker links
         """
-
-        if highToLow:
-            return sorted(
-            [linker for linker in self.summit.saddles
-             if _linker_ok(linker, skipDisqualified, {})
-             and self._help_exclude_self(linker, excludeSelf)],
-                key=lambda x:x.saddle.elevation, reverse=True)
-
         return [linker for linker in self.summit.saddles
-                if _linker_ok(linker, skipDisqualified, {})
-                and self._help_exclude_self(linker, excludeSelf)]
+                if _linker_ok(linker, skipDisqualified, {}) and
+                self._help_exclude_self(linker, excludeSelf)]
 
     def linkers_to_summits_connected_via_saddle(self, excludeSelf=True,
                                                 skipDisqualified=True):
@@ -149,7 +141,6 @@ class Linker:
         else:
             self.summit.addSaddleLinker(self)
             self.saddle.addSummitLinker(self)
-
 
     def to_dict(self, referenceById=True, noWalkPath=True):
         """
@@ -236,6 +227,7 @@ def isLinker(linker):
     """
     if not isinstance(linker, Linker):
         raise TypeError("Expected Linker Object.")
+
 
 def _linker_ok(linker, skipDisqualified, exemptLinkers={}):
     """

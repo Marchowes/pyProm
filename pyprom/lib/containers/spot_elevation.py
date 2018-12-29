@@ -163,7 +163,8 @@ class SpotElevationContainer(_Base):
 
     def index(self, spotElevation):
         """
-        Returns the index that this :class:`SpotElevation` or child object occurs.
+        Returns the index that this :class:`SpotElevation` or child
+        object occurs.
         if none, return None
         :param gridPoint: :class:`SpotElevation`
         :return: index in points list where this spotElevation exists

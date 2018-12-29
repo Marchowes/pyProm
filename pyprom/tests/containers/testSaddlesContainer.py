@@ -127,6 +127,7 @@ class SaddlesContainerTests(unittest.TestCase):
         container = SaddlesContainer([s1, s2, sd3, sd4])
         self.assertEqual(container.disqualified, [sd3, sd4])
 
+
 class SaddlesContainerRebuildTests(unittest.TestCase):
     """
     SaddlesContainerRebuildTests
@@ -144,6 +145,9 @@ class SaddlesContainerRebuildTests(unittest.TestCase):
         cls.datamap = datafile.datamap
 
     def setUp(self):
+        """
+        Set up
+        """
         self.elevation = 1000
         self.islands = [BaseGridPointContainer([BaseGridPoint(103, 203)]),
                         BaseGridPointContainer([BaseGridPoint(107, 207)])]
@@ -165,11 +169,14 @@ class SaddlesContainerRebuildTests(unittest.TestCase):
         newSaddles = twoIslands.rebuildSaddles(self.datamap)
 
         ns0 = Saddle(44.97097222222222, -71.94319444444444, 1000)
-        ns0.highShores = [twoIslands[0].highShores[0], twoIslands[0].highShores[1]]
+        ns0.highShores = [twoIslands[0].highShores[0],
+                          twoIslands[0].highShores[1]]
         ns1 = Saddle(44.97208333333334, -71.94430555555554, 1000)
-        ns1.highShores = [twoIslands[0].highShores[3], twoIslands[0].highShores[0]]
+        ns1.highShores = [twoIslands[0].highShores[3],
+                          twoIslands[0].highShores[0]]
         ns2 = Saddle(44.97236111111111, -71.94458333333333, 1000)
-        ns2.highShores = [twoIslands[0].highShores[3], twoIslands[0].highShores[2]]
+        ns2.highShores = [twoIslands[0].highShores[3],
+                          twoIslands[0].highShores[2]]
         self.assertEqual(len(newSaddles), 3)
         self.assertEqual(newSaddles[0], ns0)
         self.assertEqual(newSaddles[1], ns1)
@@ -190,9 +197,11 @@ class SaddlesContainerRebuildTests(unittest.TestCase):
 
         newSaddles = oneIsland.rebuildSaddles(self.datamap)
         ns0 = Saddle(44.971805555555555, -71.94402777777778, 1000)
-        ns0.highShores = [oneIsland[0].highShores[0], oneIsland[0].highShores[2]]
+        ns0.highShores = [oneIsland[0].highShores[0],
+                          oneIsland[0].highShores[2]]
         ns1 = Saddle(44.97236111111111, -71.94458333333333, 1000)
-        ns1.highShores = [oneIsland[0].highShores[2], oneIsland[0].highShores[1]]
+        ns1.highShores = [oneIsland[0].highShores[2],
+                          oneIsland[0].highShores[1]]
         self.assertEqual(len(newSaddles), 2)
         self.assertEqual(newSaddles[0], ns0)
         self.assertEqual(newSaddles[1], ns1)
@@ -202,7 +211,8 @@ class SaddlesContainerRebuildTests(unittest.TestCase):
         Ensure rebuildSaddles produces expected results.
         0 island, 2 perimeter high shores.
         Must generate 1 new Saddle (len(hs)-1)
-        This exercises the internal logic inside the :class:`SaddlesContainer` which bypasses
+        This exercises the internal logic inside the
+        :class:`SaddlesContainer` which bypasses
         InternalSaddleNetwork logic.
         """
         noIsland = SaddlesContainer([generate_multiPoint_saddle(100,
@@ -210,7 +220,7 @@ class SaddlesContainerRebuildTests(unittest.TestCase):
                                     self.datamap,
                                     self.elevation, [], 2)])
         newSaddles = noIsland.rebuildSaddles(self.datamap)
-        ns0 = Saddle(44.97236111111111,-71.94458333333333, 1000)
+        ns0 = Saddle(44.97236111111111, -71.94458333333333, 1000)
         ns0.highShores = [noIsland[0].highShores[1], noIsland[0].highShores[0]]
         self.assertEqual(len(newSaddles), 1)
         self.assertEqual(newSaddles[0], ns0)
@@ -220,17 +230,19 @@ class SaddlesContainerRebuildTests(unittest.TestCase):
         Ensure rebuildSaddles produces expected results.
         1 island, 1 perimeter high shores.
         Must generate 1 new Saddle (len(hs)-1)
-        This exercises the internal logic inside the :class:`SaddlesContainer` which bypasses
-        InternalSaddleNetwork logic.
+        This exercises the internal logic inside the :class:`SaddlesContainer`
+        which bypasses InternalSaddleNetwork logic.
         """
-        oneIslandOnePerimeter = SaddlesContainer([generate_multiPoint_saddle(100,
-                                           200, 10, 10,
-                                           self.datamap,
-                                           self.elevation,
-                                           self.island, 1)])
+        oneIslandOnePerimeter = SaddlesContainer(
+            [generate_multiPoint_saddle(100,
+             200, 10, 10,
+             self.datamap,
+             self.elevation,
+             self.island, 1)])
         newSaddles = oneIslandOnePerimeter.rebuildSaddles(self.datamap)
         ns0 = Saddle(44.971805555555555, -71.94402777777778, 1000)
-        ns0.highShores = [oneIslandOnePerimeter[0].highShores[1], oneIslandOnePerimeter[0].highShores[0]]
+        ns0.highShores = [oneIslandOnePerimeter[0].highShores[1],
+                          oneIslandOnePerimeter[0].highShores[0]]
         self.assertEqual(len(newSaddles), 1)
         self.assertEqual(newSaddles[0], ns0)
 
@@ -241,11 +253,12 @@ class SaddlesContainerRebuildTests(unittest.TestCase):
         Since there is only a single highEdge this fast
         exits and returns the same Saddle.
         """
-        oneIslandOnePerimeter = SaddlesContainer([generate_multiPoint_saddle(100,
-                                           200, 10, 10,
-                                           self.datamap,
-                                           self.elevation,
-                                           [], 1)])
+        oneIslandOnePerimeter = SaddlesContainer(
+            [generate_multiPoint_saddle(100,
+                                        200, 10, 10,
+                                        self.datamap,
+                                        self.elevation,
+                                        [], 1)])
         newSaddles = oneIslandOnePerimeter.rebuildSaddles(self.datamap)
         self.assertEqual(newSaddles[0], oneIslandOnePerimeter[0])
 
@@ -261,7 +274,7 @@ class SaddlesContainerRebuildTests(unittest.TestCase):
         saddle.highShores = [GridPointContainer([GridPoint(99, 199, 1001)]),
                              GridPointContainer([GridPoint(99, 201, 1001)]),
                              GridPointContainer([GridPoint(101, 199, 1001)]),
-                            ]
+                             ]
         saddles = SaddlesContainer([saddle])
         newSaddles = saddles.rebuildSaddles(self.datamap)
         ns0 = Saddle(44.97236111111111, -71.94458333333333, 1000)

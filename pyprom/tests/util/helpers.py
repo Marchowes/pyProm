@@ -11,9 +11,10 @@ from pyprom.lib.locations.base_gridpoint import BaseGridPoint
 from pyprom.lib.locations.gridpoint import GridPoint
 from pyprom.lib.locations.saddle import Saddle
 
+
 def generate_MultiPoint(x, y, xSpan, ySpan,
                         datamap, elevation,
-                        excludeBGPC = []):
+                        excludeBGPC=[]):
     """
     Generate a rectangular MultiPoint, with the ability to exclude
     points.
@@ -27,10 +28,9 @@ def generate_MultiPoint(x, y, xSpan, ySpan,
      points to remove from MultiPoint
     :return: :class:`MultiPoint`
     """
-
     mpBlock = []
-    for xx in range(x, x+xSpan):
-        for yy in range(y, y+ySpan):
+    for xx in range(x, x + xSpan):
+        for yy in range(y, y + ySpan):
             # leave these ones out, they're our islands.
             mpBlock.append(BaseGridPoint(xx, yy))
     mp = MultiPoint(mpBlock, elevation, datamap)
@@ -39,10 +39,11 @@ def generate_MultiPoint(x, y, xSpan, ySpan,
             mp.points.remove(point)
     return mp
 
+
 def generate_multiPoint_saddle(x, y, xSpan, ySpan,
                                datamap, elevation,
                                islands=[],
-                               perimeterHighShores = 1):
+                               perimeterHighShores=1):
     """
     Generate a rectangular MultiPoint Saddle, with the ability to exclude
     points (islands). and generate highShores on the Perimeter.
@@ -59,7 +60,6 @@ def generate_multiPoint_saddle(x, y, xSpan, ySpan,
     :param perimeterHighShores: number of perimeter highShores to make up.
     :return: :class:`MultiPoint`
     """
-
     mp = generate_MultiPoint(x, y, xSpan, ySpan,
                              datamap, elevation,
                              excludeBGPC=islands)
@@ -85,11 +85,3 @@ def generate_multiPoint_saddle(x, y, xSpan, ySpan,
         highShoresPerimeter.append(GridPointContainer([hs]))
     saddle.highShores = islandGPCs + highShoresPerimeter
     return saddle
-
-
-
-
-
-
-
-

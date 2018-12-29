@@ -17,9 +17,11 @@ from pyprom.lib.containers.saddles import SaddlesContainer
 class InternalSaddleNetworkTests(unittest.TestCase):
     """Test Internal Saddle Network Object."""
 
-
     @classmethod
     def setUpClass(cls):
+        """
+        Set up shared resources
+        """
         gettestzip()
         datafile = GDALLoader('/tmp/N44W072.hgt')
         cls.datamap = datafile.datamap
@@ -32,10 +34,10 @@ class InternalSaddleNetworkTests(unittest.TestCase):
         """
         Set Up Tests.
         """
-        self.saddles = SaddlesContainer.from_dict(self.masterSaddlesDict, self.aziscohos)
+        self.saddles = SaddlesContainer.from_dict(self.masterSaddlesDict,
+                                                  self.aziscohos)
         mp = [x for x in self.saddles.saddles if x.multiPoint]
         self.aziscohosSaddle = [x for x in mp if len(x.multiPoint) > 1000][0]
-
 
     def testInternalSaddleNetworkAziscohos(self):
         """

@@ -120,13 +120,13 @@ class Saddle(SpotElevation):
         """
         self._disqualified = value
 
-    def disqualify_self_and_linkers(self, tooLow=False, singleSummit=False):
+    def disqualify_self_and_linkers(self, tooLow=False,
+                                    singleSummit=False):
         """
         Disqualify this :class:`Saddle` and linked :class:`Linker`s.
         :param tooLow: set tooLow
         :param singleSummit: set singleSummit
         """
-
         if tooLow:
             self.tooLow = tooLow
         if singleSummit:

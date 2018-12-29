@@ -1,9 +1,22 @@
+"""
+pyProm: Copyright 2016.
+
+This software is distributed under a license that is described in
+the LICENSE file that accompanies it.
+
+This library contains logic for identifying Basin Saddles.
+"""
 import logging
 from ..containers.saddles import SaddlesContainer
 from timeit import default_timer
 from collections import OrderedDict
 
+
 class BasinSaddleFinder:
+    """
+    Class for identifying all basin saddles.
+    """
+
     def __init__(self, saddles):
         """
         :param saddles: SaddlesContainer
@@ -36,7 +49,7 @@ class BasinSaddleFinder:
                 self._disqualify_single_source_saddles(saddle)
         self.logger.info("Identifying Stub Saddles Complete"
                          " in {} seconds {} Saddles purged ".format(
-            default_timer() - start, purgedStubsCounter))
+                             default_timer() - start, purgedStubsCounter))
 
         start = default_timer()
         self.logger.info("Detecting Tree Cycles, identifying Basin Saddles")
@@ -49,9 +62,8 @@ class BasinSaddleFinder:
                 root = None
                 continue
             stack = [root]  # stack of features to explore.
-            lookback = {root.id: root}  # lookback from each features
-                                        # perspective.
-            exploredNbrs = {root.id: dict()} # hash of explored neighbors.
+            lookback = {root.id: root}  # lookback from each feature
+            exploredNbrs = {root.id: dict()}  # hash of explored neighbors.
             cycleMembers = {}
 
             self.logger.info("remaining nodes: {}".format(len(features)))
@@ -68,7 +80,7 @@ class BasinSaddleFinder:
                     if nbr.id not in exploredNbrs:  # new node
                         lookback[nbr.id] = z
                         stack.append(nbr)
-                        exploredNbrs[nbr.id] = {z.id:True}
+                        exploredNbrs[nbr.id] = {z.id: True}
                     elif nbr == z:  # self loops
                         cycles.append([z])
                     elif nbr.id not in zEexploredNbrs:  # found a cycle
@@ -94,7 +106,7 @@ class BasinSaddleFinder:
             root = None
         self.logger.info("Basin Saddle detection complete in {}"
                          " seconds {} Basin Saddles".format(
-            default_timer() - start, basinSaddlesCounter))
+                             default_timer() - start, basinSaddlesCounter))
         return cycles
 
     def _disqualify_and_label(self, lowest):
@@ -138,6 +150,7 @@ class BasinSaddleFinder:
                   and
 
         Summit 1000 ----- 995 Saddle <- Disqualify
+        :return: 0 = no disqualified. 1 = disqualified.
         """
         uniqueSummits = set([x.summit for x in saddle.summits])
         if len(uniqueSummits) <= 1:

@@ -78,7 +78,7 @@ class MultiPoint:
         isBaseGridPoint(point)
         self.points.append(point)
 
-    def closestPoint(self, gridPoint, asSpotElevation = False):
+    def closestPoint(self, gridPoint, asSpotElevation=False):
         """
         Returns the closest point in this container to the GridPoint passed in.
         :param gridPoint: :class:`GridPoint`

@@ -21,6 +21,9 @@ class SaddleTests(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
+        """
+        Set up shared resources.
+        """
         gettestzip()
         datafile = GDALLoader('/tmp/N44W072.hgt')
         cls.datamap = datafile.datamap
@@ -118,9 +121,9 @@ class SaddleTests(unittest.TestCase):
         Ensure feature_neighbors() produces expected results on
         a saddle with linked summits.
         """
-        summit1 = Summit(1,1,10000)
-        summit2 = Summit(2,2,20000)
-        saddle1000 = Saddle(1000,1000,1000)
+        summit1 = Summit(1, 1, 10000)
+        summit2 = Summit(2, 2, 20000)
+        saddle1000 = Saddle(1000, 1000, 1000)
         linkerH1a = Linker(summit1, saddle1000)
         linkerH1b = Linker(summit2, saddle1000)
         for linker in [linkerH1a, linkerH1b]:
@@ -143,7 +146,6 @@ class SaddleNetworkTests(unittest.TestCase):
                                                       |
                                         Saddle3-----linker3
         """
-
         self.masterSummit = Summit(0, 0, 0)
 
         self.summit1 = Summit(1, 1, 1)
@@ -153,7 +155,6 @@ class SaddleNetworkTests(unittest.TestCase):
         self.saddle1 = Saddle(1, 1, 1)
         self.saddle2 = Saddle(2, 2, 2)
         self.saddle3 = Saddle(3, 3, 3)
-
 
         self.linker_m1 = Linker(self.masterSummit, self.saddle1)
         self.linker_m1.add_to_remote_saddle_and_summit()
@@ -168,8 +169,6 @@ class SaddleNetworkTests(unittest.TestCase):
         self.linker_dead = Linker(self.summit_locally_dead, self.saddle2)
         self.linker_dead.add_to_remote_saddle_and_summit()
         self.linker_dead.disqualified = True
-
-
 
     def testSaddleAllNeighbors(self):
         """
