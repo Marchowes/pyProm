@@ -24,10 +24,18 @@
               <y:Fill color="#F5F5F5" transparent="false"/>
               <y:BorderStyle color="#000000" type="dashed" width="1.0"/>
               <y:NodeLabel alignment="right" autoSizePolicy="node_width" backgroundColor="#EBEBEB" borderDistance="0.0" fontFamily="Dialog" fontSize="15" fontStyle="plain" hasLineColor="false" height="21.4609375" horizontalTextPosition="center" iconTextGap="4" modelName="internal" modelPosition="t" textColor="#000000" verticalTextPosition="bottom" visible="true" width="2354.9907646817574" x="0.0" xml:space="preserve" y="0.0">Locations</y:NodeLabel>
+              <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="12" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" hasText="false" height="4.0" horizontalTextPosition="center" iconTextGap="4" modelName="custom" textColor="#000000" verticalTextPosition="bottom" visible="true" width="4.0" x="1175.4953823408787" y="658.2504559891315">
+                <y:LabelModel>
+                  <y:SmartNodeLabelModel distance="4.0"/>
+                </y:LabelModel>
+                <y:ModelParameter>
+                  <y:SmartNodeLabelModelParameter labelRatioX="0.0" labelRatioY="0.0" nodeRatioX="0.0" nodeRatioY="0.0" offsetX="0.0" offsetY="0.0" upX="0.0" upY="-1.0"/>
+                </y:ModelParameter>
+              </y:NodeLabel>
               <y:Shape type="roundrectangle"/>
               <y:State closed="false" closedHeight="50.0" closedWidth="50.0" innerGraphDisplayEnabled="false"/>
               <y:Insets bottom="15" bottomF="15.0" left="15" leftF="15.0" right="15" rightF="15.0" top="15" topF="15.0"/>
-              <y:BorderInsets bottom="187" bottomF="187.29952489034122" left="158" leftF="158.41872075052015" right="119" rightF="118.5923157979264" top="0" topF="0.0"/>
+              <y:BorderInsets bottom="121" bottomF="120.7744885932475" left="158" leftF="158.41872075052015" right="119" rightF="118.5923157979264" top="0" topF="0.0"/>
             </y:GroupNode>
             <y:GroupNode>
               <y:Geometry height="50.0" width="50.0" x="0.0" y="60.0"/>
@@ -101,7 +109,7 @@ self.longitude</y:AttributeLabel>
                 <y:MethodLabel xml:space="preserve">__init__()
 to_dict()
 @utm()
-
+@dms
 __eq__()
 __ne__()
 __hash__()
@@ -126,6 +134,7 @@ self.y</y:AttributeLabel>
                 <y:MethodLabel xml:space="preserve">__init__()
 
 to_dict()
+distance()
 __hash__()
 __repr__()</y:MethodLabel>
               </y:UML>
@@ -152,6 +161,7 @@ from_dict()
 __eq__()
 __ne__()
 __lt__()
+__hash__()
 __repr__()
 </y:MethodLabel>
               </y:UML>
@@ -162,7 +172,7 @@ __repr__()
           <data key="d4" xml:space="preserve"/>
           <data key="d6">
             <y:UMLClassNode>
-              <y:Geometry height="312.51398349473675" width="277.5" x="-40.41692125731379" y="-1198.6410104540719"/>
+              <y:Geometry height="410.20196200338137" width="277.5" x="-33.97901451888538" y="-1224.4158338956922"/>
               <y:Fill color="#339966" transparent="false"/>
               <y:BorderStyle color="#000000" type="line" width="1.0"/>
               <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="13" fontStyle="bold" hasBackgroundColor="false" hasLineColor="false" height="19.1328125" horizontalTextPosition="center" iconTextGap="4" modelName="custom" textColor="#000000" verticalTextPosition="bottom" visible="true" width="54.01953125" x="111.740234375" xml:space="preserve" y="25.96875">Saddle<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:LabelModel><y:ModelParameter><y:SmartNodeLabelModelParameter labelRatioX="0.0" labelRatioY="0.0" nodeRatioX="0.0" nodeRatioY="-0.03703090122767855" offsetX="0.0" offsetY="0.0" upX="0.0" upY="-1.0"/></y:ModelParameter></y:NodeLabel>
@@ -182,8 +192,14 @@ addSummitLinker()
 @disqualified
 to_dict()
 from_dict()
+feature_neighbors()
+neighbors()
+all_neighbors()
+summits_set()
+disqualify_self_and_linkers
 
-__repr__()</y:MethodLabel>
+__repr__()
+__hash__()</y:MethodLabel>
               </y:UML>
             </y:UMLClassNode>
           </data>
@@ -207,6 +223,7 @@ addSaddleLinker()
 all_neighbors()
 to_dict()
 from_dict()
+feature_neighbors()
 
 __repr__()</y:MethodLabel>
               </y:UML>
@@ -216,7 +233,7 @@ __repr__()</y:MethodLabel>
         <node id="n0::n6">
           <data key="d6">
             <y:ShapeNode>
-              <y:Geometry height="30.0" width="97.30616185263159" x="-28.129576139885557" y="-834.5773800760942"/>
+              <y:Geometry height="30.0" width="97.30616185263159" x="-40.41692125731379" y="-768.0523437790005"/>
               <y:Fill color="#339966" transparent="false"/>
               <y:BorderStyle color="#000000" raised="false" type="line" width="1.0"/>
               <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="12" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="17.96875" horizontalTextPosition="center" iconTextGap="4" modelName="custom" textColor="#000000" verticalTextPosition="bottom" visible="true" width="69.87109375" x="13.717534051315795" xml:space="preserve" y="6.015625">_isSaddle()<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:LabelModel><y:ModelParameter><y:SmartNodeLabelModelParameter labelRatioX="0.0" labelRatioY="0.0" nodeRatioX="0.0" nodeRatioY="0.0" offsetX="0.0" offsetY="0.0" upX="0.0" upY="-1.0"/></y:ModelParameter></y:NodeLabel>
@@ -377,6 +394,7 @@ __repr__()</y:MethodLabel>
 
 append()
 sort()
+index()
 __len__()
 __setitem__()
 __getitem__()
@@ -400,6 +418,10 @@ __repr__()
               <y:UML clipContent="true" constraint="" hasDetailsColor="false" omitDetails="false" stereotype="lib/containers/gridpoint.py" use3DEffect="true">
                 <y:AttributeLabel xml:space="preserve">self.fastLookup</y:AttributeLabel>
                 <y:MethodLabel xml:space="preserve">__init__()
+
+@lowest
+@highest
+
 genFastLookup()
 
 iterNeighborDiagonal()
@@ -437,6 +459,7 @@ to_dict()
 from_dict()
 @pointsLatLong
 append()
+closestPoint()
 __len__()
 __setitem__()
 __getitem__()
@@ -463,6 +486,7 @@ rebuildSaddles()
 to_dict()
 from_dict()
 @saddles
+@disqualified
 
 append()
 __setitem__()
@@ -516,6 +540,7 @@ elevationRangeMetric()
 
 
 append()
+index()
 __len__()
 __repr__()
 __setitem__()
@@ -1032,6 +1057,7 @@ write()
                 <y:AttributeLabel xml:space="preserve">self.datamap
 self.saddles
 self.summits
+self.runoffs
 self.linkers
 self.extent
 self.logger
@@ -1048,8 +1074,7 @@ walk()
 _walk()
 walkSingleSaddle()
 _climb_up()
-disqualify_lower_linkers()
-mark_redundant_linkers()
+detect_basin_saddles()
 __repr__()</y:MethodLabel>
               </y:UML>
             </y:UMLClassNode>
@@ -1076,6 +1101,83 @@ run()
 localProminentRegion(summit)
 branchChaser(master, branch, depth, exempt)
 parentFinder(summit)
+</y:MethodLabel>
+              </y:UML>
+            </y:UMLClassNode>
+          </data>
+        </node>
+      </graph>
+    </node>
+    <node id="n5" yfiles.foldertype="group">
+      <data key="d4" xml:space="preserve"/>
+      <data key="d5"/>
+      <data key="d6">
+        <y:ProxyAutoBoundsNode>
+          <y:Realizers active="0">
+            <y:GroupNode>
+              <y:Geometry height="893.406895819407" width="982.5356136837302" x="-1366.3753548627112" y="661.7325821445822"/>
+              <y:Fill color="#F5F5F5" transparent="false"/>
+              <y:BorderStyle color="#000000" type="dashed" width="1.0"/>
+              <y:NodeLabel alignment="right" autoSizePolicy="node_width" backgroundColor="#EBEBEB" borderDistance="0.0" fontFamily="Dialog" fontSize="15" fontStyle="plain" hasLineColor="false" height="21.4609375" horizontalTextPosition="center" iconTextGap="4" modelName="internal" modelPosition="t" textColor="#000000" verticalTextPosition="bottom" visible="true" width="982.5356136837302" x="0.0" xml:space="preserve" y="0.0">Logic</y:NodeLabel>
+              <y:Shape type="roundrectangle"/>
+              <y:State closed="false" closedHeight="50.0" closedWidth="50.0" innerGraphDisplayEnabled="false"/>
+              <y:Insets bottom="15" bottomF="15.0" left="15" leftF="15.0" right="15" rightF="15.0" top="15" topF="15.0"/>
+              <y:BorderInsets bottom="560" bottomF="559.817359333284" left="31" leftF="31.340016752508518" right="456" rightF="456.13365558883584" top="0" topF="0.0"/>
+            </y:GroupNode>
+            <y:GroupNode>
+              <y:Geometry height="50.0" width="50.0" x="0.0" y="60.0"/>
+              <y:Fill color="#F5F5F5" transparent="false"/>
+              <y:BorderStyle color="#000000" type="dashed" width="1.0"/>
+              <y:NodeLabel alignment="right" autoSizePolicy="node_width" backgroundColor="#EBEBEB" borderDistance="0.0" fontFamily="Dialog" fontSize="15" fontStyle="plain" hasLineColor="false" height="21.4609375" horizontalTextPosition="center" iconTextGap="4" modelName="internal" modelPosition="t" textColor="#000000" verticalTextPosition="bottom" visible="true" width="65.201171875" x="-7.6005859375" xml:space="preserve" y="0.0">Folder 6</y:NodeLabel>
+              <y:Shape type="roundrectangle"/>
+              <y:State closed="true" closedHeight="50.0" closedWidth="50.0" innerGraphDisplayEnabled="false"/>
+              <y:Insets bottom="5" bottomF="5.0" left="5" leftF="5.0" right="5" rightF="5.0" top="5" topF="5.0"/>
+              <y:BorderInsets bottom="0" bottomF="0.0" left="0" leftF="0.0" right="0" rightF="0.0" top="0" topF="0.0"/>
+            </y:GroupNode>
+          </y:Realizers>
+        </y:ProxyAutoBoundsNode>
+      </data>
+      <graph edgedefault="directed" id="n5:">
+        <node id="n5::n0">
+          <data key="d4" xml:space="preserve"/>
+          <data key="d6">
+            <y:UMLClassNode>
+              <y:Geometry height="236.64985464464678" width="176.27133969907413" x="-1320.0353381102027" y="698.1935196445822"/>
+              <y:Fill color="#FFFF00" transparent="false"/>
+              <y:BorderStyle color="#000000" type="line" width="1.0"/>
+              <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="13" fontStyle="bold" hasBackgroundColor="false" hasLineColor="false" height="19.1328125" horizontalTextPosition="center" iconTextGap="4" modelName="custom" textColor="#000000" verticalTextPosition="bottom" visible="true" width="141.2744140625" x="17.498462818287067" xml:space="preserve" y="25.96875">BasinSaddleFinder<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:LabelModel><y:ModelParameter><y:SmartNodeLabelModelParameter labelRatioX="0.0" labelRatioY="0.0" nodeRatioX="0.0" nodeRatioY="-0.03703090122767855" offsetX="0.0" offsetY="0.0" upX="0.0" upY="-1.0"/></y:ModelParameter></y:NodeLabel>
+              <y:UML clipContent="true" constraint="" hasDetailsColor="false" omitDetails="false" stereotype="basin_saddle_finder.py" use3DEffect="true">
+                <y:AttributeLabel xml:space="preserve">self.saddles
+self.logger
+</y:AttributeLabel>
+                <y:MethodLabel xml:space="preserve">__init__(self, saddles):
+disqualify_basin_saddles()
+_disqualify_and_label()
+find_lowest_cycle_members()
+_disqualify_single_source_saddles
+</y:MethodLabel>
+              </y:UML>
+            </y:UMLClassNode>
+          </data>
+        </node>
+        <node id="n5::n1">
+          <data key="d4" xml:space="preserve"/>
+          <data key="d6">
+            <y:UMLClassNode>
+              <y:Geometry height="282.12859898612305" width="176.27133969907413" x="-1031.244736466891" y="698.1935196445822"/>
+              <y:Fill color="#008000" transparent="false"/>
+              <y:BorderStyle color="#000000" type="line" width="1.0"/>
+              <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="13" fontStyle="bold" hasBackgroundColor="false" hasLineColor="false" height="19.1328125" horizontalTextPosition="center" iconTextGap="4" modelName="custom" textColor="#000000" verticalTextPosition="bottom" visible="true" width="173.94580078125" x="1.1627694589120665" xml:space="preserve" y="25.96875">InternalSaddleNetwork<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:LabelModel><y:ModelParameter><y:SmartNodeLabelModelParameter labelRatioX="0.0" labelRatioY="0.0" nodeRatioX="0.0" nodeRatioY="-0.03703090122767855" offsetX="0.0" offsetY="0.0" upX="0.0" upY="-1.0"/></y:ModelParameter></y:NodeLabel>
+              <y:UML clipContent="true" constraint="" hasDetailsColor="false" omitDetails="false" stereotype="internal_saddle_network.py" use3DEffect="true">
+                <y:AttributeLabel xml:space="preserve">self.saddle
+self.datamap
+self.allVertexLinkers
+self.shortest_links</y:AttributeLabel>
+                <y:MethodLabel xml:space="preserve">__init__(self, saddle, datamap):
+treeExploration()
+build_internal_tree()
+generate_child_saddles()
+find_shortest_paths_between_high_shores()
 </y:MethodLabel>
               </y:UML>
             </y:UMLClassNode>
@@ -1167,9 +1269,7 @@ parentFinder(summit)
       <data key="d8" xml:space="preserve"/>
       <data key="d10">
         <y:PolyLineEdge>
-          <y:Path sx="-24.360223273886504" sy="-99.93744962672903" tx="0.0" ty="0.0">
-            <y:Point x="99.56265251989396" y="-859.7231830238726"/>
-          </y:Path>
+          <y:Path sx="-24.360223273886504" sy="-99.93744962672903" tx="1.2295737772077473" ty="176.76841261352175"/>
           <y:LineStyle color="#000000" type="line" width="1.0"/>
           <y:Arrows source="none" target="diamond"/>
           <y:BendStyle smoothed="false"/>
@@ -1215,7 +1315,7 @@ parentFinder(summit)
       <data key="d8" xml:space="preserve"/>
       <data key="d10">
         <y:PolyLineEdge>
-          <y:Path sx="53.541269147112416" sy="-15.465219276884454" tx="0.0" ty="0.0">
+          <y:Path sx="53.541269147112416" sy="-20.299454185215225" tx="0.0" ty="0.0">
             <y:Point x="151.87434788979863" y="-1341.036107854631"/>
           </y:Path>
           <y:LineStyle color="#000000" type="dashed" width="1.0"/>

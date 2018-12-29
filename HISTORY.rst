@@ -1,6 +1,6 @@
 Release History
 
-0.6.0 (December 29, 2018)
+0.6.0 (December 28, 2018)
 +++++++++++++++++++++++++
 * More robustness in KMLWriter
 * New features for BaseGridPoints, namely index() which returns the index at which that BaseGridpoint exists in the container, and distance() which calculates the distance (in points) from one BaseGridPoint to another.
