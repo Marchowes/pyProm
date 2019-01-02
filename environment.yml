@@ -7,8 +7,9 @@ dependencies:
 - libgdal
 - numpy
 - gdal
-- fastkml
-- shapely
-- utm
-- geopy
-- cbor
+- pip:
+    - fastkml
+    - shapely
+    - utm
+    - geopy
+    - cbor
