@@ -1,0 +1,7 @@
+numpy
+fastkml
+shapely
+utm
+geopy
+cbor
+
