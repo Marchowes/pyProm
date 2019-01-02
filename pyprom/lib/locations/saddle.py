@@ -28,7 +28,15 @@ class Saddle(SpotElevation):
         :param multiPoint: :class:`MultiPoint` object
         :param highShores: :class:`HighEdgeContainer` object
         :param edge: (bool) does this :class:`Saddle` have an edge
-        Effect?
+         Effect?
+        :param id: kwarg for id
+        :param children: list of child Saddles. These are :class:`Saddle`
+         derived from this :class:`Saddle`
+        :param singleSummit: kwarg for Saddles disqualified for being
+         linked to a Single Summit.
+        :param basinSaddle: kwarg for Saddles disqualified for being
+         a Basin Saddle.
+        :param disqualified: kwarg for a generic disqualified Saddle.
         """
         super(Saddle, self).__init__(latitude, longitude,
                                      elevation, *args, **kwargs)
@@ -45,7 +53,7 @@ class Saddle(SpotElevation):
         # All Edges lead to One summit.
         self.singleSummit = kwargs.get('singleSummit', False)
         # redundant saddle, but too low.
-        self.tooLow = kwargs.get('tooLow', False)
+        self.basinSaddle = kwargs.get('basinSaddle', False)
         # alternative basin saddles
         self.basinSaddleAlternatives = []
         # Non specific disqualification
@@ -111,7 +119,7 @@ class Saddle(SpotElevation):
         if self._disqualified in [True, False]:
             return self._disqualified
         else:
-            return self.singleSummit | self.tooLow
+            return self.singleSummit | self.basinSaddle
 
     @disqualified.setter
     def disqualified(self, value):
@@ -120,18 +128,18 @@ class Saddle(SpotElevation):
         """
         self._disqualified = value
 
-    def disqualify_self_and_linkers(self, tooLow=False,
+    def disqualify_self_and_linkers(self, basinSaddle=False,
                                     singleSummit=False):
         """
         Disqualify this :class:`Saddle` and linked :class:`Linker`s.
-        :param tooLow: set tooLow
+        :param basinSaddle: set basinSaddle
         :param singleSummit: set singleSummit
         """
-        if tooLow:
-            self.tooLow = tooLow
+        if basinSaddle:
+            self.basinSaddle = basinSaddle
         if singleSummit:
             self.singleSummit = singleSummit
-        if not (tooLow | singleSummit):
+        if not (basinSaddle | singleSummit):
             self._disqualified = True
         for linker in self.summits:
             linker.disqualified = True
@@ -149,8 +157,8 @@ class Saddle(SpotElevation):
                    'id': self.id}
         if self.singleSummit:
             to_dict['singlesummit'] = self.singleSummit
-        if self.tooLow:
-            to_dict['tooLow'] = self.tooLow
+        if self.basinSaddle:
+            to_dict['basinSaddle'] = self.basinSaddle
         if self._disqualified:
             to_dict['disqualified'] = self._disqualified
 
@@ -187,7 +195,7 @@ class Saddle(SpotElevation):
                       for pt in saddleDict['edgepoints']]
         id = saddleDict['id']
         singleSummit = saddleDict.get('singleSummit', False)
-        tooLow = saddleDict.get('tooLow', False)
+        basinSaddle = saddleDict.get('basinSaddle', False)
         disqualified = saddleDict.get('disqualified', None)
 
         multipoint = saddleDict.get('multipoint', [])
@@ -203,7 +211,7 @@ class Saddle(SpotElevation):
                    edgePoints=edgePoints,
                    id=id,
                    singleSummit=singleSummit,
-                   tooLow=tooLow,
+                   basinSaddle=basinSaddle,
                    disqualified=disqualified)
 
     def __hash__(self):

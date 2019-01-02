@@ -183,7 +183,7 @@ self.highShores
 self.parent
 self.children
 self.singleSummit
-self.tooLow
+self.basinSaddle
 self._disqualified
 self.lprBoundary</y:AttributeLabel>
                 <y:MethodLabel xml:space="preserve">__init__()
@@ -300,7 +300,7 @@ self.highShores
 self.parent
 self.children
 self.singleSummit
-self.tooLow
+self.basinSaddle
 self._disqualified
 self.lprBoundary</y:AttributeLabel>
                 <y:MethodLabel xml:space="preserve">__init__()

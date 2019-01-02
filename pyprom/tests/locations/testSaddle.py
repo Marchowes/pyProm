@@ -49,7 +49,7 @@ class SaddleTests(unittest.TestCase):
         self.assertEqual(newSaddle.edgePoints, saddle.edgePoints)
         self.assertEqual(newSaddle.id, saddle.id)
         self.assertEqual(newSaddle.disqualified, saddle.disqualified)
-        self.assertEqual(newSaddle.tooLow, saddle.tooLow)
+        self.assertEqual(newSaddle.basinSaddle, saddle.basinSaddle)
         self.assertEqual(newSaddle.singleSummit, saddle.singleSummit)
         self.assertEqual(newSaddle._disqualified, saddle._disqualified)
         # check child id
@@ -78,7 +78,7 @@ class SaddleTests(unittest.TestCase):
         self.assertEqual(newSaddle.edgePoints, saddle.edgePoints)
         self.assertEqual(newSaddle.id, saddle.id)
         self.assertEqual(newSaddle.disqualified, saddle.disqualified)
-        self.assertEqual(newSaddle.tooLow, saddle.tooLow)
+        self.assertEqual(newSaddle.basinSaddle, saddle.basinSaddle)
         self.assertEqual(newSaddle.singleSummit, saddle.singleSummit)
         self.assertEqual(newSaddle._disqualified, saddle._disqualified)
         # Ensure linker ids are correct.
@@ -108,7 +108,7 @@ class SaddleTests(unittest.TestCase):
         self.assertEqual(newSaddle.edgePoints, saddle.edgePoints)
         self.assertEqual(newSaddle.id, saddle.id)
         self.assertEqual(newSaddle.disqualified, saddle.disqualified)
-        self.assertEqual(newSaddle.tooLow, saddle.tooLow)
+        self.assertEqual(newSaddle.basinSaddle, saddle.basinSaddle)
         self.assertEqual(newSaddle.singleSummit, saddle.singleSummit)
         self.assertEqual(newSaddle._disqualified, saddle._disqualified)
         self.assertEqual(saddleDict['summits'][0], saddle.summits[0].id)

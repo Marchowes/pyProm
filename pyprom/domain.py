@@ -86,6 +86,10 @@ class Domain:
         # Find Features
         self.summits, self.saddles, self.runoffs =\
             AnalyzeData(self.datamap).run()
+        self.logger.info("Domain contains {} Summits, {} Saddles, {} Runoffs".format(
+            len(self.summits),
+            len(self.saddles),
+            len(self.runoffs)))
         # If we're in superSparse mode, bail.
         if superSparse:
             return
@@ -182,6 +186,33 @@ class Domain:
         domain_dict['linkers'] = [x.to_dict(noWalkPath=noWalkPath)
                                   for x in self.linkers]
         return domain_dict
+
+    def purge_saddles(self, singleSummit = True, basinSaddle = True):
+        """
+        Purges Non-redundant Basin Saddles and/or Single Summit linked Saddles
+        :param singleSummit: Bool, purge singleSummit :class:`Saddle`s
+        :param basinSaddle:  Bool, purge basinSaddle :class:`Saddle`s
+        """
+        toRemoveSaddles = []
+        toKeepSaddles = []
+        toKeepLinkers = []
+        for saddle in self.saddles:
+            # Are we a basin saddle and are we removing basin saddles
+            # and are there no alternate basin saddles?
+            if saddle.basinSaddle and basinSaddle and\
+                    not saddle.basinSaddleAlternatives:
+                toRemoveSaddles.append(saddle)
+                continue
+            # is this a singleSummit saddle and are we removing those?
+            if saddle.singleSummit and singleSummit:
+                toRemoveSaddles.append(saddle)
+                continue
+            toKeepSaddles.append(saddle)
+            toKeepLinkers.extend(saddle.summits)
+        self.linkers = toKeepLinkers
+        self.saddles = SaddlesContainer(toKeepSaddles)
+        self.logger.info("Culled {} Saddles".format(len(toRemoveSaddles)))
+        self.logger.info("Kept {} Saddles".format(len(toKeepSaddles)))
 
     def __repr__(self):
         """
