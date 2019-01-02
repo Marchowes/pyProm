@@ -65,8 +65,6 @@ class BasinSaddleFinder:
             lookback = {root.id: root}  # lookback from each feature
             exploredNbrs = {root.id: dict()}  # hash of explored neighbors.
             cycleMembers = {}
-
-            self.logger.info("remaining nodes: {}".format(len(features)))
             while stack:
                 z = stack.pop()
                 if z.disqualified or z.edgeEffect:
@@ -109,7 +107,6 @@ class BasinSaddleFinder:
         self.logger.info("Basin Saddle detection complete in {}"
                          " seconds {} Basin Saddles".format(
                              default_timer() - start, basinSaddlesCounter))
-        return cycles
 
     def _disqualify_and_label(self, lowest):
         """

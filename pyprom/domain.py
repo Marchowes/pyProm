@@ -187,11 +187,14 @@ class Domain:
                                   for x in self.linkers]
         return domain_dict
 
-    def purge_saddles(self, singleSummit = True, basinSaddle = True):
+    def purge_saddles(self, singleSummit = True, basinSaddle = True,
+                      allBasinSaddles = False):
         """
         Purges Non-redundant Basin Saddles and/or Single Summit linked Saddles
         :param singleSummit: Bool, purge singleSummit :class:`Saddle`s
         :param basinSaddle:  Bool, purge basinSaddle :class:`Saddle`s
+        :param allBasinSaddles: Bool, purge all :class:`Saddle`s which
+         are Basin Saddles
         """
         toRemoveSaddles = []
         toKeepSaddles = []
@@ -199,10 +202,15 @@ class Domain:
         for saddle in self.saddles:
             # Are we a basin saddle and are we removing basin saddles
             # and are there no alternate basin saddles?
-            if saddle.basinSaddle and basinSaddle and\
-                    not saddle.basinSaddleAlternatives:
-                toRemoveSaddles.append(saddle)
-                continue
+            if saddle.basinSaddle and (basinSaddle or allBasinSaddles):
+                # If were culling all Basin Saddles do this.
+                if allBasinSaddles:
+                    toRemoveSaddles.append(saddle)
+                    continue
+                # If not, just cull Basin Saddles without alternatives.
+                elif not saddle.basinSaddleAlternatives:
+                    toRemoveSaddles.append(saddle)
+                    continue
             # is this a singleSummit saddle and are we removing those?
             if saddle.singleSummit and singleSummit:
                 toRemoveSaddles.append(saddle)
