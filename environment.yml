@@ -1,0 +1,14 @@
+name: pyProm
+channels:
+- conda-forge
+- defaults
+dependencies:
+- python>=3.5
+- libgdal
+- numpy
+- gdal
+- fastkml
+- shapely
+- utm
+- geopy
+- cbor
