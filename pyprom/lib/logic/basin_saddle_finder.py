@@ -65,8 +65,6 @@ class BasinSaddleFinder:
             lookback = {root.id: root}  # lookback from each feature
             exploredNbrs = {root.id: dict()}  # hash of explored neighbors.
             cycleMembers = {}
-
-            self.logger.info("remaining nodes: {}".format(len(features)))
             while stack:
                 z = stack.pop()
                 if z.disqualified or z.edgeEffect:
@@ -92,6 +90,8 @@ class BasinSaddleFinder:
                             cycle.append(p)
                             cycleMembers[p.id] = True
                             p = lookback[p.id]
+                            if p.id == root.id:
+                                break
                         cycle.append(p)
                         lowest = self.find_lowest_cycle_members(cycle)
                         self._disqualify_and_label(lowest)
@@ -107,7 +107,6 @@ class BasinSaddleFinder:
         self.logger.info("Basin Saddle detection complete in {}"
                          " seconds {} Basin Saddles".format(
                              default_timer() - start, basinSaddlesCounter))
-        return cycles
 
     def _disqualify_and_label(self, lowest):
         """
@@ -115,7 +114,7 @@ class BasinSaddleFinder:
         one, and sets basinSaddleAlternatives for equal height features.
         :param lowest: list of "lowest" peaks.
         """
-        lowest[0].disqualify_self_and_linkers(tooLow=True)
+        lowest[0].disqualify_self_and_linkers(basinSaddle=True)
         if len(lowest) > 1:
             print("")
             for saddle in lowest:

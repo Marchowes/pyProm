@@ -1,5 +1,10 @@
 Release History
 
+0.6.1 (January 1, 2019)
++++++++++++++++++++++++
+* Domain now has a feature for culling various types of disqualified Saddles.
+* Minor bug fix in loop detection algorithm.
+
 0.6.0 (December 28, 2018)
 +++++++++++++++++++++++++
 * More robustness in KMLWriter

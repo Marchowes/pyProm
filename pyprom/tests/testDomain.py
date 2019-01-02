@@ -24,7 +24,6 @@ class DomainTests(unittest.TestCase):
         self.someslice = datamap.subset(0, 0, 30, 30)
         self.domain = Domain(self.someslice)
         self.domain.run()
-        self.domain.walk()
 
     def testDomainFromDict(self):
         """
@@ -58,3 +57,111 @@ class DomainTests(unittest.TestCase):
         self.assertEqual(newDomain.summits, self.domain.summits)
         self.assertEqual(newDomain.runoffs, self.domain.runoffs)
         self.assertEqual(newDomain.linkers, self.domain.linkers)
+
+    def testDomainCullingSingleSummits(self):
+        """
+        Ensure single Summit culling works.
+        9 Disqualified
+        6 Single Summit
+        3 Basin Saddles
+        -- 1 Basin Saddle with basinSaddleAlternative
+        -- 2 Lone Basin Saddle
+        Results:
+                3 Basin Saddles should remain.
+        """
+        # alter some Saddles.
+        self.domain.saddles[0].basinSaddle = True
+        self.domain.saddles[0].basinSaddleAlternatives = self.domain.saddles[2]
+        self.domain.saddles[11].basinSaddle = True
+        self.domain.saddles[12].basinSaddle = True
+
+        # Make sure we've got 9 Saddles to start with
+        self.assertEqual(len(self.domain.saddles.disqualified), 9)
+        self.assertEqual(len(self.domain.saddles), 20)
+        self.domain.purge_saddles(singleSummit=True,
+                                  basinSaddle=False)
+        # Make sure 3 saddle remains
+        self.assertEqual(len(self.domain.saddles.disqualified), 3)
+        self.assertEqual(len(self.domain.saddles), 14)
+
+    def testDomainCullingNonAlternateBasinSaddle(self):
+        """
+        Ensure single Summit culling works.
+        9 Disqualified
+        6 Single Summit
+        3 Basin Saddles
+        -- 1 Basin Saddle with basinSaddleAlternative
+        -- 2 Lone Basin Saddle
+        Results:
+                6 Single Summit should remain, 1 Basin with Alternate
+                should remain
+        """
+        # alter some Saddles.
+        self.domain.saddles[0].basinSaddle = True
+        self.domain.saddles[0].basinSaddleAlternatives =\
+            self.domain.saddles[2]
+        self.domain.saddles[11].basinSaddle = True
+        self.domain.saddles[12].basinSaddle = True
+
+        # Make sure we've got 9 Saddles to start with
+        self.assertEqual(len(self.domain.saddles.disqualified), 9)
+        self.assertEqual(len(self.domain.saddles), 20)
+        self.domain.purge_saddles(singleSummit=False,
+                                  basinSaddle=True)
+        # Make sure 7 saddle remains
+        self.assertEqual(len(self.domain.saddles.disqualified), 7)
+        self.assertEqual(len(self.domain.saddles), 18)
+
+    def testDomainCullingAllBasinSaddle(self):
+        """
+        Ensure single Summit culling works.
+        9 Disqualified
+        6 Single Summit
+        3 Basin Saddles
+        -- 1 Basin Saddle with basinSaddleAlternative
+        -- 2 Lone Basin Saddle
+        Results:
+                6 Single Summit should remain.
+        """
+        # alter some Saddles.
+        self.domain.saddles[0].basinSaddle = True
+        self.domain.saddles[0].basinSaddleAlternatives =\
+            self.domain.saddles[2]
+        self.domain.saddles[11].basinSaddle = True
+        self.domain.saddles[12].basinSaddle = True
+
+        # Make sure we've got 9 Saddles to start with
+        self.assertEqual(len(self.domain.saddles.disqualified), 9)
+        self.assertEqual(len(self.domain.saddles), 20)
+        self.domain.purge_saddles(singleSummit=False,
+                                  basinSaddle=False,
+                                  allBasinSaddles=True)
+        # Make sure 6 saddle remains
+        self.assertEqual(len(self.domain.saddles.disqualified), 6)
+        self.assertEqual(len(self.domain.saddles), 17)
+
+    def testDomainCullingDefault(self):
+        """
+        Ensure single Summit culling works.
+        9 Disqualified
+        6 Single Summit
+        3 Basin Saddles
+        -- 1 Basin Saddle with basinSaddleAlternative
+        -- 2 Lone Basin Saddle
+        Results:
+                1 Basin with Alternate should remain
+        """
+        # alter some Saddles.
+        self.domain.saddles[0].basinSaddle = True
+        self.domain.saddles[0].basinSaddleAlternatives =\
+            self.domain.saddles[2]
+        self.domain.saddles[11].basinSaddle = True
+        self.domain.saddles[12].basinSaddle = True
+
+        # Make sure we've got 9 Saddles to start with
+        self.assertEqual(len(self.domain.saddles.disqualified), 9)
+        self.assertEqual(len(self.domain.saddles), 20)
+        self.domain.purge_saddles()
+        # Make sure 7 saddle remains
+        self.assertEqual(len(self.domain.saddles.disqualified), 1)
+        self.assertEqual(len(self.domain.saddles), 12)
