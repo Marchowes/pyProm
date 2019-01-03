@@ -18,11 +18,18 @@ class SpotElevationContainer(_Base):
     """
     Container for Spot Elevation type lists.
     Allows for various list transformations.
+
+    This is intended to be inherited from, namely for:
+    :class:`pyprom.lib.container.saddles.SaddlesContainer`
+    :class:`pyprom.lib.container.summits.SummitsContainer`
+    :class:`pyprom.lib.container.runoffs.RunOffsContainer`
     """
 
     def __init__(self, spotElevationList):
         """
-        :param spotElevationList: list of :class:`SpotElevation`s
+        :param spotElevationList: list of
+         :class:`pyprom.lib.locations.spot_elevation.SpotElevation`
+         which will reside in this container.
         """
         super(SpotElevationContainer, self).__init__()
         self.points = spotElevationList
@@ -31,7 +38,11 @@ class SpotElevationContainer(_Base):
     @property
     def lowest(self):
         """
-        :return: list of lowest spot_elevation object(s)
+        :return: list of lowest
+         :class:`pyprom.lib.locations.spot_elevation.SpotElevation` object(s)
+         found in this container
+        :rtype:
+         list(:class:`pyprom.lib.locations.spot_elevation.SpotElevation`)
         """
         low = self.points[0].elevation
         lowest = list()
@@ -47,7 +58,11 @@ class SpotElevationContainer(_Base):
     @property
     def highest(self):
         """
-        :return: list of highest spot_elevation object(s)
+        :return: list of highest
+         :class:`pyprom.lib.locations.spot_elevation.SpotElevation` object(s)
+         found in this container
+        :rtype:
+         list(:class:`pyprom.lib.locations.spot_elevation.SpotElevation`)
         """
         high = self.points[0].elevation
         highest = list()
@@ -62,11 +77,17 @@ class SpotElevationContainer(_Base):
 
     def radius(self, lat, long, value, unit='m'):
         """
+        Returns all members of this container within a certain radius.
+
         :param lat: latitude of center in dotted decimal
+        :type lat: float, int
         :param long: longitude of center in dotted decimal
+        :type long: float, int
         :param value: number of units of distance
-        :param unit: type of unit (m, km, mi, ft)
+        :type value: float, int
+        :param str unit: type of unit (m, km, mi, ft)
         :return: SpotElevationContainer loaded with results.
+        :rtype: :class:`SpotElevationContainer`
         """
         unit = unit.lower()
         # convert our units to meters so we only have to deal with one unit
@@ -94,14 +115,19 @@ class SpotElevationContainer(_Base):
 
     def rectangle(self, lat1, long1, lat2, long2):
         """
-        For the purpose of gathering all points in a rectangle of
+        Returns all members of this container in a rectangle of
         (lat1, long1) - (lat2, long2)
+
         :param lat1:  latitude of point 1
+        :type lat1: float, int
         :param long1: longitude of point 1
+        :type long1: float, int
         :param lat2:  latitude of point 2
+        :type lat2: float, int
         :param long2: longitude of point 2
-        :return: list of all points in that between
-        (lat1, long1) - (lat2, long2)
+        :type long2: float, int
+        :return: all points within (inclusive) the specified rectangle.
+        :rtype: :class:`SpotElevationContainer`
         """
         upperlat = max(lat1, lat2)
         upperlong = max(long1, long2)
@@ -113,18 +139,30 @@ class SpotElevationContainer(_Base):
 
     def elevationRange(self, lower=-100000, upper=100000):
         """
+        Returns all members of this container within a certain elevation
+        range in feet
+
         :param lower: lower limit in feet
+        :type lower: int, float
         :param upper: upper limit in feet
-        :return: list of all points in range between lower and upper
+        :type upper: int, float
+        :return: all points in range between lower and upper (exclusive)
+        :rtype: :class:`SpotElevationContainer`
         """
         return self.__class__([x for x in self.points if
                                x.feet > lower and x.feet < upper])
 
     def elevationRangeMetric(self, lower=-100000, upper=100000):
         """
-        :param lower: lower limit in Meters
-        :param upper: upper limit in Meters
-        :return: list of all points in range between lower and upper
+        Returns all members of this container within a certain elevation range
+        using meters
+
+        :param lower: lower limit in meters
+        :type lower: int, float
+        :param upper: upper limit in meters
+        :type upper: int, float
+        :return: all points in range between lower and upper (exclusive)
+        :rtype: :class:`SpotElevationContainer`
         """
         return self.__class__([x for x in self.points if
                               upper > x.elevation > lower])
@@ -139,10 +177,12 @@ class SpotElevationContainer(_Base):
     def from_dict(cls, spotElevationContainerDict, datamap=None):
         """
         Load this object and child objects from a dict.
-        :param spotElevationContainerDict: dict() representation of
-            :class:`SpotElevation`.
-        :param datamap: :class:`Datamap`
-        :return: :class:`SpotElevation`
+
+        :param dict spotElevationContainerDict: dict() representation of
+            :class:`SpotElevationContainer`.
+        :param datamap: datamap which MultiPoint style SpotElevations use.
+        :type datamap: :class:`Datamap` object.
+        :return: :class:`SpotElevationContainer`
         """
         spotelevations = []
         for spotelevation in spotElevationContainerDict['spotelevations']:
@@ -153,9 +193,14 @@ class SpotElevationContainer(_Base):
 
     def append(self, spotElevation):
         """
-        Add a SpotElevation to the container.
-        :param spotElevation: :class:`SpotElevation`
-        :raises: TypeError if point not of :class:`SpotElevation`
+        Append a :class:`pyprom.lib.locations.spot_elevation.SpotElevation`
+        to this container.
+
+        :param spotElevation: SpotElevation to append.
+        :type spotElevation:
+         :class:`pyprom.lib.locations.spot_elevation.SpotElevation`
+        :raises: TypeError if point not of
+         :class:`pyprom.lib.locations.spot_elevation.SpotElevation`
         """
         isSpotElevation(spotElevation)
         self.points.append(spotElevation)
@@ -163,11 +208,16 @@ class SpotElevationContainer(_Base):
 
     def index(self, spotElevation):
         """
-        Returns the index that this :class:`SpotElevation` or child
+        Returns the index that this
+        :class:`pyprom.lib.locations.spot_elevation.SpotElevation` or child
         object occurs.
         if none, return None
-        :param gridPoint: :class:`SpotElevation`
+
+        :param gridPoint: Gridpoint to find index of.
+        :type gridPoint:
+        :class:`pyprom.lib.locations.spot_elevation.SpotElevation`
         :return: index in points list where this spotElevation exists
+        :rtype: int, None
         """
         try:
             return self.points.index(spotElevation)
@@ -176,7 +226,8 @@ class SpotElevationContainer(_Base):
 
     def __len__(self):
         """
-        :return: integer - number of items in self.points
+        :return: number of items in self.points
+        :rtype: int
         """
         return len(self.points)
 
@@ -188,28 +239,36 @@ class SpotElevationContainer(_Base):
 
     def __setitem__(self, idx, spotElevation):
         """
-        Gives SpotElevationContainer list like set capabilities
-        :param idx: index value
-        :param spotElevation: :class:`SpotElevation`
-        :raises: TypeError if spotElevation not of :class:`SpotElevation`
+        Gives :class:`SpotElevationContainer` list like set capabilities
+
+        :param int idx: index value
+        :param spotElevation:
+         :class:`pyprom.lib.locations.spot_elevation.SpotElevation`
+        :raises: TypeError if spotElevation not of
+         :class:`pyprom.lib.locations.spot_elevation.SpotElevation`
         """
         isSpotElevation(spotElevation)
         self.points[idx] = spotElevation
 
     def __getitem__(self, idx):
         """
-        Gives SpotElevationContainer list like get capabilities
-        :param idx: index value
-        :return: :class:`SpotElevation` self.point at idx
+        Gives :class:`SpotElevationContainer` list like get capabilities
+
+        :param int idx: index value
+        :return: :class:`pyprom.lib.locations.spot_elevation.SpotElevation`
+         self.point at idx
         """
         return self.points[idx]
 
     def __eq__(self, other):
         """
-        Determines if SpotElevationContainer is equal to another.
-        :param other: :class:`SpotElevationContainer`
-        :return: bool of equality
-        :raises: TypeError if other not of :class:`SpotElevation`
+        Determines if :class:`SpotElevationContainer` is equal to another.
+
+        :param other: other :class:`SpotElevationContainer` to check.
+        :type: :class:`SpotElevationContainer`
+        :return: equality
+        :rtype: bool
+        :raises: TypeError if other not of :class:`SpotElevationContainer`
         """
         _isSpotElevationContainer(other)
         return sorted([x for x in self.points]) == \
@@ -217,8 +276,12 @@ class SpotElevationContainer(_Base):
 
     def __ne__(self, other):
         """
-        :param other: :class:`SpotElevationContainer`
-        :return: bool of inequality
+        Determines if :class:`SpotElevationContainer` is not equal to another.
+
+        :param other: other :class:`SpotElevationContainer` to check.
+        :type: :class:`SpotElevationContainer`
+        :return: equality
+        :rtype: bool
         :raises: TypeError if other not of :class:`SpotElevationContainer`
         """
         _isSpotElevationContainer(other)
@@ -230,6 +293,9 @@ class SpotElevationContainer(_Base):
 
 def _isSpotElevationContainer(spotElevationContainer):
     """
+    Check if passed in object is a :class:`SpotElevationContainer`
+
+
     :param spotElevationContainer: object under scrutiny
     :raises: TypeError if other not of :class:`SpotElevationContainer`
     """

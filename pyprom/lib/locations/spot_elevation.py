@@ -15,18 +15,20 @@ from ..util import randomString
 
 class SpotElevation(BaseCoordinate):
     """
-    SpotElevation -- Intended to be inherited from. lat/long/elevation
+    SpotElevation is intended to be inherited from. Effectively it's a
+    Latitude/Longitude coordinate with an elevation
     """
 
     def __init__(self, latitude, longitude, elevation, *args, **kwargs):
         """
-        :param latitude: latitude in dotted decimal
-        :param longitude: longitude in dotted decimal
-        :param elevation: elevation in meters
-        :param edge: (bool) does this :class:`SpotElevation` have an edge
+        :param float latitude: latitude in dotted decimal
+        :param float longitude: longitude in dotted decimal
+        :param float elevation: elevation in meters
+        :param bool edge: does this :class:`SpotElevation` have an edge
          Effect?
-        :param edgePoints: list of :class:`BaseGridPoint` which are on
-         the map edge.
+        :param list edgePoints: list of
+         :class:`pyprom.lib.locations.base_gridpoint.BaseGridPoint`s
+         which are on the map edge.
         """
         super(SpotElevation, self).__init__(latitude, longitude)
         self.elevation = elevation
@@ -50,6 +52,7 @@ class SpotElevation(BaseCoordinate):
     def from_dict(cls, spotElevationDict):
         """
         Create :class:`SpotElevation` from dictionary representation
+
         :return: :class:`SpotElevation`
         """
         lat = spotElevationDict['lat']
@@ -67,9 +70,12 @@ class SpotElevation(BaseCoordinate):
     def toGridPoint(self, datamap):
         """
         Return this :class:`SpotElevation object` as
-         a :class:`GridPoint object`
-        :param datamap: :class:`Datamap` object
-        :return: :class:`GridPoint object`
+         a :class:`GridPoint` object based on the
+         :class:`pyprom.lib.DataMap` passed in.
+
+        :param datamap: :class:`pyprom.lib.DataMap` object
+        :type datamap: :class:`pyprom.lib.DataMap`
+        :return: :class:`pyprom.lib.locations.gridpoint.GridPoint`
         """
         from .gridpoint import GridPoint
         x, y = datamap.latlong_to_xy(self.latitude, self.longitude)
@@ -79,6 +85,7 @@ class SpotElevation(BaseCoordinate):
     def feet(self):
         """
         :return: elevation in feet
+        :rtype: float, None
         """
         try:
             return self.elevation * 3.2808
@@ -88,8 +95,11 @@ class SpotElevation(BaseCoordinate):
     def __eq__(self, other):
         """
         Determines if :class:`SpotElevation` is equal to another.
-        :param other: :class:`SpotElevation` to be compared against
-        :return: bool of inequality
+
+        :param other: object to be compared against
+        :type other: :class:`SpotElevation`
+        :return: of inequality
+        :rtype: bool
         """
         latitude = longitude = olatitude = olongitude = None
         if self.latitude:
@@ -106,8 +116,10 @@ class SpotElevation(BaseCoordinate):
     def __ne__(self, other):
         """
         Determines if :class:`SpotElevation` is not equal to another.
-        :param other: :class:`SpotElevation` to be compared against
-        :return: bool of inequality
+
+        :param other: object to be compared against
+        :return: inequality
+        :rtype: bool
         """
         return [round(self.latitude, 6), round(self.longitude, 6),
                 self.elevation] != \
@@ -116,9 +128,12 @@ class SpotElevation(BaseCoordinate):
 
     def __lt__(self, other):
         """
+        Determines if :class:`SpotElevation` elevation is less than another.
+
         :param other: object which we compare against.
-        :return: bool of if self is of lower elevation than other.
-        :raises: TypeError if other not of :class:`BaseCoordinate`
+        :return: if self is of lower elevation than other.
+        :rtype: bool
+        :raises: TypeError if other not of :class:`SpotElevation`
         """
         isSpotElevation(other)
         return self.elevation < other.elevation
@@ -145,6 +160,8 @@ class SpotElevation(BaseCoordinate):
 
 def isSpotElevation(spotElevation):
     """
+    Check if passed in object is a :class:`SpotElevation`
+
     :param spotElevation: object under scrutiny
     :raises: TypeError if other not of :class:`SpotElevation`
     """

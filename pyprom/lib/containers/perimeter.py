@@ -18,8 +18,9 @@ ORTHOGONAL_SHIFT_LIST = ((-1, 0), (0, 1), (1, 0), (0, -1))
 
 class Perimeter:
     """
-    Container for :class:`Perimeter` type lists.
-    Allows for various list transformations.
+    Container for :class:`Perimeter` type lists. A Perimeter
+    is all points Diagonally or Orthogonally neighboring a
+    member of a :class:`pyprom.lib.container.multipoint.MultiPoint`
     """
 
     def __init__(self, pointList=None,
@@ -28,15 +29,19 @@ class Perimeter:
                  mapEdge=False,
                  mapEdgePoints=None):
         """
-
-        :param pointList: pointList: list of :class:`GridPoint` to
-        self.points
-        :param pointIndex: pointIndex: {X: { Y: :class:`GridPoint`}} passing
-        this will automatically generate self.points
-        :param datamap: datamap object
-        :param mapEdge: (bool) is this a map edge?
-        :param mapEdgePoints: :class:`GridPoint` list of Points on
+        :param pointList: GridPoints which make up the Perimeter.
+        :type pointList:
+         list(:class:`pyprom.lib.locations.gridpoint.GridPoint`)
+        :param pointIndex: Members as a dict().
+        :type pointIndex:
+         dict({X: { Y: :class:`pyprom.lib.locations.gridpoint.GridPoint`}}
+        :param datamap: datamap which this :class:`Perimeter` uses.
+        :type datamap: :class:`Datamap` object.
+        :param cool mapEdge: is this a map edge?
+        :param mapEdgePoints: list of Points on
          the map edge.
+        :type mapEdgePoints:
+         list(:class:`pyprom.lib.locations.gridpoint.GridPoint`)
         """
         super(Perimeter, self).__init__()
         self.points = list()
@@ -53,9 +58,12 @@ class Perimeter:
 
     def iterNeighborDiagonal(self, point):
         """
-        Iterate through existing diagonal :class:`GridPoint`
-        neighbors.
-        :param point:
+        Iterate through diagonally and orthogonally neighboring
+        :class:`pyprom.lib.locations.gridpoint.GridPoint` which are
+        also members of this :class:Perimeter
+
+        :param point: Gridpoint to find neighbors of
+        :type point: :class:`pyprom.lib.locations.gridpoint.GridPoint`
         """
         for shift in DIAGONAL_SHIFT_LIST:
             x = point.x + shift[0]
@@ -67,9 +75,12 @@ class Perimeter:
 
     def iterNeighborOrthogonal(self, point):
         """
-        Iterate through existing orthogonal :class:`GridPoint`
-        neighbors.
-        :param point:
+        Iterate through orthogonally neighboring
+        :class:`pyprom.lib.locations.gridpoint.GridPoint` which are
+        also members of this :class:Perimeter
+
+        :param point: Gridpoint to find neighbors of
+        :type point: :class:`pyprom.lib.locations.gridpoint.GridPoint`
         """
         for shift in ORTHOGONAL_SHIFT_LIST:
             x = point.x + shift[0]
@@ -93,9 +104,13 @@ class Perimeter:
     @classmethod
     def from_dict(cls, perimeterDict, datamap=None):
         """
-        :param perimeterDict: dict() representation of this object.
-        :param datamap: :class:`Datamap`
-        :return: :class:`Perimeter`
+        Creates a new :class:`Perimeter` from the dict() representation.
+
+        :param dict perimeterDict: dict() representation of this object.
+        :param datamap: datamap which this Perimeter uses.
+        :type datamap: :class:`Datamap` object.
+        :return: new Perimeter object.
+        :rtype: :class:`Perimeter`
         """
         perimeterPointHash = defaultdict(dict)
         for pt in perimeterDict['points']:
@@ -111,11 +126,17 @@ class Perimeter:
 
     def findHighEdges(self, elevation):
         """
-        This function returns a list of GridpointContainers. Each container
-        holds a list of GridPoints which are discontigous so far as
-        the other container is concerned. This is used to identify discontigous
-        sets of GridPoints for determining if this is a Saddle or not.
+        This function returns a list of
+        :class:`pyprom.lib.container.gridpoint.GridPointContainer`s. Each
+        container holds a list of
+        :class:`pyprom.lib.locations.gridpoint.GridPoint` which are
+        discontigous so far as the other container is concerned.
+        This is used to identify discontigous sets of
+        :class:`pyprom.lib.locations.gridpoint.GridPoint` for determining
+        if this is a :class:`pyprom.lib.locations.saddle.Saddle` or not.
         :return: list of GridPointContainers containing HighEdges.
+        :rtype:
+         list(:class:`pyprom.lib.container.gridpoint.GridPointContainer`)
         """
         explored = defaultdict(dict)
         highLists = list()
@@ -147,33 +168,44 @@ class Perimeter:
         """
         This function returns all points higher than the passed in
         elevation and returns them in a GridPointContainer.
+
         :param elevation:
-        :return: GridPointContainer
+        :type elevation: int, float
+        :return: GridPointContainer containing high perimeter points.
+        :rtype: :class:`pyprom.lib.container.gridpoint.GridPointContainer`
         """
         higherPoints = [x for x in self.points if x.elevation > elevation]
         return GridPointContainer(higherPoints)
 
     def append(self, point):
         """
-        Add a GridPoint to the container.
-        :param point: :class:`GridPoint`
-        :raises: TypeError if point not of :class:`GridPoint`
+        Add a :class:`pyprom.lib.locations.gridpoint.GridPoint` to
+        this container.
+
+        :param point: GridPoint to append.
+        :type point: :class:`pyprom.lib.locations.gridpoint.GridPoint`
+        :raises: TypeError if point not of
+         :class:`pyprom.lib.locations.gridpoint.GridPoint`
         """
         isGridPoint(point)
         self.points.append(point)
 
     def __len__(self):
         """
-        :return: integer - number of items in self.points
+        :return: number of items in self.points
+        :rtype: int
         """
         return len(self.points)
 
     def __setitem__(self, idx, point):
         """
         Gives Perimeter list like set capabilities
-        :param idx: index value
-        :param point: :class:`SpotElevation`
-        :raises: TypeError if point not of :class:`GridPoint`
+
+        :param int idx: index value
+        :param point: GridPoint for setitem.
+        :type point: :class:`pyprom.lib.locations.gridpoint.GridPoint`
+        :raises: TypeError if point not of
+         :class:`pyprom.lib.locations.gridpoint.GridPoint`
         """
         isGridPoint(point)
         self.points[idx] = point
@@ -181,16 +213,21 @@ class Perimeter:
     def __getitem__(self, idx):
         """
         Gives Perimeter list like get capabilities
-        :param idx: index value
-        :return: :class:`Gridpoint` self.point at idx
+
+        :param int idx: index value
+        :return: :class:`pyprom.lib.locations.gridpoint.GridPoint`
+         self.point at idx
         """
         return self.points[idx]
 
     def __eq__(self, other):
         """
         Determines if Perimeter is equal to another.
-        :param other: :class:`Perimeter`
-        :return: bool of equality
+
+        :param other: other :class:`Perimeter` to check.
+        :type: :class:`Perimeter`
+        :return: equality
+        :rtype: bool
         :raises: TypeError if other not of :class:`Perimeter`
         """
         _isPerimeter(other)
@@ -199,8 +236,12 @@ class Perimeter:
 
     def __ne__(self, other):
         """
-        :param other: :class:`Perimeter`
-        :return: bool of inequality
+        Determines if Perimeter is not equal to another.
+
+        :param other: other :class:`Perimeter` to check.
+        :type: :class:`Perimeter`
+        :return: inequality
+        :rtype: bool
         :raises: TypeError if other not of :class:`Perimeter`
         """
         _isPerimeter(other)
@@ -209,7 +250,7 @@ class Perimeter:
 
     def __iter__(self):
         """
-        :return: iterator for self.points
+        :return: self.points as iterator
         """
         for point in self.points:
             yield point
@@ -226,6 +267,8 @@ class Perimeter:
 
 def _isPerimeter(perimeter):
     """
+    Check if passed in object is a :class:`Perimeter`
+
     :param perimeter: object under scrutiny
     :raises: TypeError if other not of :class:`Perimeter`
     """

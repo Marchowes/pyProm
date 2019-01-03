@@ -18,14 +18,16 @@ class BaseGridPoint:
     def __init__(self, x, y):
         """
         Basic Gridpoint.
-        :param x: x coordinate
-        :param y: y coordinate
+        :param int x: x coordinate
+        :param int y: y coordinate
         """
         self.x = x
         self.y = y
 
     def to_dict(self):
         """
+        Returns dict representation of this :class:`BaseGridPoint`
+
         :return: dict() representation of :class:`BaseGridPoint`
         """
         return {'x': self.x,
@@ -33,8 +35,14 @@ class BaseGridPoint:
 
     def distance(self, other):
         """
-        :param other: :class:BaseGridPoint to compare for calculating distance.
-        :return: float value of distance.
+        Returns the distance between this :class:`BaseGridPoint` and
+        another (in points)
+
+        :param other: :class:`BaseGridPoint` to compare for
+         calculating distance.
+        :type other: :class:`BaseGridPoint`
+        :return: distance.
+        :rtype: float
         :raises: TypeError if other not of :class:`BaseGridPoint`
         """
         isBaseGridPoint(other)
@@ -77,6 +85,8 @@ class BaseGridPoint:
 
 def isBaseGridPoint(gridPoint):
     """
+    Check if passed in object is a :class:`BaseGridPoint`
+
     :param gridPoint: object under scrutiny
     :raises: TypeError if other not of :class:`BaseGridPoint`
     """

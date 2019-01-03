@@ -15,22 +15,48 @@ from .perimeter import Perimeter
 
 
 class MultiPoint:
-    """MultiPoint Container"""
+    """A MultiPoint Container. This is a special kind of feature which contains
+    multiple :class:`pyprom.lib.locations.base_gridpoint.BaseGridPoint`s.
+    These points are all of equal elevation and neighbor each other
+    Orthogonally or Diagonally.
+    |
+    |   [4][3][4][6][4]
+    |   [3][5][5][5][6]
+    |   [2][3][5][6][3]
+    |   [3][5][4][3]
+    |   [6][7][6]
+    |
+    |   In the above example, all [5] points represent a valid MultiPoint.
+    |   All non [5] points are Perimeter Points, that is, they neighbor
+    |   MultiPoint members Diagonally or Orthogonally.
+    |
+    |      [5][5][5]
+    |         [5]   <- Without Perimeter
+    |      [5]
+    |
+    |
+    |   [4][3][4][6][4]
+    |   [3]         [6] <- Just the Perimeter.
+    |   [2][3]   [6][3]
+    |   [3]   [4][3]
+    |   [6][7][6]
+    """
 
     def __init__(self, points, elevation, datamap,
                  perimeter=None):
         """
-        This is an "equal height" Multipoint storage container that
-        provides a number of functions for analysis of these blob like
-        locations. An Example of this would be a pond. This object in
-        contains a list of all the points of this pond.
         :param points: list of BaseGridPoint objects. These are the inside
             points that make up a Multipoint.
+        :type points:
+         list(:class:`pyprom.lib.locations.base_gridpoint.BaseGridPoint`)
         :param elevation: elevation in meters
-        :param datamap: :class:`Datamap` object.
-        :param perimeter: :class:`Perimeter` object.
-            These are the points that make up the border of the multipoint
-            outside of the multipoint.
+        :type elevation: int, float
+        :param datamap: datamap which this MultiPoint uses.
+        :type datamap: :class:`Datamap` object.
+        :param perimeter: :class:`MultiPoint` Perimeter.  These are the points
+         that make up the orthogonally/diagonally connected border of the
+         multipoint outside of the multipoint.
+        :type perimeter: :class:`Perimeter` object.
         """
         super(MultiPoint, self).__init__()
         self.points = points  # BaseGridPoint Objects.
@@ -51,9 +77,14 @@ class MultiPoint:
     @classmethod
     def from_dict(cls, multiPointDict, datamap=None):
         """
-        :param multiPointDict: dict() representation of this object.
-        :param datamap: :class:`Datamap`
-        :return: :class:`MultiPoint`
+        Creates a new :class:`MultiPoint` from the dict() representation.
+
+        :param multiPointDict: dict() representation of this
+         :class:`MultiPoint`.
+        :param datamap: datamap which this MultiPoint uses.
+        :type datamap: :class:`Datamap` object.
+        :return: new Multipoint object.
+        :rtype: :class:`MultiPoint`
         """
         points = [BaseGridPoint(x['x'], x['y'])
                   for x in multiPointDict['points']]
@@ -64,16 +95,25 @@ class MultiPoint:
     @property
     def pointsLatLong(self):
         """
+        Returns list() of Container
+         :class:`pyprom.lib.locations.base_gridpoint.BaseGridPoint` as
+         :class:`pyprom.lib.locations.base_coordinate.BaseCoordinate`
+
         :return: List of All blob points with lat/long instead of x/y
+        :rtype:
+         list(:class:`pyprom.lib.locations.base_coordinate.BaseCoordinate`)
         """
         return [BaseCoordinate(*self.datamap.xy_to_latlong(coord.x, coord.y))
                 for coord in self.points]
 
     def append(self, point):
         """
-        Add a BaseGridPoint to the container.
-        :param point: :class:`BaseGridPoint`
-        :raises: TypeError if point not of :class:`BaseGridPoint`
+        Add a BaseGridPoint to this container.
+
+        :param point: BaseGridPoint to add.
+        :type point: :class:`pyprom.lib.locations.base_gridpoint.BaseGridPoint`
+        :raises: TypeError if point not of
+         :class:`pyprom.lib.locations.base_gridpoint.BaseGridPoint`
         """
         isBaseGridPoint(point)
         self.points.append(point)
@@ -81,10 +121,14 @@ class MultiPoint:
     def closestPoint(self, gridPoint, asSpotElevation=False):
         """
         Returns the closest point in this container to the GridPoint passed in.
-        :param gridPoint: :class:`GridPoint`
-        :param asSpotElevation: bool if True, returns SpotElevation object.
-        :return: :class:`GridPoint` if asSpotElevation == False
-                 :class:`SpotElevation` if asSpotElevation == True
+
+        :param gridPoint: GridPoint to check.
+        :type gridPoint: :class:`pyprom.lib.locations.gridpoint.GridPoint`
+        :param bool asSpotElevation: If True, returns SpotElevation object.
+        :return: GridPoint if asSpotElevation == False
+                 SpotElevation if asSpotElevation == True
+        :rtype :class:`pyprom.lib.locations.gridpoint.GridPoint`,
+         :class:`pyprom.lib.locations.spot_elevation.SpotElevation`
         """
         closestDistance = gridPoint.distance(self.points[0])
         closest = self.points[0]
@@ -104,15 +148,18 @@ class MultiPoint:
 
     def __len__(self):
         """
-        :return: integer - number of items in self.points
+        :return: number of items in self.points
+        :rtype: int
         """
         return len(self.points)
 
     def __setitem__(self, idx, point):
         """
         Gives MultiPoint list like set capabilities
-        :param idx: index value
-        :param point: :class:`BaseGridPoint`
+
+        :param int idx: index value
+        :param point: BaseGridPoint for setitem.
+        :type point: :class:`pyprom.lib.locations.base_gridpoint.BaseGridPoint`
         :raises: TypeError if point not of :class:`BaseGridPoint`
         """
         isBaseGridPoint(point)
@@ -121,16 +168,21 @@ class MultiPoint:
     def __getitem__(self, idx):
         """
         Gives MultiPoint list like get capabilities
-        :param idx: index value
-        :return: :class:`GridPoint` self.point at idx
+
+        :param int idx: index value
+        :return: :class:`pyprom.lib.locations.base_gridpoint.BaseGridPoint`
+         self.point at idx
         """
         return self.points[idx]
 
     def __eq__(self, other):
         """
         Determines if MultiPoint is equal to another.
-        :param other: :class:`MultiPoint`
-        :return: bool of equality
+
+        :param other: other :class:`MultiPoint` to check.
+        :type: :class:`MultiPoint`
+        :return: equality
+        :rtype: bool
         :raises: TypeError if other not of :class:`MultiPoint`
         """
         _isMultiPoint(other)
@@ -139,8 +191,12 @@ class MultiPoint:
 
     def __ne__(self, other):
         """
-        :param other: :class:`MultiPoint`
-        :return: bool of inequality
+        Determines if MultiPoint is not equal to another.
+
+        :param other: other :class:`MultiPoint` to check.
+        :type: :class:`MultiPoint`
+        :return: inequality
+        :rtype: bool
         :raises: TypeError if other not of :class:`MultiPoint`
         """
         _isMultiPoint(other)
@@ -167,6 +223,8 @@ class MultiPoint:
 
 def _isMultiPoint(mp):
     """
+    Check if passed in object is a :class:`MultiPoint`
+
     :param mp: object under scrutiny
     :raises: TypeError if other not of :class:`MultiPoint`
     """

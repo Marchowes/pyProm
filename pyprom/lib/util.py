@@ -14,8 +14,10 @@ from .locations.base_gridpoint import BaseGridPoint
 def dottedDecimaltoDegrees(coordinate):
     """
     Converts dotted Decimal coordinate to a DMS
-    :param coordinate: (float) dd coordinate to convert.
+
+    :param float coordinate: dd coordinate to convert.
     :return: degrees, minutes, seconds
+    :rtype: int, int, int
     """
     degrees = int(coordinate)
     md = abs(coordinate - degrees) * 60
@@ -27,12 +29,20 @@ def dottedDecimaltoDegrees(coordinate):
 def degreesToDottedDecimal(deg, mnt=0, sec=0):
     """
     Accepts dms and converts to dd
+
+    :param int deg: degrees
+    :param int mnt: minutes
+    :param int sec: seconds
+    :return: dotted decimal format
+    :rtype: float
     """
     return float(round(deg + (mnt / 60) + (sec / 3600), 6))
 
 
 def coordinateHashToList(coordianteHash):
     """
+    Converts a coordinateHash to a list of coordinates.
+
     :param coordianteHash: a hash using
     {x1:[y1:True,y2:True..],x1:[y1:True,y2:True..]} format
     :return: list coordinates [[x1,y1],[x1,y2]....]
@@ -42,7 +52,10 @@ def coordinateHashToList(coordianteHash):
 
 def coordinateHashToGridPointList(coordinateHash):
     """
-    :param coordinateHash: a hash using
+    Converts a coordinateHash to a
+    :class:`pyprom.lib.locations.gridpoint.GridPoint` list.
+
+    :param dict coordinateHash: a hash using
     {x1:[y1:True,y2:True..],x1:[y1:True,y2:True..]} format
     :return: list of BaseGridPoint objects.
     """
@@ -54,15 +67,18 @@ def compressRepetetiveChars(string):
     """
     Accepts String like "HHLHHHLL" and removes continuous redundant chars
     "HLHL"
-    :param string:
-    :return:
+
+    :param str string: "H" and "L" string
+    :return: condensed non repeating string.
     """
     return ''.join(ch for ch, _ in itertools.groupby(string))
 
 
 def seconds_to_arcseconds(seconds):
     """
-    :param seconds:
+    Convert Seconds to Arc Seconds
+
+    :param float seconds:
     :return: converts seconds into arcseconds.
     """
     return seconds * 3600
@@ -70,6 +86,8 @@ def seconds_to_arcseconds(seconds):
 
 def arcseconds_to_seconds(arcseconds):
     """
+    Convert Arc Seconds to Seconds.
+
     :param arcseconds:
     :return: converts arcseconds into seconds.
     """
@@ -78,8 +96,10 @@ def arcseconds_to_seconds(arcseconds):
 
 def randomString(length=12):
     """
-    :param length: string length
-    :return: string
+    Creates Random string.
+
+    :param int length: string length
+    :return: random string of length characters.
     """
     return ''.join(random.choice(
         string.ascii_lowercase +

@@ -31,26 +31,28 @@ class Loader:
 
 
 class GDALLoader(Loader):
-    """General GDAL datasets."""
+    """
+    | Loads Raster Data from GDAL.
+    | Raster data is made available at self.datamap
+    """
 
     def __init__(self, filename, epsg_alias="WGS84"):
         """
         :param filename: full or relative file location.
         :param epsg_alias: common name for epsg code
 
-        latitude and longitude references are always "lower left"
-        GDAL raster data is always presented as such:
+        | latitude and longitude references are always "lower left"
+        | GDAL raster data is always presented as such:
 
-        Y: left/right
-        X: up/down
+        | Y: left/right
+        | X: up/down
 
-        UL---UR
-        |     |
-        LL---LR
+        | ``UL---UR``
+        | ``|     |``
+        | ``LL---LR``
 
-        The LL corner is always passed to the Datamap Object with a reference
-        to the Native grid Lower Left corner.
-
+        | The LL corner is always passed to the Datamap Object with a reference
+        | to the Native grid Lower Left corner.
         """
         super(GDALLoader, self).__init__(filename)
 

@@ -17,14 +17,37 @@ from ..util import randomString
 class Summit(SpotElevation):
     """
     Summit object stores relevant summit data.
+    A Summit is by definition a point, or set of equal height points
+    (MultiPoint) which have all points around it's perimeter lower
+    that the point or Multipoint. A Summit is a Child object of
+    :class:`pyprom.lib.locations.spot_elevation.SpotElevation`
+    |
+    | Examples:
+    |
+    |  Single Point Summit:
+    |
+    | [0][0][0]
+    | [0][1][0]   [1] = Summit
+    | [0][0][0]
+    |
+    |
+    |   MultiPoint Summit:
+    |
+    | [0][0][0][0]
+    | [0][1][1][0]  [1][1] = Summit
+    | [0][0][0][0]
+    |
+    |
     """
 
     def __init__(self, latitude, longitude, elevation, *args, **kwargs):
         """
-        :param latitude: latitude in dotted decimal
-        :param longitude: longitude in dotted decimal
-        :param elevation: elevation in meters
-        :param multiPoint: :class:`MultiPoint` object
+        :param float latitude: latitude in dotted decimal
+        :param float longitude: longitude in dotted decimal
+        :param float elevation: elevation in meters
+        :param multiPoint: MultiPoint object
+        :type multiPoint: :class:`pyprom.lib.container.multipoint.MultiPoint`,
+         None
         """
         super(Summit, self).__init__(latitude, longitude,
                                      elevation, *args, **kwargs)
@@ -43,21 +66,25 @@ class Summit(SpotElevation):
     def addSaddleLinker(self, linker):
         """
         Adds linker to this :class:`Summit`
-        :param linker: :class:`Linker`
+        :param linker: linker to be added
+        :type linker: :class:`pyprom.lib.container.linker.Linker`
         """
         isLinker(linker)
         self.saddles.append(linker)
 
     def feature_neighbors(self):
         """
-        :return: returns all Saddles. This is, in effect, an interface.
+        :return: returns all Saddles linked to this Summit.
+         This is, in effect, an interface.
         """
         return [feature.saddle for feature in self.saddles]
 
     @property
     def neighbors(self):
         """
-        :return: list of directly neighboring summits excluding self.
+        :return: list of indirectly neighboring summits excluding self.
+         these are summits linked by way of a linked
+         :class:`pyprom.lib.locations.saddle.Saddle`
         """
         neighborSet = set(self.all_neighbors())
         neighborSet.discard(self)
@@ -68,8 +95,11 @@ class Summit(SpotElevation):
         all_neighbors will return all neighboring summits by way of the saddle.
         This function deliberately makes no effort to filter out redundant
         neighbors.
-        :param filterDisqualified: bool Filter out disqualified linkers.
-        :return: list of neighboring summits by way of neighboring saddles.
+
+        :param bool filterDisqualified: Filter out disqualified linkers.
+        :return: list of neighboring
+         :class:`pyprom.lib.locations.summit.Summit`s by way of linked
+         :class:`pyprom.lib.locations.saddle.Saddle`.
         """
         neighbors = []
         if filterDisqualified:
@@ -83,7 +113,7 @@ class Summit(SpotElevation):
 
     def to_dict(self, referenceById=True):
         """
-        :param referenceById: reference Saddles by ID.
+        :param bool referenceById: reference Saddles by ID.
         :return: dict() representation of :class:`Summit`
         """
         to_dict = {'lat': self.latitude,
@@ -105,6 +135,7 @@ class Summit(SpotElevation):
     def from_dict(cls, summitDict, datamap=None):
         """
         Create :class:`Summit` from dictionary representation
+
         :return: :class:`Summit`
         """
         lat = summitDict['lat']
@@ -139,6 +170,8 @@ class Summit(SpotElevation):
 
 def isSummit(summit):
     """
+    Check if passed in object is a :class:`Summit`
+
     :param summit: object under scrutiny
     :raises: TypeError if other not of :class:`Summit`
     """

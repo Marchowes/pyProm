@@ -15,11 +15,13 @@ from collections import OrderedDict
 class BasinSaddleFinder:
     """
     Class for identifying all basin saddles.
+    A Basin Saddle is the lowest member of a cycle.
     """
 
     def __init__(self, saddles):
         """
-        :param saddles: SaddlesContainer
+        :param saddles: SaddlesContainer containg saddles to be analyzed
+        :type saddles: :class:`pyprom.lib.container.saddles.SaddlesContainer`
         :raises: TypeError
         """
         if not isinstance(saddles, SaddlesContainer):
@@ -30,8 +32,10 @@ class BasinSaddleFinder:
 
     def disqualify_basin_saddles(self):
         """
-        This function identifies Basin Saddles, marks them as disqualified,
-        and sets basinSaddleAlternatives in the saddle.
+        This function identifies Basin Saddles or single summit (stub)
+        saddles, marks them as disqualified, and sets
+        basinSaddleAlternatives on the disqualified saddle, and the
+        alternate basin saddle.
         """
         # initiation
         start = default_timer()
@@ -112,7 +116,8 @@ class BasinSaddleFinder:
         """
         Consumes a list of features of the same height, disqualifies
         one, and sets basinSaddleAlternatives for equal height features.
-        :param lowest: list of "lowest" peaks.
+
+        :param list lowest: list of "lowest" peaks.
         """
         lowest[0].disqualify_self_and_linkers(basinSaddle=True)
         if len(lowest) > 1:
@@ -125,7 +130,8 @@ class BasinSaddleFinder:
         """
         Consumes a list of points which make a cycle. Finds lowest points
         and returns a list of features which are the lowest.
-        :param cycle: list of features which make a cycle.
+
+        :param list cycle: features which make a cycle.
         """
         lowest = []
         lowest.append(cycle[0])
@@ -142,13 +148,14 @@ class BasinSaddleFinder:
     def _disqualify_single_source_saddles(self, saddle):
         """
         Disqualifies Linkers and Saddles for Single Summit Saddles.
-                  /-----/
+                  v-----v
         Summit 1000    995 Saddle  <-Disqualify
-                  /-----/
+                  ^-----^
 
                   and
 
         Summit 1000 ----- 995 Saddle <- Disqualify
+
         :return: 0 = no disqualified. 1 = disqualified.
         """
         uniqueSummits = set([x.summit for x in saddle.summits])

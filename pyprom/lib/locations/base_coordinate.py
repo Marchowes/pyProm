@@ -22,12 +22,13 @@ class BaseCoordinate:
         :param latitude: latitude in dotted decimal
         :param longitude: longitude in dotted decimal
         """
-        super(BaseCoordinate, self).__init__()
         self.latitude = latitude
         self.longitude = longitude
 
     def to_dict(self):
         """
+        Returns dict representation of this :class:`BaseCoordinate`
+
         :return: dict of :class:`BaseCoordinate`
         """
         return {'latitude': self.latitude,
@@ -37,24 +38,32 @@ class BaseCoordinate:
     def utm(self):
         """
         Returns Tuple of utm coordinate for this :class:`BaseCoordinate`.
-        :return:
+
+        :return: utm coordinate
+        :rtype: str
         """
         return utm.from_latlon(self.latitude, self.longitude)
 
     @property
     def dms(self):
         """
-        Show this SpotElevation as degrees minutes seconds
-        :return: tuple (dms, dms)
+        Returns the coordinate of this :class:`BaseCoordinate`
+        in degrees minutes seconds format
+
+        :return: (dms, dms)
+        :rtype: tuple
         """
         return ((dottedDecimaltoDegrees(self.latitude)),
                 (dottedDecimaltoDegrees(self.longitude)))
 
     def __eq__(self, other):
         """
-        Determines if :class:`BaseCoordinate` is equal to another.
+        Determines if this :class:`BaseCoordinate` is equal to another.
+
         :param other: :class:`BaseCoordinate` to be compared against
-        :return: bool of equality
+        :type other: :class:`BaseCoordinate`
+        :return: equality
+        :rtype: bool
         """
         latitude = longitude = olatitude = olongitude = None
         if self.latitude:
@@ -70,9 +79,12 @@ class BaseCoordinate:
 
     def __ne__(self, other):
         """
-        Determines if :class:`BaseCoordinate` is not equal to another.
+        Determines if this :class:`BaseCoordinate` is not equal to another.
+
         :param other: :class:`BaseCoordinate` to be compared against
-        :return: bool of inequality
+        :type other: :class:`BaseCoordinate`
+        :return: inequality
+        :rtype: bool
         """
         return [round(self.latitude, 6), round(self.longitude, 6)] != \
                [round(other.latitude, 6), round(other.longitude, 6)]
@@ -95,6 +107,8 @@ class BaseCoordinate:
 
 def isBaseCoordinate(baseCoordinate):
     """
+    Check if passed in object is a :class:`BaseCoordinate`
+
     :param baseCoordinate: object under scrutiny
     :raises: TypeError if other not of :class:`BaseCoordinate`
     """

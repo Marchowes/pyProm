@@ -14,14 +14,19 @@ class HighEdgeContainer(object):
     Container for High Edge Lists -- Specifically for the purpose of storing
     high edge sections around Saddles.
 
-    The object takes a gridPoint container which represents all Perimeter
-    points around a point. And breaks it down into distinct highEdge regions.
+    The object takes a
+    :class:`pyprom.lib.container.gridpoint.GridPointContainer` which represents
+    all Perimeter points around a
+    :class:`pyprom.lib.locations.spot_elevation.SpotElevation` child and breaks
+    it down into distinct highEdge regions.
     """
 
     def __init__(self, shore, blobElevation):
         """
-        :param shore: :class:`GridPointCointer`
+        :param shore: gridpoint container containing all perimeter points.
+        :type shore :class:`pyprom.lib.container.gridpoint.GridPointContainer`
         :param blobElevation: elevation (m) of blob.
+        :type blobElevation: int, float
         """
         # list of list of high edges.
         self._highPoints = list()

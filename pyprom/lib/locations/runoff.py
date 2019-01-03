@@ -13,18 +13,23 @@ from ..util import randomString
 
 class Runoff(Saddle):
     """
-    Runoff object stores relevant runoff data.
+    Runoff object stores relevant runoff data. A Runoff is a mapEdge feature.
+    It can either be a Saddle stand in, or a Summit stand in, tho, for our
+    purposes these are Saddle-like. This is a child object of
+    :class:`pyprom.lib.locations.saddle.Saddle`
     """
 
     def __init__(self, latitude, longitude, elevation, *args, **kwargs):
         """
-        :param latitude: latitude in dotted decimal
-        :param longitude: longitude in dotted decimal
-        :param elevation: elevation in meters
-        :param multiPoint: :class:`MultiPoint` object
-        :param highShores: :class:`HighEdgeContainer` object
-        :param edge: (bool) does this :class:`SpotElevation` have an edge
-        Effect?
+        :param float latitude: latitude in dotted decimal
+        :param float longitude: longitude in dotted decimal
+        :param float elevation: elevation in meters
+        :param multiPoint: MultiPoint object
+        :type multiPoint: :class:`pyprom.lib.container.multipoint.MultiPoint`,
+         None
+        :param highShores: HighEdgeContainer object
+        :type highShores:
+         :class:`pyprom.lib.container.high_edge.HighEdgeContainer`, None
         """
         super(Runoff, self).__init__(latitude, longitude,
                                      elevation, *args, **kwargs)
