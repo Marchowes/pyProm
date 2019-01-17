@@ -20,9 +20,10 @@ class BasinSaddleFinder:
 
     def __init__(self, saddles):
         """
-        :param saddles: SaddlesContainer containg saddles to be analyzed
-        :type saddles: :class:`pyprom.lib.container.saddles.SaddlesContainer`
-        :raises: TypeError
+        :param saddles: SaddlesContainer containing saddles to be analyzed
+        :type saddles: :class:`pyprom.lib.containers.saddles.SaddlesContainer`
+        :raises: TypeError if not a
+         :class:`pyprom.lib.containers.saddles.SaddlesContainer`
         """
         if not isinstance(saddles, SaddlesContainer):
             raise TypeError("Saddles must be SaddlesContainer")
@@ -117,7 +118,9 @@ class BasinSaddleFinder:
         Consumes a list of features of the same height, disqualifies
         one, and sets basinSaddleAlternatives for equal height features.
 
-        :param list lowest: list of "lowest" peaks.
+        :param lowest: list of "lowest" features.
+        :type lowest:
+         list(:class:`pyprom.lib.locations.spot_elevation.SpotElevation`)
         """
         lowest[0].disqualify_self_and_linkers(basinSaddle=True)
         if len(lowest) > 1:
@@ -131,7 +134,9 @@ class BasinSaddleFinder:
         Consumes a list of points which make a cycle. Finds lowest points
         and returns a list of features which are the lowest.
 
-        :param list cycle: features which make a cycle.
+        :param cycle: features which make a cycle.
+        :type cycle:
+         list(:class:`pyprom.lib.locations.spot_elevation.SpotElevation`)
         """
         lowest = []
         lowest.append(cycle[0])
@@ -147,16 +152,17 @@ class BasinSaddleFinder:
 
     def _disqualify_single_source_saddles(self, saddle):
         """
-        Disqualifies Linkers and Saddles for Single Summit Saddles.
-                  v-----v
-        Summit 1000    995 Saddle  <-Disqualify
-                  ^-----^
-
-                  and
-
-        Summit 1000 ----- 995 Saddle <- Disqualify
+        |Disqualifies Linkers and Saddles for Single Summit Saddles.
+        |          ``v-----v``
+        |``Summit 1000    995 Saddle  <-Disqualify``
+        |          ``^-----^``
+        |
+        |          and
+        |
+        | Summit 1000 ----- 995 Saddle <- Disqualify
 
         :return: 0 = no disqualified. 1 = disqualified.
+        :rtype: int
         """
         uniqueSummits = set([x.summit for x in saddle.summits])
         if len(uniqueSummits) <= 1:

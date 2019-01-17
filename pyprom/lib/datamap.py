@@ -85,8 +85,8 @@ class DataMap:
 
 class ProjectionDataMap(DataMap):
     """
-    ProjectionDataMap is a :class:`Datamap` object for projection style
-    datasets from GDAL.
+    ProjectionDataMap is a :class:`pyprom.lib.datamap.DataMap` object for
+    projection style datasets from GDAL.
     """
 
     def __init__(self, numpy_map, upperLeftY, upperLeftX, resolutionY,
@@ -190,39 +190,49 @@ class ProjectionDataMap(DataMap):
             return self.numpy_map[x, y]
 
     def _leftmost_absolute(self):
-        """Returns the Leftmost GDAL Native X coordinate (Y for numpy_map)."""
+        """
+        :return: the Leftmost GDAL Native X coordinate (Y for numpy_map).
+        :rtype: int
+        """
+
         return self.upperLeftY
 
     def _rightmost_absolute(self):
         """
-        Returns the Rightmost GDAL Native X coordinate (Y for numpy_map).
+        :return: the Rightmost GDAL Native X coordinate (Y for numpy_map).
+        :rtype: int
         """
         return self.upperLeftY + (self.res_y * self.span_y)
 
     def _lowermost_absolute(self):
         """
-        Returns the Lowermost GDAL Native Y coordinate (X for numpy_map).
+        :return: the Lowermost GDAL Native Y coordinate (X for numpy_map).
+        :rtype: int
         """
         return self.upperLeftX + (self.res_x * self.span_x)
 
     def _uppermost_absolute(self):
         """
-        Returns the Uppermost GDAL Native Y coordinate
+        :return: the Uppermost GDAL Native Y coordinate
         (X for numpy_map).
+        :rtype: int
         """
         return self.upperLeftX
 
     def x_to_native_x(self, x):
         """
-        Converts a numpy X coordinate the the gdal native Y
-        (X for numpy_map).
+        Converts a numpy X coordinate to the gdal native Y
+        :return: the gdal native Y coordinate
+        :rtype: int
         """
         return self._uppermost_absolute() + (x * self.res_x)
 
     def y_to_native_y(self, y):
         """
-        Converts a numpy Y coordinate the the gdal native X
+        Converts a numpy Y coordinate to the gdal native X
         (Y for numpy_map).
+        :return: the gdal native X coordinate
+        :rtype: int
         """
         return self._leftmost_absolute() + (y * self.res_y)
 
@@ -267,7 +277,8 @@ class ProjectionDataMap(DataMap):
         :param int y: NW corner y coordinate (longitude)
         :param int xSpan: depth of subset in points (latitude)
         :param int ySpan: width of subset in points (longitude)
-        :return: :class:`ProjectionDataMap`
+        :return: Projection Data Map
+        :rtype: :class:`ProjectionDataMap`
         """
         southExtreme = self.x_to_native_x(x)
         westExtreme = self.y_to_native_y(y)

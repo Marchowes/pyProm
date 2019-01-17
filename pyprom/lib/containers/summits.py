@@ -20,7 +20,10 @@ class SummitsContainer(SpotElevationContainer):
 
     def __init__(self, summitList):
         """
-        :param summitList: list of :class:`Summit`s
+        :param summitList: list of Summits which reside in this container.
+        :type summitList: list(:class:`pyprom.lib.locations.summit.Summit`)
+        :raises: TypeError if summitList contains non
+         :class:`pyprom.lib.locations.summit.Summit` objects
         """
         if len([x for x in summitList if not isinstance(x, Summit)]):
             raise TypeError("summitList passed to SummitsContainer"
@@ -30,7 +33,7 @@ class SummitsContainer(SpotElevationContainer):
     @property
     def summits(self):
         """
-        Getter alias for summits
+        Getter alias for `self.points`
 
         :return: All summits in this container.
         :rtype: list(:class:`pyprom.lib.locations.summit.Summit`)
@@ -40,7 +43,7 @@ class SummitsContainer(SpotElevationContainer):
     def append(self, summit):
         """
         Append a :class:`pyprom.lib.locations.summit.Summit`
-        to the container.
+        to this container.
 
         :param summit: Summit to append.
         :type summit: :class:`pyprom.lib.locations.summit.Summit`
@@ -64,7 +67,7 @@ class SummitsContainer(SpotElevationContainer):
 
         :param summitContainerDict: dict() representation of this object.
         :param datamap: datamap which MultiPoint style Saddles use.
-        :type datamap: :class:`Datamap` object.
+        :type datamap: :class:`pyprom.lib.datamap.DataMap`
         :return: New SummitsContainer
         :rtype: :class:`SummitsContainer`
         """
@@ -77,11 +80,12 @@ class SummitsContainer(SpotElevationContainer):
 
     def __setitem__(self, idx, summit):
         """
-        Gives :class:`pyprom.lib.container.summits.SummitsContainer`
+        Gives :class:`pyprom.lib.containers.summits.SummitsContainer`
         list like set capabilities
 
         :param int idx: index value
-        :param summit: :class:`pyprom.lib.locations.summit.Summit`
+        :param summit: Summit to add.
+        :type summit: :class:`pyprom.lib.locations.summit.Summit`
         :raises: TypeError if summit not of
          :class:`pyprom.lib.locations.summit.Summit`
         """

@@ -41,7 +41,7 @@ class SaddlesContainer(SpotElevationContainer):
         with waterbodies and other similiar features.
 
         :param datamap: datamap to use while rebuilding.
-        :type datamap: :class:`pyprom.lib.DataMap`
+        :type datamap: :class:`pyprom.lib.datamap.DataMap`
         :return: New SaddlesContainer
         :rtype: :class:`SaddlesContainer`
         """
@@ -121,6 +121,7 @@ class SaddlesContainer(SpotElevationContainer):
     def append(self, saddle):
         """
         Append a :class:`pyprom.lib.locations.saddle.Saddle` to this container.
+
         :param saddle: Saddle to append.
         :type saddle: :class:`pyprom.lib.locations.saddle.Saddle`
         :raises: TypeError if not of type
@@ -184,7 +185,8 @@ class SaddlesContainer(SpotElevationContainer):
         Gives :class:`SaddlesContainer` list like set capabilities
 
         :param int idx: index
-        :param saddle: :class:`pyprom.lib.locations.saddle.Saddle`
+        :param saddle: Saddle object to add.
+        :type saddle: :class:`pyprom.lib.locations.saddle.Saddle`
         :return: :class:`pyprom.lib.locations.saddle.Saddle`
         """
         isSaddle(saddle)

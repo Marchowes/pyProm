@@ -15,4 +15,7 @@ class _Base:
     """
 
     def __init__(self):
+        """
+        Base initialization of Container Object.
+        """
         self.logger = logging.getLogger('pyProm.{}'.format(__name__))

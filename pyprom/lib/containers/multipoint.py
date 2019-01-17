@@ -15,10 +15,11 @@ from .perimeter import Perimeter
 
 
 class MultiPoint:
-    """A MultiPoint Container. This is a special kind of feature which contains
-    multiple :class:`pyprom.lib.locations.base_gridpoint.BaseGridPoint`s.
-    These points are all of equal elevation and neighbor each other
-    Orthogonally or Diagonally.
+    """
+    | A MultiPoint Container. This is a special kind of feature which contains
+    | multiple :class:`pyprom.lib.locations.base_gridpoint.BaseGridPoint`s.
+    | These points are all of equal elevation and neighbor each other
+    | Orthogonally or Diagonally.
     |
     |   [4][3][4][6][4]
     |   [3][5][5][5][6]
@@ -30,33 +31,34 @@ class MultiPoint:
     |   All non [5] points are Perimeter Points, that is, they neighbor
     |   MultiPoint members Diagonally or Orthogonally.
     |
-    |      [5][5][5]
-    |         [5]   <- Without Perimeter
-    |      [5]
+    | ``[5][5][5]``
+    |    ``[5]   <- Without Perimeter``
+    | ``[5]``
     |
     |
-    |   [4][3][4][6][4]
-    |   [3]         [6] <- Just the Perimeter.
-    |   [2][3]   [6][3]
-    |   [3]   [4][3]
-    |   [6][7][6]
+    | ``[4][3][4][6][4]``
+    | ``[3]         [6] <- Just the Perimeter.``
+    | ``[2][3]   [6][3]``
+    | ``[3]   [4][3]``
+    | ``[6][7][6]``
     """
 
     def __init__(self, points, elevation, datamap,
                  perimeter=None):
         """
-        :param points: list of BaseGridPoint objects. These are the inside
-            points that make up a Multipoint.
+        :param points: list of
+         :class:`pyprom.lib.locations.base_gridpoint.BaseGridPoint` objects.
+         These are the inside points that make up a Multipoint.
         :type points:
          list(:class:`pyprom.lib.locations.base_gridpoint.BaseGridPoint`)
         :param elevation: elevation in meters
         :type elevation: int, float
         :param datamap: datamap which this MultiPoint uses.
-        :type datamap: :class:`Datamap` object.
-        :param perimeter: :class:`MultiPoint` Perimeter.  These are the points
+        :type datamap: :class:`pyprom.lib.datamap.DataMap`
+        :param perimeter: Perimeter of MultiPoint. These are the points
          that make up the orthogonally/diagonally connected border of the
          multipoint outside of the multipoint.
-        :type perimeter: :class:`Perimeter` object.
+        :type perimeter: :class:`pyprom.lib.containers.perimeter.Perimeter`
         """
         super(MultiPoint, self).__init__()
         self.points = points  # BaseGridPoint Objects.
@@ -67,6 +69,7 @@ class MultiPoint:
     def to_dict(self):
         """
         :return: dict() representation of :class:`MultiPoint`
+        :rtype: dict()
         """
         multiPointDict = dict()
         multiPointDict['points'] = [x.to_dict() for x in self.points]
@@ -82,7 +85,7 @@ class MultiPoint:
         :param multiPointDict: dict() representation of this
          :class:`MultiPoint`.
         :param datamap: datamap which this MultiPoint uses.
-        :type datamap: :class:`Datamap` object.
+        :type datamap: :class:`pyprom.lib.datamap.DataMap`
         :return: new Multipoint object.
         :rtype: :class:`MultiPoint`
         """
@@ -96,8 +99,8 @@ class MultiPoint:
     def pointsLatLong(self):
         """
         Returns list() of Container
-         :class:`pyprom.lib.locations.base_gridpoint.BaseGridPoint` as
-         :class:`pyprom.lib.locations.base_coordinate.BaseCoordinate`
+        :class:`pyprom.lib.locations.base_gridpoint.BaseGridPoint` as
+        :class:`pyprom.lib.locations.base_coordinate.BaseCoordinate`
 
         :return: List of All blob points with lat/long instead of x/y
         :rtype:
@@ -126,7 +129,7 @@ class MultiPoint:
         :type gridPoint: :class:`pyprom.lib.locations.gridpoint.GridPoint`
         :param bool asSpotElevation: If True, returns SpotElevation object.
         :return: GridPoint if asSpotElevation == False
-                 SpotElevation if asSpotElevation == True
+         SpotElevation if asSpotElevation == True
         :rtype :class:`pyprom.lib.locations.gridpoint.GridPoint`,
          :class:`pyprom.lib.locations.spot_elevation.SpotElevation`
         """

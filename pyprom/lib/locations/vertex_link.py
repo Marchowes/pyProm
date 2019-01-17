@@ -23,10 +23,11 @@ class Vertex_Link:
         :type localPoint: :class:`pyprom.lib.locations.gridpoint.GridPoint`
         :param remotePoint: relative (remote) GridPoint (vertex)
         :type remotePoint: :class:`pyprom.lib.locations.gridpoint.GridPoint`
-        :param float distance: distance between points.
+        :param distance: distance between points.
+        :type distance: int, float
         :param remote_container: Remote linked vertex container.
         :type remote_container:
-         :class:`pyprom.lib.container.feature_verticies.Feature_Verticies`
+         :class:`pyprom.lib.containers.feature_verticies.Feature_Verticies`
         """
         self.local = localPoint
         self.remote = remotePoint
@@ -36,6 +37,7 @@ class Vertex_Link:
     def _remote_container_idx(self):
         """
         :return: index of remove_container
+        :rtype: int, "None"
         """
         if self.remote_container:
             return self.remote_container.index

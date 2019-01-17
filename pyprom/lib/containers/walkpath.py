@@ -50,8 +50,8 @@ class WalkPath:
         """
         Iterator for SpotElevation representation of the Walk Path.
 
-        :param datamap: used to look up elevation of point.
-        :type datamap: :class:`pyprom.lib.DataMap`
+        :param datamap: Datamap used to look up elevation of point.
+        :type datamap: :class:`pyprom.lib.datamap.DataMap`
         :return: SpotElevation along path.
         :rtype: :class:`pyprom.lib.locations.spot_elevation.SpotElevation`
         """
@@ -64,8 +64,8 @@ class WalkPath:
         """
         Iterator for BaseGridPoint representation of the Walk Path.
 
-        :param datamap: used to look up elevation of point.
-        :type datamap: :class:`pyprom.lib.DataMap`
+        :param datamap: Datamap used to look up elevation of point.
+        :type datamap: :class:`pyprom.lib.datamap.DataMap`
         :return: BaseGridPoint along path
         :rtype: :class:`pyprom.lib.locations.base_gridpoint.BaseGridPoint`
         """
@@ -77,8 +77,8 @@ class WalkPath:
         """
         Iterator for GridPoint representation of the Walk Path.
 
-        :param datamap: used to look up elevation of point.
-        :type datamap: :class:`pyprom.lib.DataMap`
+        :param datamap: Datamap used to look up elevation of point.
+        :type datamap: :class:`pyprom.lib.datamap.DataMap`
         :return: GridPoint along path
         :rtype: :class:`pyprom.lib.locations.gridpoint.GridPoint`
         """
@@ -98,8 +98,8 @@ class WalkPath:
 
     def spotElevation(self, datamap):
         """
-        :param datamap: used to look up elevation of point.
-        :type datamap: :class:`pyprom.lib.DataMap`
+        :param datamap: Datamap used to look up elevation of point.
+        :type datamap: :class:`pyprom.lib.datamap.DataMap`
         :return: List of points as
          :class:`pyprom.lib.locations.spot_elevation.SpotElevation`
         :rtype:
@@ -109,8 +109,8 @@ class WalkPath:
 
     def baseGridPoint(self, datamap):
         """
-        :param datamap: used to look up elevation of point.
-        :type datamap: :class:`pyprom.lib.DataMap`
+        :param datamap: Datamap used to look up elevation of point.
+        :type datamap: :class:`pyprom.lib.datamap.DataMap`
         :return: List of points as
          :class:`pyprom.lib.locations.base_gridpoint.BaseGridPoint`
         :rtype:
@@ -120,10 +120,10 @@ class WalkPath:
 
     def gridPoint(self, datamap):
         """
-        :param datamap: used to look up elevation of point.
-        :type datamap: :class:`pyprom.lib.DataMap`
+        :param datamap: Datamap used to look up elevation of point.
+        :type datamap: :class:`pyprom.lib.datamap.DataMap`
         :return: List of points as
-        :class:`pyprom.lib.locations.gridpoint.GridPoint`
+         :class:`pyprom.lib.locations.gridpoint.GridPoint`
         :rtype: list(:class:`pyprom.lib.locations.gridpoint.GridPoint`)
         """
         return [x for x in self.iterateGridPoint(datamap)]

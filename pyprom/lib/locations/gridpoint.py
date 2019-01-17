@@ -21,7 +21,8 @@ class GridPoint(BaseGridPoint):
         """
         :param int x: x coordinate
         :param int y: y coordinate
-        :param float elevation: elevation in meters
+        :param elevation: elevation in meters
+        :type elevation: float, int
         """
         super(GridPoint, self).__init__(x, y)
         self.elevation = elevation
@@ -37,7 +38,9 @@ class GridPoint(BaseGridPoint):
     @classmethod
     def from_dict(self, gridPointDict):
         """
-        :return: dict of :class:`GridPoint`
+        :param dict gridPointDict: dict() representation of this object.
+        :return: GridPoint from dict()
+        :rtype: :class:`GridPoint`
         """
         return self(gridPointDict['x'],
                     gridPointDict['y'],
@@ -45,9 +48,12 @@ class GridPoint(BaseGridPoint):
 
     def toSpotElevation(self, datamap):
         """
-        :param datamap: :class:`pyprom.lib.DataMap` object
-        :type datamap: :class:`pyprom.lib.DataMap`
-        :return: :class:`pyprom.lib.locations.spot_elevation.SpotElevation`
+        Converts this GridPoint into a SpotElevation using a datamap.
+
+        :param datamap: Datamap object
+        :type datamap: :class:`pyprom.lib.datamap.DataMap`
+        :return: GridPoint as a SpotElevation object.
+        :rtype: :class:`pyprom.lib.locations.spot_elevation.SpotElevation`
         """
         from .spot_elevation import SpotElevation
         lat, long = datamap.xy_to_latlong(self.x, self.y)
@@ -91,6 +97,7 @@ class GridPoint(BaseGridPoint):
     def __hash__(self):
         """
         :return: hash representation of this object.
+        :rtype: str
         """
         return hash((self.x, self.y, self.elevation))
 

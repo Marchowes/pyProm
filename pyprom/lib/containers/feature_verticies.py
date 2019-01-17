@@ -14,7 +14,7 @@ import sys
 class Feature_Verticies:
     """
     Feature_Verticies object stores Feature_Verticies data.
-    :class:`pyprom.lib.locations.vertex_link.Vertex_link`s
+    :class:`pyprom.lib.locations.vertex_link.Vertex_Link`
     connect a vertex from one feature to a vertex from another.
     This class stores a list of those.
 
@@ -26,7 +26,9 @@ class Feature_Verticies:
     def __init__(self, index, vertex_linkers):
         """
         :param int index: index of feature
-        :param list vertex_linkers: list of :class:`Vertex_Link`s
+        :param list vertex_linkers: list of Vertex_Links
+        :type vertex_linkers:
+         list(:class:`pyprom.lib.locations.vertex_link.Vertex_Link`)
         """
         self.index = index
         self.vertex_linkers = vertex_linkers
@@ -37,9 +39,10 @@ class Feature_Verticies:
         but ignores any links connecting to a foreign index container in
         `ignored_link_index`
 
-        :param dict ignored_link_index: {idx: bool}
+        :param ignored_link_index: index of links to ignore.
+        :type ignored_link_index: {idx: bool}
         :return: vertex link
-        :rtype: :class:`Vertex_Link`
+        :rtype: :class:`pyprom.lib.locations.vertex_link.Vertex_Link`
         """
         shortest_distance = sys.maxsize
         shortest = None

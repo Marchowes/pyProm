@@ -17,42 +17,45 @@ from ..util import randomString
 
 class Saddle(SpotElevation):
     """
-    Saddle object stores relevant saddle data.
-    A Saddle is by definition a point, or set of equal height points
-    (MultiPoint) which have at least 2 non contiguous sets of points
-    around the Perimeter that are higher than the point or Multipoint.
-    These are called "High Shores". A Saddle is a Child object of
-    :class:`pyprom.lib.locations.spot_elevation.SpotElevation`
+    | Saddle object stores relevant saddle data.
+    | A Saddle is by definition a point, or set of equal height points
+    | (MultiPoint) which have at least 2 non contiguous sets of points
+    | around the Perimeter that are higher than the point or Multipoint.
+    | These are called "High Shores". A Saddle is a Child object of
+    | :class:`pyprom.lib.locations.spot_elevation.SpotElevation`
     |
     | Examples:
     |
-    |  Single Point Saddle:
-    |     v------high shore
-    | [0][2][0]
-    | [0][1][0]   [1] = Saddle
-    | [0][3][0]
-    |     ^------high shore
+    | Single Point Saddle:
+    |     ``v------high shore``
+    | ``[0][2][0]``
+    | ``[0][1][0]   [1] = Saddle``
+    | ``[0][3][0]``
+    |     ``^------high shore``
     |
-    |   MultiPoint Saddle:
-    |     v--------high shore
-    | [0][2][0][0]
-    | [0][1][1][0]  [1][1] = Saddle
-    | [0][0][3][0]
-    |        ^-----high shore
+    | MultiPoint Saddle:
+    |     ``v--------high shore``
+    | ``[0][2][0][0]``
+    | ``[0][1][1][0]  [1][1] = Saddle``
+    | ``[0][3][0][0]``
+    |     ``^-----high shore``
     |
     """
 
     def __init__(self, latitude, longitude, elevation, *args, **kwargs):
         """
-        :param float latitude: latitude in dotted decimal
-        :param float longitude: longitude in dotted decimal
-        :param float elevation: elevation in meters
+        :param latitude: latitude in dotted decimal
+        :type latitude: int, float
+        :param longitude: longitude in dotted decimal
+        :type longitude: int, float
+        :param elevation: elevation in meters
+        :type elevation: int, float
         :param multiPoint: MultiPoint object
-        :type multiPoint: :class:`pyprom.lib.container.multipoint.MultiPoint`,
+        :type multiPoint: :class:`pyprom.lib.containers.multipoint.MultiPoint`,
          None
-        :param highShores: HighEdgeContainer object
+        :param highShores: list of GridPointContainers representing a highShore
         :type highShores:
-         :class:`pyprom.lib.container.high_edge.HighEdgeContainer`, None
+         list(:class:`pyprom.lib.containers.gridPoint.GridPointContainer`)
         :param bool edge: Does this :class:`Saddle` have an edge
          Effect?
         :param str id: kwarg for id
@@ -88,30 +91,37 @@ class Saddle(SpotElevation):
 
     def addSummitLinker(self, linker):
         """
-        Add a :class:`pyprom.lib.container.linker.Linker` to this Saddle.
+        Add a :class:`pyprom.lib.containers.linker.Linker` to this Saddle.
         This in effect links a :class:`pyprom.lib.locations.summit.Summit`
         to this Saddle.
 
-        :param linker: :class:`Linker`
+        :param linker: linker to add.
+        :type linker: :class:`pyprom.lib.containers.linker.Linker`
         """
         isLinker(linker)
         self.summits.append(linker)
 
     def feature_neighbors(self):
         """
-        :return: returns all linked
-         :class:`pyprom.lib.locations.summit.Summit`s.
+        :return: returns all linked Summits.
          This is, in effect, an interface.
+        :rtype: list(:class:`pyprom.lib.locations.summit.Summit`)
         """
         return [feature.summit for feature in self.summits]
 
     @property
-    def neighbors(self):
+    def neighbors(self, filterDisqualified=True):
         """
+        neighbors will return all neighboring saddles by way of the
+        connected summit.
+        This function will filter out redundant neighbors.
+
+        :param bool filterDisqualified: Filter out disqualified linkers.
         :return: list of unique neighboring saddles by way of
          neighboring summits excluding self.
+        :rtype: list(:class:`Saddle`)
         """
-        neighborSet = set(self.all_neighbors())
+        neighborSet = set(self.all_neighbors(filterDisqualified))
         neighborSet.discard(self)
         return list(neighborSet)
 
@@ -124,6 +134,7 @@ class Saddle(SpotElevation):
 
         :param bool filterDisqualified: Filter out disqualified linkers.
         :return: list of neighboring saddles by way of neighboring summits.
+        :rtype: list(:class:`Saddle`)
         """
         neighbors = []
         if filterDisqualified:
@@ -138,7 +149,8 @@ class Saddle(SpotElevation):
     @property
     def summits_set(self):
         """
-        :return: set of linked :class:`pyprom.lib.locations.summit.Summit`
+        :return: set of linked Summits
+        :rtype: set(:class:`pyprom.lib.locations.summit.Summit`)
         """
         return set([x.summit for x in self.summits])
 
@@ -147,6 +159,7 @@ class Saddle(SpotElevation):
         """
         :return: if any values that indicate disqualification are set,
          return True.
+        :rtype: bool
         """
         # Allow for a manual override from user.
         if self._disqualified in [True, False]:
@@ -157,7 +170,7 @@ class Saddle(SpotElevation):
     @disqualified.setter
     def disqualified(self, value):
         """
-        :param bool value: Override system disqualification
+        :param bool value: Override Saddle disqualification
         """
         self._disqualified = value
 
@@ -165,10 +178,10 @@ class Saddle(SpotElevation):
                                     singleSummit=False):
         """
         Disqualify this :class:`Saddle` and linked
-        :class:`pyprom.lib.container.linker.Linker`s
+        :class:`pyprom.lib.containers.linker.Linker` s
 
-        :param basinSaddle: set basinSaddle
-        :param singleSummit: set singleSummit
+        :param bool basinSaddle: set basinSaddle
+        :param bool singleSummit: set singleSummit
         """
         if basinSaddle:
             self.basinSaddle = basinSaddle
@@ -181,8 +194,9 @@ class Saddle(SpotElevation):
 
     def to_dict(self, referenceById=True):
         """
-        :param referenceById: reference Summits by ID.
-        :return: dict() representation of :class:`Saddle`
+        :param bool referenceById: reference Summits by ID.
+        :return: dict() representation of this Saddle
+        :rtype: :class:`Saddle`
         """
         to_dict = {'lat': self.latitude,
                    'lon': self.longitude,
@@ -221,7 +235,8 @@ class Saddle(SpotElevation):
         """
         Create :class:`Saddle` from dictionary representation
 
-        :return: :class:`Saddle`
+        :return: Saddle object.
+        :rtype: :class:`Saddle`
         """
         lat = saddleDict['lat']
         long = saddleDict['lon']
@@ -256,7 +271,8 @@ class Saddle(SpotElevation):
         As well as a hash of all the highShores. This is a costly calculation
         and should probably be avoided if possible.
 
-        :return: returns unique hash of this Saddle
+        :return: Hash representation of this object
+        :rtype: str
         """
         masterHash = super(SpotElevation, self).__hash__()
         pointsTuple = tuple(self.highShores)

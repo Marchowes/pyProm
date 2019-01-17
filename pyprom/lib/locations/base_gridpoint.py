@@ -12,12 +12,15 @@ from math import hypot
 
 class BaseGridPoint:
     """
-    Base Object for GridPoints
+    Base Object for GridPoints. These are simple x, y coordinates
+    with no association to a :class:`pyprom.lib.datamap.DataMap` This
+    is a Base class intended to be inherited from in most situations.
     """
 
     def __init__(self, x, y):
         """
-        Basic Gridpoint.
+        A basic x,y GridPoint.
+
         :param int x: x coordinate
         :param int y: y coordinate
         """
@@ -51,6 +54,7 @@ class BaseGridPoint:
     def __hash__(self):
         """
         :return: Hash representation of this object
+        :rtype str:
         """
         return hash((self.x, self.y))
 
@@ -63,11 +67,15 @@ class BaseGridPoint:
     def __lt__(self, other):
         """
         :param other: object which we compare against.
+        :type other: :class:`pyprom.lib.locations.base_gridpoint.BaseGridPoint`
         :return: bool of if self is arbitrarily regarded as
          lower than the other
-        :raises: TypeError if other not of :class:`GridPoint`
+        :raises: TypeError if other not of
+         :class:`pyprom.lib.locations.base_gridpoint.BaseGridPoint`
         """
         isBaseGridPoint(other)
+        # we only do this to satisfy set requirements. There is no meaningful
+        # way to determine if a GridPoint is gt/lt another.
         return self.x + self.y < other.x + other.y
 
     def __eq__(self, other):

@@ -15,4 +15,7 @@ class _Base(object):
     """
 
     def __init__(self):
+        """
+        Initiate a basic logger for location objects.
+        """
         self.logger = logging.getLogger('pyProm.{}'.format(__name__))

@@ -26,7 +26,6 @@ Containers
    lib/containers/base_gridpoint
    lib/containers/feature_verticies
    lib/containers/gridpoint
-   lib/containers/high_edge
    lib/containers/linker
    lib/containers/multipoint
    lib/containers/perimeter

@@ -44,7 +44,7 @@ def coordinateHashToList(coordianteHash):
     Converts a coordinateHash to a list of coordinates.
 
     :param coordianteHash: a hash using
-    {x1:[y1:True,y2:True..],x1:[y1:True,y2:True..]} format
+     {x1:[y1:True,y2:True..],x1:[y1:True,y2:True..]} format
     :return: list coordinates [[x1,y1],[x1,y2]....]
     """
     return [[x, y] for x, _y in coordianteHash.items() for y, _ in _y.items()]
@@ -56,7 +56,7 @@ def coordinateHashToGridPointList(coordinateHash):
     :class:`pyprom.lib.locations.gridpoint.GridPoint` list.
 
     :param dict coordinateHash: a hash using
-    {x1:[y1:True,y2:True..],x1:[y1:True,y2:True..]} format
+     {x1:[y1:True,y2:True..],x1:[y1:True,y2:True..]} format
     :return: list of BaseGridPoint objects.
     """
     return [BaseGridPoint(x, y)

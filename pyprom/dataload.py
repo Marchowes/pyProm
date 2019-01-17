@@ -24,7 +24,7 @@ class Loader:
 
     def __init__(self, filename):
         """
-        :param filename: name of file to be loaded.
+        :param str filename: name of file to be loaded.
         """
         self.filename = os.path.expanduser(filename)
         self.logger = logging.getLogger('{}'.format(__name__))
@@ -38,8 +38,9 @@ class GDALLoader(Loader):
 
     def __init__(self, filename, epsg_alias="WGS84"):
         """
-        :param filename: full or relative file location.
-        :param epsg_alias: common name for epsg code
+        :param str filename: full or relative file location.
+        :param str epsg_alias: common name for epsg code
+        :raises: Exception when not a Projection Map.
 
         | latitude and longitude references are always "lower left"
         | GDAL raster data is always presented as such:

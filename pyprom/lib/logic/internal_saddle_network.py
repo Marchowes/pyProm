@@ -33,7 +33,7 @@ class InternalSaddleNetwork(object):
         :param saddle: saddle to build internal network for.
         :type saddle: :class:`pyprom.lib.locations.saddle.Saddle`
         :param datamap: datamap where this saddle resides.
-        :type datamap: :class:`pyprom.lib.DataMap`
+        :type datamap: :class:`pyprom.lib.datamap.DataMap`
        """
         self.saddle = saddle
         self.datamap = datamap
@@ -46,13 +46,21 @@ class InternalSaddleNetwork(object):
         Loop until toBeExplored is exhausted. This continues until all
         conventionally accessible high shores are connected via Vertex
         Links.
-
         This loop works by looking at all `remote_container`s (a node)
         that are linked to the `node` under exploration. Whatever
         unexplored remote node has the node under exploration as it's
         shortest link is added to the toBeExplored queue and that
-        :class:`pyprom.lib.locations.vertex_link.Vertex_link`
+        :class:`pyprom.lib.locations.vertex_link.Vertex_Link`
         is added to the unordered `shortest_path` list.
+
+        :param toBeExplored: list of Vertex Linkers to be explored
+        :type toBeExplored:
+         list(:class:`pyprom.lib.locations.vertex_link.Vertex_Link`)
+        :param toBeExploredIndex: index of Vertex Linkers to be explored.
+        :type toBeExploredIndex: dict(idx: bool)
+        :param explored_nodes_index: index of explored Vertex Linkers..
+        :type explored_nodes_index: dict(idx: bool)
+        :param bool first: boolean value of if this is the first explored tree.
         """
         while toBeExplored:
             node = toBeExplored.pop(0)
@@ -95,9 +103,7 @@ class InternalSaddleNetwork(object):
     def build_internal_tree(self):
         """
         This function builds an unordered list of links which connect all
-        highShores (nodes) together.
-
-        :return: list() of :class:`pyprom.lib.container.linker.Linker`s
+        highShores (nodes) together. Stored in `self.shortest_links`
         """
         # Calculate all shortest paths.
         self.find_shortest_paths_between_high_shores()
@@ -172,7 +178,8 @@ class InternalSaddleNetwork(object):
         The Parent Saddle is then disqualified from further analysis, but
         saved.
 
-        :return: list of :class:`pyprom.lib.locations.saddle.Saddle`s
+        :return: list of Saddles
+        :rtype: list(:class:`pyprom.lib.locations.saddle.Saddle`)
         """
         # Gather all shortest links.
         self.build_internal_tree()
@@ -216,15 +223,16 @@ class InternalSaddleNetwork(object):
         """
         find_shortest_paths_between_high_shores iterates through all
         highShores of `self` and returns an ordered list of
-        :class:`pyprom.lib.container.feature_verticies.Feature_Verticies`
+        :class:`pyprom.lib.containers.feature_verticies.Feature_Verticies`
         which corresponds to the ordering of the
         highShores. These
-        :class:`pyprom.lib.container.feature_verticies.Feature_Verticies`
-        contain :class:`Vertex_Link`s which link the shortest points between
-        each highShore.
+        :class:`pyprom.lib.containers.feature_verticies.Feature_Verticies`
+        contain :class:`pyprom.lib.locations.vertex_link.Vertex_Link`
+        which link the shortest points between each highShore.
 
-        :return: ordered list() of
-         :class:`pyprom.lib.container.feature_verticies.Feature_Verticies`
+        :return: ordered list of Feature_Verticies
+        :rtype:
+         list(:class:`pyprom.lib.containers.feature_verticies.Feature_Verticies`)
         """
         # create X empty :class:`Feature_Verticies`
         for idx in range(len(self.saddle.highShores)):

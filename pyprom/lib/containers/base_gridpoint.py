@@ -8,19 +8,20 @@ This library contains a base container class for storing GridPoint
 type location objects.
 """
 
-from pyprom.lib.locations.gridpoint import isGridPoint
+from pyprom.lib.locations.base_gridpoint import isBaseGridPoint
 
 
 class BaseGridPointContainer:
     """
     Base Grid Point Container. Storage and functions for
-    :class:`pyprom.lib.locations.base_gridpoint.BaseGridPoint`s
+    :class:`pyprom.lib.locations.base_gridpoint.BaseGridPoint`
     """
 
     def __init__(self, gridPointList):
         """
-        :param gridPointList: list of
-         :class:`pyprom.lib.locations.base_gridpoint.BaseGridPoint`
+        :param gridPointList: list of BaseGridPoints
+        :type gridPointList:
+         list(:class:`pyprom.lib.locations.base_gridpoint.BaseGridPoint`)
         """
         self.points = gridPointList
 
@@ -29,17 +30,19 @@ class BaseGridPointContainer:
         Append a gridPoint to the container.
 
         :param gridPoint: object to append to container.
-        :type gridPoint: :class:`pyprom.lib.locations.base_gridpoint.BaseGridPoint`
-        :raises: TypeError if gridPoint not of :class:`GridPoint`
+        :type gridPoint:
+         :class:`pyprom.lib.locations.base_gridpoint.BaseGridPoint`
+        :raises: TypeError if gridPoint not of
+         :class:`pyprom.lib.locations.base_gridpoint.BaseGridPoint`
         """
-        isGridPoint(gridPoint)
+        isBaseGridPoint(gridPoint)
         self.points.append(gridPoint)
 
     def sort(self, **kwargs):
         """
         Sort points using kwargs passed in
-        .
-        :param kwargs:
+
+        :param kwargs: common sort args
         """
         self.points.sort(**kwargs)
 
@@ -49,9 +52,7 @@ class BaseGridPointContainer:
         :class:`pyprom.lib.locations.base_gridpoint.BaseGridPoint` or child
         object occurs. If none, return None
 
-        :param gridPoint:
-         :class:`pyprom.lib.locations.base_gridpoint.BaseGridPoint` to find
-         index of
+        :param gridPoint: BaseGridPoint or child object to find index of
         :type gridPoint:
          :class:`pyprom.lib.locations.base_gridpoint.BaseGridPoint`
         :return: index in points list where this
@@ -65,6 +66,8 @@ class BaseGridPointContainer:
 
     def __len__(self):
         """
+        Returns __len__ for self.points
+
         :return: number of items in self.points
         :rtype: int
         """
@@ -75,12 +78,13 @@ class BaseGridPointContainer:
         Gives this container list like set capabilities
 
         :param int idx: index value
-        :param gridPoint: gridpoint to add.
-        :type gridPoint: :class:`pyprom.lib.locations.gridpoint.GridPoint`
+        :param gridPoint: BaseGridPoint or child object to add.
+        :type gridPoint:
+         :class:`pyprom.lib.locations.base_gridpoint.BaseGridPoint`
         :raises: TypeError if gridPoint not of
-         :class:`pyprom.lib.locations.gridpoint.GridPoint`
+         :class:`pyprom.lib.locations.base_gridpoint.BaseGridPoint`
         """
-        isGridPoint(gridPoint)
+        isBaseGridPoint(gridPoint)
         self.points[idx] = gridPoint
 
     def __getitem__(self, idx):
@@ -88,8 +92,8 @@ class BaseGridPointContainer:
         Gives this container list like get capabilities
 
         :param int idx: index value
-        :return: :class:`pyprom.lib.locations.gridpoint.GridPoint`
-         from self.point at idx
+        :return: BaseGridPoint from self.point at idx
+        :rtype: :class:`pyprom.lib.locations.base_gridpoint.BaseGridPoint`
         """
         return self.points[idx]
 

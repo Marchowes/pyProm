@@ -14,9 +14,8 @@ from ..util import randomString
 
 class Linker:
     """
-    A Linker links 1 :class:`pyprom.lib.locations.summit.Summit`
-     with 1 :class:`pyprom.lib.locations.saddle.Saddle`
-
+    A Linker links one single :class:`pyprom.lib.locations.summit.Summit`
+    with one single :class:`pyprom.lib.locations.saddle.Saddle`
     """
 
     def __init__(self, summit, saddle, path=WalkPath([]), id=None):
@@ -27,7 +26,7 @@ class Linker:
         :type saddle: :class:`pyprom.lib.locations.saddle.Saddle`
         :param path: data containing the path taken to link this
          Summit and Saddle
-        :type path: :class:`pyprom.lib.container.walkpath.WalkPath`
+        :type path: :class:`pyprom.lib.containers.walkpath.WalkPath`
         :param str id: id for this object.
         """
         self.summit = summit
@@ -44,6 +43,8 @@ class Linker:
     @property
     def prom(self):
         """
+        Calculates how much higher the summit is than the Saddle in meters
+
         :return: altitude difference between saddle and summit in meters.
         :rtype: float, int
         """
@@ -52,6 +53,8 @@ class Linker:
     @property
     def prom_ft(self):
         """
+        Calculates how much higher the summit is than the Saddle in feet
+
         :return: altitude difference between saddle and summit in feet.
         :rtype: float, int
         """
@@ -61,15 +64,16 @@ class Linker:
                                      exemptLinkers={}):
         """
         Returns all saddles connected to the
-         :class:`pyprom.lib.locations.summit.Summit` that this
-         :class:`Linker` links.
+        :class:`pyprom.lib.locations.summit.Summit` that this
+        :class:`Linker` links.
 
         :param bool skipDisqualified: If true, disregard disqualified
          remote linkers.
-        :param dict exemptLinkers: {linker.id: bool} hash of linkers regarded as
+        :param exemptLinkers: hash of linkers regarded as
          dead.
-        :return: list of saddles
-        :rtype list:
+        :type exemptLinkers: dict(linker.id: bool)
+        :return: list of Saddles
+        :rtype list(:class:`pyprom.lib.locations.saddle.Saddle`)
         """
         if skipDisqualified and self.disqualified:
             return []
@@ -83,15 +87,16 @@ class Linker:
                                      exemptLinkers={}):
         """
         Returns all summits connected to the
-         :class:`pyprom.lib.locations.saddle.Saddle` that this
-         :class:`Linker` links.
+        :class:`pyprom.lib.locations.saddle.Saddle` that this
+        :class:`Linker` links.
 
         :param bool skipDisqualified: If true, disregard disqualified
          remote linkers.
-        :param dict exemptLinkers: {linker.id: bool} hash of linkers regarded as
+        :param exemptLinkers: hash of linkers regarded as
          dead.
-        :return: list of summits
-        :rtype: list
+        :type exemptLinkers: dict(linker.id: bool)
+        :return: list of Summits
+        :rtype: list(:class:`pyprom.lib.locations.summit.Summit`)
         """
         if skipDisqualified and self.disqualified:
             return []
@@ -122,10 +127,10 @@ class Linker:
 
         :param bool exclude: exclude this linker from results.
         :param bool skipDisqualified: If true, do not return disqualified
-        linkers
+         linkers
         :return: list of linkers to saddles connected to the summit this
          linker links
-        :rtype: list(:class:`pyprom.lib.container.linker.Linker`)
+        :rtype: list(:class:`Linker`)
         """
         return [linker for linker in self.summit.saddles
                 if _linker_ok(linker, skipDisqualified, {}) and
@@ -138,10 +143,10 @@ class Linker:
 
         :param bool exclude: exclude this linker from results.
         :param bool skipDisqualified: If true, do not return disqualified
-        linkers
+         linkers
         :return: list of linkers to summits connected to the saddle this
          linker links
-        :rtype: list(:class:`pyprom.lib.container.linker.Linker`)
+        :rtype: list(:class:`Linker`)
         """
         return [linker for linker in self.saddle.summits
                 if _linker_ok(linker, skipDisqualified, {}) and
@@ -167,6 +172,10 @@ class Linker:
 
     def to_dict(self, referenceById=True, noWalkPath=True):
         """
+        Returns dict() representation of this object.
+
+        :param bool referenceById: only use ID of linked objects.
+        :param bool noWalkPath: exclude WalkPath
         :return: dict() representation of :class:`Linker`
         """
         to_dict = dict()
@@ -183,9 +192,9 @@ class Linker:
     @classmethod
     def from_dict(cls, linkerDict, saddlesContainer, summitsContainer):
         """
-        Loads the dict() representation of :class:`Linker`
+        Loads the dict() representation of this object.
 
-        :return: Linker generate from dict() representation.
+        :return: Linker generated from dict() representation.
         :rtype: :class:`Linker`
         """
         pathDict = linkerDict.get('path', None)

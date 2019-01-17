@@ -20,7 +20,7 @@ class Perimeter:
     """
     Container for :class:`Perimeter` type lists. A Perimeter
     is all points Diagonally or Orthogonally neighboring a
-    member of a :class:`pyprom.lib.container.multipoint.MultiPoint`
+    member of a :class:`pyprom.lib.containers.multipoint.MultiPoint`
     """
 
     def __init__(self, pointList=None,
@@ -36,10 +36,9 @@ class Perimeter:
         :type pointIndex:
          dict({X: { Y: :class:`pyprom.lib.locations.gridpoint.GridPoint`}}
         :param datamap: datamap which this :class:`Perimeter` uses.
-        :type datamap: :class:`Datamap` object.
-        :param cool mapEdge: is this a map edge?
-        :param mapEdgePoints: list of Points on
-         the map edge.
+        :type datamap: :class:`pyprom.lib.datamap.DataMap` object.
+        :param bool mapEdge: is this a map edge?
+        :param mapEdgePoints: list of Points on the map edge.
         :type mapEdgePoints:
          list(:class:`pyprom.lib.locations.gridpoint.GridPoint`)
         """
@@ -60,7 +59,7 @@ class Perimeter:
         """
         Iterate through diagonally and orthogonally neighboring
         :class:`pyprom.lib.locations.gridpoint.GridPoint` which are
-        also members of this :class:Perimeter
+        also members of this :class:`Perimeter`
 
         :param point: Gridpoint to find neighbors of
         :type point: :class:`pyprom.lib.locations.gridpoint.GridPoint`
@@ -77,7 +76,7 @@ class Perimeter:
         """
         Iterate through orthogonally neighboring
         :class:`pyprom.lib.locations.gridpoint.GridPoint` which are
-        also members of this :class:Perimeter
+        also members of this :class:`Perimeter`
 
         :param point: Gridpoint to find neighbors of
         :type point: :class:`pyprom.lib.locations.gridpoint.GridPoint`
@@ -108,7 +107,7 @@ class Perimeter:
 
         :param dict perimeterDict: dict() representation of this object.
         :param datamap: datamap which this Perimeter uses.
-        :type datamap: :class:`Datamap` object.
+        :type datamap: :class:`pyprom.lib.datamap.DataMap` object.
         :return: new Perimeter object.
         :rtype: :class:`Perimeter`
         """
@@ -127,16 +126,17 @@ class Perimeter:
     def findHighEdges(self, elevation):
         """
         This function returns a list of
-        :class:`pyprom.lib.container.gridpoint.GridPointContainer`s. Each
+        :class:`pyprom.lib.containers.gridpoint.GridPointContainer`. Each
         container holds a list of
         :class:`pyprom.lib.locations.gridpoint.GridPoint` which are
         discontigous so far as the other container is concerned.
         This is used to identify discontigous sets of
         :class:`pyprom.lib.locations.gridpoint.GridPoint` for determining
         if this is a :class:`pyprom.lib.locations.saddle.Saddle` or not.
+
         :return: list of GridPointContainers containing HighEdges.
         :rtype:
-         list(:class:`pyprom.lib.container.gridpoint.GridPointContainer`)
+         list(:class:`pyprom.lib.containers.gridpoint.GridPointContainer`)
         """
         explored = defaultdict(dict)
         highLists = list()
@@ -172,7 +172,7 @@ class Perimeter:
         :param elevation:
         :type elevation: int, float
         :return: GridPointContainer containing high perimeter points.
-        :rtype: :class:`pyprom.lib.container.gridpoint.GridPointContainer`
+        :rtype: :class:`pyprom.lib.containers.gridpoint.GridPointContainer`
         """
         higherPoints = [x for x in self.points if x.elevation > elevation]
         return GridPointContainer(higherPoints)
@@ -192,14 +192,14 @@ class Perimeter:
 
     def __len__(self):
         """
-        :return: number of items in self.points
+        :return: number of items in `self.points`
         :rtype: int
         """
         return len(self.points)
 
     def __setitem__(self, idx, point):
         """
-        Gives Perimeter list like set capabilities
+        Gives :class:`Perimeter` list like set capabilities
 
         :param int idx: index value
         :param point: GridPoint for setitem.
@@ -236,7 +236,7 @@ class Perimeter:
 
     def __ne__(self, other):
         """
-        Determines if Perimeter is not equal to another.
+        Determines if :class:`Perimeter` is not equal to another.
 
         :param other: other :class:`Perimeter` to check.
         :type: :class:`Perimeter`
@@ -250,7 +250,7 @@ class Perimeter:
 
     def __iter__(self):
         """
-        :return: self.points as iterator
+        :return: `self.points` as iterator
         """
         for point in self.points:
             yield point

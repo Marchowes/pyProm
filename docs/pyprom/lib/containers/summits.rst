@@ -2,7 +2,7 @@
 
 SummitsContainer
 ======================
-.. autoclass:: pyprom.lib.containers.summits.Summits
+.. autoclass:: pyprom.lib.containers.summits.SummitsContainer
     :members:
     :private-members:
     :special-members:

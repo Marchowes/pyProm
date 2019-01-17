@@ -17,15 +17,16 @@ from ..containers.perimeter import Perimeter
 def equalHeightBlob(datamap, x, y, elevation):
     """
     This function generates a
-    :class:`pyprom.lib.container.multipoint.MultiPoint`
-    which contains a list of :class:`pyprom.lib.locations.gridpoint.GridPoint`s
+    :class:`pyprom.lib.containers.multipoint.MultiPoint`
+    which contains a list of :class:`pyprom.lib.locations.gridpoint.GridPoint`
     of equal elevation which are diagonally & orthogonally connected.
 
     :param int x: x coordinate
     :param int y: y coordinate
-    :param float elevation: elevation to sedarch neighbors for.
-    :return: Object containing all x,y coordinates and elevation
-    :rtype: :class:`pyprom.lib.container.multipoint.MultiPoint`
+    :param elevation: elevation to search neighbors for.
+    :type elevation: int, float
+    :return: MultiPoint Object containing all x,y coordinates and elevation
+    :rtype: :class:`pyprom.lib.containers.multipoint.MultiPoint`
     """
     masterGridPoint = GridPoint(x, y, elevation)
     exploredEqualHeight = defaultdict(dict)

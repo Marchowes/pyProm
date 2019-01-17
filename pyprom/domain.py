@@ -35,10 +35,10 @@ from .lib.logic.basin_saddle_finder import BasinSaddleFinder
 class Domain:
     """
     Domain object, This object contains the
-    :class:`pyprom.lib.container.saddles.SaddlesContainer`,
-    :class:`pyprom.lib.container.summits.SummitsContainer`,
-    :class:`pyprom.lib.container.runoffs.RunOffsContainer`,
-    :class:`pyprom.lib.container.linker.Linker`,
+    :class:`pyprom.lib.containers.saddles.SaddlesContainer`,
+    :class:`pyprom.lib.containers.summits.SummitsContainer`,
+    :class:`pyprom.lib.containers.runoffs.RunoffsContainer`,
+    :class:`pyprom.lib.containers.linker.Linker`,
     required to calculate the surface network.
     """
 
@@ -48,20 +48,20 @@ class Domain:
                  runoffs=RunoffsContainer([]),
                  linkers=[]):
         """
-        A Domain consumes either a :class:`Datamap` object or
+        A Domain consumes either a :class:`pyprom.lib.datamap.DataMap` object or
         a :class:`pyprom.dataload.Loader` child object.
 
         :param data: Datamap to be used with this :class:`Domain`
-        :type data: :class:`pyprom.datamap.Datamap` or
+        :type data: :class:`pyprom.lib.datamap.DataMap` or
          :class:`pyprom.dataload.Loader`
         :param summits: Summits Container
-        :type summits: :class:`pyprom.lib.container.summits.SummitsContainer`
+        :type summits: :class:`pyprom.lib.containers.summits.SummitsContainer`
         :param saddles: Saddles Container
-        :type saddles: :class:`pyprom.lib.container.saddles.SaddlesContainer`
+        :type saddles: :class:`pyprom.lib.containers.saddles.SaddlesContainer`
         :param runoffs: RunOffs Container
-        :type runoffs: :class:`pyprom.lib.container.runoffs.RunOffsContainer`
+        :type runoffs: :class:`pyprom.lib.containers.runoffs.RunoffsContainer`
         :param linkers: List of Linkers
-        :type linkers: :class:`pyprom.lib.container.linker.Linker`
+        :type linkers: :class:`pyprom.lib.containers.linker.Linker`
         """
         if isinstance(data, DataMap):
             self.datamap = data
@@ -86,8 +86,8 @@ class Domain:
         """
         Performs discovery of :class:`pyprom.lib.locations.saddle.Saddle`,
         :class:`pyprom.lib.locations.summit.Summit`,
-        :class:`pyprom.lib.locations.runoff.RunOff`,
-        and :class:`pyprom.lib.container.linker.Linker`.
+        :class:`pyprom.lib.locations.runoff.Runoff`,
+        and :class:`pyprom.lib.containers.linker.Linker`.
         Runs walk() and disqualifies Basin Saddles.
 
         :param bool sparse: just do feature discovery, and walk()
@@ -125,8 +125,8 @@ class Domain:
         Class Method for reading a Domain saved to file into a :class:`Domain`.
 
         :param str filename: name of file (including path) to read
-        :param datamap: datamap for this Domain
-        :type datamap: :class:`Datamap`
+        :param datamap: Datamap for this Domain
+        :type datamap: :class:`pyprom.lib.datamap.DataMap`
         """
         # Expunge any existing saddles, summits, and linkers
         filename = os.path.expanduser(filename)
@@ -144,7 +144,7 @@ class Domain:
          :class:`Domain` to
         :param bool noWalkPath: exclude
          :class:`pyprom.lib.containers.walkpath.WalkPath` from member
-         :class:`pyprom.lib.container.linker.Linker`
+         :class:`pyprom.lib.containers.linker.Linker`
         """
         filename = os.path.expanduser(filename)
         self.logger.info("Writing Domain Dataset to {}.".format(filename))
@@ -157,11 +157,11 @@ class Domain:
     def from_cbor(cls, cborBinary, datamap):
         """
         Loads a cbor binary into a Domain. This also requires
-        a :class:`pyprom.datamap.Datamap`
+        a :class:`pyprom.lib.datamap.DataMap`
 
         :param bin cborBinary: cbor of :class:`Domain` data
         :param datamap: datamap for this Domain
-        :type datamap: :class:`Datamap`
+        :type datamap: :class:`pyprom.lib.datamap.DataMap`
         :return: :class:`Domain`
         """
         domainDict = cbor.loads(cborBinary)
@@ -173,7 +173,7 @@ class Domain:
 
         :param bool noWalkPath: exclude
          :class:`pyprom.lib.containers.walkpath.WalkPath` from member
-         :class:`pyprom.lib.container.linker.Linker`
+         :class:`pyprom.lib.containers.linker.Linker`
         :return: cbor binary of :class:`Domain`
         """
         return cbor.dumps(self.to_dict(noWalkPath=noWalkPath))
@@ -185,7 +185,7 @@ class Domain:
 
         :param dict domainDict: dict() representation of :class:`Domain`
         :param datamap: datamap for this Domain
-        :type datamap: :class:`Datamap`
+        :type datamap: :class:`pyprom.lib.datamap.DataMap`
         :return: :class:`Domain`
         """
         saddlesContainer = SaddlesContainer.from_dict(domainDict['saddles'],
@@ -211,7 +211,7 @@ class Domain:
 
         :param bool noWalkPath: exclude
          :class:`pyprom.lib.containers.walkpath.WalkPath` from member
-         :class:`pyprom.lib.container.linker.Linker`
+         :class:`pyprom.lib.containers.linker.Linker`
         :return: dict() representation of :class:`Domain`
         """
         domain_dict = dict()
@@ -235,12 +235,12 @@ class Domain:
         Purges Non-redundant Basin Saddles and/or Single Summit linked Saddles
 
         :param bool singleSummit: Purge singleSummit
-         :class:`pyprom.lib.locations.saddle.Saddle`s from Saddles Container
+         :class:`pyprom.lib.locations.saddle.Saddle` from Saddles Container
         :param bool basinSaddle: Purge basinSaddle
-         :class:`pyprom.lib.locations.saddle.Saddle`s from Saddles Container
+         :class:`pyprom.lib.locations.saddle.Saddle` from Saddles Container
          which do not have an alternativeBasinSaddle
         :param bool allBasinSaddles: Purge all
-         :class:`pyprom.lib.locations.saddle.Saddle`s from Saddles Container
+         :class:`pyprom.lib.locations.saddle.Saddle` from Saddles Container
          regardless of whether they have an alternativeBasinSaddle
         """
         toRemoveSaddles = []
@@ -286,7 +286,7 @@ class Domain:
     def walk(self):
         """
         Helper for iterating through
-        :class:`pyprom.lib.container.saddles.SaddlesContainer` saddles
+        :class:`pyprom.lib.containers.saddles.SaddlesContainer` saddles
         and Walking them. This in effect discovers which Saddles are
         linked to which summits.
         """
@@ -344,9 +344,11 @@ class Domain:
         """
         Walk from HighEdge. Appends to self.linkers
 
-        :param saddle:
+        :param saddle: Saddle to walk from.
         :type saddle: :class:`pyprom.lib.locations.saddle.Saddle`
-        :param dict summitHash: hash of all points of all Summits.
+        :param summitHash: hash of all points of all Summits.
+        :type summitHash:
+         {x: {y: :class:`pyprom.lib.locations.gridpoint.GridPoint`}}
         """
         if not saddle.highShores:
             return
@@ -403,12 +405,19 @@ class Domain:
 
         :param point: GridPoint to climb up from.
         :type point: :class:`pyprom.lib.locations.gridpoint.GridPoint`
-        :param dict summitHash: hash of all points of all Summits.
-        :param dict explored: lookup hash of GridPoints that have already
+        :param summitHash: hash of all points of all Summits.
+        :type summitHash:
+         {x: {y: :class:`pyprom.lib.locations.gridpoint.GridPoint`}}
+        :param explored: lookup hash of GridPoints that have already
          been explored and are therefore not to be explored again.
-        :param list orderedExploredPoints: list of Explored Points
+        :type explored: {x: {y: bool}
+        :param orderedExploredPoints: ordered list of Explored Points
+        :type orderedExploredPoints: list(tuple(x,y))
         :return: GridPoint (Next candidate), Summit (If found), dict()
-         (explored points)
+         explored points, ordered list of explored points (x,y).
+        :rtype: :class:`pyprom.lib.locations.gridpoint.GridPoint`.
+         :class:`pyprom.lib.locations.summit.Summit`, {x: {y: bool}},
+         list(tuple(x,y))
         """
         # Is it a summit? Good job! return that Summit!
         if summitHash[point.x].get(point.y, None):

@@ -1028,7 +1028,7 @@ self.documentName
 self.linkers
 self.saddles
 self.summits
-self.runOffs
+self.runoffs
 self.spotElevations</y:AttributeLabel>
                 <y:MethodLabel xml:space="preserve">__init__(outputFileName, documentName=None, features=[])
 extend(features)

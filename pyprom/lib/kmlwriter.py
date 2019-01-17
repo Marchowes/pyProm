@@ -57,8 +57,8 @@ class KMLFileWriter:
         """
         :param str outputFileName: Full path and for output file.
         :param str documentName: Name of root document.
-        :param features: [] list of containers or locations OR a container.
-        :type features: list, :class:`pyprom.lib.container.spot_elevation.SpotElevationContainer`
+        :param features: list of containers or locations OR a container.
+        :type features: list, :class:`pyprom.lib.containers.spot_elevation.SpotElevationContainer`
         """
         self.logger = logging.getLogger('{}'.format(__name__))
         self.filename = os.path.expanduser(outputFileName)
@@ -77,9 +77,9 @@ class KMLFileWriter:
         self.summits = kml.Folder(NS,
                                   name="Summits",
                                   description="Summit Folder")
-        self.runOffs = kml.Folder(NS,
-                                  name="RunOffs",
-                                  description="RunOff Folder")
+        self.runoffs = kml.Folder(NS,
+                                  name="Runoffs",
+                                  description="Runoff Folder")
         self.spotElevations = kml.Folder(NS,
                                          name="SpotElevations",
                                          description="SpotElevation Folder")
@@ -93,7 +93,7 @@ class KMLFileWriter:
         This is intended for lists of locations, or location containers.
 
         :param features: list of features, or container
-        :type features: list, :class:`pyprom.lib.container.spot_elevation.SpotElevationContainer`
+        :type features: list, :class:`pyprom.lib.containers.spot_elevation.SpotElevationContainer`
         """
         for feature in features:
             self.append(feature)
@@ -175,7 +175,7 @@ class KMLFileWriter:
             elif feature_type == "RunOff":
                 featurePm.styleUrl = "#runoff"
                 featurePm.description = featurePm.description + "RunOff"
-                self.runOffs.append(featurePm)
+                self.runoffs.append(featurePm)
             elif feature_type == "SpotElevation":
                 featurePm.styleUrl = "#spotelevation"
                 featurePm.description = featurePm.description + "SpotElevation"
@@ -224,9 +224,9 @@ class KMLFileWriter:
             self.logger.info("Spot Elevations: {}".format(len(
                 self.spotElevations._features)))
             kml_doc.append(self.spotElevations)
-        if self.runOffs._features:
-            self.logger.info("RunOffs: {}".format(len(self.runOffs._features)))
-            kml_doc.append(self.runOffs)
+        if self.runoffs._features:
+            self.logger.info("RunOffs: {}".format(len(self.runoffs._features)))
+            kml_doc.append(self.runoffs)
         if self.linkers._features:
             self.logger.info("Linkers: {}".format(len(self.linkers._features)))
             kml_doc.append(self.linkers)

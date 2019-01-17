@@ -1,8 +1,8 @@
 .. runoffscontainer-pyprom:
 
-RunOffsContainer
+RunoffsContainer
 ================
-.. autoclass:: pyprom.lib.containers.runoffs.RunOffsContainer
+.. autoclass:: pyprom.lib.containers.runoffs.RunoffsContainer
     :members:
     :private-members:
     :special-members:

@@ -20,16 +20,17 @@ class SpotElevationContainer(_Base):
     Allows for various list transformations.
 
     This is intended to be inherited from, namely for:
-    :class:`pyprom.lib.container.saddles.SaddlesContainer`
-    :class:`pyprom.lib.container.summits.SummitsContainer`
-    :class:`pyprom.lib.container.runoffs.RunOffsContainer`
+    :class:`pyprom.lib.containers.saddles.SaddlesContainer`,
+    :class:`pyprom.lib.containers.summits.SummitsContainer`,
+    and :class:`pyprom.lib.containers.runoffs.RunOffsContainer`
     """
 
     def __init__(self, spotElevationList):
         """
-        :param spotElevationList: list of
-         :class:`pyprom.lib.locations.spot_elevation.SpotElevation`
+        :param spotElevationList: list of SpotElevation objects
          which will reside in this container.
+        :type spotElevationList:
+         :class:`pyprom.lib.locations.spot_elevation.SpotElevation`
         """
         super(SpotElevationContainer, self).__init__()
         self.points = spotElevationList
@@ -126,7 +127,8 @@ class SpotElevationContainer(_Base):
         :type lat2: float, int
         :param long2: longitude of point 2
         :type long2: float, int
-        :return: all points within (inclusive) the specified rectangle.
+        :return: SpotElevationContainer loaded with all points within
+         (inclusive) the specified rectangle.
         :rtype: :class:`SpotElevationContainer`
         """
         upperlat = max(lat1, lat2)
@@ -179,9 +181,9 @@ class SpotElevationContainer(_Base):
         Load this object and child objects from a dict.
 
         :param dict spotElevationContainerDict: dict() representation of
-            :class:`SpotElevationContainer`.
+         :class:`SpotElevationContainer`.
         :param datamap: datamap which MultiPoint style SpotElevations use.
-        :type datamap: :class:`Datamap` object.
+        :type datamap: :class:`pyprom.lib.datamap.DataMap`
         :return: :class:`SpotElevationContainer`
         """
         spotelevations = []
@@ -215,7 +217,7 @@ class SpotElevationContainer(_Base):
 
         :param gridPoint: Gridpoint to find index of.
         :type gridPoint:
-        :class:`pyprom.lib.locations.spot_elevation.SpotElevation`
+         :class:`pyprom.lib.locations.spot_elevation.SpotElevation`
         :return: index in points list where this spotElevation exists
         :rtype: int, None
         """
@@ -226,7 +228,7 @@ class SpotElevationContainer(_Base):
 
     def __len__(self):
         """
-        :return: number of items in self.points
+        :return: number of items in `self.points`
         :rtype: int
         """
         return len(self.points)
@@ -242,7 +244,8 @@ class SpotElevationContainer(_Base):
         Gives :class:`SpotElevationContainer` list like set capabilities
 
         :param int idx: index value
-        :param spotElevation:
+        :param spotElevation: Spot Elevation object to set.
+        :type spotElevation:
          :class:`pyprom.lib.locations.spot_elevation.SpotElevation`
         :raises: TypeError if spotElevation not of
          :class:`pyprom.lib.locations.spot_elevation.SpotElevation`

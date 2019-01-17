@@ -1,8 +1,8 @@
 .. _runoff-pyprom:
 
-RunOff
+Runoff
 ======
-.. autoclass:: pyprom.lib.locations.runoff.RunOff
+.. autoclass:: pyprom.lib.locations.runoff.Runoff
     :members:
     :private-members:
     :special-members:

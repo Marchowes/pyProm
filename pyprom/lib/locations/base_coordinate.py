@@ -14,13 +14,15 @@ from ...lib.util import dottedDecimaltoDegrees
 class BaseCoordinate:
     """
     Base Coordinate, intended to be inherited from. This contains
-    basic lat/long
+    basic latitude and longitude
     """
 
     def __init__(self, latitude, longitude, *args, **kwargs):
         """
         :param latitude: latitude in dotted decimal
+        :type latitude: int, float
         :param longitude: longitude in dotted decimal
+        :type longitude: int, float
         """
         self.latitude = latitude
         self.longitude = longitude
@@ -50,7 +52,7 @@ class BaseCoordinate:
         Returns the coordinate of this :class:`BaseCoordinate`
         in degrees minutes seconds format
 
-        :return: (dms, dms)
+        :return: ((d, m, s), (d, m, s) Tuple of lat/long in dms.
         :rtype: tuple
         """
         return ((dottedDecimaltoDegrees(self.latitude)),
@@ -92,6 +94,7 @@ class BaseCoordinate:
     def __hash__(self):
         """
         :return: Hash representation of this object
+        :rtype: str
         """
         return hash((round(self.latitude, 6), round(self.longitude, 6)))
 

@@ -21,15 +21,18 @@ class Runoff(Saddle):
 
     def __init__(self, latitude, longitude, elevation, *args, **kwargs):
         """
-        :param float latitude: latitude in dotted decimal
-        :param float longitude: longitude in dotted decimal
-        :param float elevation: elevation in meters
+        :param latitude: latitude in dotted decimal
+        :type latitude: int, float
+        :param longitude: longitude in dotted decimal
+        :type longitude: int, float
+        :param elevation: elevation in meters
+        :type elevation: int, float
         :param multiPoint: MultiPoint object
-        :type multiPoint: :class:`pyprom.lib.container.multipoint.MultiPoint`,
+        :type multiPoint: :class:`pyprom.lib.containers.multipoint.MultiPoint`,
          None
-        :param highShores: HighEdgeContainer object
+        :param highShores: list of GridPointContainers representing a highShore
         :type highShores:
-         :class:`pyprom.lib.container.high_edge.HighEdgeContainer`, None
+         list(:class:`pyprom.lib.containers.gridPoint.GridPointContainer`)
         """
         super(Runoff, self).__init__(latitude, longitude,
                                      elevation, *args, **kwargs)

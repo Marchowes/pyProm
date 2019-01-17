@@ -21,14 +21,18 @@ class SpotElevation(BaseCoordinate):
 
     def __init__(self, latitude, longitude, elevation, *args, **kwargs):
         """
-        :param float latitude: latitude in dotted decimal
-        :param float longitude: longitude in dotted decimal
-        :param float elevation: elevation in meters
+        :param latitude: latitude in dotted decimal
+        :type latitude: int, float
+        :param longitude: longitude in dotted decimal
+        :type longitude: int, float
+        :param elevation: elevation in meters
+        :type elevation: int, float
         :param bool edge: does this :class:`SpotElevation` have an edge
          Effect?
-        :param list edgePoints: list of
-         :class:`pyprom.lib.locations.base_gridpoint.BaseGridPoint`s
-         which are on the map edge.
+        :param list edgePoints: list of BaseGridPoints which are on the map
+         edge.
+        :type edgePoints:
+         list(:class:`pyprom.lib.locations.base_gridpoint.BaseGridPoint`)
         """
         super(SpotElevation, self).__init__(latitude, longitude)
         self.elevation = elevation
@@ -69,13 +73,15 @@ class SpotElevation(BaseCoordinate):
 
     def toGridPoint(self, datamap):
         """
-        Return this :class:`SpotElevation object` as
-         a :class:`GridPoint` object based on the
-         :class:`pyprom.lib.DataMap` passed in.
+        Return this :class:`SpotElevation` object as
+        a :class:`pyprom.lib.locations.gridpoint.GridPoint`
+        object based on the :class:`pyprom.lib.datamap.DataMap`
+        passed in.
 
-        :param datamap: :class:`pyprom.lib.DataMap` object
-        :type datamap: :class:`pyprom.lib.DataMap`
-        :return: :class:`pyprom.lib.locations.gridpoint.GridPoint`
+        :param datamap: Datamap object
+        :type datamap: :class:`pyprom.lib.datamap.DataMap`
+        :return: Gridpoint representation of this object
+        :rtype: :class:`pyprom.lib.locations.gridpoint.GridPoint`
         """
         from .gridpoint import GridPoint
         x, y = datamap.latlong_to_xy(self.latitude, self.longitude)
@@ -98,7 +104,7 @@ class SpotElevation(BaseCoordinate):
 
         :param other: object to be compared against
         :type other: :class:`SpotElevation`
-        :return: of inequality
+        :return: equality
         :rtype: bool
         """
         latitude = longitude = olatitude = olongitude = None
@@ -118,6 +124,7 @@ class SpotElevation(BaseCoordinate):
         Determines if :class:`SpotElevation` is not equal to another.
 
         :param other: object to be compared against
+        :type other: :class:`SpotElevation`
         :return: inequality
         :rtype: bool
         """
@@ -131,6 +138,7 @@ class SpotElevation(BaseCoordinate):
         Determines if :class:`SpotElevation` elevation is less than another.
 
         :param other: object which we compare against.
+        :type other: :class:`SpotElevation`
         :return: if self is of lower elevation than other.
         :rtype: bool
         :raises: TypeError if other not of :class:`SpotElevation`
@@ -141,6 +149,7 @@ class SpotElevation(BaseCoordinate):
     def __hash__(self):
         """
         :return: Hash representation of this object
+        :rtype: str
         """
         return hash((round(self.latitude, 6), round(self.longitude, 6),
                      self.elevation))
