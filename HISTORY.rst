@@ -1,4 +1,8 @@
 Release History
+0.6.2 (January 21, 2019)
+++++++++++++++++++++++++
+* Added docs for readthedocs.io
+* Improved/standardized docstrings for sphinx.
 
 0.6.1 (January 1, 2019)
 +++++++++++++++++++++++

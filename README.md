@@ -1,4 +1,4 @@
-### pyProm v0.6.1
+### pyProm
 
 ![pyProm](https://github.com/marchowes/pyProm/raw/master/images/pyProm-logo-500px.png "pyProm")
 
@@ -22,6 +22,11 @@ consumes more memory (apalling so in some instances).
 
 This library is inspired by [WinProm](https://github.com/edwardearl/winprom), by the late [Edward Earl](http://peakbagger.com/climber/climber.aspx?cid=601), as well as the number of websites
 which make use of similiarly derived data, such as [LoJ](listsofjohn.com) and [peakbagger](peakbagger.com)
+
+Read The Docs
+--------------
+Fancy pyProm Documentation derived from docstrings can be found on [readthedocs.io](http://pyprom.readthedocs.io)
+
 
 More About Prominence and Surface Network Analysis
 --------------------------------------------------
