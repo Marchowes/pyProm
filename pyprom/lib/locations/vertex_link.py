@@ -11,17 +11,23 @@ used in Saddle highShores Tree Calculations.
 
 class Vertex_Link:
     """
-    Vertex_Link connects a vertex (:class`GridPoint`) from one feature to
-    a vertex from another
+    Vertex_Link connects a vertex
+    :class:`pyprom.lib.locations.gridpoint.GridPoint` from one feature to
+    a vertex from another. These are used in Internal Saddle Networks.
     """
 
     def __init__(self, localPoint, remotePoint,
                  distance, remote_container=None):
         """
         :param localPoint: relative (local) GridPoint (vertex)
+        :type localPoint: :class:`pyprom.lib.locations.gridpoint.GridPoint`
         :param remotePoint: relative (remote) GridPoint (vertex)
+        :type remotePoint: :class:`pyprom.lib.locations.gridpoint.GridPoint`
         :param distance: distance between points.
-        :param remote_container: :class:`Feature_Verticies`
+        :type distance: int, float
+        :param remote_container: Remote linked vertex container.
+        :type remote_container:
+         :class:`pyprom.lib.containers.feature_verticies.Feature_Verticies`
         """
         self.local = localPoint
         self.remote = remotePoint
@@ -29,6 +35,10 @@ class Vertex_Link:
         self.remote_container = remote_container
 
     def _remote_container_idx(self):
+        """
+        :return: index of remove_container
+        :rtype: int, "None"
+        """
         if self.remote_container:
             return self.remote_container.index
         else:

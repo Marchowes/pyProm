@@ -20,7 +20,10 @@ class SummitsContainer(SpotElevationContainer):
 
     def __init__(self, summitList):
         """
-        :param summitList: list of :class:`Summit`s
+        :param summitList: list of Summits which reside in this container.
+        :type summitList: list(:class:`pyprom.lib.locations.summit.Summit`)
+        :raises: TypeError if summitList contains non
+         :class:`pyprom.lib.locations.summit.Summit` objects
         """
         if len([x for x in summitList if not isinstance(x, Summit)]):
             raise TypeError("summitList passed to SummitsContainer"
@@ -30,16 +33,22 @@ class SummitsContainer(SpotElevationContainer):
     @property
     def summits(self):
         """
-        Getter alias for summits
-        :return: list() of summits (points)
+        Getter alias for `self.points`
+
+        :return: All summits in this container.
+        :rtype: list(:class:`pyprom.lib.locations.summit.Summit`)
         """
         return self.points
 
     def append(self, summit):
         """
-        Add a summit to the container.
-        :param summit: :class:`Summit`
-        :raises: TypeError if summit not of :class:`Summit`
+        Append a :class:`pyprom.lib.locations.summit.Summit`
+        to this container.
+
+        :param summit: Summit to append.
+        :type summit: :class:`pyprom.lib.locations.summit.Summit`
+        :raises: TypeError if summit not of
+         :class:`pyprom.lib.locations.summit.Summit`
         """
         isSummit(summit)
         self.points.append(summit)
@@ -47,17 +56,23 @@ class SummitsContainer(SpotElevationContainer):
 
     def to_dict(self):
         """
+        Create the dictionary representation of this object.
+
         :return: dict() representation of :class:`SummitsContainer`
+        :rtype: dict()
         """
         return {'summits': [x.to_dict() for x in self.points]}
 
     @classmethod
     def from_dict(cls, summitContainerDict, datamap=None):
         """
-        Load this object and child objects from a dict.
+        Create this object from dictionary representation
+
         :param summitContainerDict: dict() representation of this object.
-        :param datamap: :class:`Datamap`
-        :return:
+        :param datamap: datamap which MultiPoint style Saddles use.
+        :type datamap: :class:`pyprom.lib.datamap.DataMap`
+        :return: a new SummitsContainer
+        :rtype: :class:`SummitsContainer`
         """
         summits = []
         for summit in summitContainerDict['summits']:
@@ -69,9 +84,12 @@ class SummitsContainer(SpotElevationContainer):
     def __setitem__(self, idx, summit):
         """
         Gives SummitsContainer list like set capabilities
-        :param idx: index value
-        :param summit: :class:`Summit`
-        :raises: TypeError if summit not of :class:`Summit`
+
+        :param int idx: index value
+        :param summit: Summit to add.
+        :type summit: :class:`pyprom.lib.locations.summit.Summit`
+        :raises: TypeError if summit not of
+         :class:`pyprom.lib.locations.summit.Summit`
         """
         isSummit(summit)
         self.points[idx] = summit

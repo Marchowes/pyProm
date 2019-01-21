@@ -67,7 +67,7 @@ class KMLFileWriterTest(unittest.TestCase):
         self.assertEqual(len(self.kfw.linkers._features), 1)
         self.assertEqual(len(self.kfw.saddles._features), 2)
         self.assertEqual(len(self.kfw.summits._features), 2)
-        self.assertEqual(len(self.kfw.runOffs._features), 2)
+        self.assertEqual(len(self.kfw.runoffs._features), 2)
 
     def testSaddlesAppendKML(self):
         """
@@ -188,7 +188,7 @@ class KMLFileWriterTest(unittest.TestCase):
         self.kfw.append(self.runoff2)
         self.assertTrue(self.kfw.spotElevation_wkt['RunOffPOINT (2 2)'])
         self.assertEqual(len(self.kfw.spotElevation_wkt.items()), 2)
-        self.assertEqual(len(self.kfw.runOffs._features), 2)
+        self.assertEqual(len(self.kfw.runoffs._features), 2)
 
     def testRunoffsAppendSameKML(self):
         """
@@ -199,7 +199,7 @@ class KMLFileWriterTest(unittest.TestCase):
         self.assertTrue(self.kfw.spotElevation_wkt['RunOffPOINT (1 1)'])
         self.kfw.append(self.runoff1)
         self.assertEqual(len(self.kfw.spotElevation_wkt.items()), 1)
-        self.assertEqual(len(self.kfw.runOffs._features), 1)
+        self.assertEqual(len(self.kfw.runoffs._features), 1)
 
     def testRunoffsContainerAppendKML(self):
         """
@@ -210,7 +210,7 @@ class KMLFileWriterTest(unittest.TestCase):
         self.assertTrue(self.kfw.spotElevation_wkt['RunOffPOINT (1 1)'])
         self.assertTrue(self.kfw.spotElevation_wkt['RunOffPOINT (2 2)'])
         self.assertEqual(len(self.kfw.spotElevation_wkt.items()), 2)
-        self.assertEqual(len(self.kfw.runOffs._features), 2)
+        self.assertEqual(len(self.kfw.runoffs._features), 2)
 
     def testRunoffsExtendKML(self):
         """
@@ -221,7 +221,7 @@ class KMLFileWriterTest(unittest.TestCase):
         self.assertTrue(self.kfw.spotElevation_wkt['RunOffPOINT (1 1)'])
         self.assertTrue(self.kfw.spotElevation_wkt['RunOffPOINT (2 2)'])
         self.assertEqual(len(self.kfw.spotElevation_wkt.items()), 2)
-        self.assertEqual(len(self.kfw.runOffs._features), 2)
+        self.assertEqual(len(self.kfw.runoffs._features), 2)
 
     def testRunoffsContainerExtendKML(self):
         """
@@ -232,7 +232,7 @@ class KMLFileWriterTest(unittest.TestCase):
         self.assertTrue(self.kfw.spotElevation_wkt['RunOffPOINT (1 1)'])
         self.assertTrue(self.kfw.spotElevation_wkt['RunOffPOINT (2 2)'])
         self.assertEqual(len(self.kfw.spotElevation_wkt.items()), 2)
-        self.assertEqual(len(self.kfw.runOffs._features), 2)
+        self.assertEqual(len(self.kfw.runoffs._features), 2)
 
     def testSpotElevationAppendKML(self):
         """
@@ -338,7 +338,7 @@ class KMLFileWriterTest(unittest.TestCase):
         self.assertEqual(len(self.kfw.spotElevations._features), 1)
         self.assertEqual(len(self.kfw.saddles._features), 1)
         self.assertEqual(len(self.kfw.summits._features), 1)
-        self.assertEqual(len(self.kfw.runOffs._features), 1)
+        self.assertEqual(len(self.kfw.runoffs._features), 1)
 
     def testCreateWithListOfLocations(self):
         """

@@ -12,29 +12,41 @@ from math import hypot
 
 class BaseGridPoint:
     """
-    Base Object for GridPoints
+    Base Object for GridPoints. These are simple x, y coordinates
+    with no association to a :class:`pyprom.lib.datamap.DataMap` This
+    is a Base class intended to be inherited from in most situations.
     """
 
     def __init__(self, x, y):
         """
-        Basic Gridpoint.
-        :param x: x coordinate
-        :param y: y coordinate
+        A basic x,y GridPoint.
+
+        :param int x: x coordinate
+        :param int y: y coordinate
         """
         self.x = x
         self.y = y
 
     def to_dict(self):
         """
+        Create the dictionary representation of this object.
+
         :return: dict() representation of :class:`BaseGridPoint`
+        :rtype: dict()
         """
         return {'x': self.x,
                 'y': self.y}
 
     def distance(self, other):
         """
-        :param other: :class:BaseGridPoint to compare for calculating distance.
-        :return: float value of distance.
+        Returns the distance between this :class:`BaseGridPoint` and
+        another (in points)
+
+        :param other: :class:`BaseGridPoint` to compare for
+         calculating distance.
+        :type other: :class:`BaseGridPoint`
+        :return: distance.
+        :rtype: float
         :raises: TypeError if other not of :class:`BaseGridPoint`
         """
         isBaseGridPoint(other)
@@ -42,7 +54,10 @@ class BaseGridPoint:
 
     def __hash__(self):
         """
+        Produces the hash representation of this object.
+
         :return: Hash representation of this object
+        :rtype: str
         """
         return hash((self.x, self.y))
 
@@ -54,18 +69,28 @@ class BaseGridPoint:
 
     def __lt__(self, other):
         """
+        Determines if this object's elevation is less than another.
+
         :param other: object which we compare against.
+        :type other: :class:`pyprom.lib.locations.base_gridpoint.BaseGridPoint`
         :return: bool of if self is arbitrarily regarded as
          lower than the other
-        :raises: TypeError if other not of :class:`GridPoint`
+        :raises: TypeError if other not of
+         :class:`pyprom.lib.locations.base_gridpoint.BaseGridPoint`
         """
         isBaseGridPoint(other)
+        # we only do this to satisfy set requirements. There is no meaningful
+        # way to determine if a GridPoint is gt/lt another.
         return self.x + self.y < other.x + other.y
 
     def __eq__(self, other):
         """
+        Determines if this object is equal to another.
+
         :param other: object which we compare against.
-        :return: bool if self is equal to other
+        :type other: :class:`BaseGridPoint`
+        :return: equality
+        :rtype: bool
         :raises: TypeError if other not of :class:`BaseGridPoint`
         """
         isBaseGridPoint(other)
@@ -77,6 +102,8 @@ class BaseGridPoint:
 
 def isBaseGridPoint(gridPoint):
     """
+    Check if passed in object is a :class:`BaseGridPoint`
+
     :param gridPoint: object under scrutiny
     :raises: TypeError if other not of :class:`BaseGridPoint`
     """

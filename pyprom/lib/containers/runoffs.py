@@ -20,7 +20,8 @@ class RunoffsContainer(SaddlesContainer):
 
     def __init__(self, runoffList):
         """
-        :param runoffList: list of :class:`Runoff`s
+        :param runoffList: list of Runoff objects to reside in this container.
+        :type runoffList: list(:class:`pyprom.lib.locations.runoff.Runoff`)
         """
         if len([x for x in runoffList if not isinstance(x, Runoff)]):
             raise TypeError("runoffList passed to RunoffsContainer"
@@ -37,9 +38,12 @@ class RunoffsContainer(SaddlesContainer):
     def from_dict(cls, runoffContainerDict, datamap=None):
         """
         Load this object and child objects from a dict.
+
         :param runoffsContainerDict: dict() representation of this object.
-        :param datamap: :class:`Datamap`
-        :return:
+        :param datamap: datamap which MultiPoint style Runoffs use.
+        :type datamap: :class:`pyprom.lib.datamap.DataMap`
+        :return: New RunoffsContainer
+        :rtype: :class:`RunoffsContainer`
         """
         runoffs = []
         for runoff in runoffContainerDict['runoffs']:

@@ -11,14 +11,18 @@ from .base_gridpoint import BaseGridPoint
 
 
 class GridPoint(BaseGridPoint):
-    """Grid Point"""
+    """
+    A GridPoint Object. This is a Child of
+    :class:`pyprom.lib.locations.base_gridpoint.BaseGridPoint`
+    In essence, this is an x,y coordinate which also includes elevation.
+    """
 
     def __init__(self, x, y, elevation):
         """
-        A basic grid point. This maps an elevation to an X,Y coordinate.
-        :param x: x coordinate
-        :param y: y coordinate
+        :param int x: x coordinate
+        :param int y: y coordinate
         :param elevation: elevation in meters
+        :type elevation: float, int
         """
         super(GridPoint, self).__init__(x, y)
         self.elevation = elevation
@@ -34,7 +38,11 @@ class GridPoint(BaseGridPoint):
     @classmethod
     def from_dict(self, gridPointDict):
         """
-        :return: dict of :class:`GridPoint`
+        Create this object from dictionary representation
+
+        :param dict gridPointDict: dict() representation of this object.
+        :return: GridPoint from dict()
+        :rtype: :class:`GridPoint`
         """
         return self(gridPointDict['x'],
                     gridPointDict['y'],
@@ -42,8 +50,12 @@ class GridPoint(BaseGridPoint):
 
     def toSpotElevation(self, datamap):
         """
-        :param datamap: :class:`Datamap` object
-        :return: SpotElevation object
+        Converts this GridPoint into a SpotElevation using a datamap.
+
+        :param datamap: Datamap object
+        :type datamap: :class:`pyprom.lib.datamap.DataMap`
+        :return: GridPoint as a SpotElevation object.
+        :rtype: :class:`pyprom.lib.locations.spot_elevation.SpotElevation`
         """
         from .spot_elevation import SpotElevation
         lat, long = datamap.xy_to_latlong(self.x, self.y)
@@ -52,7 +64,9 @@ class GridPoint(BaseGridPoint):
     def __eq__(self, other):
         """
         :param other: object which we compare against.
-        :return: bool if self is equal to other
+        :type other: :class:`GridPoint`
+        :return: equality
+        :rtype: bool
         :raises: TypeError if other not of :class:`GridPoint`
         """
         isGridPoint(other)
@@ -62,7 +76,9 @@ class GridPoint(BaseGridPoint):
     def __ne__(self, other):
         """
         :param other: object which we compare against.
-        :return: bool if self is not equal to other
+        :type other: :class:`GridPoint`
+        :return: inequality
+        :rtype: bool
         :raises: TypeError if other not of :class:`GridPoint`
         """
         isGridPoint(other)
@@ -72,7 +88,9 @@ class GridPoint(BaseGridPoint):
     def __lt__(self, other):
         """
         :param other: object which we compare against.
+        :type other: :class:`GridPoint`
         :return: bool of if self is of lower elevation than other.
+        :rtype: bool
         :raises: TypeError if other not of :class:`GridPoint`
         """
         isGridPoint(other)
@@ -81,6 +99,7 @@ class GridPoint(BaseGridPoint):
     def __hash__(self):
         """
         :return: hash representation of this object.
+        :rtype: str
         """
         return hash((self.x, self.y, self.elevation))
 
@@ -98,6 +117,8 @@ class GridPoint(BaseGridPoint):
 
 def isGridPoint(gridPoint):
     """
+    Check if passed in object is a :class:`GridPoint`
+
     :param gridPoint: object under scrutiny
     :raises: TypeError if other not of :class:`GridPoint`
     """

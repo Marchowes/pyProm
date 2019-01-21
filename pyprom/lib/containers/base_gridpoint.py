@@ -8,42 +8,56 @@ This library contains a base container class for storing GridPoint
 type location objects.
 """
 
-from pyprom.lib.locations.gridpoint import isGridPoint
+from pyprom.lib.locations.base_gridpoint import isBaseGridPoint
 
 
 class BaseGridPointContainer:
     """
-    Base Grid Point Container.
+    Base Grid Point Container. Storage and functions for
+    :class:`pyprom.lib.locations.base_gridpoint.BaseGridPoint`
     """
 
     def __init__(self, gridPointList):
         """
-        :param gridPointList: list of :class:`GridPoints`
+        :param gridPointList: list of BaseGridPoints
+        :type gridPointList:
+         list(:class:`pyprom.lib.locations.base_gridpoint.BaseGridPoint`)
         """
         self.points = gridPointList
 
     def append(self, gridPoint):
         """
-        Append a gridPoint to the container.
-        :param gridPoint: :class:`GridPoint`
-        :raises: TypeError if gridPoint not of :class:`GridPoint`
+        Append a BaseGridPoint to the container.
+
+        :param gridPoint: object to append to container.
+        :type gridPoint:
+         :class:`pyprom.lib.locations.base_gridpoint.BaseGridPoint`
+        :raises: TypeError if gridPoint not of
+         :class:`pyprom.lib.locations.base_gridpoint.BaseGridPoint`
         """
-        isGridPoint(gridPoint)
+        isBaseGridPoint(gridPoint)
         self.points.append(gridPoint)
 
     def sort(self, **kwargs):
         """
-        Sort points using kwargs passed in.
-        :param kwargs:
+        Sort points using kwargs passed in
+
+        :param kwargs: common sort args
         """
         self.points.sort(**kwargs)
 
     def index(self, gridPoint):
         """
-        Returns the index that this :class:`BaseGridPoint` or child
+        Returns the index that this
+        :class:`pyprom.lib.locations.base_gridpoint.BaseGridPoint` or child
         object occurs. If none, return None
-        :param gridPoint: :class:`BaseGridPoint`
-        :return: index in points list where this baseGridPoint exists
+
+        :param gridPoint: BaseGridPoint or child object to find index of
+        :type gridPoint:
+         :class:`pyprom.lib.locations.base_gridpoint.BaseGridPoint`
+        :return: index in points list where this
+         :class:`pyprom.lib.locations.base_gridpoint.BaseGridPoint` resides.
+        :rtype: int
         """
         try:
             return self.points.index(gridPoint)
@@ -52,40 +66,52 @@ class BaseGridPointContainer:
 
     def __len__(self):
         """
-        :return: integer - number of items in self.points
+        :return: number of items in `self.points`
+        :rtype: int
         """
         return len(self.points)
 
     def __setitem__(self, idx, gridPoint):
         """
-        Gives BaseGridpoint list like set capabilities
-        :param idx: index value
-        :param gridPoint: :class:`GridPoint`
-        :raises: TypeError if gridPoint not of :class:`GridPoint`
+        Gives this BaseGridPointContainer list like set capabilities
+
+        :param int idx: index value
+        :param gridPoint: BaseGridPoint or child object to add.
+        :type gridPoint:
+         :class:`pyprom.lib.locations.base_gridpoint.BaseGridPoint`
+        :raises: TypeError if gridPoint not of
+         :class:`pyprom.lib.locations.base_gridpoint.BaseGridPoint`
         """
-        isGridPoint(gridPoint)
+        isBaseGridPoint(gridPoint)
         self.points[idx] = gridPoint
 
     def __getitem__(self, idx):
         """
-        Gives BaseGridpoint list like get capabilities
-        :param idx: index value
-        :return: :class:`GridPoint` self.point at idx
+        Gives this BaseGridPointContainer container list like get capabilities
+
+        :param int idx: index value
+        :return: BaseGridPoint from self.point at idx
+        :rtype: :class:`pyprom.lib.locations.base_gridpoint.BaseGridPoint`
         """
         return self.points[idx]
 
     def __hash__(self):
         """
-        Generates hash based on points.
-        :return: string representation of hash
+        Produces the hash representation of this object.
+
+        :return: Hash representation of this object
+        :rtype: str
         """
         return hash(tuple(sorted(self.points)))
 
     def __eq__(self, other):
         """
-        Determines if BaseGridPointContainer is equal to another.
-        :param other: :class:`BaseGridPointContainer` to be compared against
-        :return: bool of equality
+        Determines if this object is equal to another.
+
+        :param other: object to be compared against
+        :type other: :class:`BaseGridPointContainer`
+        :return: equality
+        :rtype: bool
         :raises: TypeError if other not of :class:`BaseGridPointContainer`
         """
         _isBaseGridPointContainer(other)
@@ -94,9 +120,12 @@ class BaseGridPointContainer:
 
     def __ne__(self, other):
         """
-        Determines if BaseGridPointContainer is not equal to another.
-        :param other: :class:`BaseGridPointContainer` to be compared against
-        :return: bool of inequality
+        Determines if this object is not equal to another.
+
+        :param other: object to be compared against
+        :type other: :class:`BaseGridPointContainer`
+        :return: inequality
+        :rtype: bool
         :raises: TypeError if other not of :class:`BaseGridPointContainer`
         """
         _isBaseGridPointContainer(other)
@@ -114,6 +143,8 @@ class BaseGridPointContainer:
 
 def _isBaseGridPointContainer(gridPointContainer):
     """
+    Check if passed in object is a :class:`BaseGridPointContainer`
+
     :param gridPointContainer: object under scrutiny
     :raises: TypeError if other not of :class:`BaseGridPointContainer`
     """

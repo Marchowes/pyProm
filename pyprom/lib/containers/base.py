@@ -11,8 +11,11 @@ import logging
 
 class _Base:
     """
-    Very Base object, which contains just a logger.
+    Very Base object for containers, which contains just a logger.
     """
 
     def __init__(self):
+        """
+        Base initialization of Container Object.
+        """
         self.logger = logging.getLogger('pyProm.{}'.format(__name__))

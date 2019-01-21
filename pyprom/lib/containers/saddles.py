@@ -23,7 +23,8 @@ class SaddlesContainer(SpotElevationContainer):
 
     def __init__(self, saddleList):
         """
-        :param saddleList: list of :class:`Saddle`s
+        :param saddleList: list of Saddle objects to reside in this container.
+        :type saddleList: list(:class:`pyprom.lib.locations.saddle.Saddle`)
         """
         if len([x for x in saddleList if not isinstance(x, Saddle)]):
             raise TypeError("saddleList passed to SaddlesContainer"
@@ -33,12 +34,16 @@ class SaddlesContainer(SpotElevationContainer):
     def rebuildSaddles(self, datamap):
         """
         Uses the saddles contained in this container and rebuilds any saddle
-        which contains greater than 2 high edges as (n-1) new saddles where n
+        which contains >= 2 high edges as (n-1) new saddles where n
         is the number of high edges. The old saddle is tossed out unless it
         is an edge effect saddle, in which it is kept and disqualified.
         Saddles with 2 high edges are added back in. This in effect deals
-        with waterbodies.
-        :return: :class:`SaddlesContainer` (new)
+        with waterbodies and other similiar features.
+
+        :param datamap: datamap to use while rebuilding.
+        :type datamap: :class:`pyprom.lib.datamap.DataMap`
+        :return: New SaddlesContainer
+        :rtype: :class:`SaddlesContainer`
         """
         new_saddles = list()
         for saddle in self.points:
@@ -106,15 +111,21 @@ class SaddlesContainer(SpotElevationContainer):
     @property
     def saddles(self):
         """
-        Getter alias for saddles
-        :return: list() of saddles (points)
+        Getter alias for self.points
+
+        :return: all Saddles in the container
+        :rtype: list
         """
         return self.points
 
     def append(self, saddle):
         """
-        Append a saddle to the container.
-        :param saddle: :class:`Saddle`
+        Append a :class:`pyprom.lib.locations.saddle.Saddle` to this container.
+
+        :param saddle: Saddle to append.
+        :type saddle: :class:`pyprom.lib.locations.saddle.Saddle`
+        :raises: TypeError if not of type
+         :class:`pyprom.lib.locations.saddle.Saddle`
         """
         isSaddle(saddle)
         self.points.append(saddle)
@@ -130,9 +141,12 @@ class SaddlesContainer(SpotElevationContainer):
     def from_dict(cls, saddleContainerDict, datamap=None):
         """
         Load this object and child objects from a dict.
+
         :param saddleContainerDict: dict() representation of this object.
-        :param datamap: :class:`Datamap`
-        :return:
+        :param datamap: datamap which MultiPoint style Saddles use.
+        :type datamap: :class:`Datamap` object.
+        :return: New SaddlesContainer
+        :rtype: :class:`SaddlesContainer`
         """
         saddles = []
         saddleHash = dict()
@@ -154,7 +168,9 @@ class SaddlesContainer(SpotElevationContainer):
     @property
     def disqualified(self):
         """
-        :return: list of all disqualified :class:`Saddle` in this container.
+        :return: list of all disqualified
+         :class:`pyprom.lib.locations.saddle.Saddle` in this container.
+        :rtype: list(:class:`pyprom.lib.locations.saddle.Saddle`)
         """
         return [x for x in self.points if x.disqualified]
 
@@ -166,9 +182,11 @@ class SaddlesContainer(SpotElevationContainer):
 
     def __setitem__(self, idx, saddle):
         """
-        :param idx: index
-        :param saddle: :class:`Saddle`
-        :return: :class:`Saddle`
+        Gives :class:`SaddlesContainer` list like set capabilities
+
+        :param int idx: index
+        :param saddle: Saddle object to add.
+        :type saddle: :class:`pyprom.lib.locations.saddle.Saddle`
         """
         isSaddle(saddle)
         self.points[idx] = saddle

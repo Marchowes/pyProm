@@ -55,9 +55,10 @@ class KMLFileWriter:
 
     def __init__(self, outputFileName, documentName=None, features=[]):
         """
-        :param outputFileName: Full path and for output file.
-        :param documentName: Name of root document.
-        :param features: [] list of containers or locations OR a container.
+        :param str outputFileName: Full path and for output file.
+        :param str documentName: Name of root document.
+        :param features: list of containers or locations OR a container.
+        :type features: list, :class:`pyprom.lib.containers.spot_elevation.SpotElevationContainer`
         """
         self.logger = logging.getLogger('{}'.format(__name__))
         self.filename = os.path.expanduser(outputFileName)
@@ -76,9 +77,9 @@ class KMLFileWriter:
         self.summits = kml.Folder(NS,
                                   name="Summits",
                                   description="Summit Folder")
-        self.runOffs = kml.Folder(NS,
-                                  name="RunOffs",
-                                  description="RunOff Folder")
+        self.runoffs = kml.Folder(NS,
+                                  name="Runoffs",
+                                  description="Runoff Folder")
         self.spotElevations = kml.Folder(NS,
                                          name="SpotElevations",
                                          description="SpotElevation Folder")
@@ -90,7 +91,9 @@ class KMLFileWriter:
         """
         Extend extends features onto this KMLFileWriter.
         This is intended for lists of locations, or location containers.
-        :param features: list, or container
+
+        :param features: list of features, or container
+        :type features: list, :class:`pyprom.lib.containers.spot_elevation.SpotElevationContainer`
         """
         for feature in features:
             self.append(feature)
@@ -98,6 +101,7 @@ class KMLFileWriter:
     def append(self, feature):
         """
         Append feature, or in the case of containers, pass on to extend.
+
         :param feature: Location or Container
         """
         # Allow appending of Containers
@@ -141,8 +145,9 @@ class KMLFileWriter:
     def _append_spotElevation_derivative(self, feature, feature_type):
         """
         Appends a spotElevation derivative to this Object
+
         :param feature: location object
-        :param feature_type: string representation of this object.
+        :param str feature_type: string representation of this object.
         """
         featurePm = kml.Placemark(NS,
                                   "{:.3f}".format(feature.feet),
@@ -170,7 +175,7 @@ class KMLFileWriter:
             elif feature_type == "RunOff":
                 featurePm.styleUrl = "#runoff"
                 featurePm.description = featurePm.description + "RunOff"
-                self.runOffs.append(featurePm)
+                self.runoffs.append(featurePm)
             elif feature_type == "SpotElevation":
                 featurePm.styleUrl = "#spotelevation"
                 featurePm.description = featurePm.description + "SpotElevation"
@@ -179,6 +184,7 @@ class KMLFileWriter:
     def _append_linker(self, linker):
         """
         Append linker object to to this Object
+
         :param linker: :class:`Linker`
         """
         linkerPm = kml.Placemark(NS)
@@ -193,6 +199,7 @@ class KMLFileWriter:
     def generateDocument(self):
         """
         Generates KML document of locations in this object.
+
         :return: kml Document
         """
         if not self.documentName:
@@ -217,9 +224,9 @@ class KMLFileWriter:
             self.logger.info("Spot Elevations: {}".format(len(
                 self.spotElevations._features)))
             kml_doc.append(self.spotElevations)
-        if self.runOffs._features:
-            self.logger.info("RunOffs: {}".format(len(self.runOffs._features)))
-            kml_doc.append(self.runOffs)
+        if self.runoffs._features:
+            self.logger.info("RunOffs: {}".format(len(self.runoffs._features)))
+            kml_doc.append(self.runoffs)
         if self.linkers._features:
             self.logger.info("Linkers: {}".format(len(self.linkers._features)))
             kml_doc.append(self.linkers)
@@ -228,6 +235,7 @@ class KMLFileWriter:
     def generateKML(self):
         """
         Produces KML string of this Writer Object.
+
         :return: string representation of KML
         """
         k = kml.KML()
@@ -236,7 +244,7 @@ class KMLFileWriter:
 
     def write(self):
         """
-        Write KML file.
+        Write KML data to file.
         """
         output = open(self.filename, "w")
         output.write(self.generateKML())

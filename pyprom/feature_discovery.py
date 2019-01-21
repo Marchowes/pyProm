@@ -27,12 +27,16 @@ from .lib.logic.equalheight import equalHeightBlob
 
 class AnalyzeData:
     """
-    Object responsible for discovering features
+    Analyze Data is responsible for discovering the following features:
+    :class:`pyprom.lib.locations.saddle.Saddle`,
+    :class:`pyprom.lib.locations.summit.Summit`,
+    :class:`pyprom.lib.locations.runoff.Runoff`
     """
 
     def __init__(self, datamap):
         """
-        :param datamap: `DataMap` object.
+        :param datamap: datamap to discover features on.
+        :type: :class:`pyprom.lib.datamap.DataMap` object.
         """
         self.logger = logging.getLogger('{}'.format(__name__))
         self.datamap = datamap
@@ -45,8 +49,15 @@ class AnalyzeData:
 
     def run(self):
         """
-        Shortcut for running analysis
-        :return: :class:`Summit`s, :class:`Saddle`s and :class:`Runoff`s
+        Shortcut for running analysis. This will find all features on
+        the datamap, as well as rebuild all
+        :class:`pyprom.lib.locations.saddle.Saddle` into a more digestible
+        format with accurate midpoints and only 2 high edges a piece.
+
+        :return: Containers with features
+        :rtype: :class:`pyprom.lib.containers.saddles.SaddlesContainer`
+         :class:`pyprom.lib.containers.summits.SummitsContainer`
+         :class:`pyprom.lib.containers.runoffs.RunoffsContainer`
         """
         _, _, _ = self.analyze()
         self.logger.info("Rebuilding Saddles")
@@ -56,9 +67,14 @@ class AnalyzeData:
     def analyze(self):
         """
         Analyze Routine.
-        Looks for :class:`Summit`s, :class:`Saddle`s and :class:`Runoff`s
-        return: (:class:`SummitsContainer`, :class:`SaddlesContainer`,
-         :class:`RunoffsContainer`,)
+        Looks for :class:`pyprom.lib.locations.summit.Summit`,
+        :class:`pyprom.lib.locations.saddle.Saddle` and
+        :class:`pyprom.lib.locations.runoff.Runoff` features
+
+        :return: Containers
+        :rtype: :class:`pyprom.lib.containers.saddles.SaddlesContainer`,
+         :class:`pyprom.lib.containers.summits.SummitsContainer`,
+         :class:`pyprom.lib.containers.runoffs.RunoffsContainer`,
         """
         self.logger.info("Initiating Saddle, Summit, Runoff Identification")
         self.summitObjects = SummitsContainer([])
@@ -68,7 +84,7 @@ class AnalyzeData:
         index = 0
         start = default_timer()
         then = start
-        # Iterate through numpy grid, and keep track of gridpoint coordinates.
+        # Iterate through numpy grid, and keep track of GridPoint coordinates.
         while not iterator.finished:
             x, y = iterator.multi_index
             # core storage is always in metric.
@@ -112,12 +128,18 @@ class AnalyzeData:
         del(self.explored)
         return self.summitObjects, self.saddleObjects, self.runoffObjects
 
-    def analyze_multipoint(self, x, y, ptElevation, edge):
+    def analyze_multipoint(self, x, y, ptElevation):
         """
-        :param x:
-        :param y:
+        Logic for analyzing a feature which fits the definition of a
+        multipoint.
+
+        :param int x: x coordinate in raster data.
+        :param int y: y coordinate in raster data.
         :param ptElevation: Elevation of Multipoint Blob
-        :return: Summit, Saddle, or None
+        :type ptElevation: int, float
+        :return: Discovered feature or None
+        :rtype: :class:`pyprom.lib.locations.saddle.Saddle`,
+         :class:`pyprom.lib.locations.summit.Summit`, or None.
         """
         blob, edgePoints = equalHeightBlob(self.datamap, x, y, ptElevation)
         edge = blob.perimeter.mapEdge
@@ -129,10 +151,16 @@ class AnalyzeData:
 
     def summit_and_saddle(self, x, y):
         """
-        summit_and_saddle does that actual discovery of summits and saddles.
-        :param x:
-        :param y:
-        :return: Summit, Saddle, or None
+        summit_and_saddle does that actual discovery of
+        :class:`pyprom.lib.locations.saddle.Saddle`,
+        or :class:`pyprom.lib.locations.summit.Summit`
+
+        :param int x: x coordinate in raster data.
+        :param int y: y coordinate in raster data.
+        :return: Disocvered Feature, or None
+        :rtype: :class:`pyprom.lib.locations.saddle.Saddle`
+         :class:`pyprom.lib.locations.summit.Summit` or
+         :class:`pyprom.lib.locations.runoff.Runoff`, or None.
         """
         # Exempt! bail out!
         if self.explored[x].get(y, False):
@@ -158,7 +186,7 @@ class AnalyzeData:
             # a special MultiPoint analysis function and return the result.
             if elevation == self.elevation and\
                     not self.explored[_x].get(_y, False):
-                return self.analyze_multipoint(_x, _y, elevation, edge)
+                return self.analyze_multipoint(_x, _y, elevation)
 
             gp = GridPoint(_x, _y, elevation)
             if elevation > self.elevation:
@@ -178,14 +206,20 @@ class AnalyzeData:
         """
         Consolidated Feature Logic analyzes the highEdges around a point or
         multipoint and determines if the pattern matches a
-        :class:`Summit` :class:`Saddle` :class:`Runoff`
+        :class:`pyprom.lib.locations.saddle.Saddle`,
+        :class:`pyprom.lib.locations.summit.Summit` or
+        :class:`pyprom.lib.locations.runoff.Runoff`
 
-        :param x: x coordinate.
-        :param y: y coordinate.
-        :param perimeter: :class:`Perimeter` container.
-        :param multipoint: :class:`Multipoint` container
-        :param edge: bool if this is a mapEdge.
-        :return: list of :class:`SpotElevationContainer` child objects.
+        :param int x: x coordinate in raster data.
+        :param int y: y coordinate in raster data.
+        :param perimeter: Perimeter container
+        :type perimeter: :class:`pyprom.lib.containers.perimeter.Perimeter`
+        :param multipoint: MultiPoint container
+        :type multipoint: :class:`pyprom.lib.containers.multipoint.MultiPoint`
+        :param bool edge: is this feature on the map edge?
+        :return: List of Container Objects.
+        :rtype: :class:`pyprom.lib.containers.spot_elevation.SpotElevationContainer`
+         child objects.
         """
         returnableLocations = []
         highPerimeter = perimeter.findHighEdges(
@@ -203,14 +237,14 @@ class AnalyzeData:
             returnableLocations.append(summit)
             # edge summits are inherently Runoffs
             if edge:
-                runOff = Runoff(lat,
+                runoff = Runoff(lat,
                                 long,
                                 self.elevation,
                                 multiPoint=multipoint,
                                 edge=edge,
                                 highShores=highPerimeter,
                                 edgePoints=edgePoints)
-                returnableLocations.append(runOff)
+                returnableLocations.append(runoff)
             return returnableLocations
 
         elif (len(highPerimeter) > 1):
@@ -220,13 +254,13 @@ class AnalyzeData:
             if edge and len([a for a in perimeter.mapEdgePoints
                              if a.elevation < self.elevation]) ==\
                     len(perimeter.mapEdgePoints):
-                runOff = Runoff(lat,
+                runoff = Runoff(lat,
                                 long,
                                 self.elevation,
                                 multiPoint=multipoint,
                                 highShores=highPerimeter,
                                 edgePoints=edgePoints)
-                returnableLocations.append(runOff)
+                returnableLocations.append(runoff)
                 return returnableLocations
 
             saddle = Saddle(lat,
@@ -243,11 +277,11 @@ class AnalyzeData:
                          if a.elevation < self.elevation]) ==\
                 len(perimeter.mapEdgePoints):
             lat, long = self.datamap.xy_to_latlong(x, y)
-            runOff = Runoff(lat,
+            runoff = Runoff(lat,
                             long,
                             self.elevation,
                             multiPoint=multipoint,
                             highShores=highPerimeter,
                             edgePoints=edgePoints)
-            returnableLocations.append(runOff)
+            returnableLocations.append(runoff)
         return returnableLocations

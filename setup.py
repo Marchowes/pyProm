@@ -14,7 +14,7 @@ with open('test-requirements.txt') as f:
     tests_requires = [line.strip() for line in f if line.strip()]
 
 setup(
-    name='pyProm',
+    name='pyprom',
     version=__version__,
     keywords=['pyProm'],
     long_description=__doc__,
@@ -22,7 +22,11 @@ setup(
     author='Marc Howes',
     author_email='marc.h.howes@gmail.com',
     url='https://github.com/marchowes/pyProm',
-    packages=['pyprom'],
+    packages=['pyprom',
+              'pyprom/lib',
+              'pyprom/lib/locations',
+              'pyprom/lib/containers',
+              'pyprom/lib/logic'],
     classifiers=[
         'Programming Language :: Python :: 3',
     ],

@@ -16,13 +16,17 @@ from collections import defaultdict
 
 class GridPointContainer(BaseGridPointContainer):
     """
-    Container for GridPoint type lists.
-    Allows for various list transformations and functions.
+    GridPoint Container for GridPoint type lists.
+    Storage and functions for :class:`pyprom.lib.locations.gridpoint.GridPoint`
     """
 
     def __init__(self, gridPointList):
         """
-        :param gridPointList: list of :class:`GridPoint`
+        :param gridPointList: list of GridPoints
+        :type gridPointList:
+         list(:class:`pyprom.lib.locations.gridpoint.GridPoint`)
+        :raises: TypeError when gridPointList contains non
+         :class:`pyprom.lib.locations.gridpoint.GridPoint`
         """
         super(GridPointContainer, self).__init__(gridPointList)
         if len([x for x in gridPointList if not isinstance(x, GridPoint)]):
@@ -35,7 +39,10 @@ class GridPointContainer(BaseGridPointContainer):
 
     def to_dict(self):
         """
+        Create the dictionary representation of this object.
+
         :return: dict() representation of :class:`GridPointContainer`
+        :rtype: dict()
         """
         gpcDict = {"points": [x.to_dict() for x in self.points]}
         return gpcDict
@@ -43,8 +50,11 @@ class GridPointContainer(BaseGridPointContainer):
     @classmethod
     def from_dict(cls, gpcDict):
         """
-        :param gpcDict: dict() representation of :class:`GridPoint`
-        :return: :class:`GridPoint`
+        Create this object from dictionary representation
+
+        :param dict gpcDict: dict representation of :class:`GridPointContainer`
+        :return: a new GridPointContainer
+        :rtype: :class:`GridPointContainer`
         """
         points = [GridPoint(pt['x'], pt['y'], pt['elevation'])
                   for pt in gpcDict['points']]
@@ -55,7 +65,8 @@ class GridPointContainer(BaseGridPointContainer):
     @property
     def lowest(self):
         """
-        :return: list of lowest :class:`GridPoint` object(s)
+        :return: list of lowest GridPoint objects found in this container
+        :rtype: list(:class:`pyprom.lib.locations.gridpoint.GridPoint`)
         """
         low = self.points[0].elevation
         lowest = list()
@@ -71,7 +82,8 @@ class GridPointContainer(BaseGridPointContainer):
     @property
     def highest(self):
         """
-        :return: list of highest :class:`GridPoint` object(s)
+        :return: list of highest GridPoint objects found in this container
+        :rtype: list(:class:`pyprom.lib.locations.gridpoint.GridPoint`)
         """
         high = self.points[0].elevation
         highest = list()
@@ -86,17 +98,22 @@ class GridPointContainer(BaseGridPointContainer):
 
     def genFastLookup(self):
         """
-        Generates a fast lookup hash of all gridpoints
-        :return:
+        Generates a fast lookup hash of all GridPoints in this container
+        in the format of:
+        {x: {y: :class:`pyprom.lib.locations.gridpoint.GridPoint`}}
         """
         for gp in self.points:
             self.fastLookup[gp.x][gp.y] = gp
 
     def iterNeighborDiagonal(self, point):
         """
-        Iterate through existing diagonal :class:`GridPoint`
-        neighbors.
-        :param GridPoint
+        Iterate through existing diagonal/orthogonal
+        :class:`pyprom.lib.locations.gridpoint.GridPoint`
+        neighbors found in this :class:`GridPointContainer`.
+
+        :param point: gridpoint to find neighbors of.
+        :type point: :class:`pyprom.lib.locations.gridpoint.GridPoint`
+        :rtype: :class:`pyprom.lib.locations.gridpoint.GridPoint`
         """
         if not len(self.fastLookup):
             self.genFastLookup()
@@ -112,9 +129,13 @@ class GridPointContainer(BaseGridPointContainer):
 
     def iterNeighborOrthogonal(self, point):
         """
-        Iterate through existing orthogonal :class:`GridPoint`
-        neighbors.
-        :param GridPoint
+        Iterate through existing orthogonal
+        :class:`pyprom.lib.locations.gridpoint.GridPoint`
+        neighbors found in this :class:`GridPointContainer`.
+
+        :param point: gridpoint to find neighbors of.
+        :type point: :class:`pyprom.lib.locations.gridpoint.GridPoint`
+        :rtype: :class:`pyprom.lib.locations.gridpoint.GridPoint`
         """
         if not len(self.fastLookup):
             self.genFastLookup()
@@ -129,19 +150,19 @@ class GridPointContainer(BaseGridPointContainer):
 
     def findPseudoSummits(self):
         """
-         Similiar in concept to finding summits and multipoint blobs,
-         but smaller in scope.
-
-        Essentially this returns locally scoped Summit points, that is,
-        anything that meets the effective definition of a summit with all
-        the available data in a GridPoint container.
-        This is intended for use for finding high portions along an edge like:
-        [1][2][3][2][2][3][4][4][3][2]
-               ^           ^^^^
-                PSEUDO SUMMITS (simple 1D example)
-        No distinction is made between the pseudo summits. This is becasue
-        these points are used as a jumping off point for Saddle -> Summit
-        walks.
+        | Similiar in concept to finding summits and multipoint blobs,
+        | but smaller in scope.
+        |
+        | Essentially this returns locally scoped Summit points, that is,
+        | anything that meets the effective definition of a summit with all
+        | the available data in a :class:`GridPointContainer`.
+        | This is intended for use for finding high portions along an edge like:
+        | ``[1][2][3][2][2][3][4][4][3][2]``
+        | ``       ^           ^^^^``
+        | ``       PSEUDO SUMMITS (simple 1D example)``
+        | No distinction is made between the pseudo summits. This is becasue
+        | these points are used as a jumping off point for Saddle -> Summit
+        | walks.
         """
         exploredGridPoints = defaultdict(dict)
         pseudoSummits = list()
@@ -149,8 +170,11 @@ class GridPointContainer(BaseGridPointContainer):
         def equalHeightBlob(point):
             """
             Find pseudosummits which contain more than a single point.
-            :param point:
-            :return:
+
+            :param point: gridpoint for analysis
+            :type param: :class:`pyprom.lib.locations.gridpoint.GridPoint`
+            :return: list of GridPoints
+            :rtype: list(:class:`pyprom.lib.locations.gridpoint.GridPoint`)
             """
             toBeAnalyzed = [point]
             analyzed = list()
@@ -202,10 +226,20 @@ class GridPointContainer(BaseGridPointContainer):
 
     def findClosestPoints(self, otherGridpointContainer):
         """
-        Calculates and returns The the two closest GridPoints from `self`
+        Calculates and returns The the two closest
+        :class:`pyprom.lib.locations.gridpoint.GridPoint`
+        objects from this :class:`GridPointContainer`
         and `otherGridpointContainer` and their distance.
-        :param otherGridpointContainer: GridPointContainer
-        :return: GridPoint, GridPoint, distance
+
+        :param otherGridpointContainer: The other
+         :class:`GridPointContainer` to compare against.
+        :type otherGridPointContainer: :class:`GridPointContainer`
+        :return: This :class:`GridPointContainer` and
+         other  :class:`GridPointContainer` closest
+         :class:`pyprom.lib.locations.gridpoint.GridPoint`, and
+         distance between them.
+        :rtype: :class:`pyprom.lib.locations.gridpoint.GridPoint`,
+         :class:`pyprom.lib.locations.gridpoint.GridPoint`, float
         """
         myClosest = None
         theirClosest = None
@@ -224,9 +258,13 @@ class GridPointContainer(BaseGridPointContainer):
 
     def append(self, gridPoint):
         """
-        Append a gridpoint to the container.
-        :param gridPoint: :class:`GridPoint`
-        :raises: TypeError if gridPoint not of :class:`GridPoint`
+        Append a :class:`pyprom.lib.locations.gridpoint.GridPoint`
+        to the container.
+
+        :param gridPoint: GridPoint to append
+        :type gridPoint: :class:`pyprom.lib.locations.gridpoint.GridPoint`
+        :raises: TypeError if gridPoint not of
+         :class:`pyprom.lib.locations.gridpoint.GridPoint`
         """
         isGridPoint(gridPoint)
         self.points.append(gridPoint)

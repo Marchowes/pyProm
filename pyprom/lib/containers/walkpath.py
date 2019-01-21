@@ -11,23 +11,37 @@ from ..locations.gridpoint import GridPoint
 
 
 class WalkPath:
-    """WalkPath Container"""
+    """
+    WalkPath Container.
+    A Walk path is an ordered list of (X,Y) coordinates which creates a path.
+    """
 
     def __init__(self, points):
         """
-        :param points: List of (X,Y) tuples.
+        :param points: List of (X,Y) tuples. making a path
+        :type points: list(tuple(int, int))
         """
         self.points = points
 
     @property
     def path(self):
-        """Returns the path as BaseCoordinates"""
+        """
+        Returns the path as BaseCoordinates
+
+        :return: List of points as
+         :class:`pyprom.lib.locations.base_coordinate.BaseCoordinate`
+        :rtype:
+         list(:class:`pyprom.lib.locations.base_coordinate.BaseCoordinate`)
+        """
         return self.baseCoordinate()
+
 
     def iterateBaseCoordinate(self):
         """
         Iterator for BaseCoordinate representation of the Walk Path.
-        :return: :class:`BaseCoordinate`
+
+        :return: Basecoordinate along path.
+        :rtype: :class:`pyprom.lib.locations.base_coordinate.BaseCoordinate`
         """
         for point in self.points:
             yield BaseCoordinate(point[0], point[1])
@@ -35,8 +49,11 @@ class WalkPath:
     def iterateSpotElevation(self, datamap):
         """
         Iterator for SpotElevation representation of the Walk Path.
-        :param: :class:`Datamap` datamap used to look up elevation of point.
-        :return: :class:`SpotElevation`
+
+        :param datamap: Datamap used to look up elevation of point.
+        :type datamap: :class:`pyprom.lib.datamap.DataMap`
+        :return: SpotElevation along path.
+        :rtype: :class:`pyprom.lib.locations.spot_elevation.SpotElevation`
         """
         for point in self.points:
             x, y = datamap.latlong_to_xy(point[0], point[1])
@@ -46,8 +63,11 @@ class WalkPath:
     def iterateBaseGridPoint(self, datamap):
         """
         Iterator for BaseGridPoint representation of the Walk Path.
-        :param: :class:`Datamap` datamap used to look up elevation of point.
-        :return: :class:`BaseGridPoint`
+
+        :param datamap: Datamap used to look up elevation of point.
+        :type datamap: :class:`pyprom.lib.datamap.DataMap`
+        :return: BaseGridPoint along path
+        :rtype: :class:`pyprom.lib.locations.base_gridpoint.BaseGridPoint`
         """
         for point in self.points:
             x, y = datamap.latlong_to_xy(point[0], point[1])
@@ -56,8 +76,11 @@ class WalkPath:
     def iterateGridPoint(self, datamap):
         """
         Iterator for GridPoint representation of the Walk Path.
-        :param: :class:`Datamap` datamap used to look up elevation of point.
-        :return: :class:`GridPoint`
+
+        :param datamap: Datamap used to look up elevation of point.
+        :type datamap: :class:`pyprom.lib.datamap.DataMap`
+        :return: GridPoint along path
+        :rtype: :class:`pyprom.lib.locations.gridpoint.GridPoint`
         """
         for point in self.points:
             x, y = datamap.latlong_to_xy(point[0], point[1])
@@ -66,34 +89,51 @@ class WalkPath:
 
     def baseCoordinate(self):
         """
-        :return: List of points as :class:`BaseCoordinate`
+        :return: List of points as
+         :class:`pyprom.lib.locations.base_coordinate.BaseCoordinate`
+        :rtype:
+         list(:class:`pyprom.lib.locations.base_coordinate.BaseCoordinate`)
         """
         return [x for x in self.iterateBaseCoordinate()]
 
     def spotElevation(self, datamap):
         """
-        :param: :class:`Datamap` datamap used to look up elevation of point.
-        :return: List of points as :class:`SpotElevation`
+        :param datamap: Datamap used to look up elevation of point.
+        :type datamap: :class:`pyprom.lib.datamap.DataMap`
+        :return: List of points as
+         :class:`pyprom.lib.locations.spot_elevation.SpotElevation`
+        :rtype:
+         list(:class:`pyprom.lib.locations.spot_elevation.SpotElevation`)
         """
         return [x for x in self.iterateSpotElevation(datamap)]
 
     def baseGridPoint(self, datamap):
         """
-        :param: :class:`Datamap` datamap used to look up elevation of point.
-        :return: List of points as :class:`BaseGridPoint`
+        :param datamap: Datamap used to look up elevation of point.
+        :type datamap: :class:`pyprom.lib.datamap.DataMap`
+        :return: List of points as
+         :class:`pyprom.lib.locations.base_gridpoint.BaseGridPoint`
+        :rtype:
+         list(:class:`pyprom.lib.locations.base_gridpoint.BaseGridPoint`)
         """
         return [x for x in self.iterateBaseGridPoint(datamap)]
 
     def gridPoint(self, datamap):
         """
-        :param: :class:`Datamap` datamap used to look up elevation of point.
-        :return: List of points as :class:`GridPoint`
+        :param datamap: Datamap used to look up elevation of point.
+        :type datamap: :class:`pyprom.lib.datamap.DataMap`
+        :return: List of points as
+         :class:`pyprom.lib.locations.gridpoint.GridPoint`
+        :rtype: list(:class:`pyprom.lib.locations.gridpoint.GridPoint`)
         """
         return [x for x in self.iterateGridPoint(datamap)]
 
     def to_dict(self):
         """
+        Create the dictionary representation of this object.
+
         :return: dict() representation of :class:`WalkPath`
+        :rtype: dict()
         """
         to_dict = dict()
         to_dict['path'] = self.points
@@ -102,7 +142,11 @@ class WalkPath:
     @classmethod
     def from_dict(cls, pathDict):
         """
-        :return: :class:`WalkPath`
+        Create this object from dictionary representation
+
+        :param dict pathDict: dict() representation of this object.
+        :return: a new WalkPath
+        :rtype: :class:`WalkPath`
         """
         path = pathDict.get('path', [])
         pathTuples = []
@@ -112,9 +156,12 @@ class WalkPath:
 
     def __eq__(self, other):
         """
-        Determines if :class:`WalkPath` is equal to another.
+        Determines if this object is equal to another.
+
         :param other: :class:`WalkPath` to be compared against
-        :return: bool of inequality
+        :type other: :class:`WalkPath`
+        :return: equality
+        :rtype: bool
         """
         return self.points == other.points
 

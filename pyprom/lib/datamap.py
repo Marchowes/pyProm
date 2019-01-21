@@ -23,7 +23,12 @@ class DataMap:
     """Base class for Datamap type objects."""
 
     def __init__(self, numpy_map, unit, filename):
-        """__init__."""
+        """
+        :param numpy.ndarray numpy_map: Numpy ndarray representation of raster data
+        :param str unit: unit of this data: valid values are feet, foot, or meter
+        :param str filename: file name.
+        :raises: Exception (regarding unit)
+        """
         self.numpy_map = numpy_map
         self.filename = filename
         unit_and_substrings = {"METERS": ["meter"], "FEET": ["foot", "feet"]}
@@ -39,6 +44,9 @@ class DataMap:
         """
         Generator returns 8 closest neighbors to a raster grid location,
         that is, all points touching including the diagonals.
+
+        :param int x: x coordinate in raster data.
+        :param int y: y coordinate in raster data.
         """
         # 0, 45, 90, 135, 180, 225, 270, 315
         for shift in DIAGONAL_SHIFT_LIST:
@@ -57,6 +65,9 @@ class DataMap:
         """
         Generator returns 4 closest neighbors to a raster grid location,
         that is, all points touching excluding the diagonals.
+
+        :param int x: x coordinate in raster data.
+        :param int y: y coordinate in raster data.
         """
         # 0, 90, 180, 270
         for shift in ORTHOGONAL_SHIFT_LIST:
@@ -74,47 +85,48 @@ class DataMap:
 
 class ProjectionDataMap(DataMap):
     """
-    ProjectionDataMap is a Datamap object for projection style
-    datasets from GDAL.
+    ProjectionDataMap is a :class:`pyprom.lib.datamap.DataMap` object for
+    projection style datasets from GDAL.
     """
 
     def __init__(self, numpy_map, upperLeftY, upperLeftX, resolutionY,
                  resolutionX, span_y, span_x, linear_unit, unit, nodata,
                  transform, reverse_transform, filename):
         """
-        :param numpy_map: numpy_array multidimensional array of data
+        | GDAL Native coordiante system oriented:
+        | Y: east/west
+        | X: north/south
+        |
+        | numpy_map is oriented:
+        | Y: north/south
+        | X: east/west
+        |
+        | called like:
+        | numpy_map[x][y]
+
+        :param numpy.ndarray numpy_map: numpy_array multidimensional array of data
          numpy_map[x][y]
-        :param upperLeftY: Upper Left Y native coordinate from GDAL. This
+        :param int upperLeftY: Upper Left Y native coordinate from GDAL. This
          is the X axis for Numpy.
-        :param upperLeftX: Upper Left X native coordinate from GDAL. This
+        :param int upperLeftX: Upper Left X native coordinate from GDAL. This
          is the Y axis for Numpy
-        :param resolutionY: Number of units per pixel on GDAL native Y axis.
+        :param int resolutionY: Number of units per pixel on GDAL native Y axis.
          This is the X axis for Numpy
-        :param resolutionX: Number of units per pixel on GDAL native X axis.
+        :param int resolutionX: Number of units per pixel on GDAL native X axis.
          This is the Y axis for Numpy
-        :param span_y: number of units along GDAL native Y axis. This is the
+        :param int span_y: number of units along GDAL native Y axis. This is the
          X axis for Numpy
-        :param span_x: number of units along GDAL native X axis. This is the
+        :param int span_x: number of units along GDAL native X axis. This is the
          Y axis for Numpy
-        :param linear_unit: Linear unit scale.
-        :param unit: Linear unit
-        :param nodata: raster point value indicating a NULL Value
-        :param transform: osr.CoordinateTransformation from GDAL native to
+        :param int linear_unit: Linear unit scale.
+        :param str unit: Linear unit
+        :param str nodata: raster point value indicating a NULL Value
+        :param osr.CoordinateTransformation transform:
+         CoordinateTransformation from GDAL native to
          selected units (degrees)
-        :param reverse_transform: osr.CoordinateTransformation from selected
+        :param osr.CoordinateTransformation reverse_transform:
+         CoordinateTransformation from selected
          units degrees scale to GDAL native
-
-
-        GDAL Native coordiante system oriented:
-        Y: east/west
-        X: north/south
-
-        numpy_map is oriented:
-        Y: north/south
-        X: east/west
-
-        called like:
-        numpy_map[x][y]
         """
         super(ProjectionDataMap, self).__init__(numpy_map, unit, filename)
         self.logger = logging.getLogger('{}'.format(__name__))
@@ -137,8 +149,9 @@ class ProjectionDataMap(DataMap):
         """
         This function converts a numpy[x][y] coordinate to
         lat/long coordinates.
-        :param x: x location in `numpy_map`
-        :param y: y location in `numpy_map`
+
+        :param int x: x location in `numpy_map`
+        :param int y: y location in `numpy_map`
         :return: (latitude, longitude)
         """
         absolute_x_position = self._uppermost_absolute() + (x * self.res_x)
@@ -150,8 +163,9 @@ class ProjectionDataMap(DataMap):
     def latlong_to_xy(self, latitude, longitude):
         """
         This function converts a lat/long coordinate set to numpy[x][y].
-        :param latitude:
-        :param longitude:
+
+        :param int latitude:
+        :param int longitude:
         :return: (x,y)
         """
         coordinate = self.reverse_transform.TransformPoint(longitude, latitude)
@@ -164,6 +178,7 @@ class ProjectionDataMap(DataMap):
     def elevation(self, latitude, longitude):
         """
         This function returns the elevation at a certain lat/long in Meters.
+
         :param latitude: latitude in dotted demical notation
         :param longitude: longitude in dotted decimal notation.
         :return: elevation of coordinate in meters.
@@ -175,39 +190,49 @@ class ProjectionDataMap(DataMap):
             return self.numpy_map[x, y]
 
     def _leftmost_absolute(self):
-        """Returns the Leftmost GDAL Native X coordinate (Y for numpy_map)."""
+        """
+        :return: the Leftmost GDAL Native X coordinate (Y for numpy_map).
+        :rtype: int
+        """
+
         return self.upperLeftY
 
     def _rightmost_absolute(self):
         """
-        Returns the Rightmost GDAL Native X coordinate (Y for numpy_map).
+        :return: the Rightmost GDAL Native X coordinate (Y for numpy_map).
+        :rtype: int
         """
         return self.upperLeftY + (self.res_y * self.span_y)
 
     def _lowermost_absolute(self):
         """
-        Returns the Lowermost GDAL Native Y coordinate (X for numpy_map).
+        :return: the Lowermost GDAL Native Y coordinate (X for numpy_map).
+        :rtype: int
         """
         return self.upperLeftX + (self.res_x * self.span_x)
 
     def _uppermost_absolute(self):
         """
-        Returns the Uppermost GDAL Native Y coordinate
+        :return: the Uppermost GDAL Native Y coordinate
         (X for numpy_map).
+        :rtype: int
         """
         return self.upperLeftX
 
     def x_to_native_x(self, x):
         """
-        Converts a numpy X coordinate the the gdal native Y
-        (X for numpy_map).
+        Converts a numpy X coordinate to the gdal native Y
+        :return: the gdal native Y coordinate
+        :rtype: int
         """
         return self._uppermost_absolute() + (x * self.res_x)
 
     def y_to_native_y(self, y):
         """
-        Converts a numpy Y coordinate the the gdal native X
+        Converts a numpy Y coordinate to the gdal native X
         (Y for numpy_map).
+        :return: the gdal native X coordinate
+        :rtype: int
         """
         return self._leftmost_absolute() + (y * self.res_y)
 
@@ -247,11 +272,13 @@ class ProjectionDataMap(DataMap):
         """
         Subset produces a subset of the parent (self) map. Uses numpy X,Y
         axis where X,Y are the upper left coordinates.
-        :param x: NW corner x coordinate (latitude)
-        :param y: NW corner y coordinate (longitude)
-        :param xSpan: depth of subset in points (latitude)
-        :param ySpan: width of subset in points (longitude)
-        :return: :class:`ProjectionDataMap`
+
+        :param int x: NW corner x coordinate (latitude)
+        :param int y: NW corner y coordinate (longitude)
+        :param int xSpan: depth of subset in points (latitude)
+        :param int ySpan: width of subset in points (longitude)
+        :return: Projection Data Map
+        :rtype: :class:`ProjectionDataMap`
         """
         southExtreme = self.x_to_native_x(x)
         westExtreme = self.y_to_native_y(y)
