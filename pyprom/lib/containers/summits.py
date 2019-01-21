@@ -56,19 +56,22 @@ class SummitsContainer(SpotElevationContainer):
 
     def to_dict(self):
         """
+        Create the dictionary representation of this object.
+
         :return: dict() representation of :class:`SummitsContainer`
+        :rtype: dict()
         """
         return {'summits': [x.to_dict() for x in self.points]}
 
     @classmethod
     def from_dict(cls, summitContainerDict, datamap=None):
         """
-        Load this object and child objects from a dict.
+        Create this object from dictionary representation
 
         :param summitContainerDict: dict() representation of this object.
         :param datamap: datamap which MultiPoint style Saddles use.
         :type datamap: :class:`pyprom.lib.datamap.DataMap`
-        :return: New SummitsContainer
+        :return: a new SummitsContainer
         :rtype: :class:`SummitsContainer`
         """
         summits = []
@@ -80,8 +83,7 @@ class SummitsContainer(SpotElevationContainer):
 
     def __setitem__(self, idx, summit):
         """
-        Gives :class:`pyprom.lib.containers.summits.SummitsContainer`
-        list like set capabilities
+        Gives SummitsContainer list like set capabilities
 
         :param int idx: index value
         :param summit: Summit to add.

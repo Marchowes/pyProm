@@ -119,8 +119,11 @@ class Summit(SpotElevation):
 
     def to_dict(self, referenceById=True):
         """
-        :param bool referenceById: reference Saddles by ID.
+        Create the dictionary representation of this object.
+
+        :param bool referenceById: reference linekd Saddles by ID.
         :return: dict() representation of :class:`Summit`
+        :rtype: dict()
         """
         to_dict = {'lat': self.latitude,
                    'lon': self.longitude,
@@ -140,9 +143,12 @@ class Summit(SpotElevation):
     @classmethod
     def from_dict(cls, summitDict, datamap=None):
         """
-        Create Summit from dictionary representation
+        Create this object from dictionary representation
 
-        :return: Summit from dict() representation
+        :param dict summitDict: dict representation of this object.
+        :param datamap: Datamap to build this object from.
+        :type datamap: :class:`pyprom.lib.datamap.DataMap`
+        :return: a new Summit
         :rtype: :class:`Summit`
         """
         lat = summitDict['lat']

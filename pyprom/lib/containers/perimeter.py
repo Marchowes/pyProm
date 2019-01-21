@@ -91,7 +91,10 @@ class Perimeter:
 
     def to_dict(self):
         """
+        Create the dictionary representation of this object.
+
         :return: dict() representation of :class:`Perimeter`
+        :rtype: dict()
         """
         perimeterDict = dict()
         perimeterDict['points'] = [x.to_dict() for x in self.points]
@@ -103,12 +106,12 @@ class Perimeter:
     @classmethod
     def from_dict(cls, perimeterDict, datamap=None):
         """
-        Creates a new :class:`Perimeter` from the dict() representation.
+        Create this object from dictionary representation
 
         :param dict perimeterDict: dict() representation of this object.
         :param datamap: datamap which this Perimeter uses.
         :type datamap: :class:`pyprom.lib.datamap.DataMap` object.
-        :return: new Perimeter object.
+        :return: a new Perimeter object.
         :rtype: :class:`Perimeter`
         """
         perimeterPointHash = defaultdict(dict)
@@ -199,7 +202,7 @@ class Perimeter:
 
     def __setitem__(self, idx, point):
         """
-        Gives :class:`Perimeter` list like set capabilities
+        Gives Perimeter list like set capabilities
 
         :param int idx: index value
         :param point: GridPoint for setitem.
@@ -222,7 +225,7 @@ class Perimeter:
 
     def __eq__(self, other):
         """
-        Determines if Perimeter is equal to another.
+        Determines if this object is equal to another.
 
         :param other: other :class:`Perimeter` to check.
         :type: :class:`Perimeter`
@@ -236,7 +239,7 @@ class Perimeter:
 
     def __ne__(self, other):
         """
-        Determines if :class:`Perimeter` is not equal to another.
+        Determines if this object is not equal to another.
 
         :param other: other :class:`Perimeter` to check.
         :type: :class:`Perimeter`

@@ -187,7 +187,6 @@ class SaddlesContainer(SpotElevationContainer):
         :param int idx: index
         :param saddle: Saddle object to add.
         :type saddle: :class:`pyprom.lib.locations.saddle.Saddle`
-        :return: :class:`pyprom.lib.locations.saddle.Saddle`
         """
         isSaddle(saddle)
         self.points[idx] = saddle

@@ -194,9 +194,11 @@ class Saddle(SpotElevation):
 
     def to_dict(self, referenceById=True):
         """
+        Create the dictionary representation of this object.
+
         :param bool referenceById: reference Summits by ID.
-        :return: dict() representation of this Saddle
-        :rtype: :class:`Saddle`
+        :return: dict() representation of :class:`Saddle`
+        :rtype: dict()
         """
         to_dict = {'lat': self.latitude,
                    'lon': self.longitude,
@@ -233,9 +235,12 @@ class Saddle(SpotElevation):
     @classmethod
     def from_dict(cls, saddleDict, datamap=None):
         """
-        Create :class:`Saddle` from dictionary representation
+        Create this object from dictionary representation
 
-        :return: Saddle object.
+        :param dict saddleDict: dict representation of this object.
+        :param datamap: Datamap to build this object from.
+        :type datamap: :class:`pyprom.lib.datamap.DataMap`
+        :return: a new Saddle object.
         :rtype: :class:`Saddle`
         """
         lat = saddleDict['lat']
@@ -280,7 +285,7 @@ class Saddle(SpotElevation):
 
     def __repr__(self):
         """
-        :return: string representation of this object.
+        :return: String representation of this object
         """
         return "<Saddle> lat {} long {} {}ft {}m MultiPoint {}".format(
             self.latitude,

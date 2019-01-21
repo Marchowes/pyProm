@@ -41,7 +41,7 @@ class Runoff(Saddle):
 
     def __repr__(self):
         """
-        :return: string representation of this object.
+        :return: String representation of this object
         """
         return "<Runoff> lat {} long {} {}ft {}m MultiPoint {}".format(
             self.latitude,

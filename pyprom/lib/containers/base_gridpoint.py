@@ -27,7 +27,7 @@ class BaseGridPointContainer:
 
     def append(self, gridPoint):
         """
-        Append a gridPoint to the container.
+        Append a BaseGridPoint to the container.
 
         :param gridPoint: object to append to container.
         :type gridPoint:
@@ -66,16 +66,14 @@ class BaseGridPointContainer:
 
     def __len__(self):
         """
-        Returns __len__ for self.points
-
-        :return: number of items in self.points
+        :return: number of items in `self.points`
         :rtype: int
         """
         return len(self.points)
 
     def __setitem__(self, idx, gridPoint):
         """
-        Gives this container list like set capabilities
+        Gives this BaseGridPointContainer list like set capabilities
 
         :param int idx: index value
         :param gridPoint: BaseGridPoint or child object to add.
@@ -89,7 +87,7 @@ class BaseGridPointContainer:
 
     def __getitem__(self, idx):
         """
-        Gives this container list like get capabilities
+        Gives this BaseGridPointContainer container list like get capabilities
 
         :param int idx: index value
         :return: BaseGridPoint from self.point at idx
@@ -99,15 +97,16 @@ class BaseGridPointContainer:
 
     def __hash__(self):
         """
-        Generates hash based on points.
+        Produces the hash representation of this object.
 
-        :return: string representation of hash
+        :return: Hash representation of this object
+        :rtype: str
         """
         return hash(tuple(sorted(self.points)))
 
     def __eq__(self, other):
         """
-        Determines if this :class:`BaseGridPointContainer` is equal to another.
+        Determines if this object is equal to another.
 
         :param other: object to be compared against
         :type other: :class:`BaseGridPointContainer`
@@ -121,7 +120,7 @@ class BaseGridPointContainer:
 
     def __ne__(self, other):
         """
-        Determines if :class:`BaseGridPointContainer` is not equal to another.
+        Determines if this object is not equal to another.
 
         :param other: object to be compared against
         :type other: :class:`BaseGridPointContainer`

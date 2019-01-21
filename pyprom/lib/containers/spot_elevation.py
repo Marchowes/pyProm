@@ -171,20 +171,24 @@ class SpotElevationContainer(_Base):
 
     def to_dict(self):
         """
+        Create the dictionary representation of this object.
+
         :return: dict() representation of :class:`SpotElevationContainer`
+        :rtype: dict()
         """
         return {"spotelevations": [x for x in self.points.to_dict()]}
 
     @classmethod
     def from_dict(cls, spotElevationContainerDict, datamap=None):
         """
-        Load this object and child objects from a dict.
+        Create this object from dictionary representation
 
         :param dict spotElevationContainerDict: dict() representation of
          :class:`SpotElevationContainer`.
         :param datamap: datamap which MultiPoint style SpotElevations use.
         :type datamap: :class:`pyprom.lib.datamap.DataMap`
-        :return: :class:`SpotElevationContainer`
+        :return: a new SpotElevationContainer
+        :rtype: :class:`SpotElevationContainer`
         """
         spotelevations = []
         for spotelevation in spotElevationContainerDict['spotelevations']:

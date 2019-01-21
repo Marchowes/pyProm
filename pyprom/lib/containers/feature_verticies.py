@@ -56,7 +56,9 @@ class Feature_Verticies:
         return shortest
 
     def __repr__(self):
-        """String representation of this object"""
+        """
+        :return: String representation of this object
+        """
         return "<Feature_Verticies> {} ".format(
             self.vertex_linkers)
 

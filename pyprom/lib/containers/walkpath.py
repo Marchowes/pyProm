@@ -130,7 +130,10 @@ class WalkPath:
 
     def to_dict(self):
         """
+        Create the dictionary representation of this object.
+
         :return: dict() representation of :class:`WalkPath`
+        :rtype: dict()
         """
         to_dict = dict()
         to_dict['path'] = self.points
@@ -139,10 +142,11 @@ class WalkPath:
     @classmethod
     def from_dict(cls, pathDict):
         """
-        Load this object from a dict.
+        Create this object from dictionary representation
 
         :param dict pathDict: dict() representation of this object.
-        :return: :class:`WalkPath`
+        :return: a new WalkPath
+        :rtype: :class:`WalkPath`
         """
         path = pathDict.get('path', [])
         pathTuples = []
@@ -152,7 +156,7 @@ class WalkPath:
 
     def __eq__(self, other):
         """
-        Determines if :class:`WalkPath` is equal to another.
+        Determines if this object is equal to another.
 
         :param other: :class:`WalkPath` to be compared against
         :type other: :class:`WalkPath`

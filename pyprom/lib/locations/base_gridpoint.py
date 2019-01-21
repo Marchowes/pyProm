@@ -29,9 +29,10 @@ class BaseGridPoint:
 
     def to_dict(self):
         """
-        Returns dict representation of this :class:`BaseGridPoint`
+        Create the dictionary representation of this object.
 
         :return: dict() representation of :class:`BaseGridPoint`
+        :rtype: dict()
         """
         return {'x': self.x,
                 'y': self.y}
@@ -53,8 +54,10 @@ class BaseGridPoint:
 
     def __hash__(self):
         """
+        Produces the hash representation of this object.
+
         :return: Hash representation of this object
-        :rtype str:
+        :rtype: str
         """
         return hash((self.x, self.y))
 
@@ -66,6 +69,8 @@ class BaseGridPoint:
 
     def __lt__(self, other):
         """
+        Determines if this object's elevation is less than another.
+
         :param other: object which we compare against.
         :type other: :class:`pyprom.lib.locations.base_gridpoint.BaseGridPoint`
         :return: bool of if self is arbitrarily regarded as
@@ -80,8 +85,12 @@ class BaseGridPoint:
 
     def __eq__(self, other):
         """
+        Determines if this object is equal to another.
+
         :param other: object which we compare against.
-        :return: bool if self is equal to other
+        :type other: :class:`BaseGridPoint`
+        :return: equality
+        :rtype: bool
         :raises: TypeError if other not of :class:`BaseGridPoint`
         """
         isBaseGridPoint(other)

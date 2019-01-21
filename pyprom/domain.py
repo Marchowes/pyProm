@@ -186,7 +186,8 @@ class Domain:
         :param dict domainDict: dict() representation of :class:`Domain`
         :param datamap: datamap for this Domain
         :type datamap: :class:`pyprom.lib.datamap.DataMap`
-        :return: :class:`Domain`
+        :return: a new Domain
+        :rtype: :class:`Domain`
         """
         saddlesContainer = SaddlesContainer.from_dict(domainDict['saddles'],
                                                       datamap=datamap)
@@ -213,6 +214,7 @@ class Domain:
          :class:`pyprom.lib.containers.walkpath.WalkPath` from member
          :class:`pyprom.lib.containers.linker.Linker`
         :return: dict() representation of :class:`Domain`
+        :rtype: dict()
         """
         domain_dict = dict()
         domain_dict['domain'] = self.extent,

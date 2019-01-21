@@ -39,7 +39,10 @@ class GridPointContainer(BaseGridPointContainer):
 
     def to_dict(self):
         """
+        Create the dictionary representation of this object.
+
         :return: dict() representation of :class:`GridPointContainer`
+        :rtype: dict()
         """
         gpcDict = {"points": [x.to_dict() for x in self.points]}
         return gpcDict
@@ -47,8 +50,10 @@ class GridPointContainer(BaseGridPointContainer):
     @classmethod
     def from_dict(cls, gpcDict):
         """
+        Create this object from dictionary representation
+
         :param dict gpcDict: dict representation of :class:`GridPointContainer`
-        :return: GridPointContainer from dict representation
+        :return: a new GridPointContainer
         :rtype: :class:`GridPointContainer`
         """
         points = [GridPoint(pt['x'], pt['y'], pt['elevation'])

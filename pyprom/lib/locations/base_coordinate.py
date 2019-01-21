@@ -29,9 +29,10 @@ class BaseCoordinate:
 
     def to_dict(self):
         """
-        Returns dict representation of this :class:`BaseCoordinate`
+        Create the dictionary representation of this object.
 
-        :return: dict of :class:`BaseCoordinate`
+        :return: dict() representation of :class:`BaseCoordinate`
+        :rtype: dict()
         """
         return {'latitude': self.latitude,
                 'longitude': self.longitude}
@@ -60,7 +61,7 @@ class BaseCoordinate:
 
     def __eq__(self, other):
         """
-        Determines if this :class:`BaseCoordinate` is equal to another.
+        Determines if this object is equal to another.
 
         :param other: :class:`BaseCoordinate` to be compared against
         :type other: :class:`BaseCoordinate`
@@ -81,7 +82,7 @@ class BaseCoordinate:
 
     def __ne__(self, other):
         """
-        Determines if this :class:`BaseCoordinate` is not equal to another.
+        Determines if this object is not equal to another.
 
         :param other: :class:`BaseCoordinate` to be compared against
         :type other: :class:`BaseCoordinate`
@@ -93,6 +94,8 @@ class BaseCoordinate:
 
     def __hash__(self):
         """
+        Produces the hash representation of this object.
+
         :return: Hash representation of this object
         :rtype: str
         """

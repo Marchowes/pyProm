@@ -42,7 +42,10 @@ class SpotElevation(BaseCoordinate):
 
     def to_dict(self):
         """
+        Create the dictionary representation of this object.
+
         :return: dict() representation of :class:`SpotElevation`
+        :rtype: dict()
         """
         return {'latitude': self.latitude,
                 'longitude': self.longitude,
@@ -57,7 +60,9 @@ class SpotElevation(BaseCoordinate):
         """
         Create :class:`SpotElevation` from dictionary representation
 
-        :return: :class:`SpotElevation`
+        :param spotElevationDict: dict representation of this object
+        :return: a new SpotElevation
+        :rtype: :class:`SpotElevation`
         """
         lat = spotElevationDict['lat']
         long = spotElevationDict['lon']
@@ -100,7 +105,7 @@ class SpotElevation(BaseCoordinate):
 
     def __eq__(self, other):
         """
-        Determines if :class:`SpotElevation` is equal to another.
+        Determines if this object is equal to another.
 
         :param other: object to be compared against
         :type other: :class:`SpotElevation`
@@ -121,7 +126,7 @@ class SpotElevation(BaseCoordinate):
 
     def __ne__(self, other):
         """
-        Determines if :class:`SpotElevation` is not equal to another.
+        Determines if this object is not equal to another.
 
         :param other: object to be compared against
         :type other: :class:`SpotElevation`

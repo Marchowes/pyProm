@@ -68,6 +68,8 @@ class MultiPoint:
 
     def to_dict(self):
         """
+        Create the dictionary representation of this object.
+
         :return: dict() representation of :class:`MultiPoint`
         :rtype: dict()
         """
@@ -80,13 +82,13 @@ class MultiPoint:
     @classmethod
     def from_dict(cls, multiPointDict, datamap=None):
         """
-        Creates a new :class:`MultiPoint` from the dict() representation.
+        Create this object from dictionary representation
 
         :param multiPointDict: dict() representation of this
          :class:`MultiPoint`.
         :param datamap: datamap which this MultiPoint uses.
         :type datamap: :class:`pyprom.lib.datamap.DataMap`
-        :return: new Multipoint object.
+        :return: a new Multipoint.
         :rtype: :class:`MultiPoint`
         """
         points = [BaseGridPoint(x['x'], x['y'])
@@ -151,7 +153,7 @@ class MultiPoint:
 
     def __len__(self):
         """
-        :return: number of items in self.points
+        :return: number of items in `self.points`
         :rtype: int
         """
         return len(self.points)
@@ -180,7 +182,7 @@ class MultiPoint:
 
     def __eq__(self, other):
         """
-        Determines if MultiPoint is equal to another.
+        Determines if this object is equal to another.
 
         :param other: other :class:`MultiPoint` to check.
         :type: :class:`MultiPoint`
@@ -194,7 +196,7 @@ class MultiPoint:
 
     def __ne__(self, other):
         """
-        Determines if MultiPoint is not equal to another.
+        Determines if this object is not equal to another.
 
         :param other: other :class:`MultiPoint` to check.
         :type: :class:`MultiPoint`
@@ -208,7 +210,7 @@ class MultiPoint:
 
     def __iter__(self):
         """
-        :return: self.points as iterator
+        :return: `self.points` as iterator
         """
         for point in self.points:
             yield point

@@ -38,6 +38,8 @@ class GridPoint(BaseGridPoint):
     @classmethod
     def from_dict(self, gridPointDict):
         """
+        Create this object from dictionary representation
+
         :param dict gridPointDict: dict() representation of this object.
         :return: GridPoint from dict()
         :rtype: :class:`GridPoint`

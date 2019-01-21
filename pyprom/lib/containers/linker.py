@@ -172,11 +172,12 @@ class Linker:
 
     def to_dict(self, referenceById=True, noWalkPath=True):
         """
-        Returns dict() representation of this object.
+        Create the dictionary representation of this object.
 
         :param bool referenceById: only use ID of linked objects.
         :param bool noWalkPath: exclude WalkPath
         :return: dict() representation of :class:`Linker`
+        :rtype: dict()
         """
         to_dict = dict()
         to_dict['id'] = self.id
@@ -192,9 +193,9 @@ class Linker:
     @classmethod
     def from_dict(cls, linkerDict, saddlesContainer, summitsContainer):
         """
-        Loads the dict() representation of this object.
+        Create this object from dictionary representation
 
-        :return: Linker generated from dict() representation.
+        :return: a new Linker
         :rtype: :class:`Linker`
         """
         pathDict = linkerDict.get('path', None)
@@ -215,15 +216,16 @@ class Linker:
 
     def __hash__(self):
         """
-        Generates hash based on points.
+        Produces the hash representation of this object.
 
-        :return: string representation of hash
+        :return: Hash representation of this object
+        :rtype: str
         """
         return hash(self.saddle.__hash__() + self.summit.__hash__())
 
     def __eq__(self, other):
         """
-        Determines if other :class:`Linker` is equal to self.
+        Determines if this object is equal to another.
 
         :param other: :class:`Linker` to be compared against
         :type other: :class:`Linker`
@@ -237,7 +239,7 @@ class Linker:
 
     def __ne__(self, other):
         """
-        Determines if other :class:`Linker` is not equal to self.
+        Determines if this object is not equal to another.
 
         :param other: :class:`Linker` to be compared against
         :type other: :class:`Linker`
