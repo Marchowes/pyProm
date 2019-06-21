@@ -31,7 +31,7 @@ class DataMap:
         """
         self.numpy_map = numpy_map
         self.filename = filename
-        unit_and_substrings = {"METERS": ["meter"], "FEET": ["foot", "feet"]}
+        unit_and_substrings = {"METERS": ["meter", "metre"], "FEET": ["foot", "feet"]}
         self.unit = None
         for unitname, unit_options in unit_and_substrings.items():
             for option in unit_options:
@@ -118,7 +118,6 @@ class ProjectionDataMap(DataMap):
          X axis for Numpy
         :param int span_x: number of units along GDAL native X axis. This is the
          Y axis for Numpy
-        :param int linear_unit: Linear unit scale.
         :param str unit: Linear unit
         :param str nodata: raster point value indicating a NULL Value
         :param osr.CoordinateTransformation transform:
