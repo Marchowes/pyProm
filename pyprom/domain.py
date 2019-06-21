@@ -433,7 +433,8 @@ class Domain:
 
         neighbors = self.datamap.iterateDiagonal(point.x, point.y)
         for x, y, elevation in neighbors:
-
+            if elevation is None:
+                continue
             # Oh fuck no, we've got an equalHeightBlob. Better check that out.
             if elevation == startingElevation:
                 multipoint, _ = equalHeightBlob(self.datamap, x, y, elevation)
