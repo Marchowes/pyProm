@@ -7,7 +7,6 @@ the LICENSE file that accompanies it.
 
 from pyprom.lib.containers.gridpoint import GridPointContainer
 from pyprom.lib.containers.multipoint import MultiPoint
-from pyprom.lib.locations.base_gridpoint import BaseGridPoint
 from pyprom.lib.locations.gridpoint import GridPoint
 from pyprom.lib.locations.saddle import Saddle
 
@@ -32,11 +31,11 @@ def generate_MultiPoint(x, y, xSpan, ySpan,
     for xx in range(x, x + xSpan):
         for yy in range(y, y + ySpan):
             # leave these ones out, they're our islands.
-            mpBlock.append(BaseGridPoint(xx, yy))
+            mpBlock.append((xx, yy))
     mp = MultiPoint(mpBlock, elevation, datamap)
     for excluded in excludeBGPC:
         for point in excluded.points:
-            mp.points.remove(point)
+            mp.points.remove(point.to_tuple())
     return mp
 
 

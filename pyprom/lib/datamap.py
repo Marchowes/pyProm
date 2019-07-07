@@ -8,9 +8,9 @@ This file acts as the glue between the raster data loaded and the logic
 used to analyze the map.
 """
 
-from __future__ import division
-
 import logging
+
+from .constants import METERS_TO_FEET
 
 ARCSEC_DEG = 3600
 ARCMIN_DEG = 60
@@ -55,7 +55,7 @@ class DataMap:
             if 0 <= _x <= self.max_x and \
                0 <= _y <= self.max_y:
                 if self.unit == 'FEET':
-                    yield _x, _y, float(.3048 * self.numpy_map[_x, _y])
+                    yield _x, _y, float(METERS_TO_FEET * self.numpy_map[_x, _y])
                 else:
                     yield _x, _y, float(self.numpy_map[_x, _y])
             else:
@@ -76,7 +76,7 @@ class DataMap:
             if 0 <= _x <= self.max_x and \
                0 <= _y <= self.max_y:
                 if self.unit == 'FEET':
-                    yield _x, _y, float(.3048 * self.numpy_map[_x, _y])
+                    yield _x, _y, float(METERS_TO_FEET * self.numpy_map[_x, _y])
                 else:
                     yield _x, _y, float(self.numpy_map[_x, _y])
             else:
@@ -184,7 +184,7 @@ class ProjectionDataMap(DataMap):
         """
         x, y = self.latlong_to_xy(latitude, longitude)
         if self.unit == 'FEET':
-            return float(.3048 * self.numpy_map[x, y])
+            return float(METERS_TO_FEET * self.numpy_map[x, y])
         else:
             return self.numpy_map[x, y]
 

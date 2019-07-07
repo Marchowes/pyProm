@@ -27,6 +27,28 @@ class BaseGridPoint:
         self.x = x
         self.y = y
 
+    @classmethod
+    def from_dict(self, baseGridPointDict):
+        """
+        Create this object from dictionary representation
+
+        :param dict baseGridPointDict: dict() representation of this object.
+        :return: BaseGridPoint from dict()
+        :rtype: :class:`BaseGridPoint`
+        """
+        return self(baseGridPointDict['x'],
+                    baseGridPointDict['y'])
+
+    @classmethod
+    def from_tuple(self, tup):
+        """
+        Create this object from tuple representation
+        :param tup:
+        :return: BaseGridPoint from tuple()
+        :rtype: :class:`BaseGridPoint`
+        """
+        return self(tup[0], tup[1])
+
     def to_dict(self):
         """
         Create the dictionary representation of this object.
@@ -36,6 +58,16 @@ class BaseGridPoint:
         """
         return {'x': self.x,
                 'y': self.y}
+
+    def to_tuple(self):
+        """
+        Create the tuple representation of this object.
+
+        :return: tuple() representation of :class:`BaseGridPoint`
+        :rtype: tuple()
+        """
+        return (self.x, self.y)
+
 
     def distance(self, other):
         """

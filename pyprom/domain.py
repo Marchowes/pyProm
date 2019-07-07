@@ -31,6 +31,8 @@ from .lib.containers.walkpath import WalkPath
 from .lib.locations.gridpoint import GridPoint
 from .lib.logic.basin_saddle_finder import BasinSaddleFinder
 
+from .lib.constants import DOMAIN_EXTENSION
+
 
 class Domain:
     """
@@ -147,6 +149,9 @@ class Domain:
          :class:`pyprom.lib.containers.linker.Linker`
         """
         filename = os.path.expanduser(filename)
+        if not filename.endswith(DOMAIN_EXTENSION):
+            filename += DOMAIN_EXTENSION
+
         self.logger.info("Writing Domain Dataset to {}.".format(filename))
         outgoing = gzip.open(filename, 'wb', 5)
         # ^^ ('filename', 'read/write mode', compression level)
@@ -296,7 +301,7 @@ class Domain:
         for point in self.summits.points:
             if point.multiPoint:
                 for mp in point.multiPoint.points:
-                    summitHash[mp.x][mp.y] = point
+                    summitHash[mp[0]][mp[1]] = point
             else:
                 x, y = self.datamap.latlong_to_xy(point.latitude,
                                                   point.longitude)
@@ -334,7 +339,7 @@ class Domain:
         for point in self.summits.points:
             if point.multiPoint:
                 for mp in point.multiPoint.points:
-                    summitHash[mp.x][mp.y] = point
+                    summitHash[mp[0]][mp[1]] = point
             else:
                 x, y = self.datamap.latlong_to_xy(point.latitude,
                                                   point.longitude)
@@ -429,13 +434,13 @@ class Domain:
         startingElevation = point.elevation
         lastElevation = point.elevation
         currentHigh = lastElevation
-        candidates = None
+        candidate = None
 
         neighbors = self.datamap.iterateDiagonal(point.x, point.y)
         for x, y, elevation in neighbors:
             if elevation is None:
                 continue
-            # Oh fuck no, we've got an equalHeightBlob. Better check that out.
+            # Oh no, we've got an equalHeightBlob. Better check that out.
             if elevation == startingElevation:
                 multipoint, _ = equalHeightBlob(self.datamap, x, y, elevation)
                 # Find all perimeter points higher than
@@ -446,17 +451,19 @@ class Domain:
                 highNeighbors.sort(key=lambda x: x.elevation, reverse=True)
                 # Mark multipoint components as explored.
                 for mp in multipoint:
-                    explored[mp.x][mp.y] = True
+                    explored[mp[0]][mp[1]] = True
                     orderedExploredPoints.append(
-                        self.datamap.xy_to_latlong(mp.x, mp.y))
+                        self.datamap.xy_to_latlong(mp[0], mp[1]))
                 return highNeighbors.points[0], None,\
                     explored, orderedExploredPoints
             # Higher than current highest neighbor? Then this is
             # the new candidate.
             if elevation > currentHigh:
-                candidates = GridPoint(x, y, elevation)
+                candidate = (x, y, elevation)
                 currentHigh = elevation
-        return candidates, None, explored, orderedExploredPoints
+        if candidate:
+            candidate = GridPoint.from_tuple(candidate)
+        return candidate, None, explored, orderedExploredPoints
 
     def detect_basin_saddles(self):
         """

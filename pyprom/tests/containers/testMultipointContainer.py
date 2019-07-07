@@ -76,7 +76,8 @@ class MultipointTests(unittest.TestCase):
         """
         Ensure __setattr__ works as expected.
         """
-        multipoint = MultiPoint([self.bgp11], 100, self.datamap)
+        multipoint = MultiPoint([], 100, self.datamap)
+        multipoint.append(self.bgp11)
         self.assertEqual(len(multipoint), 1)
         multipoint[0] = self.bgp22
         self.assertEqual(multipoint[0], self.bgp22)
@@ -85,7 +86,8 @@ class MultipointTests(unittest.TestCase):
         """
         Ensure __setattr__ Disallows Non BaseGridpoints to be set.
         """
-        multipoint = MultiPoint([self.bgp11], 100, self.datamap)
+        multipoint = MultiPoint([], 100, self.datamap)
+        multipoint.append(self.bgp11)
         self.assertEqual(len(multipoint), 1)
         with self.assertRaises(TypeError):
             multipoint[0] = "wtf"
@@ -94,7 +96,8 @@ class MultipointTests(unittest.TestCase):
         """
         Ensure __getattr__ works as expected.
         """
-        multipoint = MultiPoint([self.bgp11], 100, self.datamap)
+        multipoint = MultiPoint([], 100, self.datamap)
+        multipoint.append(self.bgp11)
         self.assertEqual(len(multipoint), 1)
         self.assertEqual(multipoint[0], self.bgp11)
 
@@ -102,7 +105,8 @@ class MultipointTests(unittest.TestCase):
         """
         Ensure adding string to Multipoint fails.
         """
-        multipoint = MultiPoint([self.bgp11], 100, self.datamap)
+        multipoint = MultiPoint([], 100, self.datamap)
+        multipoint.append(self.bgp11)
         with self.assertRaises(TypeError):
             multipoint.append("stuff")
 
@@ -110,7 +114,8 @@ class MultipointTests(unittest.TestCase):
         """
         Ensure adding GridPoint to SummitsContainer succeeds.
         """
-        multipoint = MultiPoint([self.bgp11], 100, self.datamap)
+        multipoint = MultiPoint([], 100, self.datamap)
+        multipoint.append(self.bgp11)
         multipoint.append(self.bgp22)
         self.assertEqual(len(multipoint), 2)
 
@@ -118,9 +123,12 @@ class MultipointTests(unittest.TestCase):
         """
         Ensure __eq__ works as expected.
         """
-        multipoint = MultiPoint([self.bgp11], 100, self.datamap)
-        multipoint2 = MultiPoint([self.bgp11], 100, self.datamap)
-        multipoint3 = MultiPoint([self.bgp22], 100, self.datamap)
+        multipoint = MultiPoint([], 100, self.datamap)
+        multipoint.append(self.bgp11)
+        multipoint2 = MultiPoint([], 100, self.datamap)
+        multipoint2.append(self.bgp11)
+        multipoint3 = MultiPoint([], 100, self.datamap)
+        multipoint3.append(self.bgp22)
 
         self.assertEqual(multipoint, multipoint2)
         test = multipoint2 == multipoint3
@@ -130,9 +138,12 @@ class MultipointTests(unittest.TestCase):
         """
         Ensure __ne__ works as expected.
         """
-        multipoint = MultiPoint([self.bgp11], 100, self.datamap)
-        multipoint2 = MultiPoint([self.bgp11], 100, self.datamap)
-        multipoint3 = MultiPoint([self.bgp22], 100, self.datamap)
+        multipoint = MultiPoint([], 100, self.datamap)
+        multipoint.append(self.bgp11)
+        multipoint2 = MultiPoint([], 100, self.datamap)
+        multipoint2.append(self.bgp11)
+        multipoint3 = MultiPoint([], 100, self.datamap)
+        multipoint3.append(self.bgp22)
 
         self.assertNotEqual(multipoint, multipoint3)
         test = multipoint != multipoint2
@@ -195,7 +206,7 @@ class MultipointTests(unittest.TestCase):
         points = []
         for x in range(100, 110):
             for y in range(200, 210):
-                points.append(BaseGridPoint(x, y))
+                points.append((x, y))
         mp = MultiPoint(points, 100, self.datamap)
 
         # Inside the MP
@@ -259,7 +270,7 @@ class MultipointTests(unittest.TestCase):
         points = []
         for x in range(100, 110):
             for y in range(200, 210):
-                points.append(BaseGridPoint(x, y))
+                points.append((x, y))
         mp = MultiPoint(points, 100, self.datamap)
 
         # Inside the MP

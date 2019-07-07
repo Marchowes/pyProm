@@ -10,7 +10,7 @@ from collections import defaultdict
 from ..locations.gridpoint import GridPoint
 from ..locations.base_gridpoint import BaseGridPoint
 from ..containers.multipoint import MultiPoint
-from ..util import coordinateHashToGridPointList
+from ..util import coordinateHashToXYTupleList
 from ..containers.perimeter import Perimeter
 
 
@@ -28,7 +28,7 @@ def equalHeightBlob(datamap, x, y, elevation):
     :return: MultiPoint Object containing all x,y coordinates and elevation
     :rtype: :class:`pyprom.lib.containers.multipoint.MultiPoint`
     """
-    masterGridPoint = GridPoint(x, y, elevation)
+    masterGridPoint = (x, y, elevation)
     exploredEqualHeight = defaultdict(dict)
     exploredEqualHeight[x][y] = True
     perimeterPointHash = defaultdict(dict)
@@ -45,17 +45,17 @@ def equalHeightBlob(datamap, x, y, elevation):
     edge = False
     while toBeAnalyzed:
         gridPoint = toBeAnalyzed.pop()
-        neighbors = datamap.iterateDiagonal(gridPoint.x, gridPoint.y)
+        neighbors = datamap.iterateDiagonal(gridPoint[0], gridPoint[1])
         # Determine if edge or not.
         if not edge:
-            if x_mapEdge.get(gridPoint.x) or y_mapEdge.get(gridPoint.y):
+            if x_mapEdge.get(gridPoint[0]) or y_mapEdge.get(gridPoint[1]):
                 edge = True
         for _x, _y, elevation in neighbors:
             if elevation is None:
                 continue
-            elif elevation == masterGridPoint.elevation and\
+            elif elevation == masterGridPoint[2] and\
                     not exploredEqualHeight[_x].get(_y, False):
-                branch = GridPoint(_x, _y, elevation)
+                branch = (_x, _y, elevation)
                 exploredEqualHeight[_x][_y] = True
                 if x_mapEdge.get(_x) or y_mapEdge.get(_y):
                     multipointEdges.append(BaseGridPoint(_x, y))
@@ -64,15 +64,14 @@ def equalHeightBlob(datamap, x, y, elevation):
             # a perimeter point. Only keep track of edgepoints
             # higher!
 
-            elif elevation != masterGridPoint.elevation:
+            elif elevation != masterGridPoint[2]:
                 if not perimeterPointHash[_x].get(_y, False):
-                    gp = GridPoint(_x, _y, elevation)
-                    if elevation > masterGridPoint.elevation:
-                        perimeterPointHash[_x][_y] = gp
+                    if elevation > masterGridPoint[2]:
+                        perimeterPointHash[_x][_y] = (_x, _y, elevation)
                     if x_mapEdge.get(_x) or y_mapEdge.get(_y):
-                        shoreMapEdge.append(gp)
-    return MultiPoint(coordinateHashToGridPointList(exploredEqualHeight),
-                      masterGridPoint.elevation, datamap,
+                        shoreMapEdge.append(GridPoint(_x, _y, elevation))
+    return MultiPoint(coordinateHashToXYTupleList(exploredEqualHeight),
+                      masterGridPoint[2], datamap,
                       perimeter=Perimeter(
                           pointIndex=perimeterPointHash,
                           datamap=datamap,

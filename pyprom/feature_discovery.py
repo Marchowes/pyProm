@@ -24,6 +24,8 @@ from .lib.containers.runoffs import RunoffsContainer
 from .lib.containers.perimeter import Perimeter
 from .lib.logic.equalheight import equalHeightBlob
 
+from .lib.constants import METERS_TO_FEET
+
 
 class AnalyzeData:
     """
@@ -89,7 +91,7 @@ class AnalyzeData:
             x, y = iterator.multi_index
             # core storage is always in metric.
             if self.datamap.unit == "FEET":
-                self.elevation = float(.3048 * iterator[0])
+                self.elevation = float(METERS_TO_FEET * iterator[0])
             else:
                 self.elevation = float(iterator[0])
 
@@ -144,7 +146,7 @@ class AnalyzeData:
         blob, edgePoints = equalHeightBlob(self.datamap, x, y, ptElevation)
         edge = blob.perimeter.mapEdge
         for exemptPoint in blob:
-            self.explored[exemptPoint.x][exemptPoint.y] = True
+            self.explored[exemptPoint[0]][exemptPoint[1]] = True
 
         return self.consolidatedFeatureLogic(x, y, blob.perimeter,
                                              blob, edge, edgePoints)
@@ -188,11 +190,10 @@ class AnalyzeData:
                     not self.explored[_x].get(_y, False):
                 return self.analyze_multipoint(_x, _y, elevation)
 
-            gp = GridPoint(_x, _y, elevation)
             if elevation > self.elevation:
-                shoreSetIndex[_x][_y] = gp
+                shoreSetIndex[_x][_y] = (_x, _y, elevation)
             if self.x_mapEdge.get(_x) or self.y_mapEdge.get(_y):
-                shoreMapEdge.append(gp)
+                shoreMapEdge.append(GridPoint(_x, _y, elevation))
 
         shoreSet = Perimeter(pointIndex=shoreSetIndex,
                              datamap=self.datamap,

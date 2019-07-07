@@ -63,6 +63,17 @@ def coordinateHashToGridPointList(coordinateHash):
             for x, _y in coordinateHash.items() for y, _ in _y.items()]
 
 
+def coordinateHashToXYTupleList(coordinateHash):
+    """
+    Converts a coordinateHash to a list of tuples
+
+    :param dict coordinateHash: a hash using
+     {x1:[y1:True,y2:True..],x1:[y1:True,y2:True..]} format
+    :return: list of (x,y) tuples.
+    """
+    return [(x, y) for x, _y in coordinateHash.items() for y, _ in _y.items()]
+
+
 def compressRepetetiveChars(string):
     """
     Accepts String like "HHLHHHLL" and removes continuous redundant chars

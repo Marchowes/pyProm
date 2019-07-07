@@ -1,4 +1,11 @@
 Release History
+
+0.6.3 (July 7, 2019)
+++++++++++++++++++++
+* Multipoints, and Perimeters internally use tuples instead of GridPoints. This yields a performance improvement.
+* Summit/SaddleContainers have @property to just return multiPoint members.
+* Base/Gridpoints now have factory method for creating object to/from tuple.
+
 0.6.2 (January 21, 2019)
 ++++++++++++++++++++++++
 * Added docs for readthedocs.io

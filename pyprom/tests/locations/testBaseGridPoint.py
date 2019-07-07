@@ -27,6 +27,29 @@ class BaseGridPointTests(unittest.TestCase):
         test = BaseGridPoint(1, 2)
         self.assertEqual(test.to_dict(), {'x': 1, 'y': 2})
 
+    def testBaseGridPointFromDict(self):
+        """
+        Ensure from_dict() works as expected
+        """
+        bgp = BaseGridPoint(1, 2)
+        bgp_dict = {"x": 1, "y": 2, "elevation": 3}
+        self.assertEqual(BaseGridPoint.from_dict(bgp_dict), bgp)
+
+    def testBaseGridPointToTuple(self):
+        """
+        Ensure to_tuple() returns expected results.
+        """
+        test = BaseGridPoint(1, 2)
+        self.assertEqual(test.to_tuple(), (1, 2))
+
+    def testBaseGridPointFromTuple(self):
+        """
+        Ensure from_tuple() works as expected
+        """
+        bgp = BaseGridPoint(1, 2)
+        bgp_tuple = (1, 2)
+        self.assertEqual(BaseGridPoint.from_tuple(bgp_tuple), bgp)
+
     def testBaseGridPointDistance(self):
         """
         Ensure distance() returns expected results.
