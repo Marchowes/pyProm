@@ -144,7 +144,7 @@ class AnalyzeData:
         blob, edgePoints = equalHeightBlob(self.datamap, x, y, ptElevation)
         edge = blob.perimeter.mapEdge
         for exemptPoint in blob:
-            self.explored[exemptPoint.x][exemptPoint.y] = True
+            self.explored[exemptPoint[0]][exemptPoint[1]] = True
 
         return self.consolidatedFeatureLogic(x, y, blob.perimeter,
                                              blob, edge, edgePoints)

@@ -8,8 +8,10 @@ This library contains a container class for storing Multipoint
 type location objects as well as a number of functions.
 """
 
+from math import hypot
+
 from ..locations.base_coordinate import BaseCoordinate
-from ..locations.base_gridpoint import isBaseGridPoint, BaseGridPoint
+from ..locations.base_gridpoint import  BaseGridPoint
 from ..locations.gridpoint import GridPoint
 from .perimeter import Perimeter
 
@@ -74,7 +76,7 @@ class MultiPoint:
         :rtype: dict()
         """
         multiPointDict = dict()
-        multiPointDict['points'] = [x.to_dict() for x in self.points]
+        multiPointDict['points'] = self.points
         multiPointDict['perimeter'] = self.perimeter.to_dict()
         multiPointDict['elevation'] = self.elevation
         return multiPointDict
@@ -91,8 +93,7 @@ class MultiPoint:
         :return: a new Multipoint.
         :rtype: :class:`MultiPoint`
         """
-        points = [BaseGridPoint(x['x'], x['y'])
-                  for x in multiPointDict['points']]
+        points = [(pt[0], pt[1]) for pt in multiPointDict['points']]
         perimeter = Perimeter.from_dict(multiPointDict['perimeter'], datamap)
         elevation = multiPointDict['elevation']
         return cls(points, elevation, datamap, perimeter=perimeter)
@@ -108,20 +109,22 @@ class MultiPoint:
         :rtype:
          list(:class:`pyprom.lib.locations.base_coordinate.BaseCoordinate`)
         """
-        return [BaseCoordinate(*self.datamap.xy_to_latlong(coord.x, coord.y))
+        return [BaseCoordinate(*self.datamap.xy_to_latlong(coord[0], coord[1]))
                 for coord in self.points]
 
     def append(self, point):
         """
         Add a BaseGridPoint to this container.
 
-        :param point: BaseGridPoint to add.
+        :param point: BaseGridPoint or tuple to add.
         :type point: :class:`pyprom.lib.locations.base_gridpoint.BaseGridPoint`
-        :raises: TypeError if point not of
-         :class:`pyprom.lib.locations.base_gridpoint.BaseGridPoint`
+        :type point: tuple
+        :raises: TypeError if point not of :class:`BaseGridPoint` or tuple
+        :raises: Exception if tuple length != 2
         """
-        isBaseGridPoint(point)
-        self.points.append(point)
+        incoming = self._check_and_return_incoming_point_type(point)
+        self.points.append(incoming)
+
 
     def closestPoint(self, gridPoint, asSpotElevation=False):
         """
@@ -135,10 +138,13 @@ class MultiPoint:
         :rtype :class:`pyprom.lib.locations.gridpoint.GridPoint`,
          :class:`pyprom.lib.locations.spot_elevation.SpotElevation`
         """
-        closestDistance = gridPoint.distance(self.points[0])
+        distanceCalc = lambda themX, themY, usX, usY: hypot((themX - usX),
+                                                        (themY - usY))
+        themX, themY = gridPoint.x, gridPoint.y
+        closestDistance = distanceCalc(themX, themY, *self.points[0])
         closest = self.points[0]
         for point in self.points[1:]:
-            distance = gridPoint.distance(point)
+            distance = distanceCalc(themX, themY, *point)
             # well, can't get closer than that. mark it and bail.
             if distance == 0:
                 closest = point
@@ -146,7 +152,7 @@ class MultiPoint:
             if distance < closestDistance:
                 closest = point
                 closestDistance = distance
-        gp = GridPoint(closest.x, closest.y, self.elevation)
+        gp = GridPoint(closest[0], closest[1], self.elevation)
         if asSpotElevation:
             return gp.toSpotElevation(self.datamap)
         return gp
@@ -163,12 +169,12 @@ class MultiPoint:
         Gives MultiPoint list like set capabilities
 
         :param int idx: index value
-        :param point: BaseGridPoint for setitem.
+        :param point: BaseGridPoint or tuple for setitem.
         :type point: :class:`pyprom.lib.locations.base_gridpoint.BaseGridPoint`
-        :raises: TypeError if point not of :class:`BaseGridPoint`
+        :type point: tuple()
         """
-        isBaseGridPoint(point)
-        self.points[idx] = point
+        incoming = self._check_and_return_incoming_point_type(point)
+        self.points[idx] = incoming
 
     def __getitem__(self, idx):
         """
@@ -178,7 +184,7 @@ class MultiPoint:
         :return: :class:`pyprom.lib.locations.base_gridpoint.BaseGridPoint`
          self.point at idx
         """
-        return self.points[idx]
+        return BaseGridPoint.from_tuple(self.points[idx])
 
     def __eq__(self, other):
         """
@@ -222,6 +228,27 @@ class MultiPoint:
         return "<Multipoint> elevation(m): {}, points {}". \
             format(self.elevation,
                    len(self.points))
+
+    def _check_and_return_incoming_point_type(self, point):
+        """
+        Make sure incoming point type is a tuple with length 2, or explicitly a
+        :class:`pyprom.lib.locations.base_gridpoint.BaseGridPoint`
+
+        :param point: tuple, or
+         :class:`pyprom.lib.locations.base_gridpoint.BaseGridPoint
+        :raises: TypeError if point not of :class:`BaseGridPoint` or tuple
+        :raises: Exception if tuple length != 2
+        :return: tuple(x,y)
+        """
+        if isinstance(point, BaseGridPoint):
+            incoming = point.to_tuple()
+        elif isinstance(point, tuple):
+            incoming = point
+        else:
+            raise TypeError("point must be tuple, or BaseGridPoint. Got: {}".format(type(point)))
+        if len(incoming) != 2:
+            raise Exception("tuple must have length of 2, or object must be BaseGridPoint and not inherited type.")
+        return incoming
 
     __unicode__ = __str__ = __repr__
 

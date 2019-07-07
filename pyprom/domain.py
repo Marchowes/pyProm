@@ -296,7 +296,7 @@ class Domain:
         for point in self.summits.points:
             if point.multiPoint:
                 for mp in point.multiPoint.points:
-                    summitHash[mp.x][mp.y] = point
+                    summitHash[mp[0]][mp[1]] = point
             else:
                 x, y = self.datamap.latlong_to_xy(point.latitude,
                                                   point.longitude)
@@ -334,7 +334,7 @@ class Domain:
         for point in self.summits.points:
             if point.multiPoint:
                 for mp in point.multiPoint.points:
-                    summitHash[mp.x][mp.y] = point
+                    summitHash[mp[0]][mp[1]] = point
             else:
                 x, y = self.datamap.latlong_to_xy(point.latitude,
                                                   point.longitude)
@@ -446,9 +446,9 @@ class Domain:
                 highNeighbors.sort(key=lambda x: x.elevation, reverse=True)
                 # Mark multipoint components as explored.
                 for mp in multipoint:
-                    explored[mp.x][mp.y] = True
+                    explored[mp[0]][mp[1]] = True
                     orderedExploredPoints.append(
-                        self.datamap.xy_to_latlong(mp.x, mp.y))
+                        self.datamap.xy_to_latlong(mp[0], mp[1]))
                 return highNeighbors.points[0], None,\
                     explored, orderedExploredPoints
             # Higher than current highest neighbor? Then this is

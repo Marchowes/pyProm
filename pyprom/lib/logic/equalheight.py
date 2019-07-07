@@ -10,7 +10,7 @@ from collections import defaultdict
 from ..locations.gridpoint import GridPoint
 from ..locations.base_gridpoint import BaseGridPoint
 from ..containers.multipoint import MultiPoint
-from ..util import coordinateHashToGridPointList
+from ..util import coordinateHashToXYTupleList
 from ..containers.perimeter import Perimeter
 
 
@@ -71,7 +71,7 @@ def equalHeightBlob(datamap, x, y, elevation):
                         perimeterPointHash[_x][_y] = gp
                     if x_mapEdge.get(_x) or y_mapEdge.get(_y):
                         shoreMapEdge.append(gp)
-    return MultiPoint(coordinateHashToGridPointList(exploredEqualHeight),
+    return MultiPoint(coordinateHashToXYTupleList(exploredEqualHeight),
                       masterGridPoint.elevation, datamap,
                       perimeter=Perimeter(
                           pointIndex=perimeterPointHash,
