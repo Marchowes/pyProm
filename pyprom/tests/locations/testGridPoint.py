@@ -41,6 +41,38 @@ class GridPointTests(unittest.TestCase):
         gp_dict = gp.to_dict()
         self.assertEqual(gp_dict, {"x": 1, "y": 2, "elevation": 3})
 
+    def testGridPointToTuple(self):
+        """
+        Ensure to_tuple() works as expected
+        """
+        gp = GridPoint(1, 2, 3)
+        gp_tuple = gp.to_tuple()
+        self.assertEqual(gp_tuple, (1, 2, 3))
+
+    def testGridPointFromDict(self):
+        """
+        Ensure from_dict() works as expected
+        """
+        gp = GridPoint(1, 2, 3)
+        gp_dict = {"x": 1, "y": 2, "elevation": 3}
+        self.assertEqual(GridPoint.from_dict(gp_dict), gp)
+
+    def testGridPointFromTuple(self):
+        """
+        Ensure from_tuple() works as expected
+        """
+        gp = GridPoint(1, 2, 3)
+        gp_tuple = (1, 2, 3)
+        self.assertEqual(GridPoint.from_tuple(gp_tuple), gp)
+
+    def testGridPointToTuple(self):
+        """
+        Ensure to_tuple() works as expected
+        """
+        gp = GridPoint(1, 2, 3)
+        gp_tuple = gp.to_tuple()
+        self.assertEqual(gp_tuple, (1, 2, 3))
+
     def testGridPointToSpotElevation(self):
         """
         Ensure toSpotElevation works as expected

@@ -27,14 +27,6 @@ class GridPoint(BaseGridPoint):
         super(GridPoint, self).__init__(x, y)
         self.elevation = elevation
 
-    def to_dict(self):
-        """
-        :return: dict() representation of :class:`GridPoint`
-        """
-        return {'x': self.x,
-                'y': self.y,
-                'elevation': self.elevation}
-
     @classmethod
     def from_dict(self, gridPointDict):
         """
@@ -47,6 +39,30 @@ class GridPoint(BaseGridPoint):
         return self(gridPointDict['x'],
                     gridPointDict['y'],
                     gridPointDict['elevation'])
+
+    @classmethod
+    def from_tuple(self, tup):
+        """
+        Create this object from tuple representation
+        :param tup:
+        :return: GridPoint from tuple()
+        :rtype: :class:`GridPoint`
+        """
+        return self(tup[0], tup[1], tup[2])
+
+    def to_dict(self):
+        """
+        :return: dict() representation of :class:`GridPoint`
+        """
+        return {'x': self.x,
+                'y': self.y,
+                'elevation': self.elevation}
+
+    def to_tuple(self):
+        """
+        :return: tuple() representation of :class:`GridPoint`
+        """
+        return (self.x, self.y, self.elevation)
 
     def toSpotElevation(self, datamap):
         """
