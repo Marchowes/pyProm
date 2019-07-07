@@ -429,13 +429,13 @@ class Domain:
         startingElevation = point.elevation
         lastElevation = point.elevation
         currentHigh = lastElevation
-        candidates = None
+        candidate = None
 
         neighbors = self.datamap.iterateDiagonal(point.x, point.y)
         for x, y, elevation in neighbors:
             if elevation is None:
                 continue
-            # Oh fuck no, we've got an equalHeightBlob. Better check that out.
+            # Oh no, we've got an equalHeightBlob. Better check that out.
             if elevation == startingElevation:
                 multipoint, _ = equalHeightBlob(self.datamap, x, y, elevation)
                 # Find all perimeter points higher than
@@ -454,9 +454,9 @@ class Domain:
             # Higher than current highest neighbor? Then this is
             # the new candidate.
             if elevation > currentHigh:
-                candidates = GridPoint(x, y, elevation)
+                candidate = GridPoint(x, y, elevation)
                 currentHigh = elevation
-        return candidates, None, explored, orderedExploredPoints
+        return candidate, None, explored, orderedExploredPoints
 
     def detect_basin_saddles(self):
         """
