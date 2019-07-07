@@ -188,11 +188,10 @@ class AnalyzeData:
                     not self.explored[_x].get(_y, False):
                 return self.analyze_multipoint(_x, _y, elevation)
 
-            gp = GridPoint(_x, _y, elevation)
             if elevation > self.elevation:
-                shoreSetIndex[_x][_y] = gp
+                shoreSetIndex[_x][_y] = (_x, _y, elevation)
             if self.x_mapEdge.get(_x) or self.y_mapEdge.get(_y):
-                shoreMapEdge.append(gp)
+                shoreMapEdge.append(GridPoint(_x, _y, elevation))
 
         shoreSet = Perimeter(pointIndex=shoreSetIndex,
                              datamap=self.datamap,

@@ -236,7 +236,8 @@ class MultiPoint:
 
         :param point: tuple, or
          :class:`pyprom.lib.locations.base_gridpoint.BaseGridPoint
-        :raises: TypeError if point not of :class:`BaseGridPoint` or tuple
+        :raises: TypeError if point not of
+         :class:`pyprom.lib.locations.base_gridpoint.BaseGridPoint` or tuple
         :raises: Exception if tuple length != 2
         :return: tuple(x,y)
         """

@@ -25,15 +25,37 @@ class PerimeterTests(unittest.TestCase):
         cls.datamap = cls.datafile.datamap
         # contigous Perimeter
         cls.perimeterI = defaultdict(dict)
-        cls.perimeterI[1][1] = cls.p11 = GridPoint(1, 1, 553)
-        cls.perimeterI[1][2] = cls.p12 = GridPoint(1, 2, 554)
-        cls.perimeterI[1][3] = cls.p13 = GridPoint(1, 3, 554)
-        cls.perimeterI[1][4] = cls.p14 = GridPoint(1, 4, 553)
-        cls.perimeterI[2][4] = cls.p24 = GridPoint(2, 4, 555)
-        cls.perimeterI[2][5] = cls.p25 = GridPoint(2, 5, 554)
-        cls.perimeterI[2][6] = cls.p26 = GridPoint(2, 6, 553)
+        cls.perimeterI[1][1] = cls.p11 = (1, 1, 553)
+        cls.perimeterI[1][2] = cls.p12 = (1, 2, 554)
+        cls.perimeterI[1][3] = cls.p13 = (1, 3, 554)
+        cls.perimeterI[1][4] = cls.p14 = (1, 4, 553)
+        cls.perimeterI[2][4] = cls.p24 = (2, 4, 555)
+        cls.perimeterI[2][5] = cls.p25 = (2, 5, 554)
+        cls.perimeterI[2][6] = cls.p26 = (2, 6, 553)
         cls.perimeter = Perimeter(pointIndex=cls.perimeterI,
                                   datamap=cls.datamap)
+
+    def testPerimeterBothIndexAndList(self):
+        """
+        Ensure passing in a pointList and pointIndex raises exception
+        """
+        with self.assertRaises(Exception):
+            Perimeter(pointIndex=self.perimeterI, pointList=[(1, 1)], datamap=self.datamap)
+
+    def testPerimeterListBuildsIndex(self):
+        """
+        Ensure passing in a pointList produces a pointIndex
+        """
+        perm = Perimeter(pointList=self.perimeter.points, datamap=self.datamap)
+        self.assertDictEqual(perm.pointIndex['1'], self.perimeter.pointIndex['1'])
+        self.assertDictEqual(perm.pointIndex['2'], self.perimeter.pointIndex['2'])
+
+    def testPerimeterIndexBuildsList(self):
+        """
+        Ensure passing in a pointList produces a pointIndex
+        """
+        perm = Perimeter(pointIndex=self.perimeter.pointIndex, datamap=self.datamap)
+        self.assertEqual(perm.points, self.perimeter.points)
 
     def testPerimeterIterNeighborDiagonal(self):
         """
@@ -121,9 +143,9 @@ class PerimeterTests(unittest.TestCase):
                       datamap=self.datamap)
         highEdges = perimeterDiscontigous.findHighEdges(552)
         self.assertEqual(2, len(highEdges))
-        self.assertEqual(highEdges[0].points, [self.p11, self.p12])
-        self.assertEqual(highEdges[1].points, [self.p14, self.p24,
-                                               self.p25, self.p26])
+        self.assertEqual(highEdges[0].points, [GridPoint.from_tuple(self.p11), GridPoint.from_tuple(self.p12)])
+        self.assertEqual(highEdges[1].points, [GridPoint.from_tuple(self.p14), GridPoint.from_tuple(self.p24),
+                                               GridPoint.from_tuple(self.p25), GridPoint.from_tuple(self.p26)])
 
     def testPerimeterFindHighEdgesOrthogonallyDiscontigous(self):
         """
@@ -269,7 +291,7 @@ class PerimeterTests(unittest.TestCase):
         Ensure From Dict works as expected.
         """
         self.perimeter.mapEdge = True
-        self.perimeter.mapEdgePoints = [self.p11]
+        self.perimeter.mapEdgePoints = [GridPoint.from_tuple(self.p11)]
 
         perimeterDict = self.perimeter.to_dict()
 

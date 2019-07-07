@@ -29,12 +29,12 @@ class Perimeter:
                  mapEdge=False,
                  mapEdgePoints=None):
         """
-        :param pointList: GridPoints which make up the Perimeter.
+        :param pointList: tuple(x, y, elevation) which make up the Perimeter.
         :type pointList:
-         list(:class:`pyprom.lib.locations.gridpoint.GridPoint`)
+         list(tuple(x, y, elevation))
         :param pointIndex: Members as a dict().
         :type pointIndex:
-         dict({X: { Y: :class:`pyprom.lib.locations.gridpoint.GridPoint`}}
+         dict({X: { Y: tuple(x, y, elevation)}}
         :param datamap: datamap which this :class:`Perimeter` uses.
         :type datamap: :class:`pyprom.lib.datamap.DataMap` object.
         :param bool mapEdge: is this a map edge?
@@ -44,6 +44,8 @@ class Perimeter:
         """
         super(Perimeter, self).__init__()
         self.points = list()
+        if pointList and pointIndex:
+            raise Exception("choose one, pointList or PointIndex")
         if pointIndex:
             self.pointIndex = pointIndex
             self.points = [iep for x, _y in self.pointIndex.items()
@@ -51,6 +53,10 @@ class Perimeter:
 
         if pointList:
             self.points = pointList
+            self.pointIndex = defaultdict(dict)
+            for point in self.points:
+                self.pointIndex[point[0]][point[1]] = point
+
         self.datamap = datamap
         self.mapEdge = mapEdge
         self.mapEdgePoints = mapEdgePoints
@@ -65,8 +71,8 @@ class Perimeter:
         :type point: :class:`pyprom.lib.locations.gridpoint.GridPoint`
         """
         for shift in DIAGONAL_SHIFT_LIST:
-            x = point.x + shift[0]
-            y = point.y + shift[1]
+            x = point[0] + shift[0]
+            y = point[1] + shift[1]
             if self.pointIndex[x].get(y, False):
                 yield self.pointIndex[x].get(y, False)
             else:
@@ -82,8 +88,8 @@ class Perimeter:
         :type point: :class:`pyprom.lib.locations.gridpoint.GridPoint`
         """
         for shift in ORTHOGONAL_SHIFT_LIST:
-            x = point.x + shift[0]
-            y = point.y + shift[1]
+            x = point[0] + shift[0]
+            y = point[1] + shift[1]
             if self.pointIndex[x].get(y, False):
                 yield self.pointIndex[x].get(y, False)
             else:
@@ -97,7 +103,7 @@ class Perimeter:
         :rtype: dict()
         """
         perimeterDict = dict()
-        perimeterDict['points'] = [x.to_dict() for x in self.points]
+        perimeterDict['points'] = self.points
         perimeterDict['mapEdge'] = self.mapEdge
         perimeterDict['mapEdgePoints'] = [x.to_dict()
                                           for x in self.mapEdgePoints]
@@ -116,8 +122,8 @@ class Perimeter:
         """
         perimeterPointHash = defaultdict(dict)
         for pt in perimeterDict['points']:
-            perimeterPointHash[pt['x']][pt['y']] =\
-                GridPoint(pt['x'], pt['y'], pt['elevation'])
+            perimeterPointHash[pt[0]][pt[1]] =\
+                tuple(pt)
         mapEdge = perimeterDict['mapEdge']
         mapEdgePoints = [GridPoint(x['x'], x['y'], x['elevation'])
                          for x in perimeterDict['mapEdgePoints']]
@@ -144,9 +150,9 @@ class Perimeter:
         explored = defaultdict(dict)
         highLists = list()
         for point in self.points:
-            if explored[point.x].get(point.y, False):
+            if explored[point[0]].get(point[1], False):
                 continue
-            if point.elevation > elevation:
+            if point[2] > elevation:
                 toBeAnalyzed = [point]
                 highList = list()
                 while True:
@@ -155,16 +161,16 @@ class Perimeter:
                         break
                     else:
                         gridPoint = toBeAnalyzed.pop()
-                    if not explored[gridPoint.x].get(gridPoint.y, False):
-                        highList.append(gridPoint)
+                    if not explored[gridPoint[0]].get(gridPoint[1], False):
+                        highList.append(GridPoint.from_tuple(gridPoint))
                         neighbors = [x for x in
                                      self.iterNeighborDiagonal(gridPoint)
-                                     if x.elevation > elevation and
-                                     not explored[x.x].get(x.y, False)]
+                                     if x[2] > elevation and
+                                     not explored[x[0]].get(x[1], False)]
                         toBeAnalyzed += neighbors
-                        explored[gridPoint.x][gridPoint.y] = True
+                        explored[gridPoint[0]][gridPoint[1]] = True
             else:
-                explored[point.x][point.y] = True
+                explored[point[0]][point[1]] = True
         return [GridPointContainer(x) for x in highLists]
 
     def findHighPerimeter(self, elevation):
@@ -177,21 +183,20 @@ class Perimeter:
         :return: GridPointContainer containing high perimeter points.
         :rtype: :class:`pyprom.lib.containers.gridpoint.GridPointContainer`
         """
-        higherPoints = [x for x in self.points if x.elevation > elevation]
+        higherPoints = [GridPoint.from_tuple(x) for x in self.points if x[2] > elevation]
         return GridPointContainer(higherPoints)
 
     def append(self, point):
         """
-        Add a :class:`pyprom.lib.locations.gridpoint.GridPoint` to
-        this container.
+        Add a :class:`pyprom.lib.locations.gridpoint.GridPoint` or tuple(x, y, elevation)
+        to this container.
 
-        :param point: GridPoint to append.
+        :param point: GridPoint or tuple to append.
         :type point: :class:`pyprom.lib.locations.gridpoint.GridPoint`
-        :raises: TypeError if point not of
-         :class:`pyprom.lib.locations.gridpoint.GridPoint`
+        :type point: tuple(x, y, elevation)
         """
-        isGridPoint(point)
-        self.points.append(point)
+        incoming = self._check_and_return_incoming_point_type(point)
+        self.points.append(incoming)
 
     def __len__(self):
         """
@@ -205,13 +210,12 @@ class Perimeter:
         Gives Perimeter list like set capabilities
 
         :param int idx: index value
-        :param point: GridPoint for setitem.
+        :param point: GridPoint or tuple for setitem.
         :type point: :class:`pyprom.lib.locations.gridpoint.GridPoint`
-        :raises: TypeError if point not of
-         :class:`pyprom.lib.locations.gridpoint.GridPoint`
+        :type point: tuple(x, y, elevation)
         """
-        isGridPoint(point)
-        self.points[idx] = point
+        incoming = self._check_and_return_incoming_point_type(point)
+        self.points[idx] = incoming
 
     def __getitem__(self, idx):
         """
@@ -264,6 +268,28 @@ class Perimeter:
         """
         return "<Perimeter>" \
                " {} Objects".format(len(self.points))
+
+    def _check_and_return_incoming_point_type(self, point):
+        """
+        Make sure incoming point type is a tuple with length 3, or explicitly a
+        :class:`pyprom.lib.locations.gridpoint.GridPoint`
+
+        :param point: tuple, or
+         :class:`pyprom.lib.locations.gridpoint.GridPoint`
+        :raises: TypeError if point not of
+         :class:`pyprom.lib.locations.gridpoint.GridPoint` or tuple
+        :raises: Exception if tuple length != 3
+        :return: tuple(x, y, elevation)
+        """
+        if isinstance(point, GridPoint):
+            incoming = point.to_tuple()
+        elif isinstance(point, tuple):
+            incoming = point
+        else:
+            raise TypeError("point must be tuple, or GridPoint. Got: {}".format(type(point)))
+        if len(incoming) != 3:
+            raise Exception("tuple must have length of 3, or object must be GridPoint")
+        return incoming
 
     __unicode__ = __str__ = __repr__
 
