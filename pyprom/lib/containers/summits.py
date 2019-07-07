@@ -81,6 +81,16 @@ class SummitsContainer(SpotElevationContainer):
 
         return summitsContainer
 
+    @property
+    def multipoints(self):
+        """
+        Returns list of all multipoint
+         :class:`pyprom.lib.locations.summit.Summit` within container
+
+        :return: list(:class:`pyprom.lib.locations.summit.Summit`)
+        """
+        return [pt for pt in self.points if pt.multiPoint]
+
     def __setitem__(self, idx, summit):
         """
         Gives SummitsContainer list like set capabilities

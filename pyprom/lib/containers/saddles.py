@@ -174,6 +174,16 @@ class SaddlesContainer(SpotElevationContainer):
         """
         return [x for x in self.points if x.disqualified]
 
+    @property
+    def multipoints(self):
+        """
+        Returns list of all multipoint
+         :class:`pyprom.lib.locations.saddle.Saddle` within container
+
+        :return: list(:class:`pyprom.lib.locations.saddle.Saddle`)
+        """
+        return [pt for pt in self.points if pt.multiPoint]
+
     def __repr__(self):
         """
         :return: String representation of this object

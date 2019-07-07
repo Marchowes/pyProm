@@ -127,6 +127,16 @@ class SaddlesContainerTests(unittest.TestCase):
         container = SaddlesContainer([s1, s2, sd3, sd4])
         self.assertEqual(container.disqualified, [sd3, sd4])
 
+    def testSaddlesContainerMultiPoint(self):
+        """
+        Ensure multipoint() returns all multipoint Summits
+        """
+        s1 = Saddle(1, 1, 1)
+        s1.multiPoint = ["bogus_but_ok_for_test"]
+        s2 = Saddle(2, 2, 2)
+        container = SaddlesContainer([s1, s2])
+        self.assertEqual(container.multipoints, [s1])
+
 
 class SaddlesContainerRebuildTests(unittest.TestCase):
     """
