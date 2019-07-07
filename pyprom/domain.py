@@ -31,6 +31,8 @@ from .lib.containers.walkpath import WalkPath
 from .lib.locations.gridpoint import GridPoint
 from .lib.logic.basin_saddle_finder import BasinSaddleFinder
 
+from .lib.constants import DOMAIN_EXTENSION
+
 
 class Domain:
     """
@@ -147,6 +149,9 @@ class Domain:
          :class:`pyprom.lib.containers.linker.Linker`
         """
         filename = os.path.expanduser(filename)
+        if not filename.endswith(DOMAIN_EXTENSION):
+            filename += DOMAIN_EXTENSION
+
         self.logger.info("Writing Domain Dataset to {}.".format(filename))
         outgoing = gzip.open(filename, 'wb', 5)
         # ^^ ('filename', 'read/write mode', compression level)
@@ -454,8 +459,10 @@ class Domain:
             # Higher than current highest neighbor? Then this is
             # the new candidate.
             if elevation > currentHigh:
-                candidate = GridPoint(x, y, elevation)
+                candidate = (x, y, elevation)
                 currentHigh = elevation
+        if candidate:
+            candidate = GridPoint.from_tuple(candidate)
         return candidate, None, explored, orderedExploredPoints
 
     def detect_basin_saddles(self):

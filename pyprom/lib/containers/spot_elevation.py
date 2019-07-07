@@ -10,7 +10,10 @@ type location objects.
 
 from ..locations.summit import Summit
 from ..locations.spot_elevation import isSpotElevation
+from ..constants import METERS_TO_FEET, FEET_IN_MILES
 from .base import _Base
+
+
 from geopy.distance import vincenty
 
 
@@ -98,9 +101,9 @@ class SpotElevationContainer(_Base):
         elif unit in ['kilometers', 'kilometer', 'km']:
             convertedDist = value * 1000
         elif unit in ['feet', 'foot', 'ft']:
-            convertedDist = 0.3048 * value
+            convertedDist = METERS_TO_FEET * value
         elif unit in ['miles', 'mile', 'mi']:
-            convertedDist = 0.3048 * value * 5280
+            convertedDist = METERS_TO_FEET * value * FEET_IN_MILES
         else:
             raise ValueError('No unit value specified')
 

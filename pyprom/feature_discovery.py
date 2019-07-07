@@ -24,6 +24,8 @@ from .lib.containers.runoffs import RunoffsContainer
 from .lib.containers.perimeter import Perimeter
 from .lib.logic.equalheight import equalHeightBlob
 
+from .lib.constants import METERS_TO_FEET
+
 
 class AnalyzeData:
     """
@@ -89,7 +91,7 @@ class AnalyzeData:
             x, y = iterator.multi_index
             # core storage is always in metric.
             if self.datamap.unit == "FEET":
-                self.elevation = float(.3048 * iterator[0])
+                self.elevation = float(METERS_TO_FEET * iterator[0])
             else:
                 self.elevation = float(iterator[0])
 
