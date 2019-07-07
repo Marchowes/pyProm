@@ -124,7 +124,6 @@ class BasinSaddleFinder:
         """
         lowest[0].disqualify_self_and_linkers(basinSaddle=True)
         if len(lowest) > 1:
-            print("")
             for saddle in lowest:
                 saddle.basinSaddleAlternatives = lowest.copy()
                 saddle.basinSaddleAlternatives.remove(saddle)
