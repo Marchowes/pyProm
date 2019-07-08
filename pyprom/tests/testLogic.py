@@ -50,7 +50,7 @@ class LogicTests(unittest.TestCase):
         # Metric Elevation
         self.assertEqual(washington.elevation, 1914.0)
         # Feet
-        self.assertEqual(washington.feet, 6279.4512)
+        self.assertEqual(washington.feet, 6279.527559055117)
 
     def testFindTheMultipoint(self):
         """
