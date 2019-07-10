@@ -80,7 +80,7 @@ class LinkerTests(unittest.TestCase):
         """
         Ensure foot prominence calculation are as expected
         """
-        self.assertEqual(self.linker1.prom_ft, 2952.7200000000003)
+        self.assertEqual(self.linker1.prom_ft, 2952.755905511811)
 
     def testLinkerSaddlesConnectedViaSummit(self):
         """
@@ -420,10 +420,10 @@ class LinkerTests(unittest.TestCase):
         """
         Ensure __repr__ is as expected
         """
-        expected = "<Linker> <Saddle> lat 5 long 5 328.08000000000004ft" \
+        expected = "<Linker> <Saddle> lat 5 long 5 328.0839895013123ft" \
                    " 100m MultiPoint False -> <Summit> lat 1 long 1" \
-                   " 3280.8ft 1000m MultiPoint False" \
-                   " 2952.7200000000003promFt" \
+                   " 3280.839895013123ft 1000m MultiPoint False" \
+                   " 2952.755905511811promFt" \
                    " 900promM"
         self.assertEqual(self.linker1.__repr__(), expected)
 

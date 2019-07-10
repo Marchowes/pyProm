@@ -12,6 +12,8 @@ import logging
 
 from .constants import METERS_TO_FEET
 
+from math import hypot
+
 ARCSEC_DEG = 3600
 ARCMIN_DEG = 60
 DIAGONAL_SHIFT_LIST = ((-1, 0), (-1, 1), (0, 1), (1, 1), (1, 0), (1, -1),
@@ -82,6 +84,25 @@ class DataMap:
             else:
                 yield _x, _y, self.nodata
 
+    def steepestNeighbor(self, x, y):
+        """
+        Finds neighbor with steepest slope
+
+        :param int x: x coordinate in raster data.
+        :param int y: y coordinate in raster data.
+        :return: tuple(x, y) highest neighbor
+        """
+        steepest_slope = 0
+        steepest_neighbor = None
+        point_elevation = self.numpy_map[x, y]
+        for _x, _y, elevation in self.iterateDiagonal(x, y):
+            if elevation is None or elevation < point_elevation:
+                continue
+            slope = (elevation-point_elevation)/hypot((x - _x)*self.res_x, (y - _y)*self.res_y)
+            if steepest_slope < slope:
+                steepest_neighbor = (_x, _y)
+                steepest_slope = slope
+        return steepest_neighbor
 
 class ProjectionDataMap(DataMap):
     """

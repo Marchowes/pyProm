@@ -1,5 +1,10 @@
 Release History
 
+0.6.4 (July 9, 2019)
+++++++++++++++++++++
+* Now with accurate Metric-Imperial unit conversion!
+* New function for finding the steepest neighbor in a DataMap
+
 0.6.3 (July 7, 2019)
 ++++++++++++++++++++
 * Multipoints, and Perimeters internally use tuples instead of GridPoints. This yields a performance improvement.

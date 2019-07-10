@@ -11,6 +11,7 @@ Elevation data.
 from .base_coordinate import BaseCoordinate
 from .base_gridpoint import BaseGridPoint
 from ..util import randomString
+from ..constants import FEET_TO_METERS
 
 
 class SpotElevation(BaseCoordinate):
@@ -99,7 +100,7 @@ class SpotElevation(BaseCoordinate):
         :rtype: float, None
         """
         try:
-            return self.elevation * 3.2808
+            return self.elevation * FEET_TO_METERS
         except:
             return None
 

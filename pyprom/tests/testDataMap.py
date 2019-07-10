@@ -6,13 +6,17 @@ the LICENSE file that accompanies it.
 """
 
 from __future__ import division
+from numpy import array
+
 import unittest
 from pyprom.tests.getData import gettestzip
 from pyprom.dataload import GDALLoader
+from pyprom.lib.datamap import DataMap
+
 
 
 class DataMapTests(unittest.TestCase):
-    """Test Data Maps."""
+    """Test DataMaps."""
 
     def setUp(self):
         """Set Up Tests."""
@@ -85,6 +89,87 @@ class DataMapTests(unittest.TestCase):
         self.assertEqual(subset.upper_right, (44.97236111111111,
                                               -71.91708333333334))
 
+    class DataMapSteepestNeighborTests(unittest.TestCase):
+        """Test DataMap.steepestNeighbor()"""
+
+    def setDefaultMaxAndRes(self, datamap):
+        """
+        Set default max/res for datamap.
+        """
+        datamap.max_x = 3
+        datamap.max_y = 3
+        datamap.res_x = 1
+        datamap.res_y = 1
+        datamap.nodata = None
+
+    def testSteepestNeighborAbove(self):
+        """
+        Ensure point (0, 1) is found to be the steepest.
+        """
+        numpy_map = array([[11, 15, 12],
+                           [13, 10, 9],
+                           [14, 11, 8]])
+        datamap = DataMap(numpy_map, "meters", "")
+        self.setDefaultMaxAndRes(datamap)
+        self.assertEqual(datamap.steepestNeighbor(1, 1), (0, 1))
+
+    def testSteepestNeighborBelow(self):
+        """
+        Ensure point (2, 1) is found to be the steepest.
+        """
+        numpy_map = array([[11, 15, 12],
+                           [13, 10, 9],
+                           [14, 16, 8]])
+        datamap = DataMap(numpy_map, "meters", "")
+        self.setDefaultMaxAndRes(datamap)
+        self.assertEqual(datamap.steepestNeighbor(1, 1), (2, 1))
+
+    def testSteepestNeighborAboveButDiagonalHigherJustNotHighEnough(self):
+        """
+        Ensure point (0, 1) is found to be the steepest even tho (0, 0)
+        is higher. This is due to distance.
+        """
+        numpy_map = array([[17, 15, 12],
+                           [13, 10, 9],
+                           [14, 11, 8]])
+        datamap = DataMap(numpy_map, "meters", "")
+        self.setDefaultMaxAndRes(datamap)
+        self.assertEqual(datamap.steepestNeighbor(1, 1), (0, 1))
+
+    def testSteepestNeighborDiagonalHigher(self):
+        """
+        Ensure point (0, 0) is found to be the steepest
+        """
+        numpy_map = array([[18, 15, 12],
+                           [13, 10, 9],
+                           [14, 11, 8]])
+        datamap = DataMap(numpy_map, "meters", "")
+        self.setDefaultMaxAndRes(datamap)
+        self.assertEqual(datamap.steepestNeighbor(1, 1), (0, 0))
+
+    def testSteepestNeighborUnevenXYResolution(self):
+        """
+        Ensure point (1, 2) is found to be the steepest even tho (0, 1) is higher.
+        This is due to the distance derived from the x axis resolution
+        """
+        numpy_map = array([[15, 16, 12],
+                           [13, 10, 15],
+                           [14, 11, 8]])
+        datamap = DataMap(numpy_map, "meters", "")
+        self.setDefaultMaxAndRes(datamap)
+        datamap.res_x = 2
+        self.assertEqual(datamap.steepestNeighbor(1, 1), (1, 2))
+
+    def testSteepestNeighborCorner(self):
+        """
+        Ensure we don't crash when scanning the corner.
+        """
+        numpy_map = array([[15, 16, 12],
+                           [13, 10, 15],
+                           [14, 11, 8]])
+        datamap = DataMap(numpy_map, "meters", "")
+        self.setDefaultMaxAndRes(datamap)
+        self.assertEqual(datamap.steepestNeighbor(0, 0), (0, 1))
 
 if __name__ == '__main__':
     unittest.main()
