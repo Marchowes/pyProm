@@ -92,17 +92,32 @@ class DataMap:
         :param int y: y coordinate in raster data.
         :return: tuple(x, y) highest neighbor
         """
-        steepest_slope = 0
+        steepest_slope = -1
         steepest_neighbor = None
-        point_elevation = self.numpy_map[x, y]
+        point_elevation = self.get(x, y)
+
         for _x, _y, elevation in self.iterateDiagonal(x, y):
             if elevation is None or elevation < point_elevation:
                 continue
             slope = (elevation-point_elevation)/hypot((x - _x)*self.res_x, (y - _y)*self.res_y)
             if steepest_slope < slope:
-                steepest_neighbor = (_x, _y)
+                if slope < 0:
+                    continue
+                steepest_neighbor = (_x, _y, elevation)
                 steepest_slope = slope
         return steepest_neighbor
+
+    def get(self, x, y):
+        """
+        Gets point from numpy map, and converts units to Meters
+        :param int x: x coordinate in raster data.
+        :param int y: y coordinate in raster data.
+        :return: float
+        """
+        if self.unit == 'FEET':
+            return self.numpy_map[x, y] * METERS_TO_FEET
+        else:
+            return self.numpy_map[x, y]
 
 class ProjectionDataMap(DataMap):
     """

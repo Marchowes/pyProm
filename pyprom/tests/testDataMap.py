@@ -111,7 +111,7 @@ class DataMapTests(unittest.TestCase):
                            [14, 11, 8]])
         datamap = DataMap(numpy_map, "meters", "")
         self.setDefaultMaxAndRes(datamap)
-        self.assertEqual(datamap.steepestNeighbor(1, 1), (0, 1))
+        self.assertEqual(datamap.steepestNeighbor(1, 1), (0, 1, 15.0))
 
     def testSteepestNeighborBelow(self):
         """
@@ -122,7 +122,7 @@ class DataMapTests(unittest.TestCase):
                            [14, 16, 8]])
         datamap = DataMap(numpy_map, "meters", "")
         self.setDefaultMaxAndRes(datamap)
-        self.assertEqual(datamap.steepestNeighbor(1, 1), (2, 1))
+        self.assertEqual(datamap.steepestNeighbor(1, 1), (2, 1, 16.0))
 
     def testSteepestNeighborAboveButDiagonalHigherJustNotHighEnough(self):
         """
@@ -134,7 +134,7 @@ class DataMapTests(unittest.TestCase):
                            [14, 11, 8]])
         datamap = DataMap(numpy_map, "meters", "")
         self.setDefaultMaxAndRes(datamap)
-        self.assertEqual(datamap.steepestNeighbor(1, 1), (0, 1))
+        self.assertEqual(datamap.steepestNeighbor(1, 1), (0, 1, 15.0))
 
     def testSteepestNeighborDiagonalHigher(self):
         """
@@ -145,7 +145,7 @@ class DataMapTests(unittest.TestCase):
                            [14, 11, 8]])
         datamap = DataMap(numpy_map, "meters", "")
         self.setDefaultMaxAndRes(datamap)
-        self.assertEqual(datamap.steepestNeighbor(1, 1), (0, 0))
+        self.assertEqual(datamap.steepestNeighbor(1, 1), (0, 0, 18.0))
 
     def testSteepestNeighborUnevenXYResolution(self):
         """
@@ -158,7 +158,7 @@ class DataMapTests(unittest.TestCase):
         datamap = DataMap(numpy_map, "meters", "")
         self.setDefaultMaxAndRes(datamap)
         datamap.res_x = 2
-        self.assertEqual(datamap.steepestNeighbor(1, 1), (1, 2))
+        self.assertEqual(datamap.steepestNeighbor(1, 1), (1, 2, 15.0))
 
     def testSteepestNeighborCorner(self):
         """
@@ -169,7 +169,7 @@ class DataMapTests(unittest.TestCase):
                            [14, 11, 8]])
         datamap = DataMap(numpy_map, "meters", "")
         self.setDefaultMaxAndRes(datamap)
-        self.assertEqual(datamap.steepestNeighbor(0, 0), (0, 1))
+        self.assertEqual(datamap.steepestNeighbor(0, 0), (0, 1, 16.0))
 
 if __name__ == '__main__':
     unittest.main()
