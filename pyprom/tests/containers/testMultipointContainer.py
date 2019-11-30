@@ -313,7 +313,7 @@ class MultipointTests(unittest.TestCase):
     def testMultiPointClosestHighPerimeterPointSpotElevation(self):
         """
         Ensure closestHighPerimeterPoint() returns the expected results
-        asSpotElevation = False
+        asSpotElevation = True
         """
         mp = self.saddles.multipoints[0].multiPoint
 
