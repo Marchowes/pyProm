@@ -51,8 +51,20 @@ class DomainTests(unittest.TestCase):
         """
         Ensure loading cbor into :class:`Domain`
         """
+        self.domain.write('/tmp/deletemePyPromTest.dom', noWalkPath=False)
+        newDomain = Domain.read('/tmp/deletemePyPromTest.dom', self.someslice)
+        self.assertEqual(newDomain.saddles, self.domain.saddles)
+        self.assertEqual(newDomain.summits, self.domain.summits)
+        self.assertEqual(newDomain.runoffs, self.domain.runoffs)
+        self.assertEqual(newDomain.linkers, self.domain.linkers)
+
+    def testDomainReadWriteFileSuffix(self):
+        """
+        Ensure loading cbor into :class:`Domain`
+        Ensure dom suffix is appended.
+        """
         self.domain.write('/tmp/deletemePyPromTest', noWalkPath=False)
-        newDomain = Domain.read('/tmp/deletemePyPromTest', self.someslice)
+        newDomain = Domain.read('/tmp/deletemePyPromTest.dom', self.someslice)
         self.assertEqual(newDomain.saddles, self.domain.saddles)
         self.assertEqual(newDomain.summits, self.domain.summits)
         self.assertEqual(newDomain.runoffs, self.domain.runoffs)
