@@ -179,6 +179,19 @@ class PerimeterTests(unittest.TestCase):
         higher552 = self.perimeter.findHighPerimeter(552)
         self.assertEqual(7, len(higher552.points))
 
+    def testPerimeterfindHighPerimeterTuple(self):
+        """
+        Ensure findHighPerimeter produces expected results when as_tuples is True
+        """
+        higher554 = self.perimeter.findHighPerimeter(554, as_tuples=True)
+        self.assertEqual(higher554, [(2, 4, 555)])
+
+        higher553 = self.perimeter.findHighPerimeter(553, as_tuples=True)
+        self.assertEqual(higher553, [(1, 2, 554),
+                                     (1, 3, 554),
+                                     (2, 4, 555),
+                                     (2, 5, 554)])
+
     def testPerimeterIterator(self):
         """
         Ensure __iter__ returns expected results.

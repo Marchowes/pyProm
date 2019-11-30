@@ -173,18 +173,25 @@ class Perimeter:
                 explored[point[0]][point[1]] = True
         return [GridPointContainer(x) for x in highLists]
 
-    def findHighPerimeter(self, elevation):
+    def findHighPerimeter(self, elevation, as_tuples=False):
         """
         This function returns all points higher than the passed in
-        elevation and returns them in a GridPointContainer.
+        elevation and returns them in a GridPointContainer. Unless
+        as_tuples is True, then a list of tuples is returned.
 
         :param elevation:
         :type elevation: int, float
+        :param as_tuples: returns result as list of (x, y, elevation) tuples
         :return: GridPointContainer containing high perimeter points.
         :rtype: :class:`pyprom.lib.containers.gridpoint.GridPointContainer`
+        :return: List of points as tuples
+        :rtype: list(tuple(x, y, elevation))
         """
-        higherPoints = [GridPoint.from_tuple(x) for x in self.points if x[2] > elevation]
-        return GridPointContainer(higherPoints)
+        if as_tuples:
+            return [x for x in self.points if x[2] > elevation]
+        else:
+            higherPoints = [GridPoint.from_tuple(x) for x in self.points if x[2] > elevation]
+            return GridPointContainer(higherPoints)
 
     def append(self, point):
         """
