@@ -13,6 +13,7 @@ from pyprom.lib.locations.base_coordinate import BaseCoordinate
 from pyprom.lib.locations.base_gridpoint import BaseGridPoint
 from pyprom.lib.locations.gridpoint import GridPoint
 from pyprom.lib.containers.multipoint import MultiPoint
+from pyprom.lib.locations.spot_elevation import SpotElevation
 
 
 class MultipointTests(unittest.TestCase):
@@ -286,3 +287,48 @@ class MultipointTests(unittest.TestCase):
         point = GridPoint(1, 1, 1)
         result = mp.closestPoint(point, asSpotElevation=True)
         self.assertEqual(expectedResult, result)
+
+
+
+
+    def testMultiPointClosestHighPerimeterPoint(self):
+        """
+        Ensure closestHighPerimeterPoint() returns the expected results
+        asSpotElevation = False
+        """
+        mp = self.saddles.multipoints[0].multiPoint
+
+        closest = mp.closestHighPerimeterPoint(GridPoint(0, 0, 0))
+        self.assertEqual(closest, (GridPoint(4, 55, 559)))
+
+        closest = mp.closestHighPerimeterPoint(GridPoint(0, 55, 0))
+        self.assertEqual(closest, (GridPoint(0, 56, 559)))
+
+        closest = mp.closestHighPerimeterPoint(GridPoint(10, 0, 0))
+        self.assertEqual(closest, (GridPoint(4, 55, 559)))
+
+        closest = mp.closestHighPerimeterPoint(GridPoint(10, 60, 0))
+        self.assertEqual(closest, (GridPoint(5, 58, 559)))
+
+    def testMultiPointClosestHighPerimeterPointSpotElevation(self):
+        """
+        Ensure closestHighPerimeterPoint() returns the expected results
+        asSpotElevation = False
+        """
+        mp = self.saddles.multipoints[0].multiPoint
+
+        closest = mp.closestHighPerimeterPoint(GridPoint(0, 0, 0),
+                                               asSpotElevation=True)
+        self.assertEqual(closest, (SpotElevation(44.721250000000005, -71.70708333333333, 559)))
+
+        closest = mp.closestHighPerimeterPoint(GridPoint(0, 55, 0),
+                                               asSpotElevation=True)
+        self.assertEqual(closest, (SpotElevation(44.72236111111111, -71.70680555555556, 559)))
+
+        closest = mp.closestHighPerimeterPoint(GridPoint(10, 0, 0),
+                                               asSpotElevation=True)
+        self.assertEqual(closest, (SpotElevation(44.721250000000005, -71.70708333333333, 559)))
+
+        closest = mp.closestHighPerimeterPoint(GridPoint(10, 60, 0),
+                                               asSpotElevation=True)
+        self.assertEqual(closest, (SpotElevation(44.72097222222222, -71.70625, 559)))

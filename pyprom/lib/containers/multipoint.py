@@ -157,6 +157,42 @@ class MultiPoint:
             return gp.toSpotElevation(self.datamap)
         return gp
 
+    def closestHighPerimeterPoint(self, gridPoint, asSpotElevation=False):
+        """
+        Returns the closest point in this container to the GridPoint passed in.
+
+        :param gridPoint: GridPoint to check.
+        :type gridPoint: :class:`pyprom.lib.locations.gridpoint.GridPoint`
+        :param bool asSpotElevation: If True, returns SpotElevation object.
+        :return: GridPoint if asSpotElevation == False
+         SpotElevation if asSpotElevation == True
+        :rtype :class:`pyprom.lib.locations.gridpoint.GridPoint`,
+         :class:`pyprom.lib.locations.spot_elevation.SpotElevation`
+        """
+        distanceCalc = lambda themX, themY, usX, usY: hypot((themX - usX),
+                                                            (themY - usY))
+        themX, themY = gridPoint.x, gridPoint.y
+
+        highPerimeters = self.perimeter.findHighEdges(self.elevation)
+        if not highPerimeters:
+            return None
+        closest = highPerimeters[0].points[0]
+        closestDistance = distanceCalc(themX, themY, closest.x, closest.y)
+
+        for highPerimeter in highPerimeters:
+            for point in highPerimeter:
+                distance = distanceCalc(themX, themY, point.x, point.y)
+                # well, can't get closer than that. mark it and bail.
+                if distance == 0:
+                    closest = point
+                    break
+                if distance < closestDistance:
+                    closest = point
+                    closestDistance = distance
+        if asSpotElevation:
+            return closest.toSpotElevation(self.datamap)
+        return closest
+
     def __len__(self):
         """
         :return: number of items in `self.points`
