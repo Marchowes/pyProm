@@ -49,21 +49,23 @@ class AnalyzeData:
         self.y_mapEdge = {0: True, self.max_y: True}
         self.explored = defaultdict(dict)
 
-    def run(self):
+    def run(self, rebuildSaddles=True):
         """
         Shortcut for running analysis. This will find all features on
         the datamap, as well as rebuild all
         :class:`pyprom.lib.locations.saddle.Saddle` into a more digestible
         format with accurate midpoints and only 2 high edges a piece.
 
+        :param bool rebuildSaddles: run saddle rebuild logic
         :return: Containers with features
         :rtype: :class:`pyprom.lib.containers.saddles.SaddlesContainer`
          :class:`pyprom.lib.containers.summits.SummitsContainer`
          :class:`pyprom.lib.containers.runoffs.RunoffsContainer`
         """
         _, _, _ = self.analyze()
-        self.logger.info("Rebuilding Saddles")
-        self.saddleObjects = self.saddleObjects.rebuildSaddles(self.datamap)
+        if rebuildSaddles:
+            self.logger.info("Rebuilding Saddles")
+            self.saddleObjects = self.saddleObjects.rebuildSaddles(self.datamap)
         return self.summitObjects, self.saddleObjects, self.runoffObjects
 
     def analyze(self):
@@ -176,7 +178,7 @@ class AnalyzeData:
             edgePoints = [BaseGridPoint(x, y)]
 
         # Begin the ardous task of analyzing points and multipoints
-        neighbor = self.datamap.iterateDiagonal(x, y)
+        neighbor = self.datamap.iterateFull(x, y)
         shoreSetIndex = defaultdict(dict)
         shoreMapEdge = []
         for _x, _y, elevation in neighbor:

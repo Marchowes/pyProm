@@ -11,7 +11,7 @@ from collections import defaultdict
 from .gridpoint import GridPointContainer
 from ..locations.gridpoint import isGridPoint, GridPoint
 
-DIAGONAL_SHIFT_LIST = ((-1, 0), (-1, 1), (0, 1), (1, 1), (1, 0), (1, -1),
+FULL_SHIFT_LIST = ((-1, 0), (-1, 1), (0, 1), (1, 1), (1, 0), (1, -1),
                        (0, -1), (-1, -1))
 ORTHOGONAL_SHIFT_LIST = ((-1, 0), (0, 1), (1, 0), (0, -1))
 
@@ -70,7 +70,7 @@ class Perimeter:
         :param point: Gridpoint to find neighbors of
         :type point: :class:`pyprom.lib.locations.gridpoint.GridPoint`
         """
-        for shift in DIAGONAL_SHIFT_LIST:
+        for shift in FULL_SHIFT_LIST:
             x = point[0] + shift[0]
             y = point[1] + shift[1]
             if self.pointIndex[x].get(y, False):

@@ -902,7 +902,7 @@ self.logger</y:AttributeLabel>
 self.unit</y:AttributeLabel>
                 <y:MethodLabel xml:space="preserve">__init__(numpy_map, unit)
 
-iterateDiagonal(x, y)
+iterateFull(x, y)
 iterateOrthogonal(x, y)
 </y:MethodLabel>
               </y:UML>

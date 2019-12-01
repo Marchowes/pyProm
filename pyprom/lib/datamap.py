@@ -13,12 +13,15 @@ import logging
 from .constants import METERS_TO_FEET
 
 from math import hypot
+from shapely.geometry import Polygon
 
 ARCSEC_DEG = 3600
 ARCMIN_DEG = 60
-DIAGONAL_SHIFT_LIST = ((-1, 0), (-1, 1), (0, 1), (1, 1), (1, 0), (1, -1),
+FULL_SHIFT_LIST = ((-1, 0), (-1, 1), (0, 1), (1, 1), (1, 0), (1, -1),
                        (0, -1), (-1, -1))
 ORTHOGONAL_SHIFT_LIST = ((-1, 0), (0, 1), (1, 0), (0, -1))
+DIAGONAL_SHIFT_LIST = ((-1,-1), (1, 1), (1, -1), (-1, -1))
+
 
 
 class DataMap:
@@ -42,7 +45,7 @@ class DataMap:
         if not self.unit:
             raise Exception("Need Meters or Feet. Got {}".format(unit))
 
-    def iterateDiagonal(self, x, y):
+    def iterateFull(self, x, y):
         """
         Generator returns 8 closest neighbors to a raster grid location,
         that is, all points touching including the diagonals.
@@ -51,7 +54,7 @@ class DataMap:
         :param int y: y coordinate in raster data.
         """
         # 0, 45, 90, 135, 180, 225, 270, 315
-        for shift in DIAGONAL_SHIFT_LIST:
+        for shift in FULL_SHIFT_LIST:
             _x = x + shift[0]
             _y = y + shift[1]
             if 0 <= _x <= self.max_x and \
@@ -84,6 +87,27 @@ class DataMap:
             else:
                 yield _x, _y, self.nodata
 
+    def iterateDiagonal(self, x, y):
+        """
+        Generator returns 4 closest neighbors to a raster grid location,
+        that is, all points touching excluding the orthogonals.
+
+        :param int x: x coordinate in raster data.
+        :param int y: y coordinate in raster data.
+        """
+        # 45, 135, 225, 315
+        for shift in DIAGONAL_SHIFT_LIST:
+            _x = x + shift[0]
+            _y = y + shift[1]
+            if 0 <= _x <= self.max_x and \
+               0 <= _y <= self.max_y:
+                if self.unit == 'FEET':
+                    yield _x, _y, float(METERS_TO_FEET * self.numpy_map[_x, _y])
+                else:
+                    yield _x, _y, float(self.numpy_map[_x, _y])
+            else:
+                yield _x, _y, self.nodata
+
     def steepestNeighbor(self, x, y):
         """
         Finds neighbor with steepest slope
@@ -96,7 +120,7 @@ class DataMap:
         steepest_neighbor = None
         point_elevation = self.get(x, y)
 
-        for _x, _y, elevation in self.iterateDiagonal(x, y):
+        for _x, _y, elevation in self.iterateFull(x, y):
             if elevation is None or elevation < point_elevation:
                 continue
             slope = (elevation-point_elevation)/hypot((x - _x)*self.res_x, (y - _y)*self.res_y)
@@ -331,6 +355,19 @@ class ProjectionDataMap(DataMap):
                                  self.transform,
                                  self.reverse_transform,
                                  "UnknownSubset")
+
+    def point_geom(self, x, y):
+        """
+        :param x: x coordinate
+        :param y: y coordinate
+        :return: :class:`shapely.geometry.polygon.Polygon` of this point
+        """
+        local_lat, local_long = self.xy_to_latlong(x, y)
+        corners = list()
+        for c_x, c_y, _ in self.iterateDiagonal(x, y):
+            remote_lat, remote_long = self.xy_to_latlong(c_x, c_y)
+            corners.append(((local_lat + remote_lat)/2, (local_long + remote_long)/2))
+        return Polygon(corners)
 
     def __repr__(self):
         """

@@ -4,14 +4,15 @@ pyProm: Copyright 2017.
 This software is distributed under a license that is described in
 the LICENSE file that accompanies it.
 """
-
-from __future__ import division
-from numpy import array
-
 import unittest
+
+from numpy import array
+from shapely.geometry import Polygon
+from shapely.ops import unary_union
 from pyprom.tests.getData import gettestzip
 from pyprom.dataload import GDALLoader
 from pyprom.lib.datamap import DataMap
+
 
 
 
@@ -170,6 +171,30 @@ class DataMapTests(unittest.TestCase):
         datamap = DataMap(numpy_map, "meters", "")
         self.setDefaultMaxAndRes(datamap)
         self.assertEqual(datamap.steepestNeighbor(0, 0), (0, 1, 16.0))
+
+    def testGeom(self):
+        """
+        Ensure the expected Polygon is produced from a single point
+        """
+        polygon = self.datamap.point_geom(100, 100)
+        expected_polygon = Polygon(((44.9725, -71.9725),
+                                    (44.97222222222223, -71.97222222222223),
+                                    (44.97222222222223, -71.9725),
+                                    (44.9725, -71.9725)))
+        self.assertEquals(polygon, expected_polygon)
+
+    def testGeomUnaryUnion(self):
+        """
+        Ensure a unary union on polygons derived from two neighboring points
+        provides a proper rectangle and not some hot mess.
+        """
+        composite_polygon = unary_union((self.datamap.point_geom(100, 100),
+                                         self.datamap.point_geom(100, 100)))
+        expected_polygon = Polygon(((44.97222222222223, -71.97222222222223),
+                                    (44.9725, -71.9725),
+                                    (44.97222222222223, -71.9725),
+                                    (44.97222222222223, -71.97222222222223)))
+        self.assertEquals(composite_polygon, expected_polygon)
 
 if __name__ == '__main__':
     unittest.main()

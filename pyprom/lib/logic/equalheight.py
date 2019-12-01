@@ -45,7 +45,7 @@ def equalHeightBlob(datamap, x, y, elevation):
     edge = False
     while toBeAnalyzed:
         gridPoint = toBeAnalyzed.pop()
-        neighbors = datamap.iterateDiagonal(gridPoint[0], gridPoint[1])
+        neighbors = datamap.iterateFull(gridPoint[0], gridPoint[1])
         # Determine if edge or not.
         if not edge:
             if x_mapEdge.get(gridPoint[0]) or y_mapEdge.get(gridPoint[1]):
