@@ -20,7 +20,7 @@ ARCMIN_DEG = 60
 FULL_SHIFT_LIST = ((-1, 0), (-1, 1), (0, 1), (1, 1), (1, 0), (1, -1),
                        (0, -1), (-1, -1))
 ORTHOGONAL_SHIFT_LIST = ((-1, 0), (0, 1), (1, 0), (0, -1))
-DIAGONAL_SHIFT_LIST = ((-1,-1), (1, 1), (1, -1), (-1, -1))
+DIAGONAL_SHIFT_LIST = ((-1, 1), (1, 1), (1, -1), (-1, -1))
 
 
 
@@ -366,7 +366,8 @@ class ProjectionDataMap(DataMap):
         corners = list()
         for c_x, c_y, _ in self.iterateDiagonal(x, y):
             remote_lat, remote_long = self.xy_to_latlong(c_x, c_y)
-            corners.append(((local_lat + remote_lat)/2, (local_long + remote_long)/2))
+            #shapely coords is long, lat
+            corners.append(((local_long + remote_long)/2, (local_lat + remote_lat)/2))
         return Polygon(corners)
 
     def __repr__(self):
