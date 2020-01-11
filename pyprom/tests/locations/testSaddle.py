@@ -197,3 +197,53 @@ class SaddleNetworkTests(unittest.TestCase):
         Ensure neighbors() returns expected results.
         """
         self.assertEqual(self.saddle2.neighbors, [self.saddle1])
+
+    def testSaddleDisown(self):
+        """
+        Ensure disown() works as expected
+        """
+        def make_em():
+            child = Saddle(1, 1, 1)
+            parent = Saddle(2, 2, 2)
+            child.parent = parent
+            parent.children=[child]
+            return parent, child
+
+        # Basic test
+        parent, child = make_em()
+        child.disown()
+        self.assertEqual([], parent.children)
+        self.assertEqual(None, child.parent)
+
+        # Make sure we can disown, even if parent is unaware
+        parent, child = make_em()
+        parent.children = []
+        child.disown()
+        self.assertEqual([], parent.children)
+        self.assertEqual(None, child.parent)
+
+        # Make sure other children are left alone
+        parent, child = make_em()
+        sibling = parent = Saddle(3, 3, 3)
+        parent.children.append(sibling)
+        child.disown()
+        self.assertEqual([sibling], parent.children)
+        self.assertEqual(None, child.parent)
+
+        # Twins? Make sure the twin is left alone
+        parent, child = make_em()
+        twin = parent = Saddle(2, 2, 2)
+        parent.children.append(twin)
+        child.disown()
+        self.assertEqual([twin], parent.children)
+        self.assertEqual(None, child.parent)
+
+        # Clones? make sure the clone is removed
+        parent, child = make_em()
+        parent.children.append(child)
+        child.disown()
+        self.assertEqual([], parent.children)
+        self.assertEqual(None, child.parent)
+
+
+

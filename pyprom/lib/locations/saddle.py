@@ -192,6 +192,15 @@ class Saddle(SpotElevation):
         for linker in self.summits:
             linker.disqualified = True
 
+    def disown(self):
+        """
+        Disown disassociates this saddle from a parent Saddle :class:`Saddle`
+        """
+        if self.parent:
+            self.parent.children = \
+                [x for x in self.parent.children if x != self]
+            self.parent = None
+
     def to_dict(self, referenceById=True):
         """
         Create the dictionary representation of this object.
@@ -253,6 +262,7 @@ class Saddle(SpotElevation):
         singleSummit = saddleDict.get('singleSummit', False)
         basinSaddle = saddleDict.get('basinSaddle', False)
         disqualified = saddleDict.get('disqualified', None)
+        # TODO: basinSaddleAlternatives?
 
         multipoint = saddleDict.get('multipoint', [])
         if multipoint:
