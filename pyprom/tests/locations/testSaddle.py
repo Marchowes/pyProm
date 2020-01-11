@@ -131,6 +131,17 @@ class SaddleTests(unittest.TestCase):
         self.assertEqual(saddle1000.feature_neighbors(), [summit1, summit2])
 
 
+def make_em():
+    """
+    Helper for making parent - child related saddles
+    """
+    child = Saddle(1, 1, 1)
+    parent = Saddle(2, 2, 2)
+    child.parent = parent
+    parent.children = [child]
+    return parent, child
+
+
 class SaddleNetworkTests(unittest.TestCase):
     """Test Saddles with neighbors"""
 
@@ -185,8 +196,8 @@ class SaddleNetworkTests(unittest.TestCase):
         Ensure all_neighbors returns expected results
         filterDisqualified=False
         """
-        all = self.saddle2.all_neighbors(filterDisqualified=False)
-        self.assertEqual(all, [self.saddle1,
+        allof = self.saddle2.all_neighbors(filterDisqualified=False)
+        self.assertEqual(allof, [self.saddle1,
                                self.saddle2,
                                self.saddle2,
                                self.saddle3,
@@ -198,27 +209,20 @@ class SaddleNetworkTests(unittest.TestCase):
         """
         self.assertEqual(self.saddle2.neighbors, [self.saddle1])
 
-    def testSaddleDisown(self):
+    def testSaddleEmancipate(self):
         """
-        Ensure disown() works as expected
+        Ensure emancipate() works as expected
         """
-        def make_em():
-            child = Saddle(1, 1, 1)
-            parent = Saddle(2, 2, 2)
-            child.parent = parent
-            parent.children=[child]
-            return parent, child
-
         # Basic test
         parent, child = make_em()
-        child.disown()
+        child.emancipate()
         self.assertEqual([], parent.children)
         self.assertEqual(None, child.parent)
 
-        # Make sure we can disown, even if parent is unaware
+        # Make sure we can emancipate, even if parent is unaware
         parent, child = make_em()
         parent.children = []
-        child.disown()
+        child.emancipate()
         self.assertEqual([], parent.children)
         self.assertEqual(None, child.parent)
 
@@ -226,24 +230,60 @@ class SaddleNetworkTests(unittest.TestCase):
         parent, child = make_em()
         sibling = parent = Saddle(3, 3, 3)
         parent.children.append(sibling)
-        child.disown()
+        child.emancipate()
         self.assertEqual([sibling], parent.children)
         self.assertEqual(None, child.parent)
 
         # Twins? Make sure the twin is left alone
         parent, child = make_em()
-        twin = parent = Saddle(2, 2, 2)
+        twin = Saddle(2, 2, 2)
         parent.children.append(twin)
-        child.disown()
+        child.emancipate()
         self.assertEqual([twin], parent.children)
         self.assertEqual(None, child.parent)
 
         # Clones? make sure the clone is removed
         parent, child = make_em()
         parent.children.append(child)
-        child.disown()
+        self.assertTrue(len(parent.children) == 2)
+        child.emancipate()
         self.assertEqual([], parent.children)
         self.assertEqual(None, child.parent)
 
+    def testSaddleDisownChildren(self):
+        """
+        Ensure disown_children() works as expected
+        """
+        # Basic test
+        parent, child = make_em()
+        parent.disown_children()
+        self.assertEqual([], parent.children)
+        self.assertEqual(None, child.parent)
 
+        # Make sure multiple children are removed
+        parent, child = make_em()
+        sibling = Saddle(3, 3, 3)
+        sibling.parent = parent
+        parent.children.append(sibling)
+        parent.disown_children()
+        self.assertEqual([], parent.children)
+        self.assertEqual(None, child.parent)
+        self.assertEqual(None, sibling.parent)
+
+        # Make sure multiple children are removed, including
+        # ones with incomplete references to parent.
+        parent, child = make_em()
+        sibling = Saddle(3, 3, 3)
+        parent.children.append(sibling)
+        parent.disown_children()
+        self.assertEqual([], parent.children)
+        self.assertEqual(None, child.parent)
+        self.assertEqual(None, sibling.parent)
+
+        # Clones? make sure no Exception
+        parent, child = make_em()
+        parent.children.append(child)
+        parent.disown_children()
+        self.assertEqual([], parent.children)
+        self.assertEqual(None, child.parent)
 
