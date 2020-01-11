@@ -192,14 +192,23 @@ class Saddle(SpotElevation):
         for linker in self.summits:
             linker.disqualified = True
 
-    def disown(self):
+    def emancipate(self):
         """
-        Disown disassociates this saddle from a parent Saddle :class:`Saddle`
+        Emancipate disassociates this saddle from its parent :class:`Saddle`
         """
         if self.parent:
             self.parent.children = \
                 [x for x in self.parent.children if x != self]
             self.parent = None
+
+    def disown_children(self):
+        """
+        disown_children disassociates this saddle from all child
+         :class:`Saddle`
+        """
+        for child in self.children:
+            child.emancipate()
+        self.children = []
 
     def to_dict(self, referenceById=True):
         """
