@@ -79,6 +79,15 @@ class SpotElevationContainer(_Base):
                 highest.append(spot_elevation)
         return highest
 
+    def by_id(self, id):
+        """
+        Returns member SpotElevation derivative by ID if it exists.
+        :param id: string ID of SpotElevation derivative
+        :return: SpotElevation derivative object
+        """
+        # We want to throw an exception if it's not there.
+        return self.fast_lookup[id]
+
     def radius(self, lat, long, value, unit='m'):
         """
         Returns all members of this container within a certain radius.
