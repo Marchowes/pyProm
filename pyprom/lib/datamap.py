@@ -11,6 +11,7 @@ used to analyze the map.
 import logging
 
 from .constants import METERS_TO_FEET
+from .util import checksum
 
 from math import hypot
 from shapely.geometry import Polygon
@@ -35,7 +36,12 @@ class DataMap:
         :raises: Exception (regarding unit)
         """
         self.numpy_map = numpy_map
-        self.filename = filename
+        self.file_and_path = filename
+        self.filename = filename.split("/")[-1]
+        if filename != "UnknownSubset":
+            self.md5 = checksum(filename)
+        else:
+            self.md5 = None
         unit_and_substrings = {"METERS": ["meter", "metre"], "FEET": ["foot", "feet"]}
         self.unit = None
         for unitname, unit_options in unit_and_substrings.items():
