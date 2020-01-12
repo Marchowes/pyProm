@@ -50,8 +50,9 @@ class BasinSaddleFinder:
 
         self.logger.info("Identifying Stub Saddles")
         for id, saddle in features.items():
-            purgedStubsCounter +=\
-                self._disqualify_single_source_saddles(saddle)
+            if not saddle.disqualified:
+                purgedStubsCounter +=\
+                    self._disqualify_single_source_saddles(saddle)
         self.logger.info("Identifying Stub Saddles Complete"
                          " in {} seconds {} Saddles purged ".format(
                              default_timer() - start, purgedStubsCounter))
