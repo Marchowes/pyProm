@@ -149,21 +149,27 @@ class SaddlesContainer(SpotElevationContainer):
         :rtype: :class:`SaddlesContainer`
         """
         saddles = []
-        saddleHash = dict()
         for saddle in saddleContainerDict['saddles']:
             saddleObj = Saddle.from_dict(saddle, datamap)
             saddles.append(saddleObj)
-            saddleHash[saddleObj.id] = saddleObj
-        saddlesContainer = cls(saddles)
+        sc = cls(saddles)
+
         for saddle in saddleContainerDict['saddles']:
+            sid = saddle['id']
             children = saddle.get('children', None)
             if children:
                 for child in children:
-                    saddleHash[saddle['id']].children.append(saddleHash[child])
+                    sc.by_id(sid).children.append(sc.by_id(child))
             parent = saddle.get('parent', None)
             if parent:
-                saddleHash[saddle['id']].parent = saddleHash[parent]
-        return saddlesContainer
+                sc.by_id(sid).parent = sc.by_id(parent)
+            basinSaddleAlternatives =\
+                saddle.get('basinSaddleAlternatives', None)
+            if basinSaddleAlternatives:
+                for bsa in basinSaddleAlternatives:
+                    sc.by_id(sid).basinSaddleAlternatives.append(
+                        sc.by_id(bsa))
+        return sc
 
     @property
     def disqualified(self):
