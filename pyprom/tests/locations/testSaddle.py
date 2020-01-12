@@ -15,6 +15,15 @@ from pyprom.tests.getData import gettestzip
 from pyprom.dataload import GDALLoader
 from pyprom.feature_discovery import AnalyzeData
 
+def make_em():
+    """
+    Helper for making parent - child related saddles
+    """
+    child = Saddle(1, 1, 1)
+    parent = Saddle(2, 2, 2)
+    child.parent = parent
+    parent.children = [child]
+    return parent, child
 
 class SaddleTests(unittest.TestCase):
     """Test Saddles."""
@@ -130,85 +139,6 @@ class SaddleTests(unittest.TestCase):
             linker.add_to_remote_saddle_and_summit()
         self.assertEqual(saddle1000.feature_neighbors(), [summit1, summit2])
 
-
-def make_em():
-    """
-    Helper for making parent - child related saddles
-    """
-    child = Saddle(1, 1, 1)
-    parent = Saddle(2, 2, 2)
-    child.parent = parent
-    parent.children = [child]
-    return parent, child
-
-
-class SaddleNetworkTests(unittest.TestCase):
-    """Test Saddles with neighbors"""
-
-    def setUp(self):
-        """
-        Set up test topology:
-
-        masterSummit
-        | |
-        | --linker_m1----Saddle1--linker1-------Summit1
-        |---linker_m2----Saddle2--linker2-------Summit2
-                           |------linker_dead---Summit_locally_dead
-                                                      |
-                                        Saddle3-----linker3
-        """
-        self.masterSummit = Summit(0, 0, 0)
-
-        self.summit1 = Summit(1, 1, 1)
-        self.summit2 = Summit(2, 2, 2)
-        self.summit_locally_dead = Summit(3, 3, 3)
-
-        self.saddle1 = Saddle(1, 1, 1)
-        self.saddle2 = Saddle(2, 2, 2)
-        self.saddle3 = Saddle(3, 3, 3)
-
-        self.linker_m1 = Linker(self.masterSummit, self.saddle1)
-        self.linker_m1.add_to_remote_saddle_and_summit()
-        self.linker_m2 = Linker(self.masterSummit, self.saddle2)
-        self.linker_m2.add_to_remote_saddle_and_summit()
-        self.linker1 = Linker(self.summit1, self.saddle1)
-        self.linker1.add_to_remote_saddle_and_summit()
-        self.linker2 = Linker(self.summit2, self.saddle2)
-        self.linker2.add_to_remote_saddle_and_summit()
-        self.linker3 = Linker(self.summit_locally_dead, self.saddle3)
-        self.linker3.add_to_remote_saddle_and_summit()
-        self.linker_dead = Linker(self.summit_locally_dead, self.saddle2)
-        self.linker_dead.add_to_remote_saddle_and_summit()
-        self.linker_dead.disqualified = True
-
-    def testSaddleAllNeighbors(self):
-        """
-        Ensure all_neighbors returns expected results
-        filterDisqualified=True (Default)
-        """
-        all = self.saddle2.all_neighbors()
-        self.assertEqual(all, [self.saddle1,
-                               self.saddle2,
-                               self.saddle2])
-
-    def testSaddleAllNeighborsNoFilter(self):
-        """
-        Ensure all_neighbors returns expected results
-        filterDisqualified=False
-        """
-        allof = self.saddle2.all_neighbors(filterDisqualified=False)
-        self.assertEqual(allof, [self.saddle1,
-                               self.saddle2,
-                               self.saddle2,
-                               self.saddle3,
-                               self.saddle2])
-
-    def testSaddleNeighbors(self):
-        """
-        Ensure neighbors() returns expected results.
-        """
-        self.assertEqual(self.saddle2.neighbors, [self.saddle1])
-
     def testSaddleEmancipate(self):
         """
         Ensure emancipate() works as expected
@@ -287,3 +217,102 @@ class SaddleNetworkTests(unittest.TestCase):
         self.assertEqual([], parent.children)
         self.assertEqual(None, child.parent)
 
+    def testSaddleSoftDelete(self):
+        """
+        Ensure soft_delete() works as expected
+        """
+        # Basic test
+        parent, child = make_em()
+        eqhtbasinsad = Saddle(3, 3, 1)
+        eqhtbasinsad.basinSaddleAlternatives = [child]
+        child.basinSaddleAlternatives = [eqhtbasinsad]
+        child.soft_delete()
+        self.assertEqual([], parent.children)
+        self.assertEqual(None, child.parent)
+        self.assertEqual([], child.basinSaddleAlternatives)
+        self.assertEqual([], eqhtbasinsad.basinSaddleAlternatives)
+        self.assertTrue(child.disqualified)
+
+        # 3 equal heights and a linker
+        parent, child = make_em()
+        child.summits = [Linker(None, child)]
+        eqhtbasinsad = Saddle(3, 3, 1)
+        eqhtbasinsad2 = Saddle(4, 4, 1)
+        eqhtbasinsad.basinSaddleAlternatives = [child, eqhtbasinsad2]
+        eqhtbasinsad2.basinSaddleAlternatives = [child, eqhtbasinsad]
+        child.basinSaddleAlternatives = [eqhtbasinsad, eqhtbasinsad2]
+        child.soft_delete()
+        self.assertEqual([], parent.children)
+        self.assertEqual(None, child.parent)
+        self.assertEqual([], child.basinSaddleAlternatives)
+        self.assertEqual([eqhtbasinsad2], eqhtbasinsad.basinSaddleAlternatives)
+        self.assertEqual([eqhtbasinsad], eqhtbasinsad2.basinSaddleAlternatives)
+        self.assertTrue(child.summits[0].disqualified)
+
+
+class SaddleNetworkTests(unittest.TestCase):
+    """Test Saddles with neighbors"""
+
+    def setUp(self):
+        """
+        Set up test topology:
+
+        masterSummit
+        | |
+        | --linker_m1----Saddle1--linker1-------Summit1
+        |---linker_m2----Saddle2--linker2-------Summit2
+                           |------linker_dead---Summit_locally_dead
+                                                      |
+                                        Saddle3-----linker3
+        """
+        self.masterSummit = Summit(0, 0, 0)
+
+        self.summit1 = Summit(1, 1, 1)
+        self.summit2 = Summit(2, 2, 2)
+        self.summit_locally_dead = Summit(3, 3, 3)
+
+        self.saddle1 = Saddle(1, 1, 1)
+        self.saddle2 = Saddle(2, 2, 2)
+        self.saddle3 = Saddle(3, 3, 3)
+
+        self.linker_m1 = Linker(self.masterSummit, self.saddle1)
+        self.linker_m1.add_to_remote_saddle_and_summit()
+        self.linker_m2 = Linker(self.masterSummit, self.saddle2)
+        self.linker_m2.add_to_remote_saddle_and_summit()
+        self.linker1 = Linker(self.summit1, self.saddle1)
+        self.linker1.add_to_remote_saddle_and_summit()
+        self.linker2 = Linker(self.summit2, self.saddle2)
+        self.linker2.add_to_remote_saddle_and_summit()
+        self.linker3 = Linker(self.summit_locally_dead, self.saddle3)
+        self.linker3.add_to_remote_saddle_and_summit()
+        self.linker_dead = Linker(self.summit_locally_dead, self.saddle2)
+        self.linker_dead.add_to_remote_saddle_and_summit()
+        self.linker_dead.disqualified = True
+
+    def testSaddleAllNeighbors(self):
+        """
+        Ensure all_neighbors returns expected results
+        filterDisqualified=True (Default)
+        """
+        all = self.saddle2.all_neighbors()
+        self.assertEqual(all, [self.saddle1,
+                               self.saddle2,
+                               self.saddle2])
+
+    def testSaddleAllNeighborsNoFilter(self):
+        """
+        Ensure all_neighbors returns expected results
+        filterDisqualified=False
+        """
+        allof = self.saddle2.all_neighbors(filterDisqualified=False)
+        self.assertEqual(allof, [self.saddle1,
+                               self.saddle2,
+                               self.saddle2,
+                               self.saddle3,
+                               self.saddle2])
+
+    def testSaddleNeighbors(self):
+        """
+        Ensure neighbors() returns expected results.
+        """
+        self.assertEqual(self.saddle2.neighbors, [self.saddle1])

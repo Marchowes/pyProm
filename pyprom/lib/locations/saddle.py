@@ -61,10 +61,15 @@ class Saddle(SpotElevation):
         :param str id: kwarg for id
         :param list children: list of child Saddles. These are :class:`Saddle`
          derived from this :class:`Saddle`
+        :param parent: Parent saddle These are :class:`Saddle`
+         which from this :class:`Saddle` is derived.
         :param bool singleSummit: kwarg for Saddles disqualified for being
          linked to a Single Summit.
         :param bool basinSaddle: kwarg for Saddles disqualified for being
          a Basin Saddle.
+        :param list basinSaddleAlternatives: kwarg for Saddles which are
+         basin saddles of equivalent height
+         :type basinSaddleAlternatives: list(:class:`Saddle`)
         :param bool disqualified: kwarg for a generic disqualified Saddle.
         """
         super(Saddle, self).__init__(latitude, longitude,
@@ -74,9 +79,9 @@ class Saddle(SpotElevation):
         self.id = kwargs.get('id', 'sa:' + randomString())
         # List of linkers to summits
         self.summits = []
-        # If this is set, this saddle was spun out of another
-        # Saddle with less data.
-        self.parent = None  # Parent
+        # If this is set, this saddle has spun out another
+        # Saddle with less data. (for instance, if its an edge effect)
+        self.parent = kwargs.get('parent', None)  # Parent
         # Saddles that have been spawned off of this one.
         self.children = kwargs.get('children', [])
         # All Edges lead to One summit.
@@ -84,7 +89,8 @@ class Saddle(SpotElevation):
         # redundant saddle, but too low.
         self.basinSaddle = kwargs.get('basinSaddle', False)
         # alternative basin saddles
-        self.basinSaddleAlternatives = []
+        self.basinSaddleAlternatives = \
+            kwargs.get('basinSaddleAlternatives', [])
         # Non specific disqualification
         self._disqualified = kwargs.get('disqualified', None)
         self.lprBoundary = []
@@ -108,6 +114,14 @@ class Saddle(SpotElevation):
         :rtype: list(:class:`pyprom.lib.locations.summit.Summit`)
         """
         return [feature.summit for feature in self.summits]
+
+    @property
+    def domains(self):
+        """
+        :return: list of SummitDomains associated with this Saddle
+        """
+        return [l.summit.domain for l in self.summits if l.summit.domain]
+
 
     @property
     def neighbors(self, filterDisqualified=True):
@@ -210,6 +224,22 @@ class Saddle(SpotElevation):
             child.emancipate()
         self.children = []
 
+    def soft_delete(self):
+        """
+        Soft deletes this Saddle, that is, disassociates itself
+        from other saddle attributes
+        """
+        if self.children:
+            self.disown_children()
+        if self.parent:
+            self.emancipate()
+        if self.basinSaddleAlternatives:
+            for bsa in self.basinSaddleAlternatives:
+                bsa.basinSaddleAlternatives =\
+                    [x for x in bsa.basinSaddleAlternatives if x != self]
+        self.basinSaddleAlternatives = []
+        self.disqualify_self_and_linkers()
+
     def to_dict(self, referenceById=True):
         """
         Create the dictionary representation of this object.
@@ -248,6 +278,9 @@ class Saddle(SpotElevation):
                 [x.id for x in self.summits]  # linker by ID
             if self.parent:
                 to_dict['parent'] = self.parent.id
+            if self.basinSaddleAlternatives:
+                to_dict['basinSaddleAlternatives'] =\
+                    [x.id for x in self.basinSaddleAlternatives] # saddle id
         return to_dict
 
     @classmethod
@@ -261,6 +294,15 @@ class Saddle(SpotElevation):
         :return: a new Saddle object.
         :rtype: :class:`Saddle`
         """
+        ###########
+        # The following attributes cannot be loaded here becasue they require
+        # reference IDs which can only be provided at the container level:
+        #
+        # parent
+        # children
+        # basinSaddleAlternatives
+        ###########
+
         lat = saddleDict['lat']
         long = saddleDict['lon']
         elevation = saddleDict['ele']
@@ -271,7 +313,6 @@ class Saddle(SpotElevation):
         singleSummit = saddleDict.get('singleSummit', False)
         basinSaddle = saddleDict.get('basinSaddle', False)
         disqualified = saddleDict.get('disqualified', None)
-        # TODO: basinSaddleAlternatives?
 
         multipoint = saddleDict.get('multipoint', [])
         if multipoint:
@@ -279,6 +320,7 @@ class Saddle(SpotElevation):
         highshores = saddleDict.get('highShores', [])
         if highshores:
             highshores = [GridPointContainer.from_dict(x) for x in highshores]
+
         return cls(lat, long, elevation,
                    multiPoint=multipoint,
                    highShores=highshores,
