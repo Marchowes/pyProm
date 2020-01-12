@@ -8,6 +8,8 @@ This library contains a base class for Coordinate oriented objects with
 Elevation data.
 """
 
+from shapely.geometry import Point
+
 from .base_coordinate import BaseCoordinate
 from .base_gridpoint import BaseGridPoint
 from ..util import randomString
@@ -103,6 +105,15 @@ class SpotElevation(BaseCoordinate):
             return self.elevation * FEET_TO_METERS
         except:
             return None
+
+    @property
+    def shape(self):
+        """
+        Returns a point representation of this :class:`SpotElevation` as a
+         :class:`shapely.geometry.Point`
+        :return: :class:`shapely.geometry.Point`
+        """
+        return Point(self.longitude, self.latitude)
 
     def __eq__(self, other):
         """
