@@ -250,6 +250,17 @@ class SaddleTests(unittest.TestCase):
         self.assertTrue(child.summits[0].disqualified)
 
 
+def make_em():
+    """
+    Helper for making parent - child related saddles
+    """
+    child = Saddle(1, 1, 1)
+    parent = Saddle(2, 2, 2)
+    child.parent = parent
+    parent.children = [child]
+    return parent, child
+
+
 class SaddleNetworkTests(unittest.TestCase):
     """Test Saddles with neighbors"""
 
