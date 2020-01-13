@@ -9,7 +9,6 @@ import logging
 import os
 import datetime
 from fastkml import kml, styles
-from shapely.geometry import Point, LineString
 
 from .locations.summit import Summit
 from .locations.saddle import Saddle
@@ -17,6 +16,8 @@ from .locations.runoff import Runoff
 from ..domain import Domain
 from .locations.spot_elevation import SpotElevation
 from .containers.spot_elevation import SpotElevationContainer
+from .containers.summit_domain import SummitDomain
+
 from .containers.linker import Linker
 
 NS = '{http://www.opengis.net/kml/2.2}'
@@ -53,7 +54,7 @@ class KMLFileWriter:
     folders by location type.
     """
 
-    def __init__(self, outputFileName, documentName=None, features=[]):
+    def __init__(self, outputFileName, documentName=None, features=[], noFeatureDescription=False):
         """
         :param str outputFileName: Full path and for output file.
         :param str documentName: Name of root document.
@@ -83,9 +84,14 @@ class KMLFileWriter:
         self.spotElevations = kml.Folder(NS,
                                          name="SpotElevations",
                                          description="SpotElevation Folder")
+        self.summitDomains = kml.Folder(NS,
+                                         name="SummitDomains",
+                                         description="SummitDomain Folder")
 
         if features:
             self.extend(features)
+
+        self.noFeatureDescription = noFeatureDescription
 
     def extend(self, features):
         """
@@ -139,8 +145,20 @@ class KMLFileWriter:
             self.extend(feature.runoffs)
             return
 
+        if isinstance(feature, SummitDomain):
+            self._append_summit_domain(feature)
+            return
+
         raise Exception("Did not find any valid Datatypes to append."
                         " Try extend?")
+
+    def _append_summit_domain(self, feature):
+        featurePm = kml.Placemark(NS,
+                                  "{:.3f}".format(feature.summit.feet),
+                                  "{:.3f}".format(feature.summit.feet))
+        featurePm.geometry = feature.shape
+        self.summitDomains.append(featurePm)
+
 
     def _append_spotElevation_derivative(self, feature, feature_type):
         """
@@ -149,36 +167,34 @@ class KMLFileWriter:
         :param feature: location object
         :param str feature_type: string representation of this object.
         """
+
         featurePm = kml.Placemark(NS,
                                   "{:.3f}".format(feature.feet),
                                   "{:.3f}".format(feature.feet))
-        featurePm.geometry = Point(feature.longitude, feature.latitude)
+        featurePm.geometry = feature.shape
         if not self.spotElevation_wkt.get(feature_type +
                                           featurePm.geometry.wkt):
             self.spotElevation_wkt[feature_type +
                                    featurePm.geometry.wkt] = True
-            featurePm.description = " {} {}\n {} meters\n {} feet\n".format(
-                feature.latitude, feature.longitude,
-                feature.elevation, feature.feet)
+            if not self.noFeatureDescription:
+                featurePm.description = \
+                    " {} {}\n {} meters\n {} feet\n {}\n".format(
+                    feature.latitude, feature.longitude,
+                    feature.elevation, feature.feet, feature_type)
             if feature_type == "BasinSaddle":
                 featurePm.styleUrl = "#basinsaddle"
-                featurePm.description = featurePm.description + "BasinSaddle"
                 self.saddles.append(featurePm)
             elif feature_type == "Saddle":
                 featurePm.styleUrl = "#saddle"
-                featurePm.description = featurePm.description + "Saddle"
                 self.saddles.append(featurePm)
             elif feature_type == "Summit":
                 featurePm.styleUrl = "#summit"
-                featurePm.description = featurePm.description + "Summit"
                 self.summits.append(featurePm)
             elif feature_type == "RunOff":
                 featurePm.styleUrl = "#runoff"
-                featurePm.description = featurePm.description + "RunOff"
                 self.runoffs.append(featurePm)
             elif feature_type == "SpotElevation":
                 featurePm.styleUrl = "#spotelevation"
-                featurePm.description = featurePm.description + "SpotElevation"
                 self.spotElevations.append(featurePm)
 
     def _append_linker(self, linker):
@@ -188,10 +204,7 @@ class KMLFileWriter:
         :param linker: :class:`Linker`
         """
         linkerPm = kml.Placemark(NS)
-        saddle = Point(linker.saddle.longitude, linker.saddle.latitude)
-        summit = Point(linker.summit.longitude, linker.summit.latitude)
-        linkerPm.geometry = LineString([saddle,
-                                        summit])
+        linkerPm.geometry = linker.shape
         if not self.linkers_wkt.get(linkerPm.geometry.wkt):
             self.linkers_wkt[linkerPm.geometry.wkt] = True
             self.linkers.append(linkerPm)
@@ -230,6 +243,10 @@ class KMLFileWriter:
         if self.linkers._features:
             self.logger.info("Linkers: {}".format(len(self.linkers._features)))
             kml_doc.append(self.linkers)
+        if self.summitDomains._features:
+            self.logger.info("SummitDomains: {}".format(len(
+                self.summitDomains._features)))
+            kml_doc.append(self.summitDomains)
         return kml_doc
 
     def generateKML(self):
