@@ -255,7 +255,7 @@ class Saddle(SpotElevation):
                    'edgepoints': [x.to_dict() for x in self.edgePoints],
                    'id': self.id}
         if self.singleSummit:
-            to_dict['singlesummit'] = self.singleSummit
+            to_dict['singleSummit'] = self.singleSummit
         if self.basinSaddle:
             to_dict['basinSaddle'] = self.basinSaddle
         if self._disqualified:
