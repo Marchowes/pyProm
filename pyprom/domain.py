@@ -214,12 +214,12 @@ class Domain:
                              summitsContainer)
             for linkerDict in domainDict['linkers']]
 
-        summit_domains = [
+        summit_domains = set(
             SummitDomain.from_dict(summitDomainDict,
                                    combined,
                                    summitsContainer,
                                    datamap)
-            for summitDomainDict in domainDict['summit_domains']]
+            for summitDomainDict in domainDict['summit_domains'])
 
         return cls(datamap, summitsContainer,
                    saddlesContainer, runoffsContainer,

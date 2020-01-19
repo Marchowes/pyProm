@@ -195,6 +195,7 @@ class SummitDomain:
         :rtype: :class:`SummitDomain`
         """
         points = summitDomainDict.get('points', [])
+        points = [tuple(x) for x in points]
         saddles = [saddlesContainer.fast_lookup[x] for x in summitDomainDict['saddles']]
         summit = summitsContainer.fast_lookup[summitDomainDict['summit']]
 
@@ -215,6 +216,19 @@ class SummitDomain:
         """
         return unary_union([self.datamap.point_geom(point[0], point[1])
                             for point in self.points])
+
+    def __eq__(self, other):
+        return (self.summit == other.summit and
+                sorted(self.saddles) == sorted(other.saddles) and
+                sorted(self.points) == sorted(other.points))
+
+    def __hash__(self):
+        """
+        :return: Hash representation of this object
+        We only care about the summit.
+        """
+        return self.summit.__hash__()
+
 
     def __repr__(self):
         """
