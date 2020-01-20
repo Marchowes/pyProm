@@ -88,10 +88,11 @@ class KMLFileWriter:
                                          name="SummitDomains",
                                          description="SummitDomain Folder")
 
+        self.noFeatureDescription = noFeatureDescription
+
+        # This must be the last value set in __init__()
         if features:
             self.extend(features)
-
-        self.noFeatureDescription = noFeatureDescription
 
     def extend(self, features):
         """
@@ -143,6 +144,7 @@ class KMLFileWriter:
             self.extend(feature.saddles)
             self.extend(feature.summits)
             self.extend(feature.runoffs)
+            self.extend(feature.summit_domains)
             return
 
         if isinstance(feature, SummitDomain):
