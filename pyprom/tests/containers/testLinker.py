@@ -9,7 +9,6 @@ import unittest
 from pyprom.lib.locations.saddle import Saddle
 from pyprom.lib.locations.summit import Summit
 from pyprom.lib.containers.linker import Linker
-from pyprom.lib.containers.walkpath import WalkPath
 from pyprom.lib.containers.saddles import SaddlesContainer
 from pyprom.lib.containers.summits import SummitsContainer
 
@@ -45,18 +44,16 @@ class LinkerTests(unittest.TestCase):
 
         self.locallyDeadSummit = Summit(100, 100, 1000)
 
-        self.path1 = WalkPath([(0, 0), (0, 1), (0, 2)])
-
-        self.linker1 = Linker(self.summit1, self.saddle1, self.path1)
-        self.linker2 = Linker(self.summit1, self.saddle2, self.path1)
-        self.linker3 = Linker(self.summit2, self.saddle2, self.path1)
+        self.linker1 = Linker(self.summit1, self.saddle1)
+        self.linker2 = Linker(self.summit1, self.saddle2)
+        self.linker3 = Linker(self.summit2, self.saddle2)
 
         self.disqualifiedLinker1 = Linker(
-            self.summit1, self.disqualifiedSaddle1, self.path1)
+            self.summit1, self.disqualifiedSaddle1)
         self.disqualifiedLinker1.disqualified = True
 
         self.disqualifiedLinkerLocallyDeadSummit = Linker(
-            self.locallyDeadSummit, self.saddle2, self.path1)
+            self.locallyDeadSummit, self.saddle2)
         self.disqualifiedLinkerLocallyDeadSummit.disqualified = True
 
         self.summit1.saddles = [self.linker1, self.linker2,
@@ -149,7 +146,7 @@ class LinkerTests(unittest.TestCase):
         exemptLinkers = {linkerNew.id: True}
         """
         saddleNew = Saddle(1, 2, 3)
-        linkerNew = Linker(self.summit1, saddleNew, self.path1)
+        linkerNew = Linker(self.summit1, saddleNew)
         saddleNew.summits = [linkerNew]
         self.summit1.saddles.append(linkerNew)
 
@@ -175,7 +172,7 @@ class LinkerTests(unittest.TestCase):
         exemptLinkers = {linkerNew.id: True}
         """
         saddleNew = Saddle(1, 2, 3)
-        linkerNew = Linker(self.summit1, saddleNew, self.path1)
+        linkerNew = Linker(self.summit1, saddleNew)
         saddleNew.summits = [linkerNew]
         self.summit1.saddles.append(linkerNew)
 
@@ -265,7 +262,7 @@ class LinkerTests(unittest.TestCase):
         exemptLinkers = {linkerNew.id: True}
         """
         summitNew = Summit(1, 2, 3)
-        linkerNew = Linker(summitNew, self.saddle2, self.path1)
+        linkerNew = Linker(summitNew, self.saddle2)
         self.saddle2.summits.append(linkerNew)
         summitNew.saddles.append(linkerNew)
 
@@ -291,7 +288,7 @@ class LinkerTests(unittest.TestCase):
         exemptLinkers = {linkerNew.id: True}
         """
         summitNew = Summit(1, 2, 3)
-        linkerNew = Linker(summitNew, self.saddle2, self.path1)
+        linkerNew = Linker(summitNew, self.saddle2)
         self.saddle2.summits.append(linkerNew)
         summitNew.saddles.append(linkerNew)
 
@@ -439,7 +436,7 @@ class LinkerTests(unittest.TestCase):
         Ensure __eq__ feature works as expected
         """
         self.assertEqual(self.linker1, self.linker1)
-        testLinker = Linker(self.summit1, self.saddle1, self.path1)
+        testLinker = Linker(self.summit1, self.saddle1)
         self.assertEqual(self.linker1, testLinker)
 
     def testLinkerNe(self):
@@ -490,7 +487,7 @@ class LinkerTests(unittest.TestCase):
         """
         Ensure from_dict produces expected results.
         """
-        linkerDict = self.linker1.to_dict(noWalkPath=False)
+        linkerDict = self.linker1.to_dict()
         saddlesContainer = SaddlesContainer([self.saddle1, self.saddle2])
         summitsContainer = SummitsContainer([self.summit1, self.summit2])
         newLinker = Linker.from_dict(linkerDict,
@@ -500,4 +497,3 @@ class LinkerTests(unittest.TestCase):
         self.assertEqual(newLinker, self.linker1)
         self.assertEqual(newLinker.saddle, self.saddle1)
         self.assertEqual(newLinker.summit, self.summit1)
-        self.assertEqual(newLinker.path, self.path1)
