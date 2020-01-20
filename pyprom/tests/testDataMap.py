@@ -11,9 +11,8 @@ from shapely.geometry import Polygon
 from shapely.ops import unary_union
 from pyprom.tests.getData import gettestzip
 from pyprom.dataload import GDALLoader
-from pyprom.lib.datamap import DataMap
-
-
+from pyprom.lib.datamap import (DataMap,
+                                NON_FILE_SENTINEL)
 
 
 class DataMapTests(unittest.TestCase):
@@ -110,7 +109,7 @@ class DataMapTests(unittest.TestCase):
         numpy_map = array([[11, 15, 12],
                            [13, 10, 9],
                            [14, 11, 8]])
-        datamap = DataMap(numpy_map, "meters", "")
+        datamap = DataMap(numpy_map, "meters", NON_FILE_SENTINEL)
         self.setDefaultMaxAndRes(datamap)
         self.assertEqual(datamap.steepestNeighbor(1, 1), (0, 1, 15.0))
 
@@ -121,7 +120,7 @@ class DataMapTests(unittest.TestCase):
         numpy_map = array([[11, 15, 12],
                            [13, 10, 9],
                            [14, 16, 8]])
-        datamap = DataMap(numpy_map, "meters", "")
+        datamap = DataMap(numpy_map, "meters", NON_FILE_SENTINEL)
         self.setDefaultMaxAndRes(datamap)
         self.assertEqual(datamap.steepestNeighbor(1, 1), (2, 1, 16.0))
 
@@ -133,7 +132,7 @@ class DataMapTests(unittest.TestCase):
         numpy_map = array([[17, 15, 12],
                            [13, 10, 9],
                            [14, 11, 8]])
-        datamap = DataMap(numpy_map, "meters", "")
+        datamap = DataMap(numpy_map, "meters", NON_FILE_SENTINEL)
         self.setDefaultMaxAndRes(datamap)
         self.assertEqual(datamap.steepestNeighbor(1, 1), (0, 1, 15.0))
 
@@ -144,7 +143,7 @@ class DataMapTests(unittest.TestCase):
         numpy_map = array([[18, 15, 12],
                            [13, 10, 9],
                            [14, 11, 8]])
-        datamap = DataMap(numpy_map, "meters", "")
+        datamap = DataMap(numpy_map, "meters", NON_FILE_SENTINEL)
         self.setDefaultMaxAndRes(datamap)
         self.assertEqual(datamap.steepestNeighbor(1, 1), (0, 0, 18.0))
 
@@ -156,7 +155,7 @@ class DataMapTests(unittest.TestCase):
         numpy_map = array([[15, 16, 12],
                            [13, 10, 15],
                            [14, 11, 8]])
-        datamap = DataMap(numpy_map, "meters", "")
+        datamap = DataMap(numpy_map, "meters", NON_FILE_SENTINEL)
         self.setDefaultMaxAndRes(datamap)
         datamap.res_x = 2
         self.assertEqual(datamap.steepestNeighbor(1, 1), (1, 2, 15.0))
@@ -168,7 +167,7 @@ class DataMapTests(unittest.TestCase):
         numpy_map = array([[15, 16, 12],
                            [13, 10, 15],
                            [14, 11, 8]])
-        datamap = DataMap(numpy_map, "meters", "")
+        datamap = DataMap(numpy_map, "meters", NON_FILE_SENTINEL)
         self.setDefaultMaxAndRes(datamap)
         self.assertEqual(datamap.steepestNeighbor(0, 0), (0, 1, 16.0))
 

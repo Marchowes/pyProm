@@ -23,7 +23,7 @@ FULL_SHIFT_LIST = ((-1, 0), (-1, 1), (0, 1), (1, 1), (1, 0), (1, -1),
 ORTHOGONAL_SHIFT_LIST = ((-1, 0), (0, 1), (1, 0), (0, -1))
 DIAGONAL_SHIFT_LIST = ((-1, 1), (1, 1), (1, -1), (-1, -1))
 
-
+NON_FILE_SENTINEL = "UnknownSubset"
 
 class DataMap:
     """Base class for Datamap type objects."""
@@ -38,7 +38,7 @@ class DataMap:
         self.numpy_map = numpy_map
         self.file_and_path = filename
         self.filename = filename.split("/")[-1]
-        if filename != "UnknownSubset":
+        if filename != NON_FILE_SENTINEL:
             self.md5 = checksum(filename)
         else:
             self.md5 = None
@@ -360,7 +360,7 @@ class ProjectionDataMap(DataMap):
                                  self.nodata,
                                  self.transform,
                                  self.reverse_transform,
-                                 "UnknownSubset")
+                                 NON_FILE_SENTINEL)
 
     def point_geom(self, x, y):
         """
