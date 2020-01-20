@@ -97,7 +97,7 @@ class SummitsContainerTests(unittest.TestCase):
     def testSummitsContainerFromDictEdge(self):
         """
         Ensure from_dict() produces expected
-        results on a saddle which has a child.
+        results on a Summit
         """
         gettestzip()
         datafile = GDALLoader('/tmp/N44W072.hgt')
@@ -105,7 +105,6 @@ class SummitsContainerTests(unittest.TestCase):
         someslice = datamap.subset(0, 0, 30, 30)
         domain = Domain(someslice)
         domain.run()
-        domain.walk()
         summits = domain.summits
         summit = summits[3]
         summitDict = summit.to_dict()

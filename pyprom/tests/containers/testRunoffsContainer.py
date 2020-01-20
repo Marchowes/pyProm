@@ -108,7 +108,6 @@ class RunoffsContainerTests(unittest.TestCase):
         someslice = datamap.subset(0, 0, 30, 30)
         domain = Domain(someslice)
         domain.run()
-        domain.walk()
         runoffs = domain.runoffs
         runoffsDict = runoffs.to_dict()
         newRunoffs = RunoffsContainer.from_dict(runoffsDict, datamap=someslice)

@@ -109,7 +109,6 @@ class SaddlesContainerTests(unittest.TestCase):
         someslice = datamap.subset(0, 0, 30, 30)
         domain = Domain(someslice)
         domain.run()
-        domain.walk()
         saddles = domain.saddles
         saddleDict = saddles.to_dict()
         newSaddles = SaddlesContainer.from_dict(saddleDict, datamap=someslice)

@@ -72,7 +72,6 @@ class SaddleTests(unittest.TestCase):
         someslice = self.datamap.subset(0, 0, 30, 30)
         domain = Domain(someslice)
         domain.run()
-        domain.walk()
         saddles = domain.saddles
         saddle = saddles[7]
         saddleDict = saddle.to_dict()
@@ -102,11 +101,11 @@ class SaddleTests(unittest.TestCase):
         someslice = self.datamap.subset(0, 0, 30, 30)
         domain = Domain(someslice)
         domain.run()
-        domain.walk()
         saddles = domain.saddles
         saddle = saddles[18]
         saddleDict = saddle.to_dict()
         newSaddle = Saddle.from_dict(saddleDict, datamap=someslice)
+        self.assertTrue(saddle.parent)
         self.assertEqual(newSaddle, saddle)
         self.assertEqual(newSaddle.latitude, saddle.latitude)
         self.assertEqual(newSaddle.longitude, saddle.longitude)
