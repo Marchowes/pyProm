@@ -47,6 +47,9 @@ class Walk:
         loop of which SummitDomain if any an X, Y coordinate is a member of.
         """
         for summit in self.domainmap.summits:
+            # Already got one? move along.
+            if summit.domain:
+                continue
             sd = SummitDomain(self.domainmap.datamap, summit, [], [])
             summit.domain = sd
             if summit.multiPoint:
@@ -58,8 +61,15 @@ class Walk:
 
     def climb(self, point):
         """
-        :param point:
-        :return:
+        Climb climbs from a single point and add it and all points along a
+        path to a SummitDomain. This path is comprised of whatever neighbor
+        was the steepest neighbor. If an equalheight neighbor is found,
+        then that equalheight blob is analyzed as a whole and the closest
+        high shore climb is selected.
+
+        :param point: (x, y)
+        :return: :class:`SummitDomain` for which it was determined that this
+         point climbed to.
         """
         climbed_points = [point]
         current_point = point
@@ -98,14 +108,30 @@ class Walk:
 
 
     def climb_points(self, points, entryPoint=None):
-        flat = None
+        """
+        Climb_points works in two ways:
+
+        In the case of analysis of the high shore of a Saddle, this function
+        accepts a list of points, and climbs from all of them. leveraging the
+        climb() function to determine which Saddle Domain the point belongs to.
+
+        This function is also used an an intermediary to analyze multipoints
+        along a domain walk path. This is done by passing an entryPoint and no
+        points. We can determine if the possible path to a summit has already
+        been established, and if not, we can create a disposable Multipoint
+        object used for finding all paths from the multipoint.
+
+        :param points: list[(x, y)]
+        :param entryPoint: (x, y, ele)
+        :return: :class:`SummitDomain` if points
+        :return: list(:class:`SummitDomain`) if entryPoint
+        """
         disposableMultipoint = None
         summit_domains = set()
         # Entrypoint means we know this is an equalheight, so find that
         # and build our disposableMultipoint
         if entryPoint:
             mp = equalHeightBlob(self.domainmap.datamap, entryPoint[0], entryPoint[1], entryPoint[2])[0]
-            flat = mp
             points = mp.perimeter.findHighPerimeter(entryPoint[2],
                                                     as_tuples=True)  # needs better logic, this currently blindly overwrites points
         # Loop and climb!
@@ -116,7 +142,8 @@ class Walk:
             else:
                 self.logger.info("point {} didn't climb anywhere!".format(point))
         if entryPoint:
-            # if more than 1 summit_domains were found we need to create a disposable_mp. and return the closest high shore's SummitDomain
+            # todo: This logic is where the inside MP path needs to be calculated.
+            # If more than 1 summit_domains were found we need to create a disposable_mp. and return the closest high shore's SummitDomain
             if len(summit_domains) > 1:
                 disposableMultipoint = DisposableMultipoint(entryPoint, mp, self.disposable_multipoints)
                 self.disposable_multipoints_list.append(disposableMultipoint)
@@ -132,12 +159,17 @@ class Walk:
             return summit_domains
 
     def climb_from_saddles(self):
+        """
+        Climbs from all saddles contained in self.domainmap.saddles
+        :return: walkedSaddles, linkers, summitDomains
+        """
         walkedSaddles = SaddlesContainer([])
         linkers = list()
         summitDomains = set()
         start = default_timer()
         then = start
         for idx, basesaddle in enumerate(self.domainmap.saddles):
+            # Dumb counter logic
             if not idx % 2000:
                 now = default_timer()
                 pointsPerSec = round(idx / (now - start), 2)
@@ -150,15 +182,12 @@ class Walk:
                         round(now - then, 2)
                     ))
                 then = now
-            highEdgeCount = 0
-            # [[highEdgeDoms],[highEdgeDoms]]
-
 
             # If this saddle is not an edgeEffect, we can build a Synthetic Saddle
             # and just walk up from the highShore points closest to other high shores.
             saddles = [basesaddle]
             synthetic = False
-            if not basesaddle.edgeEffect: # or not saddle.multiPoint: (??? maybe)
+            if not basesaddle.edgeEffect:
                 saddles = self.generate_synthetic_saddles(basesaddle)
                 synthetic = True
             # loop through synthetic/non synthetic saddles.
@@ -183,7 +212,7 @@ class Walk:
                 # To rectify, we need to find ..?
 
 
-                # this means its an edge effect
+                # this means it's an edge effect
                 if not synthetic:
                     edge_saddles = self.generate_synthetic_saddles(saddle)
 
@@ -229,26 +258,6 @@ class Walk:
                     walkedSaddles.append(saddle)
 
         return walkedSaddles, linkers, summitDomains
-
-
-
-                # #if highEdgeCount > 2:
-                # #    self.logger.info("More than 2 High Edges. Will need to build synthetic saddle")
-                #
-                #
-                # if len(domainsInSaddle) == 2:
-                #     #self.logger.info("Nice, just 2 domains, we can just cobble together some linkers.")
-                #     for dom in domainsInSaddle:
-                #         linker = Linker(dom.summit, synthetic_saddles[0], [])
-                #         linker.add_to_remote_saddle_and_summit()
-                # if len(domainsInSaddle) != 2:
-                #     self.logger.info("{} had {} domains".format(saddle, len(domainsInSaddle)))
-
-
-
-
-
-
 
     def generate_synthetic_saddles(self, saddle):
 
@@ -303,4 +312,3 @@ class Walk:
             newSaddle.highShores = [GridPointContainer(highShores[0]),
                                     GridPointContainer(highShores[1])]
             return [newSaddle]
-
