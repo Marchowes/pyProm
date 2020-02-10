@@ -137,6 +137,16 @@ class DataMap:
                 steepest_slope = slope
         return steepest_neighbor
 
+    def distance(self, us, them):
+        """
+        :param us: Tuple(x, y)
+        :param them: Tuple(x, y)
+        :return: distance.
+        """
+        return hypot((us[0] - them[0])*self.res_x, (us[1] - them[0]* self.res_y))
+
+
+
     def get(self, x, y):
         """
         Gets point from numpy map, and converts units to Meters

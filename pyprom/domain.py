@@ -116,8 +116,7 @@ class Domain:
             return
 
         # Perform Walk
-        walk = Walk(self)
-        self.saddles, self.linkers, self.summit_domains = walk.climb_from_saddles()
+        self.walk()
 
         # If we're in sparse mode, don't bother with the Basin Saddles.
         if sparse:
@@ -302,6 +301,22 @@ class Domain:
         self.saddles = SaddlesContainer(toKeepSaddles)
         self.logger.info("Culled {} Saddles".format(len(toRemoveSaddles)))
         self.logger.info("Kept {} Saddles".format(len(toKeepSaddles)))
+
+    def walk(self, saddles=[]):
+        """
+        Perform Walk from Saddles contained in this Domain
+
+        If saddles are passed in, dont modify the DomainMap.
+        Instead, return Saddles returned from the walk.
+        """
+        walk = Walk(self)
+        if not saddles:
+            self.saddles, self.linkers, self.summit_domains =\
+                walk.climb_from_saddles()
+        else:
+            outsaddles, self.linkers, self.summit_domains =\
+                walk.climb_from_saddles(saddles)
+            return outsaddles
 
     def __repr__(self):
         """

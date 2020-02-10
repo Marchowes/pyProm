@@ -59,6 +59,7 @@ class Walk:
                                                   summit.longitude)
                 sd.append((x, y), self.summit_domain_points)
 
+
     def climb(self, point):
         """
         Climb climbs from a single point and add it and all points along a
@@ -95,17 +96,16 @@ class Walk:
                 dm = self.disposable_multipoints[current_point[0]].get(current_point[1], None)
                 if dm:
                     hpp = dm.multiPoint.closestHighPerimeterPoint(GridPoint.from_tuple(current_point)) # comes back as GridPoint
+                    # add entrypoint? todo
                     self.summit_domain_points[hpp.x][hpp.y].extend(climbed_points,
                                                                    self.summit_domain_points)
                     return self.summit_domain_points[hpp.x][hpp.y]
-                # nope? add climb it, add out points to the found Summit_Domain and return said SummitDomain
+                # nope? add climb it, add our points to the found Summit_Domain and return said SummitDomain
                 summit_domain = self.climb_points([], current_point)
                 summit_domain.extend(climbed_points, self.summit_domain_points)
                 return summit_domain
             climbed_points.append(sn)
             current_point = sn
-
-
 
     def climb_points(self, points, entryPoint=None):
         """
@@ -158,17 +158,19 @@ class Walk:
         else:
             return summit_domains
 
-    def climb_from_saddles(self):
+    def climb_from_saddles(self, saddles=[]):
         """
         Climbs from all saddles contained in self.domainmap.saddles
         :return: walkedSaddles, linkers, summitDomains
         """
+        if not saddles:
+            saddles = self.domainmap.saddles
         walkedSaddles = SaddlesContainer([])
         linkers = list()
         summitDomains = set()
         start = default_timer()
         then = start
-        for idx, basesaddle in enumerate(self.domainmap.saddles):
+        for idx, basesaddle in enumerate(saddles):
             # Dumb counter logic
             if not idx % 2000:
                 now = default_timer()
@@ -177,7 +179,7 @@ class Walk:
                     "Saddles per second: {} - {}%"
                     " runtime: {}, split: {}".format(
                         pointsPerSec,
-                        round(idx / len(self.domainmap.saddles) * 100, 2),
+                        round(idx / len(saddles) * 100, 2),
                         (str(timedelta(seconds=round(now - start, 2)))),
                         round(now - then, 2)
                     ))
@@ -185,27 +187,24 @@ class Walk:
 
             # If this saddle is not an edgeEffect, we can build a Synthetic Saddle
             # and just walk up from the highShore points closest to other high shores.
-            saddles = [basesaddle]
+            saddlesUnderTest = [basesaddle]
             synthetic = False
             if not basesaddle.edgeEffect:
-                saddles = self.generate_synthetic_saddles(basesaddle)
+                saddlesUnderTest = self.generate_synthetic_saddles(basesaddle)
                 synthetic = True
             # loop through synthetic/non synthetic saddles.
             # non synthetic saddles will have their full highEdges explored.
             # synthetic ones do not.
-            for saddle in saddles:
-                domainsInSaddle = list()
-                highEdgeDomains = list()
+            for saddle in saddlesUnderTest:
                 for highEdge in saddle.highShores:
-                    domainsInHighEdge = list()
                     domains = self.climb_points([point.to_tuple() for point in highEdge.points])
-                    domainsInHighEdge.append(domains)
-                    domainsInSaddle.extend(domains)
-                    if len(domainsInHighEdge) > 1:
-                        self.logger.info("Found {} which is more than 1 dom in high edge. Reconcile later.".format(len(domainsInHighEdge)))
-                    if len(domainsInHighEdge) == 0:
+                    dd = list(domains) # debug
+                    if len(domains) > 1:
+                        if not saddle.edgeEffect:
+                            self.logger.info("Found {} which is more than 1 dom in high edge. Reconcile later. Edge? {}".format(len(domains), saddle.edgeEffect))
+                            print(saddle.id)
+                    if len(domains) == 0:
                         self.logger.info("no dom in high edge. That's not good.")
-                    highEdgeDomains.append(domainsInHighEdge)
 
                 # will need to check all highEdge-domains,
                 # if we find any saddles with a domain which shows up in > 1 high edge we will need to rectify that.
@@ -253,7 +252,7 @@ class Walk:
                         sd.saddles.append(saddle)
                         summit = sd.summit
                         linker = Linker(summit, saddle)
-                        linker.add_to_remote_saddle_and_summit()
+                        linker.add_to_remote_saddle_and_summit(ignoreDuplicates=False)
                         linkers.append(linker)
                     walkedSaddles.append(saddle)
 
@@ -273,42 +272,45 @@ class Walk:
         # if we've just got 2 high shores, find all the highest points in
         # the highShores, and find the midpoint between the first two if
         # it's a multipoint
-        if len(saddle.highShores) == 2:
-            highShores = []
-            for highShore in saddle.highShores:
-                highShores.append(GridPointContainer(highShore.highest))
+        highShores = []
+        for highShore in saddle.highShores:
+            highShores.append(GridPointContainer(highShore.highest))
 
-            # if multipoint use first of each of the highest high shores
-            # and find the mid point for both. Then find the point within
-            # the multipoint that is closest to that midpoint. Disregard
-            # high shores.
-            if saddle.multiPoint:
-                hs0, hs1, distance = \
-                    saddle.highShores[0].findClosestPoints(
-                        saddle.highShores[1])
-                # find the middle GP for the 2 closest opposing shore
-                # points.
-                # Note, in some cases this might be outside the multipoint
-                middleGP = GridPoint(int((hs0.x +
-                                          hs1.x) / 2),
-                                     int((hs0.y +
-                                          hs1.y) / 2),
-                                     saddle.elevation)
-                # reconcile any points which might be outside the
-                # multipoint by finding the closest point inside the
-                # multipoint.
-                middleSpotElevation = \
-                    saddle.multiPoint.closestPoint(middleGP,
-                                                   asSpotElevation=True)
-                newSaddle = Saddle(middleSpotElevation.latitude,
-                                   middleSpotElevation.longitude,
-                                   middleSpotElevation.elevation)
-            # if not multipoint, just use that point.
-            else:
-                newSaddle = Saddle(saddle.latitude,
-                                   saddle.longitude,
-                                   saddle.elevation)
+        # If this is a multipoint, take the highest of each (2) high shores,
+        # find the closest points amongst both sets. Overwrite both high shores
+        # with those points. Set the location of the Saddle as the midpoint
+        # between those two points.
 
-            newSaddle.highShores = [GridPointContainer(highShores[0]),
-                                    GridPointContainer(highShores[1])]
-            return [newSaddle]
+        if saddle.multiPoint:
+            hs0, hs1, distance = \
+                highShores[0].findClosestPoints(
+                    highShores[1])
+
+            # Only use these closest HPs for the saddle highShore.
+            highShores = [GridPointContainer([hs0]), GridPointContainer([hs1])]
+
+            # find the middle GP for the 2 closest opposing shore
+            # points.
+            # Note, in some cases this might be outside the multipoint
+            middleGP = GridPoint(int((hs0.x +
+                                      hs1.x) / 2),
+                                 int((hs0.y +
+                                      hs1.y) / 2),
+                                 saddle.elevation)
+            # reconcile any points which might be outside the
+            # multipoint by finding the closest point inside the
+            # multipoint.
+            middleSpotElevation = \
+                saddle.multiPoint.closestPoint(middleGP,
+                                               asSpotElevation=True)
+            newSaddle = Saddle(middleSpotElevation.latitude,
+                               middleSpotElevation.longitude,
+                               middleSpotElevation.elevation)
+        # if not multipoint, just use that point.
+        else:
+            newSaddle = Saddle(saddle.latitude,
+                               saddle.longitude,
+                               saddle.elevation)
+        # assign our slimmed down high shores.
+        newSaddle.highShores = highShores
+        return [newSaddle]

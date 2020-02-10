@@ -8,9 +8,12 @@ the LICENSE file that accompanies it.
 from __future__ import division
 import unittest
 from pyprom.tests.getData import gettestzip
+from pyprom.lib.logic.summit_domain_walk import Walk
 from pyprom.dataload import GDALLoader
 from pyprom.feature_discovery import AnalyzeData
 from pyprom.domain import Domain
+
+from pyprom.lib.locations.gridpoint import GridPoint
 
 
 class WalkTests(unittest.TestCase):
@@ -25,7 +28,11 @@ class WalkTests(unittest.TestCase):
         gettestzip()
         self.datafile = GDALLoader('/tmp/N44W072.hgt')
         self.datamap = self.datafile.datamap
-        self.islandpondVT = self.datamap.subset(602, 353, 260, 260)
+        #
+        #self.islandpondVT = self.datamap.subset(602, 353, 260, 260)
+        #
+        self.islandpondVT = self.datamap.subset(582, 333, 300, 300)
+
         self.islandpondVTVicinity = AnalyzeData(self.islandpondVT)
         self.summits, self.saddles, self.runoffs = \
             self.islandpondVTVicinity.run()
@@ -41,23 +48,25 @@ class WalkTests(unittest.TestCase):
                                                         -71.8676388,
                                                         10)
         islandPondSaddle = islandPondSaddleContainer[0]
-        self.domain.walkSingleSaddle(islandPondSaddle)
+        self.domain.walk([islandPondSaddle])
         self.assertEqual(len(self.domain.linkers), 2)
-        self.assertEqual(len(islandPondSaddle.summits), 2)
-        self.assertEqual(islandPondSaddle.summits[0].summit,
+        saddle = self.domain.linkers[0].saddle
+        self.assertEqual(len(saddle.summits), 2)
+        self.assertEqual(saddle.summits[0].summit,
                          self.summits[142])
-        self.assertEqual(islandPondSaddle.summits[1].summit,
+        self.assertEqual(saddle.summits[1].summit,
                          self.summits[171])
 
     def testWalkIslandPond(self):
         """
         Test walk of island pond vicinity
         """
+        self.domain.run(superSparse=True)
         self.domain.walk()
-        self.assertEqual(len(self.domain.linkers), 1067)
+        self.assertEqual(len(self.domain.linkers), 1042)
 
 
-class WalkTestsReal(unittest.TestCase):
+class WalkRealTests(unittest.TestCase):
     """
     Test The Walk Features of feature_discovery
     """
@@ -77,13 +86,16 @@ class WalkTestsReal(unittest.TestCase):
         """
         washingtonVicinityDatamap = self.datamap.subset(2608, 2417, 99, 145)
         washingtonVicinity = AnalyzeData(washingtonVicinityDatamap)
-        summits, saddles, runoffs = washingtonVicinity.run()
-        saddleUnderTest = saddles[2]
+        summits, saddles, runoffs = washingtonVicinity.run(rebuildSaddles=False)
         d = Domain(washingtonVicinityDatamap, summits, saddles, runoffs)
-        d.walkSingleSaddle(saddleUnderTest)
-        summits = [x.summit for x in saddleUnderTest.summits]
+        sut = d.walk([saddles[2]])[0]
+        summits = [x.summit for x in sut.summits]
         # Ensure summits are the same
         self.assertEqual(summits[0], summits[1])
-        # But the linkers are different (different paths)
-        self.assertNotEqual(saddleUnderTest.summits[0],
-                            saddleUnderTest.summits[1])
+        # But the linkers are different.
+        self.assertNotEqual(sut.summits[0].id,
+                            sut.summits[1].id)
+
+
+
+
