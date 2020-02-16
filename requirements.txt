@@ -5,3 +5,4 @@ shapely
 utm
 geopy
 cbor
+dijkstar

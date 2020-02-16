@@ -268,49 +268,35 @@ class Walk:
         if len(saddle.highShores) > 2:
             nw = InternalSaddleNetwork(saddle, self.domainmap.datamap)
             return nw.generate_child_saddles()
-
-        # if we've just got 2 high shores, find all the highest points in
-        # the highShores, and find the midpoint between the first two if
-        # it's a multipoint
-        highShores = []
-        for highShore in saddle.highShores:
-            highShores.append(GridPointContainer(highShore.highest))
-
-        # If this is a multipoint, take the highest of each (2) high shores,
-        # find the closest points amongst both sets. Overwrite both high shores
-        # with those points. Set the location of the Saddle as the midpoint
-        # between those two points.
+        #More than 2
 
         if saddle.multiPoint:
-            hs0, hs1, distance = \
-                highShores[0].findClosestPoints(
-                    highShores[1])
+            hs0, hs1, midpoint = saddle.high_shore_shortest_path(
+                self.domainmap.datamap)
 
-            # Only use these closest HPs for the saddle highShore.
-            highShores = [GridPointContainer([hs0]), GridPointContainer([hs1])]
+            middleSpotElevation = GridPoint(midpoint[0],
+                                            midpoint[1],
+                                            saddle.elevation).\
+                toSpotElevation(self.domainmap.datamap)
 
-            # find the middle GP for the 2 closest opposing shore
-            # points.
-            # Note, in some cases this might be outside the multipoint
-            middleGP = GridPoint(int((hs0.x +
-                                      hs1.x) / 2),
-                                 int((hs0.y +
-                                      hs1.y) / 2),
-                                 saddle.elevation)
-            # reconcile any points which might be outside the
-            # multipoint by finding the closest point inside the
-            # multipoint.
-            middleSpotElevation = \
-                saddle.multiPoint.closestPoint(middleGP,
-                                               asSpotElevation=True)
             newSaddle = Saddle(middleSpotElevation.latitude,
                                middleSpotElevation.longitude,
-                               middleSpotElevation.elevation)
-        # if not multipoint, just use that point.
+                               saddle.elevation)
+
+            highShores = [
+                GridPointContainer([GridPoint.from_tuple(hs0)]),
+                GridPointContainer([GridPoint.from_tuple(hs1)])
+            ]
         else:
             newSaddle = Saddle(saddle.latitude,
                                saddle.longitude,
                                saddle.elevation)
+
+            # todo: closest highShore, not just first one.
+            highShores = []
+            for highShore in saddle.highShores:
+                highShores.append(GridPointContainer([highShore.highest[0]]))
+
         # assign our slimmed down high shores.
         newSaddle.highShores = highShores
         return [newSaddle]

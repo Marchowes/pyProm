@@ -228,6 +228,7 @@ class AnalyzeData:
         highPerimeter = perimeter.findHighEdges(
             self.elevation)
 
+        # if there is no high perimeter
         if not len(highPerimeter):
             lat, long = self.datamap.xy_to_latlong(x, y)
             summit = Summit(lat,
@@ -275,7 +276,8 @@ class AnalyzeData:
                             edgePoints=edgePoints)
             returnableLocations.append(saddle)
 
-        # if we're an edge and all edgepoints are lower than our point.
+        # if we're an edge with one highshore and all edgepoints
+        # are lower than our point.
         if edge and len([a for a in perimeter.mapEdgePoints
                          if a.elevation < self.elevation]) ==\
                 len(perimeter.mapEdgePoints):

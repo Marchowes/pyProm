@@ -7,11 +7,15 @@ the LICENSE file that accompanies it.
 This library contains a class for storing Saddle data.
 """
 
+import math
+from collections import defaultdict
+from dijkstar import Graph, find_path
 from .spot_elevation import SpotElevation
 from .base_gridpoint import BaseGridPoint
 from ..containers.multipoint import MultiPoint
 from ..containers.gridpoint import GridPointContainer
 from ..containers.linker import isLinker
+from ..containers.base_self_iterable import BaseSelfIterable
 from ..util import randomString
 
 
@@ -159,6 +163,55 @@ class Saddle(SpotElevation):
                 skipDisqualified=False))
                 for linker in self.summits]
         return neighbors
+
+    def high_shore_shortest_path(self, datamap):
+        #needs to include perimeter in full path
+        bsi = BaseSelfIterable()
+        bsi.points = []
+        if self.multiPoint:
+            bsi.points.extend(self.multiPoint.points)
+        else:
+            gp = self.toGridPoint(datamap)
+            bsi.points.append((gp.x, gp.y))
+
+        for hs in self.highShores:
+            bsi.points.extend(hs.to_tuples())
+
+        bsi.pointIndex = defaultdict(dict)
+        for point in bsi.points:
+            bsi.pointIndex[point[0]][point[1]] = point
+
+        neighborHash = {}
+
+        for point in bsi.points:
+            neighborHash[point] = [nei for nei in bsi.iterNeighborDiagonal(point)]
+
+        graph = Graph()
+        for local, remotes in neighborHash.items():
+            for remote in remotes:
+                graph.add_edge(local, remote, datamap.distance(local, remote))
+        all_shortest = []
+        for us_hs in self.highShores[0].to_tuples():
+            shortest_lenth = None
+            for them_hs in self.highShores[1].to_tuples():
+                path = find_path(graph, us_hs, them_hs)
+                if shortest_lenth:
+                    if path.total_cost < shortest_lenth.total_cost:
+                        shortest_lenth = path
+                else:
+                    shortest_lenth = path
+            all_shortest.append(shortest_lenth)
+
+        overall_shortest = None
+        for link in all_shortest:
+            if overall_shortest:
+                if link.total_cost < overall_shortest.total_cost:
+                    overall_shortest = link
+            else:
+                overall_shortest = path
+
+        return overall_shortest.nodes[0], overall_shortest.nodes[-1],\
+               overall_shortest.nodes[math.floor(len(overall_shortest)/2)]
 
     @property
     def summits_set(self):

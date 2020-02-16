@@ -28,10 +28,10 @@ class WalkTests(unittest.TestCase):
         gettestzip()
         self.datafile = GDALLoader('/tmp/N44W072.hgt')
         self.datamap = self.datafile.datamap
-        #
-        #self.islandpondVT = self.datamap.subset(602, 353, 260, 260)
-        #
-        self.islandpondVT = self.datamap.subset(582, 333, 300, 300)
+
+        self.islandpondVT = self.datamap.subset(602, 353, 260, 260)
+
+        #self.islandpondVT = self.datamap.subset(582, 333, 300, 300)
 
         self.islandpondVTVicinity = AnalyzeData(self.islandpondVT)
         self.summits, self.saddles, self.runoffs = \

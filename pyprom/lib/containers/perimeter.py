@@ -9,14 +9,11 @@ type location objects. and various transforms.
 """
 from collections import defaultdict
 from .gridpoint import GridPointContainer
-from ..locations.gridpoint import isGridPoint, GridPoint
-
-FULL_SHIFT_LIST = ((-1, 0), (-1, 1), (0, 1), (1, 1), (1, 0), (1, -1),
-                       (0, -1), (-1, -1))
-ORTHOGONAL_SHIFT_LIST = ((-1, 0), (0, 1), (1, 0), (0, -1))
+from .base_self_iterable import BaseSelfIterable
+from ..locations.gridpoint import GridPoint
 
 
-class Perimeter:
+class Perimeter(BaseSelfIterable):
     """
     Container for :class:`Perimeter` type lists. A Perimeter
     is all points Diagonally or Orthogonally neighboring a
@@ -42,7 +39,6 @@ class Perimeter:
         :type mapEdgePoints:
          list(:class:`pyprom.lib.locations.gridpoint.GridPoint`)
         """
-        super(Perimeter, self).__init__()
         self.points = list()
         if pointList and pointIndex:
             raise Exception("choose one, pointList or PointIndex")
@@ -60,40 +56,6 @@ class Perimeter:
         self.datamap = datamap
         self.mapEdge = mapEdge
         self.mapEdgePoints = mapEdgePoints
-
-    def iterNeighborDiagonal(self, point):
-        """
-        Iterate through diagonally and orthogonally neighboring
-        :class:`pyprom.lib.locations.gridpoint.GridPoint` which are
-        also members of this :class:`Perimeter`
-
-        :param point: Gridpoint to find neighbors of
-        :type point: :class:`pyprom.lib.locations.gridpoint.GridPoint`
-        """
-        for shift in FULL_SHIFT_LIST:
-            x = point[0] + shift[0]
-            y = point[1] + shift[1]
-            if self.pointIndex[x].get(y, False):
-                yield self.pointIndex[x].get(y, False)
-            else:
-                continue
-
-    def iterNeighborOrthogonal(self, point):
-        """
-        Iterate through orthogonally neighboring
-        :class:`pyprom.lib.locations.gridpoint.GridPoint` which are
-        also members of this :class:`Perimeter`
-
-        :param point: Gridpoint to find neighbors of
-        :type point: :class:`pyprom.lib.locations.gridpoint.GridPoint`
-        """
-        for shift in ORTHOGONAL_SHIFT_LIST:
-            x = point[0] + shift[0]
-            y = point[1] + shift[1]
-            if self.pointIndex[x].get(y, False):
-                yield self.pointIndex[x].get(y, False)
-            else:
-                continue
 
     def to_dict(self):
         """

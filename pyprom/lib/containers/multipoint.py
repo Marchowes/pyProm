@@ -9,14 +9,15 @@ type location objects as well as a number of functions.
 """
 
 from math import hypot
-
+from collections import defaultdict
+from .base_self_iterable import BaseSelfIterable
 from ..locations.base_coordinate import BaseCoordinate
 from ..locations.base_gridpoint import  BaseGridPoint
 from ..locations.gridpoint import GridPoint
 from .perimeter import Perimeter
 
 
-class MultiPoint:
+class MultiPoint(BaseSelfIterable):
     """
     | A MultiPoint Container. This is a special kind of feature which contains
     | multiple :class:`pyprom.lib.locations.base_gridpoint.BaseGridPoint`s.
@@ -62,7 +63,6 @@ class MultiPoint:
          multipoint outside of the multipoint.
         :type perimeter: :class:`pyprom.lib.containers.perimeter.Perimeter`
         """
-        super(MultiPoint, self).__init__()
         self.points = points  # BaseGridPoint Objects.
         self.elevation = elevation
         self.datamap = datamap  # data analysis object.
@@ -192,6 +192,18 @@ class MultiPoint:
         if asSpotElevation:
             return closest.toSpotElevation(self.datamap)
         return closest
+
+    def internal_neighbor_map(self):
+
+        self.pointIndex = defaultdict(dict)
+        for point in self.points:
+            self.pointIndex[point[0]][point[1]] = point
+
+        neighborHash = {}
+
+        for point in self.points:
+            neighborHash[point] = [nei for nei in self.iterNeighborDiagonal(point)]
+        return neighborHash
 
     def __len__(self):
         """
