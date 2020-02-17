@@ -130,7 +130,7 @@ class Summit(SpotElevation):
                    'lon': self.longitude,
                    'ele': self.elevation,
                    'edge': self.edgeEffect,
-                   'edgepoints': [x.to_dict() for x in self.edgePoints],
+                   'edgepoints': self.edgePoints,
                    'id': self.id
                    }
         # TODO: localhighest (for divide tree time)
@@ -156,8 +156,7 @@ class Summit(SpotElevation):
         long = summitDict['lon']
         elevation = summitDict['ele']
         edge = summitDict['edge']
-        edgePoints = [BaseGridPoint(pt['x'], pt['y'])
-                      for pt in summitDict['edgepoints']]
+        edgePoints = [tuple(pt) for pt in summitDict['edgepoints']]
         id = summitDict['id']
         multipoint = summitDict.get('multipoint', [])
         if multipoint:

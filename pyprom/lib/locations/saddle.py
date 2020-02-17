@@ -305,7 +305,7 @@ class Saddle(SpotElevation):
                    'lon': self.longitude,
                    'ele': self.elevation,
                    'edge': self.edgeEffect,
-                   'edgepoints': [x.to_dict() for x in self.edgePoints],
+                   'edgepoints': self.edgePoints,
                    'id': self.id}
         if self.singleSummit:
             to_dict['singleSummit'] = self.singleSummit
@@ -319,10 +319,7 @@ class Saddle(SpotElevation):
         if self.multiPoint:
             to_dict['multipoint'] = self.multiPoint.to_dict()
         if self.highShores:
-            to_dict['highShores'] = list()
-            for shore in self.highShores:
-                hs = shore.to_dict()
-                to_dict['highShores'].append(hs)
+            to_dict['highShores'] = self.highShores
         # These values are not unloaded by from_dict()
         if referenceById:
             to_dict['children'] =\
@@ -360,8 +357,7 @@ class Saddle(SpotElevation):
         long = saddleDict['lon']
         elevation = saddleDict['ele']
         edge = saddleDict['edge']
-        edgePoints = [BaseGridPoint(pt['x'], pt['y'])
-                      for pt in saddleDict['edgepoints']]
+        edgePoints = [tuple(pt) for pt in saddleDict['edgepoints']]
         id = saddleDict['id']
         singleSummit = saddleDict.get('singleSummit', False)
         basinSaddle = saddleDict.get('basinSaddle', False)
@@ -370,9 +366,14 @@ class Saddle(SpotElevation):
         multipoint = saddleDict.get('multipoint', [])
         if multipoint:
             multipoint = MultiPoint.from_dict(multipoint, datamap=datamap)
-        highshores = saddleDict.get('highShores', [])
-        if highshores:
-            highshores = [GridPointContainer.from_dict(x) for x in highshores]
+        highshores = []
+        incoming_hs = saddleDict.get('highShores', [])
+        if incoming_hs:
+             for hss in highshores:
+                hsx = []
+                for hs in hss:
+                    hsx.append(tuple(hs))
+                highshores.append(hsx)
 
         return cls(lat, long, elevation,
                    multiPoint=multipoint,

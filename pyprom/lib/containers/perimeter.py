@@ -10,6 +10,7 @@ type location objects. and various transforms.
 from collections import defaultdict
 from .gridpoint import GridPointContainer
 from .base_self_iterable import BaseSelfIterable
+from ..logic.contiguous_neighbors import contiguous_neighbors
 from ..locations.gridpoint import GridPoint
 
 
@@ -35,7 +36,7 @@ class Perimeter(BaseSelfIterable):
         :param datamap: datamap which this :class:`Perimeter` uses.
         :type datamap: :class:`pyprom.lib.datamap.DataMap` object.
         :param bool mapEdge: is this a map edge?
-        :param mapEdgePoints: list of Points on the map edge.
+        :param mapEdgePoints: list of Points (tuple) on the map edge.
         :type mapEdgePoints:
          list(:class:`pyprom.lib.locations.gridpoint.GridPoint`)
         """
@@ -67,8 +68,7 @@ class Perimeter(BaseSelfIterable):
         perimeterDict = dict()
         perimeterDict['points'] = self.points
         perimeterDict['mapEdge'] = self.mapEdge
-        perimeterDict['mapEdgePoints'] = [x.to_dict()
-                                          for x in self.mapEdgePoints]
+        perimeterDict['mapEdgePoints'] = self.mapEdgePoints
         return perimeterDict
 
     @classmethod
@@ -87,8 +87,7 @@ class Perimeter(BaseSelfIterable):
             perimeterPointHash[pt[0]][pt[1]] =\
                 tuple(pt)
         mapEdge = perimeterDict['mapEdge']
-        mapEdgePoints = [GridPoint(x['x'], x['y'], x['elevation'])
-                         for x in perimeterDict['mapEdgePoints']]
+        mapEdgePoints = [tuple(x) for x in perimeterDict['mapEdgePoints']]
         return cls(pointIndex=perimeterPointHash,
                    datamap=datamap,
                    mapEdge=mapEdge,
@@ -96,64 +95,54 @@ class Perimeter(BaseSelfIterable):
 
     def findHighEdges(self, elevation):
         """
-        This function returns a list of
-        :class:`pyprom.lib.containers.gridpoint.GridPointContainer`. Each
-        container holds a list of
-        :class:`pyprom.lib.locations.gridpoint.GridPoint` which are
-        discontigous so far as the other container is concerned.
-        This is used to identify discontigous sets of
-        :class:`pyprom.lib.locations.gridpoint.GridPoint` for determining
-        if this is a :class:`pyprom.lib.locations.saddle.Saddle` or not.
+        Finds all points that are higher than passed in elevation and returns
+        them as a list of contiguous point lists
 
-        :return: list of GridPointContainers containing HighEdges.
-        :rtype:
-         list(:class:`pyprom.lib.containers.gridpoint.GridPointContainer`)
+        :return: list of lists of points containing perimeter member points
+         higher than elevation
+        :rtype: list(list(tuples)))
         """
-        explored = defaultdict(dict)
-        highLists = list()
-        for point in self.points:
-            if explored[point[0]].get(point[1], False):
-                continue
-            if point[2] > elevation:
-                toBeAnalyzed = [point]
-                highList = list()
-                while True:
-                    if not toBeAnalyzed:
-                        highLists.append(highList)
-                        break
-                    else:
-                        gridPoint = toBeAnalyzed.pop()
-                    if not explored[gridPoint[0]].get(gridPoint[1], False):
-                        highList.append(GridPoint.from_tuple(gridPoint))
-                        neighbors = [x for x in
-                                     self.iterNeighborDiagonal(gridPoint)
-                                     if x[2] > elevation and
-                                     not explored[x[0]].get(x[1], False)]
-                        toBeAnalyzed += neighbors
-                        explored[gridPoint[0]][gridPoint[1]] = True
-            else:
-                explored[point[0]][point[1]] = True
-        return [GridPointContainer(x) for x in highLists]
 
-    def findHighPerimeter(self, elevation, as_tuples=False):
+        return contiguous_neighbors(self.findHighPerimeter(elevation), self.datamap)
+
+
+        # explored = defaultdict(dict)
+        # highLists = list()
+        # for point in self.points:
+        #     if explored[point[0]].get(point[1], False):
+        #         continue
+        #     if point[2] > elevation:
+        #         toBeAnalyzed = [point]
+        #         highList = list()
+        #         while True:
+        #             if not toBeAnalyzed:
+        #                 highLists.append(highList)
+        #                 break
+        #             else:
+        #                 gridPoint = toBeAnalyzed.pop()
+        #             if not explored[gridPoint[0]].get(gridPoint[1], False):
+        #                 highList.append(GridPoint.from_tuple(gridPoint))
+        #                 neighbors = [x for x in
+        #                              self.iterNeighborDiagonal(gridPoint)
+        #                              if x[2] > elevation and
+        #                              not explored[x[0]].get(x[1], False)]
+        #                 toBeAnalyzed += neighbors
+        #                 explored[gridPoint[0]][gridPoint[1]] = True
+        #     else:
+        #         explored[point[0]][point[1]] = True
+        # return [GridPointContainer(x) for x in highLists]
+
+    def findHighPerimeter(self, elevation):
         """
         This function returns all points higher than the passed in
-        elevation and returns them in a GridPointContainer. Unless
-        as_tuples is True, then a list of tuples is returned.
+        elevation and returns them in a list of tuples
 
         :param elevation:
         :type elevation: int, float
-        :param as_tuples: returns result as list of (x, y, elevation) tuples
-        :return: GridPointContainer containing high perimeter points.
-        :rtype: :class:`pyprom.lib.containers.gridpoint.GridPointContainer`
         :return: List of points as tuples
         :rtype: list(tuple(x, y, elevation))
         """
-        if as_tuples:
-            return [x for x in self.points if x[2] > elevation]
-        else:
-            higherPoints = [GridPoint.from_tuple(x) for x in self.points if x[2] > elevation]
-            return GridPointContainer(higherPoints)
+        return [x for x in self.points if x[2] > elevation]
 
     def append(self, point):
         """

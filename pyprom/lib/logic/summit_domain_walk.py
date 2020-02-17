@@ -14,6 +14,7 @@ from ..containers.disposable_multipoint import DisposableMultipoint
 from ..containers.linker import Linker
 from ..containers.saddles import SaddlesContainer
 from ..logic.internal_saddle_network import InternalSaddleNetwork
+from ..logic.tuple_funcs import highest
 from ..containers.gridpoint import GridPointContainer
 
 from timeit import default_timer
@@ -197,7 +198,7 @@ class Walk:
             # synthetic ones do not.
             for saddle in saddlesUnderTest:
                 for highEdge in saddle.highShores:
-                    domains = self.climb_points([point.to_tuple() for point in highEdge.points])
+                    domains = self.climb_points(highEdge)
                     dd = list(domains) # debug
                     if len(domains) > 1:
                         if not saddle.edgeEffect:
@@ -220,7 +221,7 @@ class Walk:
                     for edge_saddle in edge_saddles:
                         for highEdge in edge_saddle.highShores:
                             h0 = highEdge[0]
-                            sd = self.summit_domain_points[h0.x].get(h0.y, None)
+                            sd = self.summit_domain_points[h0[0]].get(h0[1], None)
                             # nothing there? continue.
                             if not sd:
                                 self.logger.info("highEdge {} in NON-synthetic saddle {} was not a summit domain member.".format(h0, edge_saddle))
@@ -244,7 +245,7 @@ class Walk:
                     # synthetic saddles only have 1 point in each HS, so we know they'll be a domain member.
                     for highEdge in saddle.highShores:
                         h0 = highEdge[0]
-                        sd = self.summit_domain_points[h0.x].get(h0.y, None)
+                        sd = self.summit_domain_points[h0[0]].get(h0[1], None)
                         if not sd:
                             self.logger.info("highEdge {} in synthetic saddle {} was not a summit domain member.".format(h0, saddle))
                             continue
@@ -295,8 +296,9 @@ class Walk:
             # todo: closest highShore, not just first one.
             highShores = []
             for highShore in saddle.highShores:
-                highShores.append(GridPointContainer([highShore.highest[0]]))
+                highShores.append(highest(highShore))
 
         # assign our slimmed down high shores.
         newSaddle.highShores = highShores
         return [newSaddle]
+

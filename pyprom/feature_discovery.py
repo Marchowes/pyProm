@@ -175,12 +175,12 @@ class AnalyzeData:
         edgePoints = []
         if self.x_mapEdge.get(x) or self.y_mapEdge.get(y):
             edge = True
-            edgePoints = [BaseGridPoint(x, y)]
+            edgePoints = [(x, y)]
 
         # Begin the ardous task of analyzing points and multipoints
         neighbor = self.datamap.iterateFull(x, y)
         shoreSetIndex = defaultdict(dict)
-        shoreMapEdge = []
+        shoreMapEdge = set()
         for _x, _y, elevation in neighbor:
 
             # Nothing there? move along.
@@ -195,12 +195,12 @@ class AnalyzeData:
             if elevation > self.elevation:
                 shoreSetIndex[_x][_y] = (_x, _y, elevation)
             if self.x_mapEdge.get(_x) or self.y_mapEdge.get(_y):
-                shoreMapEdge.append(GridPoint(_x, _y, elevation))
+                shoreMapEdge.add((_x, _y, elevation))
 
         shoreSet = Perimeter(pointIndex=shoreSetIndex,
                              datamap=self.datamap,
                              mapEdge=edge,
-                             mapEdgePoints=shoreMapEdge)
+                             mapEdgePoints=list(shoreMapEdge))
         return self.consolidatedFeatureLogic(x, y, shoreSet, [],
                                              edge, edgePoints)
 
@@ -229,7 +229,7 @@ class AnalyzeData:
             self.elevation)
 
         # if there is no high perimeter
-        if not len(highPerimeter):
+        if not highPerimeter:
             lat, long = self.datamap.xy_to_latlong(x, y)
             summit = Summit(lat,
                             long,
@@ -256,7 +256,7 @@ class AnalyzeData:
 
             # if we're an edge and all edgepoints are lower than our point.
             if edge and len([a for a in perimeter.mapEdgePoints
-                             if a.elevation < self.elevation]) ==\
+                             if a[2] < self.elevation]) ==\
                     len(perimeter.mapEdgePoints):
                 runoff = Runoff(lat,
                                 long,
@@ -279,7 +279,7 @@ class AnalyzeData:
         # if we're an edge with one highshore and all edgepoints
         # are lower than our point.
         if edge and len([a for a in perimeter.mapEdgePoints
-                         if a.elevation < self.elevation]) ==\
+                         if a[2] < self.elevation]) ==\
                 len(perimeter.mapEdgePoints):
             lat, long = self.datamap.xy_to_latlong(x, y)
             runoff = Runoff(lat,

@@ -33,13 +33,13 @@ def equalHeightBlob(datamap, x, y, elevation):
     exploredEqualHeight[x][y] = True
     perimeterPointHash = defaultdict(dict)
     toBeAnalyzed = [masterGridPoint]
-    shoreMapEdge = []
+    shoreMapEdge = set()
     multipointEdges = []
 
     x_mapEdge = {0: True, datamap.max_x: True}
     y_mapEdge = {0: True, datamap.max_y: True}
     if x_mapEdge.get(x) or y_mapEdge.get(y):
-        multipointEdges.append(BaseGridPoint(x, y))
+        multipointEdges.append((x, y))
 
     # Loop until pool of equalHeight neighbors has been exhausted.
     edge = False
@@ -58,7 +58,7 @@ def equalHeightBlob(datamap, x, y, elevation):
                 branch = (_x, _y, elevation)
                 exploredEqualHeight[_x][_y] = True
                 if x_mapEdge.get(_x) or y_mapEdge.get(_y):
-                    multipointEdges.append(BaseGridPoint(_x, y))
+                    multipointEdges.append((_x, _y))
                 toBeAnalyzed.append(branch)
             # If elevation > master grid point, stash away as
             # a perimeter point. Only keep track of edgepoints
@@ -69,12 +69,66 @@ def equalHeightBlob(datamap, x, y, elevation):
                     if elevation > masterGridPoint[2]:
                         perimeterPointHash[_x][_y] = (_x, _y, elevation)
                     if x_mapEdge.get(_x) or y_mapEdge.get(_y):
-                        shoreMapEdge.append(GridPoint(_x, _y, elevation))
+                        shoreMapEdge.add((_x, _y, elevation))
     return MultiPoint(coordinateHashToXYTupleList(exploredEqualHeight),
                       masterGridPoint[2], datamap,
                       perimeter=Perimeter(
                           pointIndex=perimeterPointHash,
                           datamap=datamap,
                           mapEdge=edge,
-                          mapEdgePoints=shoreMapEdge)),\
+                          mapEdgePoints=list(shoreMapEdge))),\
         multipointEdges
+
+def high_low_equal(x, y, elevation, datamap):
+    point = (x, y, elevation)
+
+    edgepoints = set() #equalheight edgepoints
+    mapEdgePoints = set() #perimeter points which touch the map edge
+
+    x_edge = (0, datamap.max_x)
+    y_edge = (0, datamap.max_y)
+    edge = False
+
+    high = set()
+    low = set()
+
+    stack = list()
+    stack.append(point)
+    equal = set([point])
+    tracker = set()
+
+    while stack:
+        point = stack.pop()
+        tracker.add(point)
+        for x, y, el in datamap.iterateFull(point[0], point[1]):
+            pt = (x, y, el)
+            if el == point[2]:
+                if isinstance(equal, float):
+                    print("what")
+                equal.add(pt)
+                if pt not in tracker:
+                    stack.append(pt)
+                if x in x_edge or y in y_edge:
+                    edge = True
+                    edgepoints.add(pt)
+                continue
+
+            if el > point[2]:
+                high.add(pt)
+            if el < point[2]:
+                low.add(pt)
+            if x in x_edge or y in y_edge:
+                edge = True
+                mapEdgePoints.add(pt)
+
+
+
+    mp = MultiPoint(list(equal),
+                    point[2], datamap,
+                    perimeter=Perimeter(
+                          pointList=list(high),
+                          datamap=datamap,
+                          mapEdge=edge,
+                          mapEdgePoints=list(mapEdgePoints))), \
+           list(edgepoints)
+    return mp

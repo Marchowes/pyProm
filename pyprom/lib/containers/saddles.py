@@ -10,9 +10,9 @@ type location objects.
 
 from .spot_elevation import SpotElevationContainer
 from ..logic.internal_saddle_network import InternalSaddleNetwork
+from ..logic.tuple_funcs import highest
 from ..locations.saddle import Saddle, isSaddle
 from ..locations.gridpoint import GridPoint
-from ..containers.gridpoint import GridPointContainer
 
 
 class SaddlesContainer(SpotElevationContainer):
@@ -61,7 +61,7 @@ class SaddlesContainer(SpotElevationContainer):
             if len(saddle.highShores) == 2:
                 highShores = []
                 for highShore in saddle.highShores:
-                    highShores.append(GridPointContainer(highShore.highest))
+                    highShores.append(highest(highShore))
 
                 # if multipoint use first of each of the highest high shores
                 # and find the mid point for both. Then find the point within
@@ -94,8 +94,7 @@ class SaddlesContainer(SpotElevationContainer):
                                        saddle.longitude,
                                        saddle.elevation)
 
-                newSaddle.highShores = [GridPointContainer(highShores[0]),
-                                        GridPointContainer(highShores[1])]
+                newSaddle.highShores = [highShores[0], highShores[1]]
                 new_saddles.append(newSaddle)
                 if saddle.edgeEffect:
                     newSaddle.parent = saddle
