@@ -16,6 +16,7 @@ from ..locations.vertex_link import Vertex_Link
 from ..containers.feature_verticies import Feature_Verticies
 from ..containers.gridpoint import GridPointContainer
 from ..locations.saddle import Saddle
+from .shortest_path_by_points import findClosestPoints
 
 from collections import defaultdict
 
@@ -193,8 +194,8 @@ class InternalSaddleNetwork(object):
         # Finally if the saddle(`self`) has an edgeEffect, save it and mark
         # all new saddles as children and mark the parent on all new Saddles.
         for link in self.shortest_links:
-            middlePoint = GridPoint(int(link.local.x + link.remote.x) / 2,
-                                    int(link.local.y + link.remote.y) / 2,
+            middlePoint = GridPoint(int(link.local[0] + link.remote[0]) / 2,
+                                    int(link.local[1] + link.remote[1]) / 2,
                                     self.saddle.elevation)
 
             if self.saddle.multiPoint:
@@ -209,8 +210,8 @@ class InternalSaddleNetwork(object):
                                    self.saddle.longitude,
                                    self.saddle.elevation)
 
-            newSaddle.highShores = [GridPointContainer([link.local]),
-                                    GridPointContainer([link.remote])]
+            newSaddle.highShores = [[link.local],
+                                    [link.remote]]
 
             if self.saddle.edgeEffect:
                 newSaddle.parent = self.saddle
@@ -248,9 +249,8 @@ class InternalSaddleNetwork(object):
                 if index[outerIdx][innerIdx]:
                     continue
                 # outer closest, inner closest, distance between
-                outer, inner, distance = \
-                    self.saddle.highShores[outerIdx].findClosestPoints(
-                        self.saddle.highShores[innerIdx])
+                outer, inner, distance = findClosestPoints(self.saddle.highShores[innerIdx], self.saddle.highShores[outerIdx], self.datamap)
+
                 # assign tuple to hash for local and remote so we don't
                 # have to bother calculating twice.
                 index[outerIdx][innerIdx] = (outer, inner, distance)

@@ -175,7 +175,7 @@ class Saddle(SpotElevation):
             bsi.points.append((gp.x, gp.y))
 
         for hs in self.highShores:
-            bsi.points.extend(hs.to_tuples())
+            bsi.points.extend(hs)
 
         bsi.pointIndex = defaultdict(dict)
         for point in bsi.points:
@@ -191,16 +191,16 @@ class Saddle(SpotElevation):
             for remote in remotes:
                 graph.add_edge(local, remote, datamap.distance(local, remote))
         all_shortest = []
-        for us_hs in self.highShores[0].to_tuples():
-            shortest_lenth = None
-            for them_hs in self.highShores[1].to_tuples():
+        for us_hs in self.highShores[0]:
+            shortest_length = None
+            for them_hs in self.highShores[1]:
                 path = find_path(graph, us_hs, them_hs)
-                if shortest_lenth:
-                    if path.total_cost < shortest_lenth.total_cost:
-                        shortest_lenth = path
+                if shortest_length:
+                    if path.total_cost < shortest_length.total_cost:
+                        shortest_length = path
                 else:
-                    shortest_lenth = path
-            all_shortest.append(shortest_lenth)
+                    shortest_length = path
+            all_shortest.append(shortest_length)
 
         overall_shortest = None
         for link in all_shortest:
@@ -211,7 +211,7 @@ class Saddle(SpotElevation):
                 overall_shortest = path
 
         return overall_shortest.nodes[0], overall_shortest.nodes[-1],\
-               overall_shortest.nodes[math.floor(len(overall_shortest)/2)]
+               overall_shortest.nodes[math.floor(len(overall_shortest.nodes)/2)]
 
     @property
     def summits_set(self):
@@ -313,9 +313,6 @@ class Saddle(SpotElevation):
             to_dict['basinSaddle'] = self.basinSaddle
         if self._disqualified:
             to_dict['disqualified'] = self._disqualified
-
-        # TODO: lprBoundary will be needed someday.
-
         if self.multiPoint:
             to_dict['multipoint'] = self.multiPoint.to_dict()
         if self.highShores:
@@ -369,7 +366,7 @@ class Saddle(SpotElevation):
         highshores = []
         incoming_hs = saddleDict.get('highShores', [])
         if incoming_hs:
-             for hss in highshores:
+            for hss in incoming_hs:
                 hsx = []
                 for hs in hss:
                     hsx.append(tuple(hs))

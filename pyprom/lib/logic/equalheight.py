@@ -39,7 +39,7 @@ def equalHeightBlob(datamap, x, y, elevation):
     x_mapEdge = {0: True, datamap.max_x: True}
     y_mapEdge = {0: True, datamap.max_y: True}
     if x_mapEdge.get(x) or y_mapEdge.get(y):
-        multipointEdges.append((x, y))
+        multipointEdges.append((x, y, elevation))
 
     # Loop until pool of equalHeight neighbors has been exhausted.
     edge = False
@@ -58,7 +58,7 @@ def equalHeightBlob(datamap, x, y, elevation):
                 branch = (_x, _y, elevation)
                 exploredEqualHeight[_x][_y] = True
                 if x_mapEdge.get(_x) or y_mapEdge.get(_y):
-                    multipointEdges.append((_x, _y))
+                    multipointEdges.append((_x, _y, elevation))
                 toBeAnalyzed.append(branch)
             # If elevation > master grid point, stash away as
             # a perimeter point. Only keep track of edgepoints

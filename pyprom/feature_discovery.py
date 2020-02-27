@@ -13,6 +13,7 @@ import logging
 from collections import defaultdict
 from timeit import default_timer
 from datetime import timedelta
+from math import floor
 from .lib.locations.gridpoint import GridPoint
 from .lib.locations.saddle import Saddle
 from .lib.locations.summit import Summit
@@ -23,6 +24,9 @@ from .lib.containers.summits import SummitsContainer
 from .lib.containers.runoffs import RunoffsContainer
 from .lib.containers.perimeter import Perimeter
 from .lib.logic.equalheight import equalHeightBlob
+from .lib.logic.contiguous_neighbors import contiguous_neighbors, touching_neighborhoods
+from .lib.logic.shortest_path_by_points import high_shore_shortest_path
+from .lib.logic.tuple_funcs import highest
 
 from .lib.constants import METERS_TO_FEET
 
@@ -175,7 +179,7 @@ class AnalyzeData:
         edgePoints = []
         if self.x_mapEdge.get(x) or self.y_mapEdge.get(y):
             edge = True
-            edgePoints = [(x, y)]
+            edgePoints = [(x, y, self.elevation)]
 
         # Begin the ardous task of analyzing points and multipoints
         neighbor = self.datamap.iterateFull(x, y)
@@ -227,10 +231,10 @@ class AnalyzeData:
         returnableLocations = []
         highPerimeter = perimeter.findHighEdges(
             self.elevation)
+        lat, long = self.datamap.xy_to_latlong(x, y)
 
         # if there is no high perimeter
         if not highPerimeter:
-            lat, long = self.datamap.xy_to_latlong(x, y)
             summit = Summit(lat,
                             long,
                             self.elevation,
@@ -239,34 +243,8 @@ class AnalyzeData:
                             edgePoints=edgePoints
                             )
             returnableLocations.append(summit)
-            # edge summits are inherently Runoffs
-            if edge:
-                runoff = Runoff(lat,
-                                long,
-                                self.elevation,
-                                multiPoint=multipoint,
-                                edge=edge,
-                                highShores=highPerimeter,
-                                edgePoints=edgePoints)
-                returnableLocations.append(runoff)
-            return returnableLocations
 
-        elif (len(highPerimeter) > 1):
-            lat, long = self.datamap.xy_to_latlong(x, y)
-
-            # if we're an edge and all edgepoints are lower than our point.
-            if edge and len([a for a in perimeter.mapEdgePoints
-                             if a[2] < self.elevation]) ==\
-                    len(perimeter.mapEdgePoints):
-                runoff = Runoff(lat,
-                                long,
-                                self.elevation,
-                                multiPoint=multipoint,
-                                highShores=highPerimeter,
-                                edgePoints=edgePoints)
-                returnableLocations.append(runoff)
-                return returnableLocations
-
+        elif (len(highPerimeter) > 1) and not edge:
             saddle = Saddle(lat,
                             long,
                             self.elevation,
@@ -276,17 +254,166 @@ class AnalyzeData:
                             edgePoints=edgePoints)
             returnableLocations.append(saddle)
 
-        # if we're an edge with one highshore and all edgepoints
-        # are lower than our point.
-        if edge and len([a for a in perimeter.mapEdgePoints
-                         if a[2] < self.elevation]) ==\
-                len(perimeter.mapEdgePoints):
-            lat, long = self.datamap.xy_to_latlong(x, y)
+        if edge:
+            returnableLocations.extend(self.edge_feature_analysis(x, y, perimeter,
+                              multipoint, edge, edgePoints, highPerimeter))
+
+
+
+        return returnableLocations
+
+
+
+    def edge_feature_analysis(self, x, y, perimeter,
+                              multipoint, edge, edgePoints, highPerimeter):
+        """
+        figure out edge runoffs and saddles.
+
+        :param x:
+        :param y:
+        :param perimeter:
+        :param multipoint:
+        :param edge:
+        :param edgePoints:
+        :param highPerimeter:
+        :return:
+        """
+
+        returnable_features = []
+        # not edge? GTFO
+        if not edge:
+            return returnable_features
+
+        lat, long = self.datamap.xy_to_latlong(x, y)
+
+        # No high perimeter? that makes this a "Summit-like" runoff.
+        if not highPerimeter:
             runoff = Runoff(lat,
                             long,
                             self.elevation,
                             multiPoint=multipoint,
+                            edge=edge,
                             highShores=highPerimeter,
                             edgePoints=edgePoints)
-            returnableLocations.append(runoff)
-        return returnableLocations
+            returnable_features.append(runoff)
+            # No need to further process.
+            return returnable_features
+
+
+        # All points which are technically perimeter points,
+        # which are on the edge of our map regardless of elevation
+        map_edge_perimeter_neighborhoods = contiguous_neighbors(perimeter.mapEdgePoints, self.datamap)
+
+        # Find all neighborhoods comprising of only points lower than self.elevation
+        lower_perimeter_map_edge_neighborhoods = []
+        for neighborhood in map_edge_perimeter_neighborhoods:
+            if highest(neighborhood)[0][2] < self.elevation:
+                lower_perimeter_map_edge_neighborhoods.append(neighborhood)
+
+        # did we find one or fewer perimeter neighborhood lower than our elevation?
+        if len(lower_perimeter_map_edge_neighborhoods) <= 1:
+            # Do we have more than one high shore?
+            # If so, generate a saddle with an edge effect.
+            # There is no runoff here.
+            if len(highPerimeter) > 1:
+                saddle = Saddle(lat,
+                                long,
+                                self.elevation,
+                                multiPoint=multipoint,
+                                edge=edge,
+                                highShores=highPerimeter,
+                                edgePoints=edgePoints)
+                returnable_features.append(saddle)
+            # No need to further process.
+            # If there are no runoff like edges, and just a single high
+            # shore, then we'll just return an empty list.
+            return returnable_features
+
+        # keep track of all edgepoint neighborhoods which were converted to runoff.
+        runoff_edge_neighborhoods = []
+
+        # did we find more than one perimeter neighborhood
+        # lower than our elevation, and do we have at least 1 highPerimeter?
+        if len(lower_perimeter_map_edge_neighborhoods) > 1 and highPerimeter:
+            # okay, damn, lets analyze further!
+
+            # Keep track of edgepoints not converted into runoffs.
+            remaining_edgepoints = edgePoints.copy()
+
+            # Find all neighborhoods of edgepoints
+            edge_point_neighborhoods = contiguous_neighbors(edgePoints, self.datamap)
+
+            # we're packing these into a big list, so keep track of where edgepoint neighborhoods end in the list
+            edges_max_idx = len(edge_point_neighborhoods) - 1
+
+            # combine lower perimeter edges and edgepoints
+            all_neighborhoods = edge_point_neighborhoods + lower_perimeter_map_edge_neighborhoods
+
+            # find out what neighborhood neighbors other neighborhoods.
+            touching = touching_neighborhoods(all_neighborhoods, self.datamap)
+
+
+            # this loop identifies Runoffs.
+            # This also handles the case where we have one high shore
+            for idx, touched in touching.items():
+                # unless its a non perimeter edge point, dont bother.
+                if idx > edges_max_idx:
+                    continue
+                # if your edgepoint neighborhood, touches 2 lower perimeter neighborhoods, then this is a Runoff.
+                if len(touched) == 2:
+                    #todo: make this choose the actual center, not just list middle.
+                    mid = edge_point_neighborhoods[idx][floor(len(edge_point_neighborhoods[idx])/2)]
+                    _lat, _long = self.datamap.xy_to_latlong(mid[0], mid[1])
+
+                    highShores = []
+                    if multipoint:
+                        pts = multipoint.points
+                        # this gets the closest single highshore point to our midpoint
+                        highShores.append([high_shore_shortest_path(mid, pts, highPerimeter, self.datamap)])
+                    else:
+                        # just use the regular highShores if not a multipoint
+                        highShores = highPerimeter
+
+                    runoff = Runoff(_lat,
+                                    _long,
+                                    self.elevation,
+                                    multiPoint=[],
+                                    highShores=highShores,
+                                    edgePoints=edge_point_neighborhoods[idx])
+                    returnable_features.append(runoff)
+
+                    runoff_edge_neighborhoods.append(edge_point_neighborhoods[idx])
+                    for pt in edge_point_neighborhoods[idx]:
+                        remaining_edgepoints.remove(pt) #todo optimize
+
+            # If we meet the definition of a regular Saddle do the following:
+            # - If all high edges were converted into runoffs,
+            # then we make this into a regular old non edge saddle,
+            # and we remove and edgePoints, as well as the edge flag.
+            #
+            # - If there are some edgepoints which were not converted into
+            # a runoff, then keep those edgepoints (but not any converted to runoffs)
+            # and keep this as an edge Saddle.
+
+            if len(highPerimeter) >= 2:
+                # did all our edgepoints get converted to runoffs?
+                # if not, we need to make an edge saddle.
+                # if so, we can just make a regular saddle. and ignore edgepoints
+                if len(runoff_edge_neighborhoods) == len(edge_point_neighborhoods):
+                    saddle = Saddle(lat, long,
+                                    self.elevation,
+                                    multiPoint = multipoint,
+                                    edge = False,
+                                    highShores = highPerimeter,
+                                    edgePoints = [])
+                    returnable_features.append(saddle)
+                else:
+                    saddle = Saddle(lat, long,
+                                    self.elevation,
+                                    multiPoint = multipoint,
+                                    edge = edge,
+                                    highShores = highPerimeter,
+                                    edgePoints = remaining_edgepoints)
+                    returnable_features.append(saddle)
+
+        return returnable_features

@@ -143,9 +143,7 @@ class DataMap:
         :param them: Tuple(x, y)
         :return: distance.
         """
-        return hypot((us[0] - them[0])*self.res_x, (us[1] - them[0]* self.res_y))
-
-
+        return hypot((us[0] - them[0]) * self.res_x, (us[1] - them[1]) * self.res_y)
 
     def get(self, x, y):
         """

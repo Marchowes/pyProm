@@ -13,8 +13,10 @@ from .equalheight import equalHeightBlob
 from ..containers.disposable_multipoint import DisposableMultipoint
 from ..containers.linker import Linker
 from ..containers.saddles import SaddlesContainer
+from ..containers.spot_elevation import SpotElevationContainer
 from ..logic.internal_saddle_network import InternalSaddleNetwork
 from ..logic.tuple_funcs import highest
+from ..logic.shortest_path_by_points import findClosestPointsByDistance
 from ..containers.gridpoint import GridPointContainer
 
 from timeit import default_timer
@@ -94,15 +96,15 @@ class Walk:
             # equal height? (idx 2 is elevation)
             if sn[2] == current_point[2]:
                 # already calculated?
-                dm = self.disposable_multipoints[current_point[0]].get(current_point[1], None)
-                if dm:
-                    hpp = dm.multiPoint.closestHighPerimeterPoint(GridPoint.from_tuple(current_point)) # comes back as GridPoint
-                    # add entrypoint? todo
-                    self.summit_domain_points[hpp.x][hpp.y].extend(climbed_points,
-                                                                   self.summit_domain_points)
-                    return self.summit_domain_points[hpp.x][hpp.y]
+                # dm = self.disposable_multipoints[current_point[0]].get(current_point[1], None)
+                # if dm:
+                #     hpp = dm.multiPoint.closestHighPerimeterPoint(current_point)
+                #     # add entrypoint? todo
+                #     self.summit_domain_points[hpp[0]][hpp[1]].extend(climbed_points,
+                #                                                    self.summit_domain_points)
+                #     return self.summit_domain_points[hpp[0]][hpp[1]]
                 # nope? add climb it, add our points to the found Summit_Domain and return said SummitDomain
-                summit_domain = self.climb_points([], current_point)
+                summit_domain = self.climb_points([], sn)
                 summit_domain.extend(climbed_points, self.summit_domain_points)
                 return summit_domain
             climbed_points.append(sn)
@@ -132,9 +134,8 @@ class Walk:
         # Entrypoint means we know this is an equalheight, so find that
         # and build our disposableMultipoint
         if entryPoint:
-            mp = equalHeightBlob(self.domainmap.datamap, entryPoint[0], entryPoint[1], entryPoint[2])[0]
-            points = mp.perimeter.findHighPerimeter(entryPoint[2],
-                                                    as_tuples=True)  # needs better logic, this currently blindly overwrites points
+            mp, _ = equalHeightBlob(self.domainmap.datamap, entryPoint[0], entryPoint[1], entryPoint[2])
+            points = mp.perimeter.findHighPerimeter(entryPoint[2])  # needs better logic, this currently blindly overwrites points
         # Loop and climb!
         for point in points:
             sd = self.climb(point)
@@ -142,20 +143,29 @@ class Walk:
                 summit_domains.add(sd)
             else:
                 self.logger.info("point {} didn't climb anywhere!".format(point))
+
         if entryPoint:
+            closest = findClosestPointsByDistance(mp.points, mp.perimeter.findHighPerimeter(mp.elevation), self.domainmap.datamap)
+
+            #closest = mp.closest_high_edge_to_internal_points()
+            for internal_pt, highShore in closest.items():
+                # assign all internal members of the multipoint to the summit domain of the closest highShore
+                self.summit_domain_points[internal_pt[0]][internal_pt[1]] = self.summit_domain_points[highShore[0]][highShore[1]]
+            return self.summit_domain_points[entryPoint[0]][entryPoint[1]]
+
             # todo: This logic is where the inside MP path needs to be calculated.
             # If more than 1 summit_domains were found we need to create a disposable_mp. and return the closest high shore's SummitDomain
-            if len(summit_domains) > 1:
-                disposableMultipoint = DisposableMultipoint(entryPoint, mp, self.disposable_multipoints)
-                self.disposable_multipoints_list.append(disposableMultipoint)
-                closestHPP = disposableMultipoint.multiPoint.closestHighPerimeterPoint(GridPoint.from_tuple(entryPoint))
+            #if len(summit_domains) > 1:
+                #disposableMultipoint = DisposableMultipoint(entryPoint, mp, self.disposable_multipoints)
+                #self.disposable_multipoints_list.append(disposableMultipoint)
+                #closestHPP = disposableMultipoint.multiPoint.closestHighPerimeterPoint(entryPoint)
                 # dont populate the summit doing with an points yet, save that for post processing.
-                return self.summit_domain_points[closestHPP.x][closestHPP.y]
-            if len(summit_domains) == 1:
-                sd = summit_domains.pop()
-                for point in points:
-                    self.summit_domain_points[point[0]][point[1]] = sd
-                return sd
+
+            # if len(summit_domains) == 1:
+            #     sd = summit_domains.pop()
+            #     for point in points:
+            #         self.summit_domain_points[point[0]][point[1]] = sd
+            #     return sd
         else:
             return summit_domains
 
@@ -165,7 +175,7 @@ class Walk:
         :return: walkedSaddles, linkers, summitDomains
         """
         if not saddles:
-            saddles = self.domainmap.saddles
+            saddles = SpotElevationContainer(self.domainmap.saddles.points + self.domainmap.runoffs.points)
         walkedSaddles = SaddlesContainer([])
         linkers = list()
         summitDomains = set()
@@ -269,7 +279,7 @@ class Walk:
         if len(saddle.highShores) > 2:
             nw = InternalSaddleNetwork(saddle, self.domainmap.datamap)
             return nw.generate_child_saddles()
-        #More than 2
+        #Just 2
 
         if saddle.multiPoint:
             hs0, hs1, midpoint = saddle.high_shore_shortest_path(
@@ -284,10 +294,7 @@ class Walk:
                                middleSpotElevation.longitude,
                                saddle.elevation)
 
-            highShores = [
-                GridPointContainer([GridPoint.from_tuple(hs0)]),
-                GridPointContainer([GridPoint.from_tuple(hs1)])
-            ]
+            highShores = [[hs0], [hs1]]
         else:
             newSaddle = Saddle(saddle.latitude,
                                saddle.longitude,

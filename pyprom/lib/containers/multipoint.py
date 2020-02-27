@@ -10,6 +10,7 @@ type location objects as well as a number of functions.
 
 from math import hypot
 from collections import defaultdict
+from dijkstar import Graph, find_path
 from .base_self_iterable import BaseSelfIterable
 from ..locations.base_coordinate import BaseCoordinate
 from ..locations.base_gridpoint import  BaseGridPoint
@@ -144,7 +145,7 @@ class MultiPoint(BaseSelfIterable):
         closestDistance = distanceCalc(themX, themY, *self.points[0])
         closest = self.points[0]
         for point in self.points[1:]:
-            distance = distanceCalc(themX, themY, *point)
+            distance = distanceCalc(themX, themY, point[0], point[1])
             # well, can't get closer than that. mark it and bail.
             if distance == 0:
                 closest = point
@@ -171,17 +172,17 @@ class MultiPoint(BaseSelfIterable):
         """
         distanceCalc = lambda themX, themY, usX, usY: hypot((themX - usX),
                                                             (themY - usY))
-        themX, themY = gridPoint.x, gridPoint.y
+        themX, themY = gridPoint[0], gridPoint[1]
 
         highPerimeters = self.perimeter.findHighEdges(self.elevation)
         if not highPerimeters:
             return None
-        closest = highPerimeters[0].points[0]
-        closestDistance = distanceCalc(themX, themY, closest.x, closest.y)
+        closest = highPerimeters[0][0]
+        closestDistance = distanceCalc(themX, themY, closest[0], closest[1])
 
         for highPerimeter in highPerimeters:
             for point in highPerimeter:
-                distance = distanceCalc(themX, themY, point.x, point.y)
+                distance = distanceCalc(themX, themY, point[0], point[1])
                 # well, can't get closer than that. mark it and bail.
                 if distance == 0:
                     closest = point
@@ -190,7 +191,8 @@ class MultiPoint(BaseSelfIterable):
                     closest = point
                     closestDistance = distance
         if asSpotElevation:
-            return closest.toSpotElevation(self.datamap)
+            gp = GridPoint(closest[0], closest[1], closest[2])
+            return gp.toSpotElevation(self.datamap)
         return closest
 
     def internal_neighbor_map(self):
@@ -204,6 +206,47 @@ class MultiPoint(BaseSelfIterable):
         for point in self.points:
             neighborHash[point] = [nei for nei in self.iterNeighborDiagonal(point)]
         return neighborHash
+
+    def closest_high_edge_to_internal_points(self):
+        bsi = BaseSelfIterable()
+        bsi.points = []
+        bsi.points.extend(self.points)
+
+        all_high_edges = self.perimeter.findHighPerimeter(self.elevation)
+        bsi.points.extend(all_high_edges)
+
+        bsi.pointIndex = defaultdict(dict)
+        for point in bsi.points:
+            bsi.pointIndex[point[0]][point[1]] = point
+
+        neighborHash = {}
+
+        for point in bsi.points:
+            neighborHash[point] = [nei for nei in bsi.iterNeighborDiagonal(point)]
+
+        graph = Graph()
+        for local, remotes in neighborHash.items():
+            for remote in remotes:
+                graph.add_edge(local, remote, self.datamap.distance(local, remote))
+
+
+        closest_dict = dict() # {self.point: closest_hs}
+
+        for point in self.points:
+            shortest_length = None
+            for hs in all_high_edges:
+                path = find_path(graph, point, hs)
+                if shortest_length:
+                    if path.total_cost < shortest_length.total_cost:
+                        shortest_length = path
+                else:
+                    shortest_length = path
+            closest_dict[point] = shortest_length.nodes[-1]
+        return closest_dict
+
+
+    def points_with_elevation(self):
+        return [(x[0], x[1], self.elevation) for x in self.points]
 
     def __len__(self):
         """
