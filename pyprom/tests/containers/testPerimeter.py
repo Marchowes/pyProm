@@ -143,9 +143,9 @@ class PerimeterTests(unittest.TestCase):
                       datamap=self.datamap)
         highEdges = perimeterDiscontigous.findHighEdges(552)
         self.assertEqual(2, len(highEdges))
-        self.assertEqual(highEdges[0].points, [GridPoint.from_tuple(self.p11), GridPoint.from_tuple(self.p12)])
-        self.assertEqual(highEdges[1].points, [GridPoint.from_tuple(self.p14), GridPoint.from_tuple(self.p24),
-                                               GridPoint.from_tuple(self.p25), GridPoint.from_tuple(self.p26)])
+
+        self.assertEqual(highEdges[0], [self.p11, self.p12])
+        self.assertEqual(highEdges[1], [self.p25, self.p14, self.p24, self.p26])
 
     def testPerimeterFindHighEdgesOrthogonallyDiscontigous(self):
         """
@@ -163,33 +163,20 @@ class PerimeterTests(unittest.TestCase):
             Perimeter(pointIndex=perimeterId,
                       datamap=self.datamap)
         highEdges = perimeterOrthogonallyDiscontigous.findHighEdges(552)
-        self.assertEqual(6, len(highEdges))
+        self.assertEqual(1, len(highEdges))
 
     def testPerimeterfindHighPerimeter(self):
         """
         Ensure findHighPerimeter produces expected results
         """
         higher554 = self.perimeter.findHighPerimeter(554)
-        self.assertEqual(1, len(higher554.points))
+        self.assertEqual(1, len(higher554))
 
         higher553 = self.perimeter.findHighPerimeter(553)
-        self.assertEqual(4, len(higher553.points))
+        self.assertEqual(4, len(higher553))
 
         higher552 = self.perimeter.findHighPerimeter(552)
-        self.assertEqual(7, len(higher552.points))
-
-    def testPerimeterfindHighPerimeterTuple(self):
-        """
-        Ensure findHighPerimeter produces expected results when as_tuples is True
-        """
-        higher554 = self.perimeter.findHighPerimeter(554, as_tuples=True)
-        self.assertEqual(higher554, [(2, 4, 555)])
-
-        higher553 = self.perimeter.findHighPerimeter(553, as_tuples=True)
-        self.assertEqual(higher553, [(1, 2, 554),
-                                     (1, 3, 554),
-                                     (2, 4, 555),
-                                     (2, 5, 554)])
+        self.assertEqual(7, len(higher552))
 
     def testPerimeterIterator(self):
         """
@@ -303,7 +290,7 @@ class PerimeterTests(unittest.TestCase):
         Ensure From Dict works as expected.
         """
         self.perimeter.mapEdge = True
-        self.perimeter.mapEdgePoints = [GridPoint.from_tuple(self.p11)]
+        self.perimeter.mapEdgePoints = [self.p11]
 
         perimeterDict = self.perimeter.to_dict()
 

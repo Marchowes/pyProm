@@ -7,59 +7,51 @@ the LICENSE file that accompanies it.
 
 from collections import defaultdict
 
-def contiguous_neighbors(points, datamap):
+OFFSETS = (-1, 0, 1)
+
+
+def contiguous_neighbors(points):
     """
+    Consumes a list of (x,y,el) points. finds which points neighbor
+    each other diagonally or orthogonally.
+
+    This works by looking at full X, Y cartesian slices
+
     :param points: list of (x, y, ele) points
     :param datamap: datamap
     :return: Finds all contigous blocks of neighboring points.
      Returns list of these contiguous blocks.
     """
-    # strip out elevation.
     points = set(points)
+    lookup = defaultdict(dict)
+    for pt in points:
+        lookup[pt[0]][pt[1]] = pt[2]
     neighborsList = list()
     while points:
         stack = [points.pop()]
+        lookup[stack[0][0]][stack[0][1]] = None
         neighbors = list([stack[0]])
         neighborsList.append(neighbors)
         while stack:
             # Grab a point from the stack.
             point = stack.pop()
-            for x, y, el in datamap.iterateFull(point[0], point[1]):
-                pt = (x, y, el)
-                # is this neighbor a member of our pointlist still?
-                if pt in points:
-                    stack.append(pt)
-                    points.remove(pt)
-                    neighbors.append(pt)
+            for offset_x in OFFSETS:
+                x_val = point[0] + offset_x
+                x_axis = lookup[x_val]
+                if not x_axis or x_val < 0:
+                    continue
+                for offset_y in OFFSETS:
+                    y_val = point[1] + offset_y
+                    if y_val < 0:
+                        continue
+                    el = x_axis.get(y_val, None)
+                    if el is not None:
+                        pt = (x_val, y_val, el)
+                        stack.append(pt)
+                        points.remove(pt)
+                        lookup[pt[0]][pt[1]] = None
+                        neighbors.append(pt)
     return neighborsList
-
-
-# def contiguous_neighbors(points, datamap):
-#     explored = defaultdict(dict)
-#     highLists = list()
-#     for point in points:
-#         if explored[point[0]].get(point[1], False):
-#             continue
-#         if point[2] > elevation:
-#             toBeAnalyzed = [point]
-#             highList = list()
-#             while True:
-#                 if not toBeAnalyzed:
-#                     highLists.append(highList)
-#                     break
-#                 else:
-#                     gridPoint = toBeAnalyzed.pop()
-#                 if not explored[gridPoint[0]].get(gridPoint[1], False):
-#                     highList.append(gridPoint)
-#                     neighbors = [x for x in
-#                                  self.iterNeighborDiagonal(gridPoint)
-#                                  if x[2] > elevation and
-#                                  not explored[x[0]].get(x[1], False)]
-#                     toBeAnalyzed += neighbors
-#                     explored[gridPoint[0]][gridPoint[1]] = True
-#         else:
-#             explored[point[0]][point[1]] = True
-#     return [GridPointContainer(x) for x in highLists]
 
 def touching_neighborhoods(list_of_point_lists, datamap):
     """
@@ -86,10 +78,3 @@ def touching_neighborhoods(list_of_point_lists, datamap):
                         tracker.extend([(them, us), (us, them)])
                         touching_neighborhoods[us].append(them)
     return touching_neighborhoods
-
-
-
-
-
-
-

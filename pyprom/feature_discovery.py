@@ -302,7 +302,7 @@ class AnalyzeData:
 
         # All points which are technically perimeter points,
         # which are on the edge of our map regardless of elevation
-        map_edge_perimeter_neighborhoods = contiguous_neighbors(perimeter.mapEdgePoints, self.datamap)
+        map_edge_perimeter_neighborhoods = contiguous_neighbors(perimeter.mapEdgePoints)
 
         # Find all neighborhoods comprising of only points lower than self.elevation
         lower_perimeter_map_edge_neighborhoods = []
@@ -341,7 +341,7 @@ class AnalyzeData:
             remaining_edgepoints = edgePoints.copy()
 
             # Find all neighborhoods of edgepoints
-            edge_point_neighborhoods = contiguous_neighbors(edgePoints, self.datamap)
+            edge_point_neighborhoods = contiguous_neighbors(edgePoints)
 
             # we're packing these into a big list, so keep track of where edgepoint neighborhoods end in the list
             edges_max_idx = len(edge_point_neighborhoods) - 1

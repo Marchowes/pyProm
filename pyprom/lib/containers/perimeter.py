@@ -102,35 +102,7 @@ class Perimeter(BaseSelfIterable):
          higher than elevation
         :rtype: list(list(tuples)))
         """
-
-        return contiguous_neighbors(self.findHighPerimeter(elevation), self.datamap)
-
-
-        # explored = defaultdict(dict)
-        # highLists = list()
-        # for point in self.points:
-        #     if explored[point[0]].get(point[1], False):
-        #         continue
-        #     if point[2] > elevation:
-        #         toBeAnalyzed = [point]
-        #         highList = list()
-        #         while True:
-        #             if not toBeAnalyzed:
-        #                 highLists.append(highList)
-        #                 break
-        #             else:
-        #                 gridPoint = toBeAnalyzed.pop()
-        #             if not explored[gridPoint[0]].get(gridPoint[1], False):
-        #                 highList.append(GridPoint.from_tuple(gridPoint))
-        #                 neighbors = [x for x in
-        #                              self.iterNeighborDiagonal(gridPoint)
-        #                              if x[2] > elevation and
-        #                              not explored[x[0]].get(x[1], False)]
-        #                 toBeAnalyzed += neighbors
-        #                 explored[gridPoint[0]][gridPoint[1]] = True
-        #     else:
-        #         explored[point[0]][point[1]] = True
-        # return [GridPointContainer(x) for x in highLists]
+        return contiguous_neighbors(self.findHighPerimeter(elevation))
 
     def findHighPerimeter(self, elevation):
         """
