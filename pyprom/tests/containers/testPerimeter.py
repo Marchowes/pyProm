@@ -163,8 +163,7 @@ class PerimeterTests(unittest.TestCase):
             Perimeter(pointIndex=perimeterId,
                       datamap=self.datamap)
         highEdges = perimeterOrthogonallyDiscontigous.findHighEdges(552)
-        self.assertEqual(1, len(highEdges))
-        self.assertEqual(6, len(highEdges[0].points))
+        self.assertEqual(6, len(highEdges))
 
     def testPerimeterfindHighPerimeter(self):
         """
