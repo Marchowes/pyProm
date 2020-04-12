@@ -8,11 +8,13 @@ the LICENSE file that accompanies it.
 from collections import defaultdict
 from ..locations.gridpoint import GridPoint
 from ..locations.saddle import Saddle
+from ..locations.runoff import Runoff
 from ..containers.summit_domain import SummitDomain
 from .equalheight import equalHeightBlob
 from ..containers.disposable_multipoint import DisposableMultipoint
 from ..containers.linker import Linker
 from ..containers.saddles import SaddlesContainer
+from ..containers.runoffs import RunoffsContainer
 from ..containers.spot_elevation import SpotElevationContainer
 from ..logic.internal_saddle_network import InternalSaddleNetwork
 from ..logic.tuple_funcs import highest
@@ -172,11 +174,11 @@ class Walk:
     def climb_from_saddles(self, saddles=[]):
         """
         Climbs from all saddles contained in self.domainmap.saddles
-        :return: walkedSaddles, linkers, summitDomains
+        :return: walkedSaddles, walkedRunOffs, linkers, summitDomains
         """
         if not saddles:
             saddles = SpotElevationContainer(self.domainmap.saddles.points + self.domainmap.runoffs.points)
-        walkedSaddles = SaddlesContainer([])
+        walkedFeatures = list()
         linkers = list()
         summitDomains = set()
         start = default_timer()
@@ -247,10 +249,10 @@ class Walk:
                         # and vice versa
                         saddle.children.append(edge_saddle)
                         saddle.disqualified = True
-                        walkedSaddles.append(edge_saddle)
+                        walkedFeatures.append(edge_saddle)
                     # keep the old saddle, but make sure to disqualify
                     basesaddle.disqualified = True
-                    walkedSaddles.append(basesaddle)
+                    walkedFeatures.append(basesaddle)
                 else:
                     # synthetic saddles only have 1 point in each HS, so we know they'll be a domain member.
                     for highEdge in saddle.highShores:
@@ -265,9 +267,17 @@ class Walk:
                         linker = Linker(summit, saddle)
                         linker.add_to_remote_saddle_and_summit(ignoreDuplicates=False)
                         linkers.append(linker)
-                    walkedSaddles.append(saddle)
+                    walkedFeatures.append(saddle)
 
-        return walkedSaddles, linkers, summitDomains
+        walkedSaddles = SaddlesContainer([])
+        walkedRunOffs = RunoffsContainer([])
+        for walkedFeature in walkedFeatures:
+            if isinstance(walkedFeature, Runoff):
+                walkedRunOffs.append(walkedFeature)
+            elif isinstance(walkedFeature, Saddle):
+                walkedSaddles.append(walkedFeature)
+
+        return walkedSaddles, walkedRunOffs, linkers, summitDomains
 
     def generate_synthetic_saddles(self, saddle):
 

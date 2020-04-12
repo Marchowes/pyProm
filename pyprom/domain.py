@@ -311,12 +311,12 @@ class Domain:
         """
         walk = Walk(self)
         if not saddles:
-            self.saddles, self.linkers, self.summit_domains =\
+            self.saddles, self.runoffs, self.linkers, self.summit_domains =\
                 walk.climb_from_saddles()
         else:
-            outsaddles, self.linkers, self.summit_domains =\
+            outsaddles, outrunoffs, self.linkers, self.summit_domains =\
                 walk.climb_from_saddles(saddles)
-            return outsaddles
+            return outsaddles, outrunoffs
 
     def __repr__(self):
         """
