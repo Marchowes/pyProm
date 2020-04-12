@@ -80,6 +80,5 @@ def findClosestPointsByDistance(us, them, datamap):
             if distance < closest_distance:
                 closest[myPoint] = theirPoint
                 closest_distance = distance
-
     return closest
 

@@ -8,12 +8,9 @@ the LICENSE file that accompanies it.
 from __future__ import division
 import unittest
 from pyprom.tests.getData import gettestzip
-from pyprom.lib.logic.summit_domain_walk import Walk
 from pyprom.dataload import GDALLoader
 from pyprom.feature_discovery import AnalyzeData
 from pyprom.domain import Domain
-
-from pyprom.lib.locations.gridpoint import GridPoint
 
 
 class WalkTests(unittest.TestCase):

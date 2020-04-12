@@ -13,6 +13,7 @@ from ..logic.internal_saddle_network import InternalSaddleNetwork
 from ..logic.tuple_funcs import highest
 from ..locations.saddle import Saddle, isSaddle
 from ..locations.gridpoint import GridPoint
+from ..logic.shortest_path_by_points import findClosestPoints
 
 
 class SaddlesContainer(SpotElevationContainer):
@@ -69,15 +70,14 @@ class SaddlesContainer(SpotElevationContainer):
                 # high shores.
                 if saddle.multiPoint:
                     hs0, hs1, distance =\
-                        saddle.highShores[0].findClosestPoints(
-                            saddle.highShores[1])
+                        findClosestPoints(saddle.highShores[0], saddle.highShores[1], datamap)
                     # find the middle GP for the 2 closest opposing shore
                     # points.
                     # Note, in some cases this might be outside the multipoint
-                    middleGP = GridPoint(int((hs0.x +
-                                             hs1.x) / 2),
-                                         int((hs0.y +
-                                             hs1.y) / 2),
+                    middleGP = GridPoint(int((hs0[0] +
+                                             hs1[0]) / 2),
+                                         int((hs0[1] +
+                                             hs1[1]) / 2),
                                          saddle.elevation)
                     # reconcile any points which might be outside the
                     # multipoint by finding the closest point inside the

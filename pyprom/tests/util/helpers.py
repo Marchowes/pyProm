@@ -70,17 +70,17 @@ def generate_multiPoint_saddle(x, y, xSpan, ySpan,
     for island in islands:
         islandGridPoints = []
         for islandPoint in island:
-            islandGridPoints.append(GridPoint(islandPoint.x,
-                                              islandPoint.y,
-                                              elevation + 1))
-        islandGPCs.append(GridPointContainer(islandGridPoints))
+            islandGridPoints.append((islandPoint.x,
+                                     islandPoint.y,
+                                     elevation + 1))
+        islandGPCs.append(islandGridPoints)
 
     highShoresPerimeter = []
     # Dumb highShore generator. One point along y axis. Since
     # this is for testing, make sure not to set `perimeterHighShores`
     # to more than the ySpan + 2. Again, this is dumb.
     for highShoreIdx in range(perimeterHighShores):
-        hs = GridPoint(x - 1, y - 1 + highShoreIdx, elevation + 1)
-        highShoresPerimeter.append(GridPointContainer([hs]))
+        hs = (x - 1, y - 1 + highShoreIdx, elevation + 1)
+        highShoresPerimeter.append([hs])
     saddle.highShores = islandGPCs + highShoresPerimeter
     return saddle
