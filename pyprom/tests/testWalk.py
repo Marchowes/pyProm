@@ -41,8 +41,8 @@ class WalkTests(unittest.TestCase):
         """
         Test walk around Island Pond VT.
         """
-        islandPondSaddleContainer = self.saddles.radius(44.8109,
-                                                        -71.8676388,
+        islandPondSaddleContainer = self.saddles.radius(44.81069,
+                                                        -71.86763,
                                                         10)
         islandPondSaddle = islandPondSaddleContainer[0]
         self.domain.walk([islandPondSaddle])
@@ -60,7 +60,7 @@ class WalkTests(unittest.TestCase):
         """
         self.domain.run(superSparse=True)
         self.domain.walk()
-        self.assertEqual(len(self.domain.linkers), 1042)
+        self.assertEqual(len(self.domain.linkers), 1080)
 
 
 class WalkRealTests(unittest.TestCase):
@@ -85,14 +85,11 @@ class WalkRealTests(unittest.TestCase):
         washingtonVicinity = AnalyzeData(washingtonVicinityDatamap)
         summits, saddles, runoffs = washingtonVicinity.run(rebuildSaddles=False)
         d = Domain(washingtonVicinityDatamap, summits, saddles, runoffs)
-        sut = d.walk([saddles[2]])[0]
+        sut, _ = d.walk([saddles[2]])
+        sut = sut[0]
         summits = [x.summit for x in sut.summits]
         # Ensure summits are the same
         self.assertEqual(summits[0], summits[1])
         # But the linkers are different.
         self.assertNotEqual(sut.summits[0].id,
                             sut.summits[1].id)
-
-
-
-
