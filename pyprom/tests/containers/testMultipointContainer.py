@@ -28,7 +28,7 @@ class MultipointTests(unittest.TestCase):
         cls.someslice = cls.datamap.subset(1000, 1000, 100, 100)
         cls.somewhere = AnalyzeData(cls.someslice)
         cls.summits, cls.saddles, cls.runoffs = cls.somewhere.run()
-        cls.saddle = cls.runoffs.saddles[0]
+        cls.saddle = cls.saddles.multipoints[3]
         cls.summitWithoutMultipointEdge = cls.summits.summits[4]
         cls.bgp11 = BaseGridPoint(1, 1)
         cls.bgp22 = BaseGridPoint(2, 2)
@@ -50,7 +50,7 @@ class MultipointTests(unittest.TestCase):
         Test multipoint container perimeter count is as expected.
         """
         multipoint = self.saddle.multiPoint
-        self.assertEqual(len(multipoint.perimeter), 7)
+        self.assertEqual(len(multipoint.perimeter), 8)
 
     def testMultipointRepr(self):
         """
@@ -58,7 +58,7 @@ class MultipointTests(unittest.TestCase):
         """
         multipoint = self.saddle.multiPoint
         self.assertEqual(multipoint.__repr__(),
-                         "<Multipoint> elevation(m): 552.0, points 4")
+                         "<Multipoint> elevation(m): 551.0, points 4")
 
     def testMultipointIterator(self):
         """
@@ -155,7 +155,7 @@ class MultipointTests(unittest.TestCase):
         Ensure edge effect Saddle-like multipoint objects
         generate an edgePoint list.
         """
-        edgePoint = BaseGridPoint(99, 48)
+        edgePoint = (99, 49, 552.0)
         edgeMulti = self.saddles[20]
         self.assertTrue(edgeMulti.edgeEffect)
         self.assertEqual(edgeMulti.edgePoints, [edgePoint])
@@ -164,7 +164,7 @@ class MultipointTests(unittest.TestCase):
         """
         Ensure edge effect Saddle-like objects generate an edgePoint list.
         """
-        edgePoint = BaseGridPoint(37, 0)
+        edgePoint = (37, 99, 605.0)
         edgeMulti = self.runoffs[9]
         self.assertTrue(edgeMulti.edgeEffect)
         self.assertEqual(edgeMulti.edgePoints, [edgePoint])
@@ -298,17 +298,17 @@ class MultipointTests(unittest.TestCase):
         """
         mp = self.saddles.multipoints[0].multiPoint
 
-        closest = mp.closestHighPerimeterPoint(GridPoint(0, 0, 0))
-        self.assertEqual(closest, (GridPoint(4, 55, 559)))
+        closest = mp.closestHighPerimeterPoint((0, 0, 0))
+        self.assertEqual(closest, (4, 55, 559))
 
-        closest = mp.closestHighPerimeterPoint(GridPoint(0, 55, 0))
-        self.assertEqual(closest, (GridPoint(0, 56, 559)))
+        closest = mp.closestHighPerimeterPoint((0, 55, 0))
+        self.assertEqual(closest, (0, 56, 559))
 
-        closest = mp.closestHighPerimeterPoint(GridPoint(10, 0, 0))
-        self.assertEqual(closest, (GridPoint(4, 55, 559)))
+        closest = mp.closestHighPerimeterPoint((10, 0, 0))
+        self.assertEqual(closest, (4, 55, 559))
 
-        closest = mp.closestHighPerimeterPoint(GridPoint(10, 60, 0))
-        self.assertEqual(closest, (GridPoint(5, 58, 559)))
+        closest = mp.closestHighPerimeterPoint((10, 60, 0))
+        self.assertEqual(closest, (5, 58, 559))
 
     def testMultiPointClosestHighPerimeterPointSpotElevation(self):
         """
@@ -317,18 +317,18 @@ class MultipointTests(unittest.TestCase):
         """
         mp = self.saddles.multipoints[0].multiPoint
 
-        closest = mp.closestHighPerimeterPoint(GridPoint(0, 0, 0),
+        closest = mp.closestHighPerimeterPoint((0, 0, 0),
                                                asSpotElevation=True)
         self.assertEqual(closest, (SpotElevation(44.721250000000005, -71.70708333333333, 559)))
 
-        closest = mp.closestHighPerimeterPoint(GridPoint(0, 55, 0),
+        closest = mp.closestHighPerimeterPoint((0, 55, 0),
                                                asSpotElevation=True)
         self.assertEqual(closest, (SpotElevation(44.72236111111111, -71.70680555555556, 559)))
 
-        closest = mp.closestHighPerimeterPoint(GridPoint(10, 0, 0),
+        closest = mp.closestHighPerimeterPoint((10, 0, 0),
                                                asSpotElevation=True)
         self.assertEqual(closest, (SpotElevation(44.721250000000005, -71.70708333333333, 559)))
 
-        closest = mp.closestHighPerimeterPoint(GridPoint(10, 60, 0),
+        closest = mp.closestHighPerimeterPoint((10, 60, 0),
                                                asSpotElevation=True)
         self.assertEqual(closest, (SpotElevation(44.72097222222222, -71.70625, 559)))
