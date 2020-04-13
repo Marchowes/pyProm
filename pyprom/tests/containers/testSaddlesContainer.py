@@ -280,9 +280,9 @@ class SaddlesContainerRebuildTests(unittest.TestCase):
         centerpoint calculations
         """
         saddle = Saddle(44.97236111111111, -71.94458333333333, 1000)
-        saddle.highShores = [GridPointContainer([GridPoint(99, 199, 1001)]),
-                             GridPointContainer([GridPoint(99, 201, 1001)]),
-                             GridPointContainer([GridPoint(101, 199, 1001)]),
+        saddle.highShores = [[(99, 199, 1001)],
+                             [(99, 201, 1001)],
+                             [(101, 199, 1001)],
                              ]
         saddles = SaddlesContainer([saddle])
         newSaddles = saddles.rebuildSaddles(self.datamap)
