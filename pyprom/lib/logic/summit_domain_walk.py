@@ -86,7 +86,7 @@ class Walk:
             sn = self.domainmap.datamap.steepestNeighbor(current_point[0], current_point[1])
 
             if not sn:
-                self.logger.info("Strip Went Nowhere! {}".format(climbed_points))
+                self.logger.info(f"Strip Went Nowhere! Ends at {current_point} climbed points: {climbed_points}")
                 return None
 
             # If the steepest neighbor is already a member of a SummitDomain,
