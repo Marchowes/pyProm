@@ -94,11 +94,20 @@ class DomainTests(unittest.TestCase):
         # Make sure we've got 9 Saddles to start with
         self.assertEqual(len(self.domain.saddles.disqualified), 9)
         self.assertEqual(len(self.domain.saddles), 20)
+        parent = self.domain.saddles.disqualified[1]
+        child = self.domain.saddles.disqualified[0]
+        self.assertEqual(child.parent, parent)
+        self.assertEqual(len(parent.children), 1)
+        self.assertEqual(child, parent.children[0])
         self.domain.purge_saddles(singleSummit=True,
                                   basinSaddle=False)
         # Make sure 7 DQ saddle remains, 18 overall
         self.assertEqual(len(self.domain.saddles.disqualified), 7)
         self.assertEqual(len(self.domain.saddles), 18)
+        self.assertEqual(child.parent, None)
+        self.assertEqual(parent.children, [])
+        self.assertTrue(child.summits[0].disqualified) # ensure link dqed
+        self.assertEqual(parent.summits, []) # never was linked.
 
     def testDomainCullingNonAlternateBasinSaddle(self):
         """
