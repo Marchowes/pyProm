@@ -11,7 +11,6 @@ from ..locations.saddle import Saddle
 from ..locations.runoff import Runoff
 from ..containers.summit_domain import SummitDomain
 from .equalheight import equalHeightBlob
-from ..containers.disposable_multipoint import DisposableMultipoint
 from ..containers.linker import Linker
 from ..containers.saddles import SaddlesContainer
 from ..containers.runoffs import RunoffsContainer
@@ -19,7 +18,6 @@ from ..containers.spot_elevation import SpotElevationContainer
 from ..logic.internal_saddle_network import InternalSaddleNetwork
 from ..logic.tuple_funcs import highest
 from ..logic.shortest_path_by_points import findClosestPointsByDistance
-from ..containers.gridpoint import GridPointContainer
 
 from timeit import default_timer
 from datetime import timedelta
@@ -36,13 +34,9 @@ class Walk:
         self.domainmap = domainmap
         # all points found to be members of a Summit_Domain
         self.summit_domain_points = defaultdict(dict)
-        # all points found to be members of a Disposable Multipoint
-        self.disposable_multipoints = defaultdict(dict)
-        self.disposable_multipoints_list = list()
         self.logger = logging.getLogger('{}'.format(__name__))
 
         self._prepopulate_summit_domain_points()
-
 
     def _prepopulate_summit_domain_points(self):
         """
@@ -97,15 +91,6 @@ class Walk:
                 return self.summit_domain_points[sn[0]][sn[1]]
             # equal height? (idx 2 is elevation)
             if sn[2] == current_point[2]:
-                # already calculated?
-                # dm = self.disposable_multipoints[current_point[0]].get(current_point[1], None)
-                # if dm:
-                #     hpp = dm.multiPoint.closestHighPerimeterPoint(current_point)
-                #     # add entrypoint? todo
-                #     self.summit_domain_points[hpp[0]][hpp[1]].extend(climbed_points,
-                #                                                    self.summit_domain_points)
-                #     return self.summit_domain_points[hpp[0]][hpp[1]]
-                # nope? add climb it, add our points to the found Summit_Domain and return said SummitDomain
                 summit_domain = self.climb_points([], sn)
                 summit_domain.extend(climbed_points, self.summit_domain_points)
                 return summit_domain
@@ -123,18 +108,15 @@ class Walk:
         This function is also used an an intermediary to analyze multipoints
         along a domain walk path. This is done by passing an entryPoint and no
         points. We can determine if the possible path to a summit has already
-        been established, and if not, we can create a disposable Multipoint
-        object used for finding all paths from the multipoint.
+        been established.
 
         :param points: list[(x, y)]
         :param entryPoint: (x, y, ele)
         :return: :class:`SummitDomain` if points
         :return: list(:class:`SummitDomain`) if entryPoint
         """
-        disposableMultipoint = None
         summit_domains = set()
-        # Entrypoint means we know this is an equalheight, so find that
-        # and build our disposableMultipoint
+        # Entrypoint means we know this is an equalheight
         if entryPoint:
             mp, _ = equalHeightBlob(self.domainmap.datamap, entryPoint[0], entryPoint[1], entryPoint[2])
             points = mp.perimeter.findHighPerimeter(entryPoint[2])  # needs better logic, this currently blindly overwrites points
@@ -154,20 +136,6 @@ class Walk:
                 # assign all internal members of the multipoint to the summit domain of the closest highShore
                 self.summit_domain_points[internal_pt[0]][internal_pt[1]] = self.summit_domain_points[highShore[0]][highShore[1]]
             return self.summit_domain_points[entryPoint[0]][entryPoint[1]]
-
-            # todo: This logic is where the inside MP path needs to be calculated.
-            # If more than 1 summit_domains were found we need to create a disposable_mp. and return the closest high shore's SummitDomain
-            #if len(summit_domains) > 1:
-                #disposableMultipoint = DisposableMultipoint(entryPoint, mp, self.disposable_multipoints)
-                #self.disposable_multipoints_list.append(disposableMultipoint)
-                #closestHPP = disposableMultipoint.multiPoint.closestHighPerimeterPoint(entryPoint)
-                # dont populate the summit doing with an points yet, save that for post processing.
-
-            # if len(summit_domains) == 1:
-            #     sd = summit_domains.pop()
-            #     for point in points:
-            #         self.summit_domain_points[point[0]][point[1]] = sd
-            #     return sd
         else:
             return summit_domains
 
