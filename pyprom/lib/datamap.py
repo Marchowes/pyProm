@@ -147,15 +147,15 @@ class DataMap:
 
     def get(self, x, y):
         """
-        Gets point from numpy map, and converts units to Meters
+        Gets elevation from numpy map, and converts units to Meters
         :param int x: x coordinate in raster data.
         :param int y: y coordinate in raster data.
         :return: float
         """
         if self.unit == 'FEET':
-            return self.numpy_map[x, y] * METERS_TO_FEET
+            return float(self.numpy_map[x, y] * METERS_TO_FEET)
         else:
-            return self.numpy_map[x, y]
+            return float(self.numpy_map[x, y])
 
 class ProjectionDataMap(DataMap):
     """
@@ -252,15 +252,12 @@ class ProjectionDataMap(DataMap):
         """
         This function returns the elevation at a certain lat/long in Meters.
 
-        :param latitude: latitude in dotted demical notation
+        :param latitude: latitude in dotted decimal notation
         :param longitude: longitude in dotted decimal notation.
         :return: elevation of coordinate in meters.
         """
         x, y = self.latlong_to_xy(latitude, longitude)
-        if self.unit == 'FEET':
-            return float(METERS_TO_FEET * self.numpy_map[x, y])
-        else:
-            return self.numpy_map[x, y]
+        return self.get(x, y)
 
     def _leftmost_absolute(self):
         """

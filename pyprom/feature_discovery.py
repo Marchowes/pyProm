@@ -67,6 +67,24 @@ class AnalyzeData:
          :class:`pyprom.lib.containers.runoffs.RunoffsContainer`
         """
         _, _, _ = self.analyze()
+        # Corners also are runoffs.
+        rll = Runoff(*self.datamap.lower_left,
+                     self.datamap.get(self.max_x, 0))
+        rll.edgePoints.append((self.max_x, 0, self.datamap.get(self.max_x, 0)))
+        rlr = Runoff(*self.datamap.lower_right,
+                     self.datamap.get(self.max_x, self.max_y))
+        rlr.edgePoints.append((self.max_x, self.max_y, self.datamap.get(self.max_x, self.max_y)))
+        rul = Runoff(*self.datamap.upper_left,
+                     self.datamap.get(0, 0))
+        rul.edgePoints.append((0, 0, self.datamap.get(0, 0)))
+        rur = Runoff(*self.datamap.upper_right,
+                     self.datamap.get(0, self.max_y))
+        rur.edgePoints.append((0, self.max_y, self.datamap.get(0, self.max_y)))
+        self.runoffObjects.append(rll)
+        self.runoffObjects.append(rlr)
+        self.runoffObjects.append(rul)
+        self.runoffObjects.append(rur)
+
         if rebuildSaddles:
             self.logger.info("Rebuilding Saddles")
             self.saddleObjects = self.saddleObjects.rebuildSaddles(self.datamap)

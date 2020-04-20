@@ -226,10 +226,11 @@ class Walk:
 
                 # this means it's an edge effect
                 if not synthetic:
+                    # don't mess with runoffs.
+                    if isinstance(saddle, Runoff):
+                        walkedFeatures.append(saddle)
+                        continue
                     edge_saddles = self.generate_synthetic_saddles(saddle)
-
-                    # if len(edge_saddle.highshores) < 2:
-                    #     continue
                     for edge_saddle in edge_saddles:
                         for highEdge in edge_saddle.highShores:
                             h0 = highEdge[0]
