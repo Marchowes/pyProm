@@ -16,7 +16,8 @@ class GDALDataTests(unittest.TestCase):
     def setUp(self):
         """Download datafile."""
         gettestzip()
-        self.datafile = GDALLoader('/tmp/N44W072.hgt')
+        self.filename = '/tmp/N44W072.hgt'
+        self.datafile = GDALLoader(self.filename)
 
     def testGDALLoad(self):
         """Assert some basic info. from some SRTM data."""
@@ -26,6 +27,9 @@ class GDALDataTests(unittest.TestCase):
         self.assertEqual(self.datafile.upperLeftY, 45.00013888888889)
         self.assertEqual(self.datafile.span_x, 3601)
         self.assertEqual(self.datafile.span_y, 3601)
+        self.assertEqual(self.datafile.filename, self.filename)
+        # datamap needs to just have filename, not path.
+        self.assertEqual(self.datafile.datamap.filename, self.filename.split("/")[-1])
 
 
 if __name__ == '__main__':
