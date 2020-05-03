@@ -8,7 +8,6 @@ This library contains a Perimeter container class for storing GridPoints
 type location objects. and various transforms.
 """
 from collections import defaultdict
-from .gridpoint import GridPointContainer
 from .base_self_iterable import BaseSelfIterable
 from ..logic.contiguous_neighbors import contiguous_neighbors
 from ..locations.gridpoint import GridPoint
@@ -37,8 +36,7 @@ class Perimeter(BaseSelfIterable):
         :type datamap: :class:`pyprom.lib.datamap.DataMap` object.
         :param bool mapEdge: is this a map edge?
         :param mapEdgePoints: list of Points (tuple) on the map edge.
-        :type mapEdgePoints:
-         list(:class:`pyprom.lib.locations.gridpoint.GridPoint`)
+        :type mapEdgePoints: list(tuple(x, y, ele))
         """
         self.points = list()
         if pointList and pointIndex:
