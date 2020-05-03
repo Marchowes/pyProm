@@ -497,3 +497,10 @@ class LinkerTests(unittest.TestCase):
         self.assertEqual(newLinker, self.linker1)
         self.assertEqual(newLinker.saddle, self.saddle1)
         self.assertEqual(newLinker.summit, self.summit1)
+
+    def testLinkerShape(self):
+        """
+        Ensure shape functions works as expected.
+        """
+        shape = self.linker1.shape
+        self.assertEqual(shape.wkt, "LINESTRING (5 5, 1 1)")
