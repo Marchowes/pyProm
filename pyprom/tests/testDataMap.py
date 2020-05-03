@@ -24,7 +24,7 @@ class DataMapTests(unittest.TestCase):
         self.datafile = GDALLoader('/tmp/N44W072.hgt')
         self.datamap = self.datafile.datamap
 
-    def testGeneralDataMap(self):
+    def testDataMapGeneralDataMap(self):
         """Test defaults."""
         self.assertEqual(self.datamap.upperLeftX, 45.00013888888889)
         self.assertEqual(self.datamap.upperLeftY, -72.00013888888888)
@@ -44,7 +44,7 @@ class DataMapTests(unittest.TestCase):
         self.assertEqual(self.datamap.upper_right, (45.00013888888889,
                                                     -70.9998611111111))
 
-    def testLatLongToXY(self):
+    def testDataMapLatLongToXY(self):
         """Test Lat-long to XY function."""
         input = [(44.000138, -71.000138888), (44.1, -71.1), (44.2, -71.2),
                  (44.25, -71.25), (44.33333, -71.33333), (44.5, -71.5),
@@ -57,7 +57,7 @@ class DataMapTests(unittest.TestCase):
             self.assertEqual(self.datamap.latlong_to_xy(value[0], value[1]),
                              output[index])
 
-    def test_XY_latlong_determinism(self):
+    def testDataMap_XY_latlong_determinism(self):
         """
         Ensure converting from XY to LATLONG and back returns the same results.
         """
@@ -68,7 +68,7 @@ class DataMapTests(unittest.TestCase):
                 self.assertEqual(_x, x)
                 self.assertEqual(_y, y)
 
-    def testSubset(self):
+    def testDataMapSubset(self):
         """Test that datamap subsets return accurate subsets."""
         subset = self.datamap.subset(100, 100, 200, 199)
         self.assertEqual(subset.upperLeftX, 44.97236111111111)
@@ -88,6 +88,54 @@ class DataMapTests(unittest.TestCase):
                                               -71.91708333333334))
         self.assertEqual(subset.upper_right, (44.97236111111111,
                                               -71.91708333333334))
+
+    def testDataMapGeom(self):
+        """
+        Ensure the expected Polygon is produced from a single point
+        """
+        polygon = self.datamap.point_geom(100, 100)
+        expected_polygon = Polygon(((-71.97222222222223, 44.9725),
+                                    (-71.97222222222223, 44.97222222222223),
+                                    (-71.9725, 44.97222222222223),
+                                    (-71.9725, 44.9725)))
+        self.assertEquals(polygon, expected_polygon)
+
+    def testDataMapGeomUnaryUnion(self):
+        """
+        Ensure a unary union on polygons derived from two neighboring points
+        provides a proper rectangle and not some hot mess.
+        """
+        composite_polygon = unary_union((self.datamap.point_geom(100, 100),
+                                         self.datamap.point_geom(100, 101)))
+        expected_polygon = Polygon(((-71.97222222222223, 44.97222222222223),
+                                    (-71.9725, 44.97222222222223),
+                                    (-71.9725, 44.9725),
+                                    (-71.97222222222223, 44.9725),
+                                    (-71.97194444444443, 44.9725),
+                                    (-71.97194444444443, 44.97222222222223)))
+        self.assertEquals(composite_polygon, expected_polygon)
+
+    def testDataMapDistance(self):
+        """
+        Ensure distance calculation produces expected results.
+        """
+        self.assertEqual(self.datamap.distance((0, 0), (1, 1)),
+                                               0.00039283710065919305)
+        self.assertEqual(self.datamap.distance((0, 0), (0, 1)),
+                                               0.0002777777777777778)
+
+    def testDataMapGet(self):
+        """
+        Ensure distance calculation produces expected results.
+        """
+        self.assertEqual(self.datamap.get(0, 0),
+                         415.0)
+
+        # pretend data is stored in Feet.
+        self.datamap.unit = "FEET"
+        self.assertEqual(self.datamap.get(0, 0),
+                         126.492)
+
 
     class DataMapSteepestNeighborTests(unittest.TestCase):
         """Test DataMap.steepestNeighbor()"""
@@ -170,32 +218,6 @@ class DataMapTests(unittest.TestCase):
         datamap = DataMap(numpy_map, "meters", NON_FILE_SENTINEL)
         self.setDefaultMaxAndRes(datamap)
         self.assertEqual(datamap.steepestNeighbor(0, 0), (0, 1, 16.0))
-
-    def testGeom(self):
-        """
-        Ensure the expected Polygon is produced from a single point
-        """
-        polygon = self.datamap.point_geom(100, 100)
-        expected_polygon = Polygon(((-71.97222222222223, 44.9725),
-                                    (-71.97222222222223, 44.97222222222223),
-                                    (-71.9725, 44.97222222222223),
-                                    (-71.9725, 44.9725)))
-        self.assertEquals(polygon, expected_polygon)
-
-    def testGeomUnaryUnion(self):
-        """
-        Ensure a unary union on polygons derived from two neighboring points
-        provides a proper rectangle and not some hot mess.
-        """
-        composite_polygon = unary_union((self.datamap.point_geom(100, 100),
-                                         self.datamap.point_geom(100, 101)))
-        expected_polygon = Polygon(((-71.97222222222223, 44.97222222222223),
-                                    (-71.9725, 44.97222222222223),
-                                    (-71.9725, 44.9725),
-                                    (-71.97222222222223, 44.9725),
-                                    (-71.97194444444443, 44.9725),
-                                    (-71.97194444444443, 44.97222222222223)))
-        self.assertEquals(composite_polygon, expected_polygon)
 
 if __name__ == '__main__':
     unittest.main()
