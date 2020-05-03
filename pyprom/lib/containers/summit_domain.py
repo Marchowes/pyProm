@@ -101,9 +101,9 @@ class SummitDomain:
         :rtype: :class:`pyprom.lib.locations.spot_elevation.SpotElevation`
         """
         for point in self.points:
-            x, y = self.datamap.latlong_to_xy(point[0], point[1])
-            elevation = self.datamap.numpy_map[x, y]
-            yield SpotElevation(point[0], point[1], elevation)
+            lat, long = self.datamap.xy_to_latlong(point[0], point[1])
+            elevation = self.datamap.get(point[0], point[1])
+            yield SpotElevation(lat, long, elevation)
 
     def iterateBaseGridPoint(self):
         """
@@ -126,9 +126,8 @@ class SummitDomain:
         :rtype: :class:`pyprom.lib.locations.gridpoint.GridPoint`
         """
         for point in self.points:
-            x, y = self.datamap.latlong_to_xy(point[0], point[1])
-            elevation = self.datamap.numpy_map[x, y]
-            yield GridPoint(x, y, elevation)
+            elevation = self.datamap.get(point[0], point[1])
+            yield GridPoint(point[0], point[1], elevation)
 
     def baseCoordinate(self):
         """
