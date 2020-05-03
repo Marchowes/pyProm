@@ -103,7 +103,7 @@ class Walk:
 
         In the case of analysis of the high shore of a Saddle, this function
         accepts a list of points, and climbs from all of them. leveraging the
-        climb() function to determine which Saddle Domain the point belongs to.
+        climb() function to determine which Saddle Domain the point belongs to.f
 
         This function is also used an an intermediary to analyze multipoints
         along a domain walk path. This is done by passing an entryPoint and no
@@ -130,8 +130,6 @@ class Walk:
 
         if entryPoint:
             closest = findClosestPointsByDistance(mp.points, mp.perimeter.findHighPerimeter(mp.elevation), self.domainmap.datamap)
-
-            #closest = mp.closest_high_edge_to_internal_points()
             for internal_pt, highShore in closest.items():
                 # assign all internal members of the multipoint to the summit domain of the closest highShore
                 self.summit_domain_points[internal_pt[0]][internal_pt[1]] = self.summit_domain_points[highShore[0]][highShore[1]]
