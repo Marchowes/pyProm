@@ -82,7 +82,7 @@ class SpotElevationContainer(_Base):
     def by_id(self, id):
         """
         Returns member SpotElevation derivative by ID if it exists.
-        :param id: string ID of SpotElevation derivative
+        :param string id: string ID of SpotElevation derivative
         :return: SpotElevation derivative object
         """
         # We want to throw an exception if it's not there.
