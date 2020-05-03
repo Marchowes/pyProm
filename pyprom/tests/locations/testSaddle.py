@@ -11,6 +11,7 @@ from pyprom.domain import Domain
 from pyprom.lib.locations.saddle import Saddle
 from pyprom.lib.locations.summit import Summit
 from pyprom.lib.containers.linker import Linker
+from pyprom.lib.containers.summit_domain import SummitDomain
 from pyprom.tests.getData import gettestzip
 from pyprom.dataload import GDALLoader
 from pyprom.feature_discovery import AnalyzeData
@@ -138,6 +139,23 @@ class SaddleTests(unittest.TestCase):
             linker.add_to_remote_saddle_and_summit()
         self.assertEqual(saddle1000.feature_neighbors(), [summit1, summit2])
 
+    def testSaddleFeatureNeighbors(self):
+        """
+        Ensure domains getter returns expected results.
+        """
+        summit1 = Summit(1, 1, 10000)
+        summit2 = Summit(2, 2, 20000)
+        saddle1000 = Saddle(1000, 1000, 1000)
+        summit_domain1 = SummitDomain(self.datamap, summit1, saddle1000, [])
+        summit1.domain = summit_domain1
+        summit_domain2 = SummitDomain(self.datamap, summit2, saddle1000, [])
+        summit2.domain = summit_domain2
+        linkerH1a = Linker(summit1, saddle1000)
+        linkerH1b = Linker(summit2, saddle1000)
+        for linker in [linkerH1a, linkerH1b]:
+            linker.add_to_remote_saddle_and_summit()
+        self.assertEqual(saddle1000.domains, [summit_domain1, summit_domain2])
+
     def testSaddleEmancipate(self):
         """
         Ensure emancipate() works as expected
@@ -247,6 +265,37 @@ class SaddleTests(unittest.TestCase):
         self.assertEqual([eqhtbasinsad2], eqhtbasinsad.basinSaddleAlternatives)
         self.assertEqual([eqhtbasinsad], eqhtbasinsad2.basinSaddleAlternatives)
         self.assertTrue(child.summits[0].disqualified)
+
+
+    def testSaddleHighShoreShortestPath(self):
+        """
+        Ensure high_shore_shortest_path() produces expected results.
+        Single Point.
+        """
+        someslice = self.datamap.subset(0, 0, 30, 30)
+        domain = Domain(someslice)
+        domain.run()
+        saddles = domain.saddles
+        saddle = saddles[7]
+        point1, point2, middle = saddle.high_shore_shortest_path(someslice)
+        self.assertEqual(point1, (12, 9, 423.0))
+        self.assertEqual(point2, (14, 10, 423.0))
+        self.assertEqual(middle, (13, 9))
+
+    def testSaddleHighShoreShortestPathMultiPoint(self):
+        """
+        Ensure high_shore_shortest_path() produces expected results.
+        Multipoint
+        """
+        someslice = self.datamap.subset(0, 0, 30, 30)
+        domain = Domain(someslice)
+        domain.run()
+        saddles = domain.saddles
+        saddle = saddles.multipoints[1]
+        point1, point2, middle = saddle.high_shore_shortest_path(someslice)
+        self.assertEqual(point1, (7, 27, 425.0))
+        self.assertEqual(point2, (4, 27, 425.0))
+        self.assertEqual(middle, (5, 27))
 
 
 def make_em():

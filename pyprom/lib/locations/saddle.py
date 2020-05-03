@@ -165,7 +165,15 @@ class Saddle(SpotElevation):
         return neighbors
 
     def high_shore_shortest_path(self, datamap):
-        #needs to include perimeter in full path
+        """
+        Finds the two closest opposing high shore points.
+        This follows a path inside the saddle.
+        Also returns the midpoint.
+
+        :param datamap: Datamap required for distance calculations.
+        :type datamap: :class:`pyprom.lib.datamap.DataMap`
+        :return: HS1, HS2, Midpoint
+        """
         bsi = BaseSelfIterable()
         bsi.points = []
         if self.multiPoint:
