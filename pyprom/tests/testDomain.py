@@ -37,6 +37,17 @@ class DomainTests(unittest.TestCase):
         self.assertEqual(newDomain.linkers, self.domain.linkers)
         self.assertEqual(newDomain.summit_domains, self.domain.summit_domains)
 
+    def testDomainFromDictWrongSubset(self):
+        """
+        Try loading Domain with different datamap, should raise xception
+        """
+        domainDict = self.domain.to_dict()
+        someslice = self.domain.datamap.subset(0, 0, 20, 20)
+        with self.assertRaises(Exception) as e:
+            Domain.from_dict(domainDict, someslice)
+        self.assertEqual(str(e.exception),
+                         "Datamap file does not match Datamap file used to create Domain.")
+
     def testDomainFromCbor(self):
         """
         Ensure loading cbor binary into :class:`Domain`

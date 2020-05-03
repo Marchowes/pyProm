@@ -14,13 +14,9 @@ import logging
 import gzip
 import cbor
 
-from timeit import default_timer
-from datetime import timedelta
-from collections import defaultdict, deque
 
 from .feature_discovery import AnalyzeData
 from .lib.datamap import DataMap
-from .lib.logic.equalheight import equalHeightBlob
 from .dataload import Loader
 from .lib.containers.spot_elevation import SpotElevationContainer
 from .lib.containers.summits import SummitsContainer
@@ -28,7 +24,6 @@ from .lib.containers.runoffs import RunoffsContainer
 from .lib.containers.saddles import SaddlesContainer
 from .lib.containers.linker import Linker
 from .lib.containers.summit_domain import SummitDomain
-from .lib.locations.gridpoint import GridPoint
 from .lib.logic.basin_saddle_finder import BasinSaddleFinder
 from .lib.logic.summit_domain_walk import Walk
 from .lib.constants import DOMAIN_EXTENSION
