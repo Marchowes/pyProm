@@ -288,47 +288,17 @@ class MultipointTests(unittest.TestCase):
         result = mp.closestPoint(point, asSpotElevation=True)
         self.assertEqual(expectedResult, result)
 
-
-
-
-    def testMultiPointClosestHighPerimeterPoint(self):
+    def testMultiPointWithElevation(self):
         """
-        Ensure closestHighPerimeterPoint() returns the expected results
-        asSpotElevation = False
+        Ensure points_with_elevation produces expected results.
         """
-        mp = self.saddles.multipoints[0].multiPoint
+        mp = self.saddles[3].multiPoint
+        pwe = [(0, 65, 564.0), (0, 64, 564.0), (1, 66, 564.0),
+               (1, 65, 564.0), (1, 67, 564.0), (2, 66, 564.0),
+               (2, 65, 564.0), (2, 67, 564.0), (2, 69, 564.0),
+               (3, 64, 564.0), (3, 63, 564.0), (3, 68, 564.0),
+               (3, 69, 564.0)]
+        result = mp.points_with_elevation()
+        self.assertEqual(pwe, result)
 
-        closest = mp.closestHighPerimeterPoint((0, 0, 0))
-        self.assertEqual(closest, (4, 55, 559))
 
-        closest = mp.closestHighPerimeterPoint((0, 55, 0))
-        self.assertEqual(closest, (0, 56, 559))
-
-        closest = mp.closestHighPerimeterPoint((10, 0, 0))
-        self.assertEqual(closest, (4, 55, 559))
-
-        closest = mp.closestHighPerimeterPoint((10, 60, 0))
-        self.assertEqual(closest, (5, 58, 559))
-
-    def testMultiPointClosestHighPerimeterPointSpotElevation(self):
-        """
-        Ensure closestHighPerimeterPoint() returns the expected results
-        asSpotElevation = True
-        """
-        mp = self.saddles.multipoints[0].multiPoint
-
-        closest = mp.closestHighPerimeterPoint((0, 0, 0),
-                                               asSpotElevation=True)
-        self.assertEqual(closest, (SpotElevation(44.721250000000005, -71.70708333333333, 559)))
-
-        closest = mp.closestHighPerimeterPoint((0, 55, 0),
-                                               asSpotElevation=True)
-        self.assertEqual(closest, (SpotElevation(44.72236111111111, -71.70680555555556, 559)))
-
-        closest = mp.closestHighPerimeterPoint((10, 0, 0),
-                                               asSpotElevation=True)
-        self.assertEqual(closest, (SpotElevation(44.721250000000005, -71.70708333333333, 559)))
-
-        closest = mp.closestHighPerimeterPoint((10, 60, 0),
-                                               asSpotElevation=True)
-        self.assertEqual(closest, (SpotElevation(44.72097222222222, -71.70625, 559)))
