@@ -15,6 +15,7 @@ from .util import checksum
 
 from math import hypot
 from shapely.geometry import Polygon
+from numpy import array2string
 
 ARCSEC_DEG = 3600
 ARCMIN_DEG = 60
@@ -41,7 +42,8 @@ class DataMap:
         if filename != NON_FILE_SENTINEL:
             self.md5 = checksum(filename)
         else:
-            self.md5 = None
+            # Not really an MD5, but whatever.
+            self.md5 = hash(array2string(self.numpy_map))
         unit_and_substrings = {"METERS": ["meter", "metre"], "FEET": ["foot", "feet"]}
         self.unit = None
         for unitname, unit_options in unit_and_substrings.items():
