@@ -224,6 +224,23 @@ class SpotElevationContainer(_Base):
         self.points.append(spotElevation)
         self.fast_lookup[spotElevation.id] = spotElevation
 
+    def extend(self, spotElevations):
+        """
+        Extend a list of :class:`pyprom.lib.locations.spot_elevation.SpotElevation`
+        to this container.
+
+        :param spotElevations: list of SpotElevations to append.
+        :type list(spotElevation):
+         list(:class:`pyprom.lib.locations.spot_elevation.SpotElevation`)
+        :raises: TypeError if point not of
+         :class:`pyprom.lib.locations.spot_elevation.SpotElevation`
+        """
+        for se in spotElevations:
+            isSpotElevation(se)
+        self.points.extend(spotElevations)
+        for se in spotElevations:
+            self.fast_lookup[se.id] = se
+
     def index(self, spotElevation):
         """
         Returns the index that this

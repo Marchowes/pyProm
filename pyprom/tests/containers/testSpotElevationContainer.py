@@ -171,6 +171,23 @@ class SpotElevationContainerTests(unittest.TestCase):
         container.append(Summit(1, 2, 3))
         container.append(Saddle(1, 2, 3))
 
+    def testSpotElevationContainerExtend(self):
+        """
+        Ensure extending Different child SpotElevations
+        to SpotElevationContainer succeeds.
+        """
+        container = SpotElevationContainer([])
+        container.extend([Summit(1, 2, 3), Saddle(1, 2, 3)])
+
+    def testSpotElevationContainerExtendNegative(self):
+        """
+        Ensure extending Different child SpotElevations
+        to SpotElevationContainer succeeds.
+        """
+        container = SpotElevationContainer([])
+        with self.assertRaises(TypeError):
+            container.extend(['what?'])
+
     def testSpotElevationContainerSetItem(self):
         """
         Ensure setting item index succeeds.
