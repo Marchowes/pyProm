@@ -34,3 +34,10 @@ class SpotElevationTests(unittest.TestCase):
         se = SpotElevation(44.11291666666667, -71.37791666666666, 100)
         shouldBe = ((44, 6, 46.50000000001398), (-71, 22, 40.49999999999045))
         self.assertTupleEqual(se.dms, shouldBe)
+
+    def testSpotElevationShape(self):
+       """
+       Ensure shape works.
+       """
+       se = SpotElevation(44.11291666666667, -71.37791666666666, 100)
+       self.assertEqual(se.shape.wkt, "POINT (-71.37791666666666 44.11291666666667)")
