@@ -227,6 +227,7 @@ class AnalyzeData:
         :param multipoint: MultiPoint container
         :type multipoint: :class:`pyprom.lib.containers.multipoint.MultiPoint`
         :param bool edge: is this feature on the map edge?
+        :param list edgePoints: list of edgePoints (x, y, el tuples).
         :return: List of Container Objects.
         :rtype: :class:`pyprom.lib.containers.spot_elevation.SpotElevationContainer`
          child objects.
@@ -272,14 +273,18 @@ class AnalyzeData:
         """
         figure out edge runoffs and saddles.
 
-        :param x:
-        :param y:
-        :param perimeter:
-        :param multipoint:
-        :param edge:
-        :param edgePoints:
-        :param highPerimeter:
-        :return:
+        :param int x: x coordinate in raster data.
+        :param int y: y coordinate in raster data.
+        :param perimeter: Perimeter container
+        :type perimeter: :class:`pyprom.lib.containers.perimeter.Perimeter`
+        :param multipoint: MultiPoint container
+        :type multipoint: :class:`pyprom.lib.containers.multipoint.MultiPoint`
+        :param bool edge: is this feature on the map edge?
+        :param list edgePoints: list of edgePoints (x, y, el tuples).
+        :param highPerimeter: list of high perimeter points
+        :return: List of Container Objects.
+        :rtype: :class:`pyprom.lib.containers.spot_elevation.SpotElevationContainer`
+         child objects.
         """
 
         returnable_features = []
@@ -301,7 +306,6 @@ class AnalyzeData:
             returnable_features.append(runoff)
             # No need to further process.
             return returnable_features
-
 
         # All points which are technically perimeter points,
         # which are on the edge of our map regardless of elevation
@@ -418,7 +422,6 @@ class AnalyzeData:
                                     highShores = highPerimeter,
                                     edgePoints = remaining_edgepoints)
                     returnable_features.append(saddle)
-
         return returnable_features
 
 def make_corner_runoffs(datamap):
