@@ -130,6 +130,23 @@ class SaddlesContainer(SpotElevationContainer):
         self.points.append(saddle)
         self.fast_lookup[saddle.id] = saddle
 
+    def extend(self, saddles):
+        """
+        Extend a list of :class:`pyprom.lib.locations.saddle.Saddle`
+        to this container.
+
+        :param saddles: list of Saddles to append.
+        :type list(saddles):
+         list(:class:`pyprom.lib.locations.saddle.Saddle`)
+        :raises: TypeError if point not of
+         :class:`pyprom.lib.locations.saddle.Saddle`
+        """
+        for sa in saddles:
+            isSaddle(sa)
+        self.points.extend(saddles)
+        for sa in saddles:
+            self.fast_lookup[sa.id] = sa
+
     def to_dict(self):
         """
         :return: dict() representation of :class:`SaddlesContainer`

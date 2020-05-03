@@ -57,6 +57,25 @@ class SummitsContainerTests(unittest.TestCase):
         container = SummitsContainer([])
         container.append(Summit(1, 2, 3))
 
+    def testSummitsContainerExtend(self):
+        """
+        Ensure extending Different child Summits
+        to SummitsContainer succeeds.
+        """
+        container = SummitsContainer([])
+        summit = Summit(1, 2, 3)
+        container.extend([summit])
+        self.assertEqual(container.points, [summit])
+
+    def testSummitsContainerExtendNegative(self):
+        """
+        Ensure extending invalid child Summits
+        to SummitsContainer fails.
+        """
+        container = SummitsContainer([])
+        with self.assertRaises(TypeError):
+            container.extend([Saddle(1, 2, 3)])
+
     def testSummitsContainerGetItem(self):
         """
         Ensure getting item index succeeds.

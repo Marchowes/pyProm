@@ -62,6 +62,25 @@ class SaddlesContainerTests(unittest.TestCase):
         container = SaddlesContainer([])
         container.append(Saddle(1, 2, 3))
 
+    def testSaddlesContainerExtend(self):
+        """
+        Ensure extending Different child Saddles
+        to SaddlesContainer succeeds.
+        """
+        container = SaddlesContainer([])
+        saddle = Saddle(1, 2, 3)
+        container.extend([saddle])
+        self.assertEqual(container.points, [saddle])
+
+    def testSaddlesContainerExtendNegative(self):
+        """
+        Ensure extending invalid child Saddles
+        to SaddlesContainer fails.
+        """
+        container = SaddlesContainer([])
+        with self.assertRaises(TypeError):
+            container.extend([Summit(1, 2, 3)])
+
     def testSaddlesContainerGetItem(self):
         """
         Ensure getting item index succeeds.

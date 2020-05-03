@@ -181,8 +181,8 @@ class SpotElevationContainerTests(unittest.TestCase):
 
     def testSpotElevationContainerExtendNegative(self):
         """
-        Ensure extending Different child SpotElevations
-        to SpotElevationContainer succeeds.
+        Ensure extending invalid child SpotElevations
+        to SpotElevationContainer fails.
         """
         container = SpotElevationContainer([])
         with self.assertRaises(TypeError):

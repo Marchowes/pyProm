@@ -61,6 +61,25 @@ class RunoffsContainerTests(unittest.TestCase):
         container = RunoffsContainer([])
         container.append(Runoff(1, 2, 3))
 
+    def testRunoffsContainerExtend(self):
+        """
+        Ensure extending Different child Runoffs
+        to RunoffsContainer succeeds.
+        """
+        container = RunoffsContainer([])
+        runoff = Runoff(1, 2, 3)
+        container.extend([runoff])
+        self.assertEqual(container.points, [runoff])
+
+    def testRunoffsContainerExtendNegative(self):
+        """
+        Ensure extending invalid child Runoffs
+        to RunoffsContainer fails.
+        """
+        container = RunoffsContainer([])
+        with self.assertRaises(TypeError):
+            container.extend([Summit(1, 2, 3)])
+
     def testRunoffsContainerGetItem(self):
         """
         Ensure getting item index succeeds.

@@ -68,22 +68,7 @@ class AnalyzeData:
         """
         _, _, _ = self.analyze()
         # Corners also are runoffs.
-        rll = Runoff(*self.datamap.lower_left,
-                     self.datamap.get(self.max_x, 0))
-        rll.edgePoints.append((self.max_x, 0, self.datamap.get(self.max_x, 0)))
-        rlr = Runoff(*self.datamap.lower_right,
-                     self.datamap.get(self.max_x, self.max_y))
-        rlr.edgePoints.append((self.max_x, self.max_y, self.datamap.get(self.max_x, self.max_y)))
-        rul = Runoff(*self.datamap.upper_left,
-                     self.datamap.get(0, 0))
-        rul.edgePoints.append((0, 0, self.datamap.get(0, 0)))
-        rur = Runoff(*self.datamap.upper_right,
-                     self.datamap.get(0, self.max_y))
-        rur.edgePoints.append((0, self.max_y, self.datamap.get(0, self.max_y)))
-        self.runoffObjects.append(rll)
-        self.runoffObjects.append(rlr)
-        self.runoffObjects.append(rul)
-        self.runoffObjects.append(rur)
+        self.runoffObjects.extend(make_corner_runoffs(self.datamap))
 
         if rebuildSaddles:
             self.logger.info("Rebuilding Saddles")
@@ -435,3 +420,27 @@ class AnalyzeData:
                     returnable_features.append(saddle)
 
         return returnable_features
+
+def make_corner_runoffs(datamap):
+    """
+    Dumb function for generating single point corner runoffs.
+
+    :param datamap: datamap to generate corner runoffs for.
+    :type datamap: :class:`pyprom.lib.datamap.DataMap`
+    :return: list(:class:`pyprom.lib.locations.runoff.Runoff`)
+    """
+
+    rll = Runoff(*datamap.lower_left,
+                 datamap.get(datamap.max_x, 0))
+    rll.edgePoints.append((datamap.max_x, 0, datamap.get(datamap.max_x, 0)))
+    rlr = Runoff(*datamap.lower_right,
+                 datamap.get(datamap.max_x, datamap.max_y))
+    rlr.edgePoints.append((datamap.max_x, datamap.max_y, datamap.get(datamap.max_x, datamap.max_y)))
+    rul = Runoff(*datamap.upper_left,
+                 datamap.get(0, 0))
+    rul.edgePoints.append((0, 0, datamap.get(0, 0)))
+    rur = Runoff(*datamap.upper_right,
+                 datamap.get(0, datamap.max_y))
+    rur.edgePoints.append((0, datamap.max_y, datamap.get(0, datamap.max_y)))
+
+    return [rll, rlr, rul, rur]

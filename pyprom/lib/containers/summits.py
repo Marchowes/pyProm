@@ -54,6 +54,23 @@ class SummitsContainer(SpotElevationContainer):
         self.points.append(summit)
         self.fast_lookup[summit.id] = summit
 
+    def extend(self, summits):
+        """
+        Extend a list of :class:`pyprom.lib.locations.summit.Summit
+        to this container.
+
+        :param summits: list of Saddles to append.
+        :type list(summits):
+         list(:class:`pyprom.lib.locations.summit.Summit`)
+        :raises: TypeError if point not of
+         :class:`pyprom.lib.locations.summit.Summit'
+        """
+        for su in summits:
+            isSummit(su)
+        self.points.extend(summits)
+        for su in summits:
+            self.fast_lookup[su.id] = su
+
     def to_dict(self):
         """
         Create the dictionary representation of this object.
