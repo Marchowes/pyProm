@@ -43,8 +43,8 @@ class Perimeter(BaseSelfIterable):
             raise Exception("choose one, pointList or PointIndex")
         if pointIndex:
             self.pointIndex = pointIndex
-            self.points = [iep for x, _y in self.pointIndex.items()
-                           for y, iep in _y.items()]
+            self.points = [p for x, _y in self.pointIndex.items()
+                           for y, p in _y.items()]
 
         if pointList:
             self.points = pointList
