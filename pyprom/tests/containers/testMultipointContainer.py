@@ -13,7 +13,6 @@ from pyprom.lib.locations.base_coordinate import BaseCoordinate
 from pyprom.lib.locations.base_gridpoint import BaseGridPoint
 from pyprom.lib.locations.gridpoint import GridPoint
 from pyprom.lib.containers.multipoint import MultiPoint
-from pyprom.lib.locations.spot_elevation import SpotElevation
 
 
 class MultipointTests(unittest.TestCase):
@@ -165,7 +164,7 @@ class MultipointTests(unittest.TestCase):
         Ensure edge effect Saddle-like objects generate an edgePoint list.
         """
         edgePoint = (37, 99, 605.0)
-        edgeMulti = self.runoffs[9]
+        edgeMulti = self.runoffs[8]
         self.assertTrue(edgeMulti.edgeEffect)
         self.assertEqual(edgeMulti.edgePoints, [edgePoint])
 

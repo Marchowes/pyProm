@@ -51,7 +51,7 @@ def equalHeightBlob(datamap, x, y, elevation):
             if x_mapEdge.get(gridPoint[0]) or y_mapEdge.get(gridPoint[1]):
                 edge = True
         for _x, _y, elevation in neighbors:
-            if elevation is None:
+            if elevation is None or elevation == datamap.nodata:
                 continue
             elif elevation == masterGridPoint[2] and\
                     not exploredEqualHeight[_x].get(_y, False):
