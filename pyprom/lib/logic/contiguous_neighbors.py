@@ -12,14 +12,14 @@ OFFSETS = (-1, 0, 1)
 
 def contiguous_neighbors(points):
     """
-    Consumes a list of (x,y,el) points. finds which points neighbor
+    Consumes a list of (x, y, ele) points. finds which points neighbor
     each other diagonally or orthogonally.
 
     This works by looking at full X, Y cartesian slices
 
     :param points: list of (x, y, ele) points
     :param datamap: datamap
-    :return: Finds all contigous blocks of neighboring points.
+    :return: Finds all contiguous blocks of neighboring points.
      Returns list of these contiguous blocks.
     """
     points = set(points)
@@ -55,10 +55,16 @@ def contiguous_neighbors(points):
 
 def touching_neighborhoods(list_of_point_lists, datamap):
     """
-    todo: inefficient, fix.
-    :param list_of_point_lists:
-    :param datamap:
-    :return:
+    Consumes list of point lists and which lists touch.
+
+    THis works by looking at the list index from the passed
+    in from list_of_point_lists. What is returned follows
+    the following format:
+    Example:
+    {0: [2, 4], 1: [3, 2]})
+    {my_idx: [touching_neighborhood_1_idx, ...]}
+    :param list list_of_point_lists: list(list(tuple(x, y, ele)))
+    :param datamap: datamap
     """
     touching_neighborhoods = defaultdict(list)
 
