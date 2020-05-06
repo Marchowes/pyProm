@@ -129,7 +129,7 @@ class Walk:
                 self.logger.info("point {} didn't climb anywhere!".format(point))
 
         if entryPoint:
-            closest = findClosestPointsByDistance(mp.points, mp.perimeter.findHighPerimeter(mp.elevation), self.domainmap.datamap)
+            closest = findClosestPointsByDistance(mp.points, mp.perimeter.findHighPerimeter(mp.elevation))
             for internal_pt, highShore in closest.items():
                 # assign all internal members of the multipoint to the summit domain of the closest highShore
                 self.summit_domain_points[internal_pt[0]][internal_pt[1]] = self.summit_domain_points[highShore[0]][highShore[1]]
