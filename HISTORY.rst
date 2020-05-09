@@ -1,5 +1,13 @@
 Release History
 
+0.7.0 (May 9, 2020)
++++++++++++++++++++
+* Significant Improvements to Walk accuracy
+* Significant improvements to RunOff accuracy
+* Further movement away from point objects, and to tuples (namely, with highshores)
+* Introduction of SummitDomain
+* Saddle simplification has been moved to Walk functionality
+
 0.6.4 (July 9, 2019)
 ++++++++++++++++++++
 * Now with accurate Metric-Imperial unit conversion!
