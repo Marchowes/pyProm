@@ -1,4 +1,4 @@
-FROM marchowes/pyprom:2.3
+FROM marchowes/pyprom:2.4
 
 ENV PATH "$PATH:/root/miniconda3/bin"
 

@@ -1,18 +1,24 @@
 version: '3'
 services:
   test-pyprom:
+    image: marchowes/pyprom:2.4
     build:
       context: .
       dockerfile: Dockerfile.pyprom-test
+    entrypoint: ["make", "test"]
     volumes:
       - ./:/pyProm
     working_dir:
       /pyProm
 
   pyprom:
+    image: marchowes/pyprom:2.4
     build:
       context: .
       dockerfile: Dockerfile.pyprom
+    environment:
+      - PATH=$PATH:/root/miniconda3/bin
+    entrypoint: ["ipython"]
     volumes:
       - ./:/pyProm
     working_dir:
