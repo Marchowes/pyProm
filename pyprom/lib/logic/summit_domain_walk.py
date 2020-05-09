@@ -17,7 +17,7 @@ from ..containers.runoffs import RunoffsContainer
 from ..containers.spot_elevation import SpotElevationContainer
 from ..logic.internal_saddle_network import InternalSaddleNetwork
 from ..logic.tuple_funcs import highest
-from ..logic.shortest_path_by_points import findClosestPointsByDistance
+from ..logic.shortest_path_by_points import find_closest_point_by_distance_map
 
 from timeit import default_timer
 from datetime import timedelta
@@ -129,7 +129,7 @@ class Walk:
                 self.logger.info("point {} didn't climb anywhere!".format(point))
 
         if entryPoint:
-            closest = findClosestPointsByDistance(mp.points, mp.perimeter.findHighPerimeter(mp.elevation))
+            closest = find_closest_point_by_distance_map(mp.points, mp.perimeter.findHighPerimeter(mp.elevation))
             for internal_pt, highShore in closest.items():
                 # assign all internal members of the multipoint to the summit domain of the closest highShore
                 self.summit_domain_points[internal_pt[0]][internal_pt[1]] = self.summit_domain_points[highShore[0]][highShore[1]]

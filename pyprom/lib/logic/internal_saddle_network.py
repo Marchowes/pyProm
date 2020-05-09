@@ -16,7 +16,7 @@ from ..locations.vertex_link import Vertex_Link
 from ..containers.feature_verticies import Feature_Verticies
 from ..containers.gridpoint import GridPointContainer
 from ..locations.saddle import Saddle
-from .shortest_path_by_points import findClosestPoints
+from .shortest_path_by_points import find_closest_points
 
 from collections import defaultdict
 
@@ -249,7 +249,7 @@ class InternalSaddleNetwork(object):
                 if index[outerIdx][innerIdx]:
                     continue
                 # outer closest, inner closest, distance between
-                outer, inner, distance = findClosestPoints(self.saddle.highShores[innerIdx], self.saddle.highShores[outerIdx], self.datamap)
+                outer, inner, distance = find_closest_points(self.saddle.highShores[innerIdx], self.saddle.highShores[outerIdx], self.datamap)
 
                 # assign tuple to hash for local and remote so we don't
                 # have to bother calculating twice.

@@ -149,7 +149,7 @@ def closest_point_by_distance_kdtree(us, them):
     return closest
 
 
-def findClosestPoints(us, them, datamap):
+def find_closest_points(us, them, datamap):
     """
     Returns closest points from two different sets of coordinates
     as well as their distance.
@@ -168,7 +168,7 @@ def findClosestPoints(us, them, datamap):
     else:
         return closest_points_between_sets_kdtree(us, them, datamap)
 
-def findClosestPointsByDistance(us, them):
+def find_closest_point_by_distance_map(us, them):
     """
     For all points in us, find the closest point in them.
 
