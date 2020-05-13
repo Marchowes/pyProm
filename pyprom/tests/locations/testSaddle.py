@@ -11,10 +11,20 @@ from pyprom.domain import Domain
 from pyprom.lib.locations.saddle import Saddle
 from pyprom.lib.locations.summit import Summit
 from pyprom.lib.containers.linker import Linker
+from pyprom.lib.containers.summit_domain import SummitDomain
 from pyprom.tests.getData import gettestzip
 from pyprom.dataload import GDALLoader
 from pyprom.feature_discovery import AnalyzeData
 
+def make_em():
+    """
+    Helper for making parent - child related saddles
+    """
+    child = Saddle(1, 1, 1)
+    parent = Saddle(2, 2, 2)
+    child.parent = parent
+    parent.children = [child]
+    return parent, child
 
 class SaddleTests(unittest.TestCase):
     """Test Saddles."""
@@ -63,7 +73,6 @@ class SaddleTests(unittest.TestCase):
         someslice = self.datamap.subset(0, 0, 30, 30)
         domain = Domain(someslice)
         domain.run()
-        domain.walk()
         saddles = domain.saddles
         saddle = saddles[7]
         saddleDict = saddle.to_dict()
@@ -93,11 +102,11 @@ class SaddleTests(unittest.TestCase):
         someslice = self.datamap.subset(0, 0, 30, 30)
         domain = Domain(someslice)
         domain.run()
-        domain.walk()
         saddles = domain.saddles
         saddle = saddles[18]
         saddleDict = saddle.to_dict()
         newSaddle = Saddle.from_dict(saddleDict, datamap=someslice)
+        self.assertTrue(saddle.parent)
         self.assertEqual(newSaddle, saddle)
         self.assertEqual(newSaddle.latitude, saddle.latitude)
         self.assertEqual(newSaddle.longitude, saddle.longitude)
@@ -129,6 +138,175 @@ class SaddleTests(unittest.TestCase):
         for linker in [linkerH1a, linkerH1b]:
             linker.add_to_remote_saddle_and_summit()
         self.assertEqual(saddle1000.feature_neighbors(), [summit1, summit2])
+
+    def testSaddleFeatureNeighbors(self):
+        """
+        Ensure domains getter returns expected results.
+        """
+        summit1 = Summit(1, 1, 10000)
+        summit2 = Summit(2, 2, 20000)
+        saddle1000 = Saddle(1000, 1000, 1000)
+        summit_domain1 = SummitDomain(self.datamap, summit1, saddle1000, [])
+        summit1.domain = summit_domain1
+        summit_domain2 = SummitDomain(self.datamap, summit2, saddle1000, [])
+        summit2.domain = summit_domain2
+        linkerH1a = Linker(summit1, saddle1000)
+        linkerH1b = Linker(summit2, saddle1000)
+        for linker in [linkerH1a, linkerH1b]:
+            linker.add_to_remote_saddle_and_summit()
+        self.assertEqual(saddle1000.domains, [summit_domain1, summit_domain2])
+
+    def testSaddleEmancipate(self):
+        """
+        Ensure emancipate() works as expected
+        """
+        # Basic test
+        parent, child = make_em()
+        child.emancipate()
+        self.assertEqual([], parent.children)
+        self.assertEqual(None, child.parent)
+
+        # Make sure we can emancipate, even if parent is unaware
+        parent, child = make_em()
+        parent.children = []
+        child.emancipate()
+        self.assertEqual([], parent.children)
+        self.assertEqual(None, child.parent)
+
+        # Make sure other children are left alone
+        parent, child = make_em()
+        sibling = parent = Saddle(3, 3, 3)
+        parent.children.append(sibling)
+        child.emancipate()
+        self.assertEqual([sibling], parent.children)
+        self.assertEqual(None, child.parent)
+
+        # Twins? Make sure the twin is left alone
+        parent, child = make_em()
+        twin = Saddle(2, 2, 2)
+        parent.children.append(twin)
+        child.emancipate()
+        self.assertEqual([twin], parent.children)
+        self.assertEqual(None, child.parent)
+
+        # Clones? make sure the clone is removed
+        parent, child = make_em()
+        parent.children.append(child)
+        self.assertTrue(len(parent.children) == 2)
+        child.emancipate()
+        self.assertEqual([], parent.children)
+        self.assertEqual(None, child.parent)
+
+    def testSaddleDisownChildren(self):
+        """
+        Ensure disown_children() works as expected
+        """
+        # Basic test
+        parent, child = make_em()
+        parent.disown_children()
+        self.assertEqual([], parent.children)
+        self.assertEqual(None, child.parent)
+
+        # Make sure multiple children are removed
+        parent, child = make_em()
+        sibling = Saddle(3, 3, 3)
+        sibling.parent = parent
+        parent.children.append(sibling)
+        parent.disown_children()
+        self.assertEqual([], parent.children)
+        self.assertEqual(None, child.parent)
+        self.assertEqual(None, sibling.parent)
+
+        # Make sure multiple children are removed, including
+        # ones with incomplete references to parent.
+        parent, child = make_em()
+        sibling = Saddle(3, 3, 3)
+        parent.children.append(sibling)
+        parent.disown_children()
+        self.assertEqual([], parent.children)
+        self.assertEqual(None, child.parent)
+        self.assertEqual(None, sibling.parent)
+
+        # Clones? make sure no Exception
+        parent, child = make_em()
+        parent.children.append(child)
+        parent.disown_children()
+        self.assertEqual([], parent.children)
+        self.assertEqual(None, child.parent)
+
+    def testSaddleSoftDelete(self):
+        """
+        Ensure soft_delete() works as expected
+        """
+        # Basic test
+        parent, child = make_em()
+        eqhtbasinsad = Saddle(3, 3, 1)
+        eqhtbasinsad.basinSaddleAlternatives = [child]
+        child.basinSaddleAlternatives = [eqhtbasinsad]
+        child.soft_delete()
+        self.assertEqual([], parent.children)
+        self.assertEqual(None, child.parent)
+        self.assertEqual([], child.basinSaddleAlternatives)
+        self.assertEqual([], eqhtbasinsad.basinSaddleAlternatives)
+        self.assertTrue(child.disqualified)
+
+        # 3 equal heights and a linker
+        parent, child = make_em()
+        child.summits = [Linker(None, child)]
+        eqhtbasinsad = Saddle(3, 3, 1)
+        eqhtbasinsad2 = Saddle(4, 4, 1)
+        eqhtbasinsad.basinSaddleAlternatives = [child, eqhtbasinsad2]
+        eqhtbasinsad2.basinSaddleAlternatives = [child, eqhtbasinsad]
+        child.basinSaddleAlternatives = [eqhtbasinsad, eqhtbasinsad2]
+        child.soft_delete()
+        self.assertEqual([], parent.children)
+        self.assertEqual(None, child.parent)
+        self.assertEqual([], child.basinSaddleAlternatives)
+        self.assertEqual([eqhtbasinsad2], eqhtbasinsad.basinSaddleAlternatives)
+        self.assertEqual([eqhtbasinsad], eqhtbasinsad2.basinSaddleAlternatives)
+        self.assertTrue(child.summits[0].disqualified)
+
+
+    def testSaddleHighShoreShortestPath(self):
+        """
+        Ensure high_shore_shortest_path() produces expected results.
+        Single Point.
+        """
+        someslice = self.datamap.subset(0, 0, 30, 30)
+        domain = Domain(someslice)
+        domain.run()
+        saddles = domain.saddles
+        saddle = saddles[7]
+        point1, point2, middle = saddle.high_shore_shortest_path(someslice)
+        self.assertEqual(point1, (12, 9, 423.0))
+        self.assertEqual(point2, (14, 10, 423.0))
+        self.assertEqual(middle, (13, 9))
+
+    def testSaddleHighShoreShortestPathMultiPoint(self):
+        """
+        Ensure high_shore_shortest_path() produces expected results.
+        Multipoint
+        """
+        someslice = self.datamap.subset(0, 0, 30, 30)
+        domain = Domain(someslice)
+        domain.run()
+        saddles = domain.saddles
+        saddle = saddles.multipoints[1]
+        point1, point2, middle = saddle.high_shore_shortest_path(someslice)
+        self.assertEqual(point1, (7, 27, 425.0))
+        self.assertEqual(point2, (4, 27, 425.0))
+        self.assertEqual(middle, (5, 27))
+
+
+def make_em():
+    """
+    Helper for making parent - child related saddles
+    """
+    child = Saddle(1, 1, 1)
+    parent = Saddle(2, 2, 2)
+    child.parent = parent
+    parent.children = [child]
+    return parent, child
 
 
 class SaddleNetworkTests(unittest.TestCase):
@@ -185,8 +363,8 @@ class SaddleNetworkTests(unittest.TestCase):
         Ensure all_neighbors returns expected results
         filterDisqualified=False
         """
-        all = self.saddle2.all_neighbors(filterDisqualified=False)
-        self.assertEqual(all, [self.saddle1,
+        allof = self.saddle2.all_neighbors(filterDisqualified=False)
+        self.assertEqual(allof, [self.saddle1,
                                self.saddle2,
                                self.saddle2,
                                self.saddle3,

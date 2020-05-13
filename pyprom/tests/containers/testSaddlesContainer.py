@@ -62,6 +62,25 @@ class SaddlesContainerTests(unittest.TestCase):
         container = SaddlesContainer([])
         container.append(Saddle(1, 2, 3))
 
+    def testSaddlesContainerExtend(self):
+        """
+        Ensure extending Different child Saddles
+        to SaddlesContainer succeeds.
+        """
+        container = SaddlesContainer([])
+        saddle = Saddle(1, 2, 3)
+        container.extend([saddle])
+        self.assertEqual(container.points, [saddle])
+
+    def testSaddlesContainerExtendNegative(self):
+        """
+        Ensure extending invalid child Saddles
+        to SaddlesContainer fails.
+        """
+        container = SaddlesContainer([])
+        with self.assertRaises(TypeError):
+            container.extend([Summit(1, 2, 3)])
+
     def testSaddlesContainerGetItem(self):
         """
         Ensure getting item index succeeds.
@@ -109,7 +128,6 @@ class SaddlesContainerTests(unittest.TestCase):
         someslice = datamap.subset(0, 0, 30, 30)
         domain = Domain(someslice)
         domain.run()
-        domain.walk()
         saddles = domain.saddles
         saddleDict = saddles.to_dict()
         newSaddles = SaddlesContainer.from_dict(saddleDict, datamap=someslice)
@@ -281,9 +299,9 @@ class SaddlesContainerRebuildTests(unittest.TestCase):
         centerpoint calculations
         """
         saddle = Saddle(44.97236111111111, -71.94458333333333, 1000)
-        saddle.highShores = [GridPointContainer([GridPoint(99, 199, 1001)]),
-                             GridPointContainer([GridPoint(99, 201, 1001)]),
-                             GridPointContainer([GridPoint(101, 199, 1001)]),
+        saddle.highShores = [[(99, 199, 1001)],
+                             [(99, 201, 1001)],
+                             [(101, 199, 1001)],
                              ]
         saddles = SaddlesContainer([saddle])
         newSaddles = saddles.rebuildSaddles(self.datamap)

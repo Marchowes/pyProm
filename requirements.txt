@@ -1,7 +1,9 @@
-numpy == 1.16.4
-gdal
+cbor
+dijkstar
 fastkml
+gdal
+geopy
+numpy == 1.16.4
+scipy
 shapely
 utm
-geopy
-cbor

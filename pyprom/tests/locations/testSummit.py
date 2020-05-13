@@ -60,12 +60,12 @@ class SummitTests(unittest.TestCase):
         someslice = datamap.subset(0, 0, 30, 30)
         domain = Domain(someslice)
         domain.run()
-        domain.walk()
         summits = domain.summits
-        summit = summits[3]
+        summit = summits[0]
         summitDict = summit.to_dict()
         newSummit = Summit.from_dict(summitDict, datamap=someslice)
 
+        self.assertTrue(summit.edgeEffect)
         self.assertEqual(newSummit, summit)
         self.assertEqual(newSummit.latitude, summit.latitude)
         self.assertEqual(newSummit.longitude, summit.longitude)

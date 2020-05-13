@@ -38,9 +38,9 @@ class LogicTests(unittest.TestCase):
         # Should find 2 Cols (non edge Effect)
         self.assertEqual(len([x for x in self.saddles
                               if not x.edgeEffect]), 2)
-        # Should find 13 cols with edgeEffect.
+        # Should find 2 Cols. and 8 runoffs
         self.assertEqual(len(self.saddles), 2)
-        self.assertEqual(len(self.runoffs), 4)
+        self.assertEqual(len(self.runoffs), 8)
 
     def testFindSummitsHighest(self):
         """

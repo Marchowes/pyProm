@@ -8,6 +8,8 @@ This library contains a base class for Coordinate oriented objects with
 Elevation data.
 """
 
+from shapely.geometry import Point
+
 from .base_coordinate import BaseCoordinate
 from .base_gridpoint import BaseGridPoint
 from ..util import randomString
@@ -93,6 +95,21 @@ class SpotElevation(BaseCoordinate):
         x, y = datamap.latlong_to_xy(self.latitude, self.longitude)
         return GridPoint(x, y, self.elevation)
 
+    def toXYTuple(self, datamap):
+        """
+        Return this :class:`SpotElevation` object as
+        an (x, y, ele) tuple
+        object based on the :class:`pyprom.lib.datamap.DataMap`
+        passed in.
+
+        :param datamap: Datamap object
+        :type datamap: :class:`pyprom.lib.datamap.DataMap`
+        :return: (x, y, ele))
+        :rtype: tuple
+        """
+        x, y = datamap.latlong_to_xy(self.latitude, self.longitude)
+        return (x, y, self.elevation)
+
     @property
     def feet(self):
         """
@@ -103,6 +120,15 @@ class SpotElevation(BaseCoordinate):
             return self.elevation * FEET_TO_METERS
         except:
             return None
+
+    @property
+    def shape(self):
+        """
+        Returns a point representation of this :class:`SpotElevation` as a
+         :class:`shapely.geometry.Point`
+        :return: :class:`shapely.geometry.Point`
+        """
+        return Point(self.longitude, self.latitude)
 
     def __eq__(self, other):
         """

@@ -8,7 +8,8 @@ This library contains a base container class for storing GridPoint
 type location objects.
 """
 
-from .walkpath import WalkPath
+from shapely.geometry import LineString
+
 from ..util import randomString
 
 
@@ -18,20 +19,16 @@ class Linker:
     with one single :class:`pyprom.lib.locations.saddle.Saddle`
     """
 
-    def __init__(self, summit, saddle, path=WalkPath([]), id=None):
+    def __init__(self, summit, saddle, id=None):
         """
         :param summit: Summit this linker links.
         :type summit: :class:`pyprom.lib.locations.summit.Summit`
         :param saddle: Saddle this linker links.
         :type saddle: :class:`pyprom.lib.locations.saddle.Saddle`
-        :param path: data containing the path taken to link this
-         Summit and Saddle
-        :type path: :class:`pyprom.lib.containers.walkpath.WalkPath`
         :param str id: id for this object.
         """
         self.summit = summit
         self.saddle = saddle
-        self.path = path
         if id:
             self.id = id
         else:
@@ -170,24 +167,19 @@ class Linker:
             self.summit.addSaddleLinker(self)
             self.saddle.addSummitLinker(self)
 
-    def to_dict(self, referenceById=True, noWalkPath=True):
+    def to_dict(self):
         """
         Create the dictionary representation of this object.
 
-        :param bool referenceById: only use ID of linked objects.
-        :param bool noWalkPath: exclude WalkPath
         :return: dict() representation of :class:`Linker`
         :rtype: dict()
         """
         to_dict = dict()
         to_dict['id'] = self.id
-        if self.path and not noWalkPath:
-            to_dict['path'] = self.path.to_dict()
         if self.disqualified:
             to_dict['disqualified'] = self.disqualified
-        if referenceById:
-            to_dict['saddle'] = self.saddle.id
-            to_dict['summit'] = self.summit.id
+        to_dict['summit'] = self.summit.id
+        to_dict['saddle'] = self.saddle.id
         return to_dict
 
     @classmethod
@@ -198,21 +190,25 @@ class Linker:
         :return: a new Linker
         :rtype: :class:`Linker`
         """
-        pathDict = linkerDict.get('path', None)
-        if pathDict:
-            path = WalkPath.from_dict(pathDict)
-        else:
-            path = WalkPath([])
         saddle = saddlesContainer.fast_lookup[linkerDict['saddle']]
-
         summit = summitsContainer.fast_lookup[linkerDict['summit']]
 
         # create linker
-        linker = cls(summit, saddle, path)
+        linker = cls(summit, saddle, id=linkerDict['id'])
         # add linker to foreign saddles/summits
         linker.add_to_remote_saddle_and_summit()
         linker.disqualified = linkerDict.get('disqualified', False)
         return linker
+
+    @property
+    def shape(self):
+        """
+        Returns a line representation of this linker as a
+         :class:`shapely.geometry.Linestring` This does not include
+         the summit or saddle, just the line connecting them.
+        :return: :class:`shapely.geometry.Linestring`
+        """
+        return LineString([self.saddle.shape, self.summit.shape])
 
     def __hash__(self):
         """
@@ -234,8 +230,7 @@ class Linker:
         :raises: TypeError if other not of :class:`Linker`
         """
         isLinker(other)
-        return [self.summit, self.saddle, self.path] ==\
-               [other.summit, other.saddle, other.path]
+        return [self.summit, self.saddle] == [other.summit, other.saddle]
 
     def __ne__(self, other):
         """
@@ -248,8 +243,7 @@ class Linker:
         :raises: TypeError if other not of :class:`Linker`
         """
         isLinker(other)
-        return [self.summit, self.saddle, self.path] !=\
-               [other.summit, other.saddle, other.path]
+        return [self.summit, self.saddle] != [other.summit, other.saddle]
 
     def __repr__(self):
         """

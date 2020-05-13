@@ -7,6 +7,7 @@ the LICENSE file that accompanies it.
 import random
 import itertools
 import string
+import hashlib
 
 from .locations.base_gridpoint import BaseGridPoint
 
@@ -116,3 +117,18 @@ def randomString(length=12):
         string.ascii_lowercase +
         string.ascii_uppercase +
         string.digits) for _ in range(length))
+
+def checksum(filename, hash_factory=hashlib.md5, chunk_num_blocks=128):
+    """
+    Read file and produce md5 hash of contents as string.
+
+    :param filename: file name
+    :param hash_factory: factory for producing hash
+    :param chunk_num_blocks: number of blocks, factor of 128
+    :return: str md5 hash of file contents
+    """
+    h = hash_factory()
+    with open(filename,'rb') as f:
+        for chunk in iter(lambda: f.read(chunk_num_blocks*h.block_size), b''):
+            h.update(chunk)
+    return h.hexdigest()

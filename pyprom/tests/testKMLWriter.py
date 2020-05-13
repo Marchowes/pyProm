@@ -18,6 +18,7 @@ from pyprom.lib.locations.runoff import Runoff
 from pyprom.lib.containers.runoffs import RunoffsContainer
 from pyprom.lib.containers.saddles import SaddlesContainer
 from pyprom.lib.containers.summits import SummitsContainer
+from pyprom.lib.containers.summit_domain import SummitDomain
 from pyprom.lib.containers.spot_elevation import SpotElevationContainer
 
 from pyprom.lib.kmlwriter import KMLFileWriter
@@ -52,8 +53,13 @@ class KMLFileWriterTest(unittest.TestCase):
         """
         gettestzip()
         domain = Domain(GDALLoader('/tmp/N44W072.hgt'), self.summitscontainer,
-                        self.saddlescontainer, self.runoffscontainer,
+                        self.saddlescontainer, self.runoffscontainer, [],
                         [self.linker1])
+        summit_domain1 = SummitDomain(domain.datamap,
+                                           self.summit1,
+                                           self.saddle1,
+                                           [(1, 1, 1)])
+        domain.summit_domains = [summit_domain1]
         self.kfw.append(domain)
         self.assertTrue(self.kfw.spotElevation_wkt['SaddlePOINT (1 1)'])
         self.assertTrue(self.kfw.spotElevation_wkt['SaddlePOINT (2 2)'])
@@ -62,12 +68,14 @@ class KMLFileWriterTest(unittest.TestCase):
         self.assertTrue(self.kfw.spotElevation_wkt['RunOffPOINT (1 1)'])
         self.assertTrue(self.kfw.spotElevation_wkt['RunOffPOINT (2 2)'])
         self.assertTrue(self.kfw.linkers_wkt['LINESTRING (1 1, 1 1)'])
+        # We dont track summitDomains in a hash
         self.assertEqual(len(self.kfw.spotElevation_wkt.items()), 6)
         self.assertEqual(len(self.kfw.linkers_wkt.items()), 1)
         self.assertEqual(len(self.kfw.linkers._features), 1)
         self.assertEqual(len(self.kfw.saddles._features), 2)
         self.assertEqual(len(self.kfw.summits._features), 2)
         self.assertEqual(len(self.kfw.runoffs._features), 2)
+        self.assertEqual(len(self.kfw.summitDomains._features), 1)
 
     def testSaddlesAppendKML(self):
         """

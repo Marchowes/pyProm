@@ -1,7 +1,8 @@
-numpy == 1.15.0
+numpy == 1.16.4
 fastkml
 shapely
 utm
 geopy
 cbor
+dijkstar
 

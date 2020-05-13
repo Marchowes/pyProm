@@ -85,19 +85,15 @@ This will work with Python 3.4+
 
 Trouble Getting GDAL installed?
 -------------------------------
-The GDAL (Geo Data Abstration Layer) package for Python is a thin wrapper over a much larger binary package.
+The GDAL (Geo Data Abstration Layer) package for Python must match the version of gdal installed on your system.
 
-This produces a number of installation problems that can't always be easily dealt with with package managers
-and thus may need manual intervention.
+`gdalinfo --version`
 
-[First try this](http://www.sarasafavi.com/installing-gdalogr-on-ubuntu.html)
-Gdal still giving you trouble? [Try this](http://gis.stackexchange.com/questions/9553/installing-gdal-and-ogr-for-pythonround)
-More resources:
-* https://pypi.python.org/pypi/GDAL/
-* https://github.com/OSGeo/gdal
-* http://www.gdal.org/formats_list.html
+You may have to manually install the proper version with pip3.
+..or use conda..
 
-If all else fails, I've had good luck getting it to work with conda. You're on your own with that one.
+Most common fix here:
+https://gis.stackexchange.com/questions/28966/python-gdal-package-missing-header-file-when-installing-via-pip
 
 Running Unit Tests
 ------------------

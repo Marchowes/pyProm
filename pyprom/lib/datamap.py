@@ -11,15 +11,20 @@ used to analyze the map.
 import logging
 
 from .constants import METERS_TO_FEET
+from .util import checksum
 
 from math import hypot
+from shapely.geometry import Polygon
+from numpy import array2string
 
 ARCSEC_DEG = 3600
 ARCMIN_DEG = 60
-DIAGONAL_SHIFT_LIST = ((-1, 0), (-1, 1), (0, 1), (1, 1), (1, 0), (1, -1),
+FULL_SHIFT_LIST = ((-1, 0), (-1, 1), (0, 1), (1, 1), (1, 0), (1, -1),
                        (0, -1), (-1, -1))
 ORTHOGONAL_SHIFT_LIST = ((-1, 0), (0, 1), (1, 0), (0, -1))
+DIAGONAL_SHIFT_LIST = ((-1, 1), (1, 1), (1, -1), (-1, -1))
 
+NON_FILE_SENTINEL = "UnknownSubset"
 
 class DataMap:
     """Base class for Datamap type objects."""
@@ -32,7 +37,13 @@ class DataMap:
         :raises: Exception (regarding unit)
         """
         self.numpy_map = numpy_map
-        self.filename = filename
+        self.file_and_path = filename
+        self.filename = filename.split("/")[-1]
+        if filename != NON_FILE_SENTINEL:
+            self.md5 = checksum(filename)
+        else:
+            # Not really an MD5, but whatever.
+            self.md5 = hash(array2string(self.numpy_map))
         unit_and_substrings = {"METERS": ["meter", "metre"], "FEET": ["foot", "feet"]}
         self.unit = None
         for unitname, unit_options in unit_and_substrings.items():
@@ -42,7 +53,7 @@ class DataMap:
         if not self.unit:
             raise Exception("Need Meters or Feet. Got {}".format(unit))
 
-    def iterateDiagonal(self, x, y):
+    def iterateFull(self, x, y):
         """
         Generator returns 8 closest neighbors to a raster grid location,
         that is, all points touching including the diagonals.
@@ -51,7 +62,7 @@ class DataMap:
         :param int y: y coordinate in raster data.
         """
         # 0, 45, 90, 135, 180, 225, 270, 315
-        for shift in DIAGONAL_SHIFT_LIST:
+        for shift in FULL_SHIFT_LIST:
             _x = x + shift[0]
             _y = y + shift[1]
             if 0 <= _x <= self.max_x and \
@@ -84,6 +95,27 @@ class DataMap:
             else:
                 yield _x, _y, self.nodata
 
+    def iterateDiagonal(self, x, y):
+        """
+        Generator returns 4 closest neighbors to a raster grid location,
+        that is, all points touching excluding the orthogonals.
+
+        :param int x: x coordinate in raster data.
+        :param int y: y coordinate in raster data.
+        """
+        # 45, 135, 225, 315
+        for shift in DIAGONAL_SHIFT_LIST:
+            _x = x + shift[0]
+            _y = y + shift[1]
+            if 0 <= _x <= self.max_x and \
+               0 <= _y <= self.max_y:
+                if self.unit == 'FEET':
+                    yield _x, _y, float(METERS_TO_FEET * self.numpy_map[_x, _y])
+                else:
+                    yield _x, _y, float(self.numpy_map[_x, _y])
+            else:
+                yield _x, _y, self.nodata
+
     def steepestNeighbor(self, x, y):
         """
         Finds neighbor with steepest slope
@@ -92,17 +124,40 @@ class DataMap:
         :param int y: y coordinate in raster data.
         :return: tuple(x, y) highest neighbor
         """
-        steepest_slope = 0
+        steepest_slope = -1
         steepest_neighbor = None
-        point_elevation = self.numpy_map[x, y]
-        for _x, _y, elevation in self.iterateDiagonal(x, y):
+        point_elevation = self.get(x, y)
+
+        for _x, _y, elevation in self.iterateFull(x, y):
             if elevation is None or elevation < point_elevation:
                 continue
             slope = (elevation-point_elevation)/hypot((x - _x)*self.res_x, (y - _y)*self.res_y)
             if steepest_slope < slope:
-                steepest_neighbor = (_x, _y)
+                if slope < 0:
+                    continue
+                steepest_neighbor = (_x, _y, elevation)
                 steepest_slope = slope
         return steepest_neighbor
+
+    def distance(self, us, them):
+        """
+        :param us: Tuple(x, y)
+        :param them: Tuple(x, y)
+        :return: distance.
+        """
+        return hypot((us[0] - them[0]) * self.res_x, (us[1] - them[1]) * self.res_y)
+
+    def get(self, x, y):
+        """
+        Gets elevation from numpy map, and converts units to Meters
+        :param int x: x coordinate in raster data.
+        :param int y: y coordinate in raster data.
+        :return: float
+        """
+        if self.unit == 'FEET':
+            return float(self.numpy_map[x, y] * METERS_TO_FEET)
+        else:
+            return float(self.numpy_map[x, y])
 
 class ProjectionDataMap(DataMap):
     """
@@ -199,15 +254,12 @@ class ProjectionDataMap(DataMap):
         """
         This function returns the elevation at a certain lat/long in Meters.
 
-        :param latitude: latitude in dotted demical notation
+        :param latitude: latitude in dotted decimal notation
         :param longitude: longitude in dotted decimal notation.
         :return: elevation of coordinate in meters.
         """
         x, y = self.latlong_to_xy(latitude, longitude)
-        if self.unit == 'FEET':
-            return float(METERS_TO_FEET * self.numpy_map[x, y])
-        else:
-            return self.numpy_map[x, y]
+        return self.get(x, y)
 
     def _leftmost_absolute(self):
         """
@@ -315,7 +367,21 @@ class ProjectionDataMap(DataMap):
                                  self.nodata,
                                  self.transform,
                                  self.reverse_transform,
-                                 "UnknownSubset")
+                                 NON_FILE_SENTINEL)
+
+    def point_geom(self, x, y):
+        """
+        :param x: x coordinate
+        :param y: y coordinate
+        :return: :class:`shapely.geometry.polygon.Polygon` of this point
+        """
+        local_lat, local_long = self.xy_to_latlong(x, y)
+        corners = list()
+        for c_x, c_y, _ in self.iterateDiagonal(x, y):
+            remote_lat, remote_long = self.xy_to_latlong(c_x, c_y)
+            #shapely coords is long, lat
+            corners.append(((local_long + remote_long)/2, (local_lat + remote_lat)/2))
+        return Polygon(corners)
 
     def __repr__(self):
         """

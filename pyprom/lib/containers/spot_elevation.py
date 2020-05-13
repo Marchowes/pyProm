@@ -79,6 +79,15 @@ class SpotElevationContainer(_Base):
                 highest.append(spot_elevation)
         return highest
 
+    def by_id(self, id):
+        """
+        Returns member SpotElevation derivative by ID if it exists.
+        :param string id: string ID of SpotElevation derivative
+        :return: SpotElevation derivative object
+        """
+        # We want to throw an exception if it's not there.
+        return self.fast_lookup[id]
+
     def radius(self, lat, long, value, unit='m'):
         """
         Returns all members of this container within a certain radius.
@@ -214,6 +223,23 @@ class SpotElevationContainer(_Base):
         isSpotElevation(spotElevation)
         self.points.append(spotElevation)
         self.fast_lookup[spotElevation.id] = spotElevation
+
+    def extend(self, spotElevations):
+        """
+        Extend a list of :class:`pyprom.lib.locations.spot_elevation.SpotElevation`
+        to this container.
+
+        :param spotElevations: list of SpotElevations to append.
+        :type list(spotElevation):
+         list(:class:`pyprom.lib.locations.spot_elevation.SpotElevation`)
+        :raises: TypeError if point not of
+         :class:`pyprom.lib.locations.spot_elevation.SpotElevation`
+        """
+        for se in spotElevations:
+            isSpotElevation(se)
+        self.points.extend(spotElevations)
+        for se in spotElevations:
+            self.fast_lookup[se.id] = se
 
     def index(self, spotElevation):
         """

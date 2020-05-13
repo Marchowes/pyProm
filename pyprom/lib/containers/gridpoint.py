@@ -270,6 +270,13 @@ class GridPointContainer(BaseGridPointContainer):
         self.points.append(gridPoint)
         self.genFastLookup()
 
+    def to_tuples(self):
+        """
+        :return: :class:`GridPointContainer` members as a list of
+         (x, y, elevation) tuples.
+        """
+        return [x.to_tuple() for x in self.points]
+
     def __repr__(self):
         """
         :return: String representation of this object

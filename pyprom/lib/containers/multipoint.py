@@ -9,7 +9,6 @@ type location objects as well as a number of functions.
 """
 
 from math import hypot
-
 from ..locations.base_coordinate import BaseCoordinate
 from ..locations.base_gridpoint import  BaseGridPoint
 from ..locations.gridpoint import GridPoint
@@ -62,7 +61,6 @@ class MultiPoint:
          multipoint outside of the multipoint.
         :type perimeter: :class:`pyprom.lib.containers.perimeter.Perimeter`
         """
-        super(MultiPoint, self).__init__()
         self.points = points  # BaseGridPoint Objects.
         self.elevation = elevation
         self.datamap = datamap  # data analysis object.
@@ -144,7 +142,7 @@ class MultiPoint:
         closestDistance = distanceCalc(themX, themY, *self.points[0])
         closest = self.points[0]
         for point in self.points[1:]:
-            distance = distanceCalc(themX, themY, *point)
+            distance = distanceCalc(themX, themY, point[0], point[1])
             # well, can't get closer than that. mark it and bail.
             if distance == 0:
                 closest = point
@@ -156,6 +154,14 @@ class MultiPoint:
         if asSpotElevation:
             return gp.toSpotElevation(self.datamap)
         return gp
+
+    def points_with_elevation(self):
+        """
+        Returns list of tuples of member points with (x, y, elevation)
+
+        :return: list(tuple(x, y, ele)))
+        """
+        return [(x[0], x[1], self.elevation) for x in self.points]
 
     def __len__(self):
         """

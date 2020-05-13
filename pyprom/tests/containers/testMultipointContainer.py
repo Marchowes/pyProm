@@ -27,7 +27,7 @@ class MultipointTests(unittest.TestCase):
         cls.someslice = cls.datamap.subset(1000, 1000, 100, 100)
         cls.somewhere = AnalyzeData(cls.someslice)
         cls.summits, cls.saddles, cls.runoffs = cls.somewhere.run()
-        cls.saddle = cls.runoffs.saddles[0]
+        cls.saddle = cls.saddles.multipoints[3]
         cls.summitWithoutMultipointEdge = cls.summits.summits[4]
         cls.bgp11 = BaseGridPoint(1, 1)
         cls.bgp22 = BaseGridPoint(2, 2)
@@ -49,7 +49,7 @@ class MultipointTests(unittest.TestCase):
         Test multipoint container perimeter count is as expected.
         """
         multipoint = self.saddle.multiPoint
-        self.assertEqual(len(multipoint.perimeter), 7)
+        self.assertEqual(len(multipoint.perimeter), 8)
 
     def testMultipointRepr(self):
         """
@@ -57,7 +57,7 @@ class MultipointTests(unittest.TestCase):
         """
         multipoint = self.saddle.multiPoint
         self.assertEqual(multipoint.__repr__(),
-                         "<Multipoint> elevation(m): 552.0, points 4")
+                         "<Multipoint> elevation(m): 551.0, points 4")
 
     def testMultipointIterator(self):
         """
@@ -154,7 +154,7 @@ class MultipointTests(unittest.TestCase):
         Ensure edge effect Saddle-like multipoint objects
         generate an edgePoint list.
         """
-        edgePoint = BaseGridPoint(99, 48)
+        edgePoint = (99, 49, 552.0)
         edgeMulti = self.saddles[20]
         self.assertTrue(edgeMulti.edgeEffect)
         self.assertEqual(edgeMulti.edgePoints, [edgePoint])
@@ -163,8 +163,8 @@ class MultipointTests(unittest.TestCase):
         """
         Ensure edge effect Saddle-like objects generate an edgePoint list.
         """
-        edgePoint = BaseGridPoint(37, 0)
-        edgeMulti = self.runoffs[9]
+        edgePoint = (37, 99, 605.0)
+        edgeMulti = self.runoffs[8]
         self.assertTrue(edgeMulti.edgeEffect)
         self.assertEqual(edgeMulti.edgePoints, [edgePoint])
 
@@ -286,3 +286,18 @@ class MultipointTests(unittest.TestCase):
         point = GridPoint(1, 1, 1)
         result = mp.closestPoint(point, asSpotElevation=True)
         self.assertEqual(expectedResult, result)
+
+    def testMultiPointWithElevation(self):
+        """
+        Ensure points_with_elevation produces expected results.
+        """
+        mp = self.saddles[3].multiPoint
+        pwe = [(0, 65, 564.0), (0, 64, 564.0), (1, 66, 564.0),
+               (1, 65, 564.0), (1, 67, 564.0), (2, 66, 564.0),
+               (2, 65, 564.0), (2, 67, 564.0), (2, 69, 564.0),
+               (3, 64, 564.0), (3, 63, 564.0), (3, 68, 564.0),
+               (3, 69, 564.0)]
+        result = mp.points_with_elevation()
+        self.assertEqual(pwe, result)
+
+

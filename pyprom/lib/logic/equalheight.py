@@ -33,32 +33,32 @@ def equalHeightBlob(datamap, x, y, elevation):
     exploredEqualHeight[x][y] = True
     perimeterPointHash = defaultdict(dict)
     toBeAnalyzed = [masterGridPoint]
-    shoreMapEdge = []
+    shoreMapEdge = set()
     multipointEdges = []
 
     x_mapEdge = {0: True, datamap.max_x: True}
     y_mapEdge = {0: True, datamap.max_y: True}
     if x_mapEdge.get(x) or y_mapEdge.get(y):
-        multipointEdges.append(BaseGridPoint(x, y))
+        multipointEdges.append((x, y, elevation))
 
     # Loop until pool of equalHeight neighbors has been exhausted.
     edge = False
     while toBeAnalyzed:
         gridPoint = toBeAnalyzed.pop()
-        neighbors = datamap.iterateDiagonal(gridPoint[0], gridPoint[1])
+        neighbors = datamap.iterateFull(gridPoint[0], gridPoint[1])
         # Determine if edge or not.
         if not edge:
             if x_mapEdge.get(gridPoint[0]) or y_mapEdge.get(gridPoint[1]):
                 edge = True
         for _x, _y, elevation in neighbors:
-            if elevation is None:
+            if elevation is None or elevation == datamap.nodata:
                 continue
             elif elevation == masterGridPoint[2] and\
                     not exploredEqualHeight[_x].get(_y, False):
                 branch = (_x, _y, elevation)
                 exploredEqualHeight[_x][_y] = True
                 if x_mapEdge.get(_x) or y_mapEdge.get(_y):
-                    multipointEdges.append(BaseGridPoint(_x, y))
+                    multipointEdges.append((_x, _y, elevation))
                 toBeAnalyzed.append(branch)
             # If elevation > master grid point, stash away as
             # a perimeter point. Only keep track of edgepoints
@@ -69,12 +69,12 @@ def equalHeightBlob(datamap, x, y, elevation):
                     if elevation > masterGridPoint[2]:
                         perimeterPointHash[_x][_y] = (_x, _y, elevation)
                     if x_mapEdge.get(_x) or y_mapEdge.get(_y):
-                        shoreMapEdge.append(GridPoint(_x, _y, elevation))
+                        shoreMapEdge.add((_x, _y, elevation))
     return MultiPoint(coordinateHashToXYTupleList(exploredEqualHeight),
                       masterGridPoint[2], datamap,
                       perimeter=Perimeter(
                           pointIndex=perimeterPointHash,
                           datamap=datamap,
                           mapEdge=edge,
-                          mapEdgePoints=shoreMapEdge)),\
+                          mapEdgePoints=list(shoreMapEdge))),\
         multipointEdges

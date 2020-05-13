@@ -171,6 +171,23 @@ class SpotElevationContainerTests(unittest.TestCase):
         container.append(Summit(1, 2, 3))
         container.append(Saddle(1, 2, 3))
 
+    def testSpotElevationContainerExtend(self):
+        """
+        Ensure extending Different child SpotElevations
+        to SpotElevationContainer succeeds.
+        """
+        container = SpotElevationContainer([])
+        container.extend([Summit(1, 2, 3), Saddle(1, 2, 3)])
+
+    def testSpotElevationContainerExtendNegative(self):
+        """
+        Ensure extending invalid child SpotElevations
+        to SpotElevationContainer fails.
+        """
+        container = SpotElevationContainer([])
+        with self.assertRaises(TypeError):
+            container.extend(['what?'])
+
     def testSpotElevationContainerSetItem(self):
         """
         Ensure setting item index succeeds.
@@ -237,3 +254,29 @@ class SpotElevationContainerTests(unittest.TestCase):
         container = SpotElevationContainer([])
         self.assertEqual(container.__repr__(),
                          "<SpotElevationContainer> 0 Objects")
+
+    def testSpotElevationContainerByIDinit(self):
+        """
+        Ensure by_id works on __init__ obj
+        """
+        se0 = Saddle(1, 2, 3)
+        container = SpotElevationContainer([se0])
+        self.assertEqual(container.by_id(se0.id), se0)
+
+    def testSpotElevationContainerByIDappend(self):
+        """
+        Ensure by_id works on append obj
+        """
+        se0 = Saddle(1, 2, 3)
+        container = SpotElevationContainer([])
+        container.append(se0)
+        self.assertEqual(container.by_id(se0.id), se0)
+
+    def testSpotElevationContainerByIDextend(self):
+        """
+        Ensure by_id works on extended obj
+        """
+        se0 = Saddle(1, 2, 3)
+        container = SpotElevationContainer([])
+        container.extend([se0])
+        self.assertEqual(container.by_id(se0.id), se0)

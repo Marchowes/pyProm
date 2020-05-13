@@ -288,3 +288,12 @@ class GridPointContainerTests(unittest.TestCase):
         """
         highest = self.gpc.highest
         self.assertEqual(highest, [self.p24])
+
+    def testGridPointContainerlToTuples(self):
+        """
+        Ensure to_tuples() produces expected results
+        """
+        gp1 = GridPoint(1, 2, 3)
+        gp2 = GridPoint(3, 2, 1)
+        gps = GridPointContainer([gp1, gp2])
+        self.assertEqual(gps.to_tuples(), [(1, 2, 3), (3, 2, 1)])

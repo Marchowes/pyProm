@@ -10,9 +10,10 @@ type location objects.
 
 from .spot_elevation import SpotElevationContainer
 from ..logic.internal_saddle_network import InternalSaddleNetwork
+from ..logic.tuple_funcs import highest
 from ..locations.saddle import Saddle, isSaddle
 from ..locations.gridpoint import GridPoint
-from ..containers.gridpoint import GridPointContainer
+from ..logic.shortest_path_by_points import find_closest_points
 
 
 class SaddlesContainer(SpotElevationContainer):
@@ -61,7 +62,7 @@ class SaddlesContainer(SpotElevationContainer):
             if len(saddle.highShores) == 2:
                 highShores = []
                 for highShore in saddle.highShores:
-                    highShores.append(GridPointContainer(highShore.highest))
+                    highShores.append(highest(highShore))
 
                 # if multipoint use first of each of the highest high shores
                 # and find the mid point for both. Then find the point within
@@ -69,15 +70,14 @@ class SaddlesContainer(SpotElevationContainer):
                 # high shores.
                 if saddle.multiPoint:
                     hs0, hs1, distance =\
-                        saddle.highShores[0].findClosestPoints(
-                            saddle.highShores[1])
+                        find_closest_points(saddle.highShores[0], saddle.highShores[1], datamap)
                     # find the middle GP for the 2 closest opposing shore
                     # points.
                     # Note, in some cases this might be outside the multipoint
-                    middleGP = GridPoint(int((hs0.x +
-                                             hs1.x) / 2),
-                                         int((hs0.y +
-                                             hs1.y) / 2),
+                    middleGP = GridPoint(int((hs0[0] +
+                                             hs1[0]) / 2),
+                                         int((hs0[1] +
+                                             hs1[1]) / 2),
                                          saddle.elevation)
                     # reconcile any points which might be outside the
                     # multipoint by finding the closest point inside the
@@ -94,8 +94,7 @@ class SaddlesContainer(SpotElevationContainer):
                                        saddle.longitude,
                                        saddle.elevation)
 
-                newSaddle.highShores = [GridPointContainer(highShores[0]),
-                                        GridPointContainer(highShores[1])]
+                newSaddle.highShores = [highShores[0], highShores[1]]
                 new_saddles.append(newSaddle)
                 if saddle.edgeEffect:
                     newSaddle.parent = saddle
@@ -131,6 +130,23 @@ class SaddlesContainer(SpotElevationContainer):
         self.points.append(saddle)
         self.fast_lookup[saddle.id] = saddle
 
+    def extend(self, saddles):
+        """
+        Extend a list of :class:`pyprom.lib.locations.saddle.Saddle`
+        to this container.
+
+        :param saddles: list of Saddles to append.
+        :type list(saddles):
+         list(:class:`pyprom.lib.locations.saddle.Saddle`)
+        :raises: TypeError if point not of
+         :class:`pyprom.lib.locations.saddle.Saddle`
+        """
+        for sa in saddles:
+            isSaddle(sa)
+        self.points.extend(saddles)
+        for sa in saddles:
+            self.fast_lookup[sa.id] = sa
+
     def to_dict(self):
         """
         :return: dict() representation of :class:`SaddlesContainer`
@@ -149,21 +165,27 @@ class SaddlesContainer(SpotElevationContainer):
         :rtype: :class:`SaddlesContainer`
         """
         saddles = []
-        saddleHash = dict()
         for saddle in saddleContainerDict['saddles']:
             saddleObj = Saddle.from_dict(saddle, datamap)
             saddles.append(saddleObj)
-            saddleHash[saddleObj.id] = saddleObj
-        saddlesContainer = cls(saddles)
+        sc = cls(saddles)
+
         for saddle in saddleContainerDict['saddles']:
+            sid = saddle['id']
             children = saddle.get('children', None)
             if children:
                 for child in children:
-                    saddleHash[saddle['id']].children.append(saddleHash[child])
+                    sc.by_id(sid).children.append(sc.by_id(child))
             parent = saddle.get('parent', None)
             if parent:
-                saddleHash[saddle['id']].parent = saddleHash[parent]
-        return saddlesContainer
+                sc.by_id(sid).parent = sc.by_id(parent)
+            basinSaddleAlternatives =\
+                saddle.get('basinSaddleAlternatives', None)
+            if basinSaddleAlternatives:
+                for bsa in basinSaddleAlternatives:
+                    sc.by_id(sid).basinSaddleAlternatives.append(
+                        sc.by_id(bsa))
+        return sc
 
     @property
     def disqualified(self):
