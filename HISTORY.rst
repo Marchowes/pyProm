@@ -1,12 +1,13 @@
 Release History
 
-0.7.0 (May 9, 2020)
-+++++++++++++++++++
+0.7.0 (May 12, 2020)
+++++++++++++++++++++
 * Significant Improvements to Walk accuracy
 * Significant improvements to RunOff accuracy
 * Further movement away from point objects, and to tuples (namely, with highshores)
 * Introduction of SummitDomain
 * Saddle simplification has been moved to Walk functionality
+* Shapely shapes for various objects (helpful for KML)
 
 0.6.4 (July 9, 2019)
 ++++++++++++++++++++
