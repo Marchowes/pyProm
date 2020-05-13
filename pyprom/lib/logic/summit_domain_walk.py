@@ -192,11 +192,29 @@ class Walk:
 
                 # this means it's an edge effect
                 if not synthetic:
+                    edge_saddles = []
                     # don't mess with runoffs.
                     if isinstance(saddle, Runoff):
-                        walkedFeatures.append(saddle)
-                        continue
-                    edge_saddles = self.generate_synthetic_saddles(saddle)
+                        # No high Shores, means this is a Summit-Like Runoff, look for matching summit domain at runoff point.
+                        if not saddle.highShores:
+                            point = saddle.toXYTuple(self.domainmap.datamap)
+                            sd = self.summit_domain_points[point[0]].get(point[1], None)
+                            # nothing there? continue.
+                            if not sd:
+                                self.logger.info("Failed to find SummitDomain for summit-like Runoff {}".format(saddle))
+                                walkedFeatures.append(saddle)
+                                continue
+                            summitDomains.add(sd)
+                            sd.saddles.append(saddle)
+                            summit = sd.summit
+                            linker = Linker(summit, saddle)
+                            linker.add_to_remote_saddle_and_summit()
+                            linkers.append(linker)
+                        else:
+                            # if we are a Runoff and there is a high edge, treat like any old Saddle
+                            # becasue we walk from all high shore points, this should be OK.
+                            edge_saddles = [saddle]
+                    edge_saddles = self.generate_synthetic_saddles(saddle) if not edge_saddles else edge_saddles
                     for edge_saddle in edge_saddles:
                         for highEdge in edge_saddle.highShores:
                             h0 = highEdge[0]

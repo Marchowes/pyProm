@@ -95,6 +95,21 @@ class SpotElevation(BaseCoordinate):
         x, y = datamap.latlong_to_xy(self.latitude, self.longitude)
         return GridPoint(x, y, self.elevation)
 
+    def toXYTuple(self, datamap):
+        """
+        Return this :class:`SpotElevation` object as
+        an (x, y, ele) tuple
+        object based on the :class:`pyprom.lib.datamap.DataMap`
+        passed in.
+
+        :param datamap: Datamap object
+        :type datamap: :class:`pyprom.lib.datamap.DataMap`
+        :return: (x, y, ele))
+        :rtype: tuple
+        """
+        x, y = datamap.latlong_to_xy(self.latitude, self.longitude)
+        return (x, y, self.elevation)
+
     @property
     def feet(self):
         """

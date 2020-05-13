@@ -60,7 +60,7 @@ class WalkTests(unittest.TestCase):
         """
         self.domain.run(superSparse=True)
         self.domain.walk()
-        self.assertEqual(len(self.domain.linkers), 1050)
+        self.assertEqual(len(self.domain.linkers), 1119)
 
 
 class WalkRealTests(unittest.TestCase):
