@@ -1,7 +1,7 @@
 # Run Unittests
 .PHONY: test
 test:
-	nosetests
+	nosetests -v
 
 # run flake8
 .PHONY: lint
