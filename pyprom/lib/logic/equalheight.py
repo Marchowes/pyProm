@@ -12,6 +12,7 @@ from ..util import coordinateHashToXYTupleList
 from ..containers.perimeter import Perimeter
 
 
+
 def equalHeightBlob(datamap, x, y, elevation):
     """
     This function generates a
@@ -34,7 +35,7 @@ def equalHeightBlob(datamap, x, y, elevation):
     shoreMapEdge = set()
     multipointEdges = []
 
-    if datamap.is_edge(x, y):
+    if datamap.is_map_edge(x, y):
         multipointEdges.append((x, y, elevation))
 
     # Loop until pool of equalHeight neighbors has been exhausted.
@@ -44,7 +45,7 @@ def equalHeightBlob(datamap, x, y, elevation):
         neighbors = datamap.iterateFull(gridPoint[0], gridPoint[1])
         # Determine if edge or not.
         if not edge:
-            if datamap.is_edge(gridPoint[0], gridPoint[1]):
+            if datamap.is_map_edge(gridPoint[0], gridPoint[1]):
                 edge = True
         for _x, _y, elevation in neighbors:
             if elevation is None or elevation == datamap.nodata:
@@ -53,7 +54,7 @@ def equalHeightBlob(datamap, x, y, elevation):
                     not exploredEqualHeight[_x].get(_y, False):
                 branch = (_x, _y, elevation)
                 exploredEqualHeight[_x][_y] = True
-                if datamap.is_edge(_x, _y):
+                if datamap.is_map_edge(_x, _y):
                     multipointEdges.append((_x, _y, elevation))
                 toBeAnalyzed.append(branch)
             # If elevation > master grid point, stash away as
@@ -64,7 +65,7 @@ def equalHeightBlob(datamap, x, y, elevation):
                 if not perimeterPointHash[_x].get(_y, False):
                     if elevation > masterGridPoint[2]:
                         perimeterPointHash[_x][_y] = (_x, _y, elevation)
-                    if datamap.is_edge(_x, _y):
+                    if datamap.is_map_edge(_x, _y):
                         shoreMapEdge.add((_x, _y, elevation))
     return MultiPoint(coordinateHashToXYTupleList(exploredEqualHeight),
                       masterGridPoint[2], datamap,

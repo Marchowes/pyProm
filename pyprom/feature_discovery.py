@@ -178,7 +178,7 @@ class AnalyzeData:
 
         # Label this as an mapEdge under the following condition
         edgePoints = []
-        if self.datamap.is_edge(x, y):
+        if self.datamap.is_map_edge(x, y):
             edge = True
             edgePoints = [(x, y, self.elevation)]
 
@@ -199,7 +199,7 @@ class AnalyzeData:
 
             if elevation > self.elevation:
                 shoreSetIndex[_x][_y] = (_x, _y, elevation)
-            if self.datamap.is_edge(_x, _y):
+            if self.datamap.is_map_edge(_x, _y):
                 shoreMapEdge.add((_x, _y, elevation))
 
         shoreSet = Perimeter(pointIndex=shoreSetIndex,

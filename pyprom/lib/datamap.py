@@ -159,7 +159,7 @@ class DataMap:
         else:
             return float(self.numpy_map[x, y])
 
-    def is_edge(self, x, y):
+    def is_map_edge(self, x, y):
         """
         Determine if x, y is on the map edge.
         :param x: x coord
