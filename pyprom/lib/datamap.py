@@ -159,6 +159,15 @@ class DataMap:
         else:
             return float(self.numpy_map[x, y])
 
+    def is_edge(self, x, y):
+        """
+        Determine if x, y is on the map edge.
+        :param x: x coord
+        :param y: y coord
+        :return: bool
+        """
+        return self._x_mapEdge.get(x) or self._y_mapEdge.get(y)
+
 class ProjectionDataMap(DataMap):
     """
     ProjectionDataMap is a :class:`pyprom.lib.datamap.DataMap` object for
@@ -219,6 +228,8 @@ class ProjectionDataMap(DataMap):
         self.nodata = nodata
         self.transform = transform
         self.reverse_transform = reverse_transform
+        self._x_mapEdge = {0: True, self.max_x: True}
+        self._y_mapEdge = {0: True, self.max_y: True}
 
     def xy_to_latlong(self, x, y):
         """
