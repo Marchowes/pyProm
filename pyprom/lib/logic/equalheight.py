@@ -7,8 +7,6 @@ the LICENSE file that accompanies it.
 
 from collections import defaultdict
 
-from ..locations.gridpoint import GridPoint
-from ..locations.base_gridpoint import BaseGridPoint
 from ..containers.multipoint import MultiPoint
 from ..util import coordinateHashToXYTupleList
 from ..containers.perimeter import Perimeter
