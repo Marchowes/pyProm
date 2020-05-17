@@ -18,14 +18,14 @@ class FastLookup:
     coordinate has been explored, but can also be used to store other values
     associated with any sort of 2d array.
     """
-    def __init__(self, points, lookup_hash = defaultdict(dict), default=None, only_existence=False):
+    def __init__(self, points, lookup_hash = None, default=None, only_existence=False):
         """
         :param points: list of points
         :param lookup_hash: a prebuilt lookup hash.
         :param default: default value for an unassigned array value.
         :param only_existence: if building from points,
         """
-        self.lookup_hash = lookup_hash
+        self.lookup_hash = defaultdict(dict) if not lookup_hash else lookup_hash
         self.default = default
 
         # don't bother building points, we've already got a lookup_hash set.
@@ -63,7 +63,7 @@ class FastLookup:
             for pt in points:
                 self.lookup_hash[pt.latitude][pt.longitude] = True
 
-    def put(self, x, y, value):
+    def set(self, x, y, value):
         """
         :param x: first dimension
         :param y: second dimension
