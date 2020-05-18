@@ -8,7 +8,6 @@ the LICENSE file that accompanies it.
 from collections import defaultdict
 
 from ..containers.multipoint import MultiPoint
-from ..util import coordinateHashToXYTupleList
 from ..containers.perimeter import Perimeter
 
 
@@ -29,8 +28,11 @@ def equalHeightBlob(datamap, x, y, elevation):
     """
     masterGridPoint = (x, y, elevation)
     exploredEqualHeight = defaultdict(dict)
-    exploredEqualHeight[x][y] = True
+    memberPoint = list()
+    _add_member_point(x, y, exploredEqualHeight, memberPoint)
+
     perimeterPointHash = defaultdict(dict)
+    perimeterPoints = list()
     toBeAnalyzed = [masterGridPoint]
     shoreMapEdge = set()
     multipointEdges = []
@@ -53,7 +55,7 @@ def equalHeightBlob(datamap, x, y, elevation):
             elif elevation == masterGridPoint[2] and\
                     not exploredEqualHeight[_x].get(_y, False):
                 branch = (_x, _y, elevation)
-                exploredEqualHeight[_x][_y] = True
+                _add_member_point(_x, _y, exploredEqualHeight, memberPoint)
                 if datamap.is_map_edge(_x, _y):
                     multipointEdges.append((_x, _y, elevation))
                 toBeAnalyzed.append(branch)
@@ -64,14 +66,40 @@ def equalHeightBlob(datamap, x, y, elevation):
             elif elevation != masterGridPoint[2]:
                 if not perimeterPointHash[_x].get(_y, False):
                     if elevation > masterGridPoint[2]:
-                        perimeterPointHash[_x][_y] = (_x, _y, elevation)
+                        _add_perimeter_point(_x, _y, (_x, _y, elevation), perimeterPointHash, perimeterPoints)
                     if datamap.is_map_edge(_x, _y):
                         shoreMapEdge.add((_x, _y, elevation))
-    return MultiPoint(coordinateHashToXYTupleList(exploredEqualHeight),
-                      masterGridPoint[2], datamap,
+    return MultiPoint(memberPoint,
+                      masterGridPoint[2],
+                      datamap,
                       perimeter=Perimeter(
+                          pointList=perimeterPoints,
                           pointIndex=perimeterPointHash,
                           datamap=datamap,
                           mapEdge=edge,
                           mapEdgePoints=list(shoreMapEdge))),\
         multipointEdges
+
+def _add_member_point(x, y, hash, list):
+    """
+    Adds point to list and to hash
+    :param x: x coordinate
+    :param y: y coordinate
+    :param hash: hash to add to
+    :param list: list to add to
+    :return:
+    """
+    hash[x][y] = True
+    list.append((x, y))
+
+def _add_perimeter_point(x, y, val, hash, list):
+    """
+    Adds point to list and to hash
+    :param x: x coordinate
+    :param y: y coordinate
+    :param hash: hash to add to
+    :param list: list to add to
+    :return:
+    """
+    hash[x][y] = val
+    list.append(val)

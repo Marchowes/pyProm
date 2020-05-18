@@ -185,6 +185,7 @@ class AnalyzeData:
         # Begin the ardous task of analyzing points and multipoints
         neighbor = self.datamap.iterateFull(x, y)
         shoreSetIndex = defaultdict(dict)
+        shoreList = list()
         shoreMapEdge = set()
         for _x, _y, elevation in neighbor:
 
@@ -198,11 +199,14 @@ class AnalyzeData:
                 return self.analyze_multipoint(_x, _y, elevation)
 
             if elevation > self.elevation:
+                shore = (_x, _y, elevation)
                 shoreSetIndex[_x][_y] = (_x, _y, elevation)
+                shoreList.append(shore)
             if self.datamap.is_map_edge(_x, _y):
                 shoreMapEdge.add((_x, _y, elevation))
 
-        shoreSet = Perimeter(pointIndex=shoreSetIndex,
+        shoreSet = Perimeter(pointList=shoreList,
+                             pointIndex=shoreSetIndex,
                              datamap=self.datamap,
                              mapEdge=edge,
                              mapEdgePoints=list(shoreMapEdge))
