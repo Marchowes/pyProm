@@ -166,7 +166,7 @@ class DataMap:
         :param y: y coord
         :return: bool
         """
-        return self._x_mapEdge.get(x) or self._y_mapEdge.get(y)
+        return x == 0 or y == 0 or x == self.max_x or y == self.max_y
 
 class ProjectionDataMap(DataMap):
     """
