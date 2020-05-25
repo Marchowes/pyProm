@@ -192,7 +192,7 @@ class Saddle(SpotElevation):
         neighborHash = {}
 
         for point in bsi.points:
-            neighborHash[point] = [nei for nei in bsi.iterNeighborDiagonal(point)]
+            neighborHash[point] = [nei for nei in bsi.iterNeighborFull(point)]
 
         graph = Graph()
         for local, remotes in neighborHash.items():
