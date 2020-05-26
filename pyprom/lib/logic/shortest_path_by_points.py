@@ -25,15 +25,11 @@ def high_shore_shortest_path(point, flat_area_points, highShores, datamap):
     :return:
     """
     # needs to include perimeter in full path
-    bsi = BaseSelfIterable()
-    bsi.points = flat_area_points
+    pts = flat_area_points
 
     for hs in highShores:
-        bsi.points.extend(hs)
-
-    bsi.pointIndex = defaultdict(dict)
-    for point in bsi.points:
-        bsi.pointIndex[point[0]][point[1]] = point
+        pts.extend(hs)
+    bsi = BaseSelfIterable(pointList=pts)
 
     neighborHash = {}
 

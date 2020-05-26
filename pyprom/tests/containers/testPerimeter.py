@@ -35,13 +35,6 @@ class PerimeterTests(unittest.TestCase):
         cls.perimeter = Perimeter(pointIndex=cls.perimeterI,
                                   datamap=cls.datamap)
 
-    def testPerimeterBothIndexAndList(self):
-        """
-        Ensure passing in a pointList and pointIndex raises exception
-        """
-        with self.assertRaises(Exception):
-            Perimeter(pointIndex=self.perimeterI, pointList=[(1, 1)], datamap=self.datamap)
-
     def testPerimeterListBuildsIndex(self):
         """
         Ensure passing in a pointList produces a pointIndex
