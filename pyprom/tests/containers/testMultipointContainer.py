@@ -292,10 +292,10 @@ class MultipointTests(unittest.TestCase):
         Ensure points_with_elevation produces expected results.
         """
         mp = self.saddles[3].multiPoint
-        pwe = [(0, 65, 564.0), (0, 64, 564.0), (1, 66, 564.0),
-               (1, 65, 564.0), (1, 67, 564.0), (2, 66, 564.0),
-               (2, 65, 564.0), (2, 67, 564.0), (2, 69, 564.0),
-               (3, 64, 564.0), (3, 63, 564.0), (3, 68, 564.0),
+        pwe = [(0, 65, 564.0), (1, 66, 564.0), (1, 65, 564.0),
+               (0, 64, 564.0), (2, 66, 564.0), (2, 65, 564.0),
+               (3, 64, 564.0), (3, 63, 564.0), (1, 67, 564.0),
+               (2, 67, 564.0), (3, 68, 564.0), (2, 69, 564.0),
                (3, 69, 564.0)]
         result = mp.points_with_elevation()
         self.assertEqual(pwe, result)
