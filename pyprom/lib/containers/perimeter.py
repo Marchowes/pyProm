@@ -20,6 +20,8 @@ class Perimeter(BaseSelfIterable):
     member of a :class:`pyprom.lib.containers.multipoint.MultiPoint`
     """
 
+    __slots__ = ['datamap', 'mapEdge', 'mapEdgePoints']
+
     def __init__(self, pointList=None,
                  pointIndex=None,
                  datamap=None,

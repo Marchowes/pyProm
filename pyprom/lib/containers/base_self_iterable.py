@@ -25,6 +25,9 @@ class BaseSelfIterable:
     :type pointIndex:
     dict({X: { Y: tuple(x, y, elevation)}}
     """
+
+    __slots__ = ['points', 'pointIndex']
+
     def __init__(self,
                  pointList=None,
                  pointIndex=None):

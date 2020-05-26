@@ -23,6 +23,8 @@ class Feature_Verticies:
     are all all linked to foreign verticies
     """
 
+    __slots__ = ['index', 'vertex_linkers']
+
     def __init__(self, index, vertex_linkers):
         """
         :param int index: index of feature

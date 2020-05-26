@@ -20,6 +20,8 @@ class SummitDomain:
     all points along all directly ascending paths to a summit.
     """
 
+    __slots__ = ['datamap', 'points', 'summit', 'saddles']
+
     def __init__(self, datamap, summit, saddles, points):
         """
         :param datamap: Datamap associated with this :class:`SummitDomain`

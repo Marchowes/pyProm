@@ -17,6 +17,8 @@ class BaseGridPointContainer:
     :class:`pyprom.lib.locations.base_gridpoint.BaseGridPoint`
     """
 
+    __slots__ = ['points']
+
     def __init__(self, gridPointList):
         """
         :param gridPointList: list of BaseGridPoints

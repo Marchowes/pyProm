@@ -28,6 +28,8 @@ class SpotElevationContainer(_Base):
     and :class:`pyprom.lib.containers.runoffs.RunOffsContainer`
     """
 
+    __slots__ = ['points', 'fast_lookup']
+
     def __init__(self, spotElevationList):
         """
         :param spotElevationList: list of SpotElevation objects
