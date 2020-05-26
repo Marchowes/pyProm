@@ -1,5 +1,16 @@
 Release History
 
+0.7.2 (May 25, 2020)
+++++++++++++++++++++
+* multiPoint -> multipoint
+* Domain -> DomainMap
+
+0.7.1 (May 25, 2020)
+++++++++++++++++++++
+* Optimizations
+* Fast lookup object
+* Logic collapsed into Base Self Iterable
+
 0.7.0 (May 12, 2020)
 ++++++++++++++++++++
 * Significant Improvements to Walk accuracy

@@ -4,12 +4,13 @@
 
 This library is still under development. Do not expect full functionality, or documentation until release 1.0.0
 
-**Warning** There will be breaking changes to how domains are exported starting in 0.5.4
+**Warning** There will be breaking changes to how DomainMaps are exported starting in 0.5.4. As this is an alpha
+the concept of saving DomainMaps should never be considered stable.
 
 pyProm
 ======
 
-Supported version of Python: Python 3
+Supported version of Python: Python 3.4+
 
 The purpose of PyProm is to have a fully scriptable API for loading Raster Data for discovery of Summits,
 Saddles (cols), Prominence, Peak Parentage and all that good stuff. Anything you might want to be able to
@@ -56,22 +57,22 @@ logging.basicConfig(level=logging.DEBUG)
 
 # Load your Datamap into your Domain
 data = GDALLoader('YOURPATHHERE/N44W072.hgt')
-domain = Domain(data)
-domain.run()
+domainmap = DomainMap(data)
+domainmap.run()
 # ^ This will run the Saddle/RunOff/Summit discovery as well as saddle walk and saddle disqualifiers, it'll take a while..
 
 # Find all summits above 4000 feet
-_4ks = domain.summits.elevationRange(4000)
+_4ks = domainmap.summits.elevationRange(4000)
 
 # Write your fancy list of 4ks to a KML file
 mykml = KMLfileWriter('YOURPATHHERE/myfile.kml', features=_4ks')
 mykml.writeFile()
 
 # Save your Domain
-domain.write('YOURPATHHERE/mydomain.dom')
+domainmap.write('YOURPATHHERE/mydomain.dom')
 
-# Load your Domain you you don't need to wait forever for analysis.
-newDomain = Domain.read('YOURPATHHERE/mydomain.dom', data.datamap)
+# Load your DomainMap you you don't need to wait forever for analysis.
+newDomain = DomainMap.read('YOURPATHHERE/mydomain.dom', data.datamap)
 ```
 
 Installation

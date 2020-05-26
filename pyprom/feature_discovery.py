@@ -244,7 +244,7 @@ class AnalyzeData:
             summit = Summit(lat,
                             long,
                             self.elevation,
-                            multiPoint=multipoint,
+                            multipoint=multipoint,
                             edge=edge,
                             edgePoints=edgePoints
                             )
@@ -254,7 +254,7 @@ class AnalyzeData:
             saddle = Saddle(lat,
                             long,
                             self.elevation,
-                            multiPoint=multipoint,
+                            multipoint=multipoint,
                             edge=edge,
                             highShores=highPerimeter,
                             edgePoints=edgePoints)
@@ -301,7 +301,7 @@ class AnalyzeData:
             runoff = Runoff(lat,
                             long,
                             self.elevation,
-                            multiPoint=multipoint,
+                            multipoint=multipoint,
                             edge=edge,
                             highShores=highPerimeter,
                             edgePoints=edgePoints)
@@ -328,7 +328,7 @@ class AnalyzeData:
                 saddle = Saddle(lat,
                                 long,
                                 self.elevation,
-                                multiPoint=multipoint,
+                                multipoint=multipoint,
                                 edge=edge,
                                 highShores=highPerimeter,
                                 edgePoints=edgePoints)
@@ -386,7 +386,7 @@ class AnalyzeData:
                     runoff = Runoff(_lat,
                                     _long,
                                     self.elevation,
-                                    multiPoint=[],
+                                    multipoint=[],
                                     highShores=highShores,
                                     edgePoints=edge_point_neighborhoods[idx])
                     returnable_features.append(runoff)
@@ -411,7 +411,7 @@ class AnalyzeData:
                 if len(runoff_edge_neighborhoods) == len(edge_point_neighborhoods):
                     saddle = Saddle(lat, long,
                                     self.elevation,
-                                    multiPoint = multipoint,
+                                    multipoint = multipoint,
                                     edge = False,
                                     highShores = highPerimeter,
                                     edgePoints = [])
@@ -419,7 +419,7 @@ class AnalyzeData:
                 else:
                     saddle = Saddle(lat, long,
                                     self.elevation,
-                                    multiPoint = multipoint,
+                                    multipoint = multipoint,
                                     edge = edge,
                                     highShores = highPerimeter,
                                     edgePoints = remaining_edgepoints)

@@ -73,27 +73,27 @@ class MultiPoint:
         :return: dict() representation of :class:`MultiPoint`
         :rtype: dict()
         """
-        multiPointDict = dict()
-        multiPointDict['points'] = self.points
-        multiPointDict['perimeter'] = self.perimeter.to_dict()
-        multiPointDict['elevation'] = self.elevation
-        return multiPointDict
+        multipointDict = dict()
+        multipointDict['points'] = self.points
+        multipointDict['perimeter'] = self.perimeter.to_dict()
+        multipointDict['elevation'] = self.elevation
+        return multipointDict
 
     @classmethod
-    def from_dict(cls, multiPointDict, datamap=None):
+    def from_dict(cls, multipointDict, datamap=None):
         """
         Create this object from dictionary representation
 
-        :param multiPointDict: dict() representation of this
+        :param multipointDict: dict() representation of this
          :class:`MultiPoint`.
         :param datamap: datamap which this MultiPoint uses.
         :type datamap: :class:`pyprom.lib.datamap.DataMap`
         :return: a new Multipoint.
         :rtype: :class:`MultiPoint`
         """
-        points = [(pt[0], pt[1]) for pt in multiPointDict['points']]
-        perimeter = Perimeter.from_dict(multiPointDict['perimeter'], datamap)
-        elevation = multiPointDict['elevation']
+        points = [(pt[0], pt[1]) for pt in multipointDict['points']]
+        perimeter = Perimeter.from_dict(multipointDict['perimeter'], datamap)
+        elevation = multipointDict['elevation']
         return cls(points, elevation, datamap, perimeter=perimeter)
 
     @property

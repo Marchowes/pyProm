@@ -54,8 +54,8 @@ class Saddle(SpotElevation):
         :type longitude: int, float
         :param elevation: elevation in meters
         :type elevation: int, float
-        :param multiPoint: MultiPoint object
-        :type multiPoint: :class:`pyprom.lib.containers.multipoint.MultiPoint`,
+        :param multipoint: MultiPoint object
+        :type multipoint: :class:`pyprom.lib.containers.multipoint.MultiPoint`,
          None
         :param highShores: list of GridPointContainers representing a highShore
         :type highShores:
@@ -78,7 +78,7 @@ class Saddle(SpotElevation):
         """
         super(Saddle, self).__init__(latitude, longitude,
                                      elevation, *args, **kwargs)
-        self.multiPoint = kwargs.get('multiPoint', [])
+        self.multipoint = kwargs.get('multipoint', [])
         self.highShores = kwargs.get('highShores', [])
         self.id = kwargs.get('id', 'sa:' + randomString())
         # List of linkers to summits
@@ -175,8 +175,8 @@ class Saddle(SpotElevation):
         :return: HS1, HS2, Midpoint
         """
         pts = []
-        if self.multiPoint:
-            pts.extend(self.multiPoint.points)
+        if self.multipoint:
+            pts.extend(self.multipoint.points)
         else:
             gp = self.toGridPoint(datamap)
             pts.append((gp.x, gp.y))
@@ -315,8 +315,8 @@ class Saddle(SpotElevation):
             to_dict['basinSaddle'] = self.basinSaddle
         if self._disqualified:
             to_dict['disqualified'] = self._disqualified
-        if self.multiPoint:
-            to_dict['multipoint'] = self.multiPoint.to_dict()
+        if self.multipoint:
+            to_dict['multipoint'] = self.multipoint.to_dict()
         if self.highShores:
             to_dict['highShores'] = self.highShores
         # These values are not unloaded by from_dict()
@@ -375,7 +375,7 @@ class Saddle(SpotElevation):
                 highshores.append(hsx)
 
         return cls(lat, long, elevation,
-                   multiPoint=multipoint,
+                   multipoint=multipoint,
                    highShores=highshores,
                    edge=edge,
                    edgePoints=edgePoints,
@@ -406,7 +406,7 @@ class Saddle(SpotElevation):
             self.longitude,
             self.feet,
             self.elevation,
-            bool(self.multiPoint))
+            bool(self.multipoint))
 
     __unicode__ = __str__ = __repr__
 

@@ -36,8 +36,8 @@ class InternalSaddleNetworkTests(unittest.TestCase):
         """
         self.saddles = SaddlesContainer.from_dict(self.masterSaddlesDict,
                                                   self.aziscohos)
-        mp = [x for x in self.saddles.saddles if x.multiPoint]
-        self.aziscohosSaddle = [x for x in mp if len(x.multiPoint) > 1000][0]
+        mp = [x for x in self.saddles.saddles if x.multipoint]
+        self.aziscohosSaddle = [x for x in mp if len(x.multipoint) > 1000][0]
 
     def testInternalSaddleNetworkAziscohos(self):
         """
@@ -49,7 +49,7 @@ class InternalSaddleNetworkTests(unittest.TestCase):
         self.assertEqual(len(new_saddles), 6)
         for saddle in new_saddles:
             self.assertEqual(len(saddle.highShores), 2)
-            self.assertEqual(saddle.multiPoint, [])
+            self.assertEqual(saddle.multipoint, [])
             self.assertEqual(saddle.disqualified, False)
 
     def testInternalSaddleNetworkAziscohosViaContainer(self):

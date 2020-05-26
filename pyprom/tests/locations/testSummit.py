@@ -8,7 +8,7 @@ the LICENSE file that accompanies it.
 import unittest
 
 from pyprom.tests.getData import gettestzip
-from pyprom.domain import Domain
+from pyprom.domain_map import DomainMap
 from pyprom.dataload import GDALLoader
 from pyprom.lib.locations.summit import Summit
 from pyprom.lib.locations.saddle import Saddle
@@ -58,7 +58,7 @@ class SummitTests(unittest.TestCase):
         datafile = GDALLoader('/tmp/N44W072.hgt')
         datamap = datafile.datamap
         someslice = datamap.subset(0, 0, 30, 30)
-        domain = Domain(someslice)
+        domain = DomainMap(someslice)
         domain.run()
         summits = domain.summits
         summit = summits[0]
@@ -70,7 +70,7 @@ class SummitTests(unittest.TestCase):
         self.assertEqual(newSummit.latitude, summit.latitude)
         self.assertEqual(newSummit.longitude, summit.longitude)
         self.assertEqual(newSummit.elevation, summit.elevation)
-        self.assertEqual(newSummit.multiPoint, summit.multiPoint)
+        self.assertEqual(newSummit.multipoint, summit.multipoint)
         self.assertEqual(newSummit.edgeEffect, summit.edgeEffect)
         self.assertEqual(newSummit.edgePoints, summit.edgePoints)
         self.assertEqual(newSummit.id, summit.id)

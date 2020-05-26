@@ -4,7 +4,7 @@ pyProm: Copyright 2017.
 This software is distributed under a license that is described in
 the LICENSE file that accompanies it.
 
-This library contains a class for creating a pyProm Domain.
+This library contains a class for creating a pyProm DomainMap.
 """
 
 
@@ -29,9 +29,9 @@ from .lib.logic.summit_domain_walk import Walk
 from .lib.constants import DOMAIN_EXTENSION
 from . import version_info
 
-class Domain:
+class DomainMap:
     """
-    Domain object, This object contains the
+    DomainMap object, This object contains the
     :class:`pyprom.lib.containers.saddles.SaddlesContainer`,
     :class:`pyprom.lib.containers.summits.SummitsContainer`,
     :class:`pyprom.lib.containers.runoffs.RunoffsContainer`,
@@ -46,10 +46,10 @@ class Domain:
                  summit_domains=[],
                  linkers=[]):
         """
-        A Domain consumes either a :class:`pyprom.lib.datamap.DataMap` object or
+        A DomainMap consumes either a :class:`pyprom.lib.datamap.DataMap` object or
         a :class:`pyprom.dataload.Loader` child object.
 
-        :param data: Datamap to be used with this :class:`Domain`
+        :param data: Datamap to be used with this :class:`DomainMap`
         :type data: :class:`pyprom.lib.datamap.DataMap` or
          :class:`pyprom.dataload.Loader`
         :param summits: Summits Container
@@ -66,7 +66,7 @@ class Domain:
         elif isinstance(data, Loader):
             self.datamap = data.datamap
         else:
-            raise TypeError('Domain Object consumes DataMap object,'
+            raise TypeError('DomainMap Object consumes DataMap object,'
                             ' or Loader type object')
         self.saddles = saddles
         self.summits = summits
@@ -79,7 +79,7 @@ class Domain:
             self.datamap.upper_left,
             self.datamap.upper_right)
         self.logger = logging.getLogger('{}'.format(__name__))
-        self.logger.info("Domain Object Created: \n{}".format(self.extent))
+        self.logger.info("DomainMap Object Created: \n{}".format(self.extent))
 
     def run(self, sparse=False, superSparse=False, rebuildSaddles=False):
         """
@@ -101,7 +101,7 @@ class Domain:
         # Find Features
         self.summits, self.saddles, self.runoffs =\
             AnalyzeData(self.datamap).run(rebuildSaddles)
-        self.logger.info("Domain contains {} Summits,"
+        self.logger.info("DomainMap contains {} Summits,"
                          " {} Saddles, {} Runoffs".format(
             len(self.summits),
             len(self.saddles),
@@ -122,32 +122,32 @@ class Domain:
     @classmethod
     def read(cls, filename, datamap):
         """
-        Class Method for reading a Domain saved to file into a :class:`Domain`.
+        Class Method for reading a DomainMap saved to file into a :class:`DomainMap`.
 
         :param str filename: name of file (including path) to read
-        :param datamap: Datamap for this Domain
+        :param datamap: Datamap for this DomainMap
         :type datamap: :class:`pyprom.lib.datamap.DataMap`
         """
         # Expunge any existing saddles, summits, and linkers
         filename = os.path.expanduser(filename)
         incoming = gzip.open(filename, 'r')
         domain = cls.from_cbor(incoming.read(), datamap)
-        domain.logger.info("Loaded Domain Dataset from {}.".format(filename))
+        domain.logger.info("Loaded DomainMap Dataset from {}.".format(filename))
         incoming.close()
         return domain
 
     def write(self, filename):
         """
-        Writes the contents of the :class:`Domain` to a file.
+        Writes the contents of the :class:`DomainMap` to a file.
 
         :param str filename: name of file (including path) to write this
-         :class:`Domain` to
+         :class:`DomainMap` to
         """
         filename = os.path.expanduser(filename)
         if not filename.endswith(DOMAIN_EXTENSION):
             filename += DOMAIN_EXTENSION
 
-        self.logger.info("Writing Domain Dataset to {}.".format(filename))
+        self.logger.info("Writing DomainMap Dataset to {}.".format(filename))
         outgoing = gzip.open(filename, 'wb', 5)
         # ^^ ('filename', 'read/write mode', compression level)
         outgoing.write(self.to_cbor())
@@ -156,22 +156,22 @@ class Domain:
     @classmethod
     def from_cbor(cls, cborBinary, datamap):
         """
-        Loads a cbor binary into a Domain. This also requires
+        Loads a cbor binary into a DomainMap. This also requires
         a :class:`pyprom.lib.datamap.DataMap`
 
-        :param bin cborBinary: cbor of :class:`Domain` data
-        :param datamap: datamap for this Domain
+        :param bin cborBinary: cbor of :class:`DomainMap` data
+        :param datamap: datamap for this DomainMap
         :type datamap: :class:`pyprom.lib.datamap.DataMap`
-        :return: :class:`Domain`
+        :return: :class:`DomainMap`
         """
         domainDict = cbor.loads(cborBinary)
         return cls.from_dict(domainDict, datamap)
 
     def to_cbor(self):
         """
-        Returns compressed cbor binary representation of this :class:`Domain`
+        Returns compressed cbor binary representation of this :class:`DomainMap`
 
-        :return: cbor binary of :class:`Domain`
+        :return: cbor binary of :class:`DomainMap`
         """
         return cbor.dumps(self.to_dict())
 
@@ -184,11 +184,11 @@ class Domain:
         :param datamap: datamap for this Domain
         :type datamap: :class:`pyprom.lib.datamap.DataMap`
         :return: a new Domain
-        :rtype: :class:`Domain`
+        :rtype: :class:`DomainMap`
         """
         if domainDict['file_md5'] != datamap.md5:
             raise Exception("Datamap file does not match Datamap "
-                            "file used to create Domain.")
+                            "file used to create DomainMap.")
         saddlesContainer = SaddlesContainer.from_dict(domainDict['saddles'],
                                                       datamap=datamap)
         summitsContainer = SummitsContainer.from_dict(domainDict['summits'],
@@ -221,12 +221,12 @@ class Domain:
 
     def to_dict(self):
         """
-        Returns dict representation of this :class:`Domain`
+        Returns dict representation of this :class:`DomainMap`
 
         :param bool noWalkPath: exclude
          :class:`pyprom.lib.containers.walkpath.WalkPath` from member
          :class:`pyprom.lib.containers.linker.Linker`
-        :return: dict() representation of :class:`Domain`
+        :return: dict() representation of :class:`DomainMap`
         :rtype: dict()
         """
         domain_dict = dict()
@@ -299,7 +299,7 @@ class Domain:
 
     def walk(self, saddles=[]):
         """
-        Perform Walk from Saddles contained in this Domain
+        Perform Walk from Saddles contained in this DomainMap
 
         If saddles are passed in, dont modify the DomainMap.
         Instead, return Saddles returned from the walk.
@@ -317,7 +317,7 @@ class Domain:
         """
         :return: String representation of this object
         """
-        return "<Domain> Lat/Long Extent {} Saddles " \
+        return "<DomainMap> Lat/Long Extent {} Saddles " \
             "{} Summits {} Runoffs {} Linkers {}".format(
                 self.extent,
                 len(self.saddles),

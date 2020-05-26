@@ -198,9 +198,9 @@ class InternalSaddleNetwork(object):
                                     int(link.local[1] + link.remote[1]) / 2,
                                     self.saddle.elevation)
 
-            if self.saddle.multiPoint:
+            if self.saddle.multipoint:
                 middleSpotElevation = \
-                    self.saddle.multiPoint.closestPoint(middlePoint,
+                    self.saddle.multipoint.closestPoint(middlePoint,
                                                         asSpotElevation=True)
                 newSaddle = Saddle(middleSpotElevation.latitude,
                                    middleSpotElevation.longitude,

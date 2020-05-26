@@ -39,7 +39,7 @@ def generate_MultiPoint(x, y, xSpan, ySpan,
     return mp
 
 
-def generate_multiPoint_saddle(x, y, xSpan, ySpan,
+def generate_multipoint_saddle(x, y, xSpan, ySpan,
                                datamap, elevation,
                                islands=[],
                                perimeterHighShores=1):
@@ -64,7 +64,7 @@ def generate_multiPoint_saddle(x, y, xSpan, ySpan,
                              excludeBGPC=islands)
 
     saddle = Saddle(x, y, elevation)
-    saddle.multiPoint = mp
+    saddle.multipoint = mp
 
     islandGPCs = []
     for island in islands:
