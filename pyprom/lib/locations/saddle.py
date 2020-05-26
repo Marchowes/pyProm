@@ -174,25 +174,19 @@ class Saddle(SpotElevation):
         :type datamap: :class:`pyprom.lib.datamap.DataMap`
         :return: HS1, HS2, Midpoint
         """
-        bsi = BaseSelfIterable()
-        bsi.points = []
+        pts = []
         if self.multiPoint:
-            bsi.points.extend(self.multiPoint.points)
+            pts.extend(self.multiPoint.points)
         else:
             gp = self.toGridPoint(datamap)
-            bsi.points.append((gp.x, gp.y))
-
+            pts.append((gp.x, gp.y))
         for hs in self.highShores:
-            bsi.points.extend(hs)
-
-        bsi.pointIndex = defaultdict(dict)
-        for point in bsi.points:
-            bsi.pointIndex[point[0]][point[1]] = point
-
+            pts.extend(hs)
+        bsi = BaseSelfIterable(pointList=pts)
         neighborHash = {}
 
         for point in bsi.points:
-            neighborHash[point] = [nei for nei in bsi.iterNeighborDiagonal(point)]
+            neighborHash[point] = [nei for nei in bsi.iterNeighborFull(point)]
 
         graph = Graph()
         for local, remotes in neighborHash.items():

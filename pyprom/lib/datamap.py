@@ -23,6 +23,7 @@ FULL_SHIFT_LIST = ((-1, 0), (-1, 1), (0, 1), (1, 1), (1, 0), (1, -1),
                        (0, -1), (-1, -1))
 ORTHOGONAL_SHIFT_LIST = ((-1, 0), (0, 1), (1, 0), (0, -1))
 DIAGONAL_SHIFT_LIST = ((-1, 1), (1, 1), (1, -1), (-1, -1))
+FULL_SHIFT_ORTHOGONAL_DIAGONAL_LIST = ORTHOGONAL_SHIFT_LIST + DIAGONAL_SHIFT_LIST
 
 NON_FILE_SENTINEL = "UnknownSubset"
 
@@ -159,6 +160,15 @@ class DataMap:
         else:
             return float(self.numpy_map[x, y])
 
+    def is_map_edge(self, x, y):
+        """
+        Determine if x, y is on the map edge.
+        :param x: x coord
+        :param y: y coord
+        :return: bool
+        """
+        return x == 0 or y == 0 or x == self.max_x or y == self.max_y
+
 class ProjectionDataMap(DataMap):
     """
     ProjectionDataMap is a :class:`pyprom.lib.datamap.DataMap` object for
@@ -219,6 +229,8 @@ class ProjectionDataMap(DataMap):
         self.nodata = nodata
         self.transform = transform
         self.reverse_transform = reverse_transform
+        self._x_mapEdge = {0: True, self.max_x: True}
+        self._y_mapEdge = {0: True, self.max_y: True}
 
     def xy_to_latlong(self, x, y):
         """

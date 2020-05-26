@@ -105,7 +105,7 @@ class GridPointContainer(BaseGridPointContainer):
         for gp in self.points:
             self.fastLookup[gp.x][gp.y] = gp
 
-    def iterNeighborDiagonal(self, point):
+    def iterNeighborFull(self, point):
         """
         Iterate through existing diagonal/orthogonal
         :class:`pyprom.lib.locations.gridpoint.GridPoint`
@@ -117,8 +117,8 @@ class GridPointContainer(BaseGridPointContainer):
         """
         if not len(self.fastLookup):
             self.genFastLookup()
-        shiftList = [[-1, 0], [-1, 1], [0, 1], [1, 1], [1, 0], [1, -1],
-                     [0, -1], [-1, -1]]
+        shiftList = ((-1, 0), (-1, 1), (0, 1), (1, 1), (1, 0), (1, -1),
+                     (0, -1), (-1, -1))
         for shift in shiftList:
             x = point.x + shift[0]
             y = point.y + shift[1]
@@ -183,7 +183,7 @@ class GridPointContainer(BaseGridPointContainer):
                 # officially declare that we're looking at this point.
                 exploredGridPoints[gridPoint.x][gridPoint.y] = True
                 analyzed.append(gridPoint)
-                neighbors = self.iterNeighborDiagonal(gridPoint)
+                neighbors = self.iterNeighborFull(gridPoint)
                 for neighbor in neighbors:
                     if exploredGridPoints[neighbor.x].get(neighbor.y, None):
                         continue
@@ -207,7 +207,7 @@ class GridPointContainer(BaseGridPointContainer):
             # officially declare that we're looking at this point.
             exploredGridPoints[point.x][point.y] = True
             skip = False
-            for neighbor in self.iterNeighborDiagonal(point):
+            for neighbor in self.iterNeighborFull(point):
                 # do we have equal height neighbors?
                 if neighbor.elevation == point.elevation:
                     pseudos = equalHeightBlob(point)

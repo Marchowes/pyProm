@@ -38,19 +38,8 @@ class Perimeter(BaseSelfIterable):
         :param mapEdgePoints: list of Points (tuple) on the map edge.
         :type mapEdgePoints: list(tuple(x, y, ele))
         """
-        self.points = list()
-        if pointList and pointIndex:
-            raise Exception("choose one, pointList or PointIndex")
-        if pointIndex:
-            self.pointIndex = pointIndex
-            self.points = [p for x, _y in self.pointIndex.items()
-                           for y, p in _y.items()]
-
-        if pointList:
-            self.points = pointList
-            self.pointIndex = defaultdict(dict)
-            for point in self.points:
-                self.pointIndex[point[0]][point[1]] = point
+        super().__init__(pointList=pointList,
+                         pointIndex=pointIndex)
 
         self.datamap = datamap
         self.mapEdge = mapEdge

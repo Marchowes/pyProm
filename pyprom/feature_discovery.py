@@ -49,8 +49,6 @@ class AnalyzeData:
         self.data = self.datamap.numpy_map
         self.max_y = self.datamap.max_y
         self.max_x = self.datamap.max_x
-        self.x_mapEdge = {0: True, self.max_x: True}
-        self.y_mapEdge = {0: True, self.max_y: True}
         self.explored = defaultdict(dict)
 
     def run(self, rebuildSaddles=True):
@@ -180,13 +178,14 @@ class AnalyzeData:
 
         # Label this as an mapEdge under the following condition
         edgePoints = []
-        if self.x_mapEdge.get(x) or self.y_mapEdge.get(y):
+        if self.datamap.is_map_edge(x, y):
             edge = True
             edgePoints = [(x, y, self.elevation)]
 
         # Begin the ardous task of analyzing points and multipoints
         neighbor = self.datamap.iterateFull(x, y)
         shoreSetIndex = defaultdict(dict)
+        shoreList = list()
         shoreMapEdge = set()
         for _x, _y, elevation in neighbor:
 
@@ -200,11 +199,14 @@ class AnalyzeData:
                 return self.analyze_multipoint(_x, _y, elevation)
 
             if elevation > self.elevation:
+                shore = (_x, _y, elevation)
                 shoreSetIndex[_x][_y] = (_x, _y, elevation)
-            if self.x_mapEdge.get(_x) or self.y_mapEdge.get(_y):
+                shoreList.append(shore)
+            if self.datamap.is_map_edge(_x, _y):
                 shoreMapEdge.add((_x, _y, elevation))
 
-        shoreSet = Perimeter(pointIndex=shoreSetIndex,
+        shoreSet = Perimeter(pointList=shoreList,
+                             pointIndex=shoreSetIndex,
                              datamap=self.datamap,
                              mapEdge=edge,
                              mapEdgePoints=list(shoreMapEdge))

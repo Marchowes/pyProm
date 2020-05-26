@@ -52,28 +52,28 @@ class GridPointContainerTests(unittest.TestCase):
         container = GridPointContainer([])
         self.assertEqual(len(container), 0)
 
-    def testGridPointContainerIterNeighborDiagonal(self):
+    def testGridPointContainerIterNeighborFull(self):
         """
-        Ensure that iterDiagonal returns the expected results.
-        Iter diagonal returns all neighbors of a GridPoint contained
+        Ensure that iterNeighborFull returns the expected results.
+        iterNeighborFull returns all neighbors of a GridPoint contained
         in the GridPointPointContainer
         """
         count = 0
         # Should have two results.
-        for point in self.gpc.iterNeighborDiagonal(self.p12):
+        for point in self.gpc.iterNeighborFull(self.p12):
             count += 1
             self.assertIn(point, [self.p11,
                                   self.p13])
         self.assertEqual(count, 2)
         count = 0
         # Should have just the one result.
-        for point in self.gpc.iterNeighborDiagonal(self.p11):
+        for point in self.gpc.iterNeighborFull(self.p11):
             count += 1
             self.assertIn(point, [self.p12])
         self.assertEqual(count, 1)
         count = 0
         # Should have three results.
-        for point in self.gpc.iterNeighborDiagonal(self.p24):
+        for point in self.gpc.iterNeighborFull(self.p24):
             count += 1
             self.assertIn(point, [self.p14,
                                   self.p25,
@@ -81,7 +81,7 @@ class GridPointContainerTests(unittest.TestCase):
         self.assertEqual(count, 3)
         count = 0
         # Should have three results.
-        for point in self.gpc.iterNeighborDiagonal(self.p13):
+        for point in self.gpc.iterNeighborFull(self.p13):
             count += 1
             self.assertIn(point, [self.p12,
                                   self.p14,
@@ -91,7 +91,7 @@ class GridPointContainerTests(unittest.TestCase):
     def testGridPointContainerIterNeighborOrthogonal(self):
         """
         Ensure that iterOrthogonal returns the expected results.
-        Iter diagonal returns all orthogonal (right angle) neighbors
+        IterNeighborOrthogonal returns all orthogonal (right angle) neighbors
         of a GridPoint contained in the GridPointContainer
         """
         count = 0

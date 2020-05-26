@@ -35,13 +35,6 @@ class PerimeterTests(unittest.TestCase):
         cls.perimeter = Perimeter(pointIndex=cls.perimeterI,
                                   datamap=cls.datamap)
 
-    def testPerimeterBothIndexAndList(self):
-        """
-        Ensure passing in a pointList and pointIndex raises exception
-        """
-        with self.assertRaises(Exception):
-            Perimeter(pointIndex=self.perimeterI, pointList=[(1, 1)], datamap=self.datamap)
-
     def testPerimeterListBuildsIndex(self):
         """
         Ensure passing in a pointList produces a pointIndex
@@ -57,28 +50,28 @@ class PerimeterTests(unittest.TestCase):
         perm = Perimeter(pointIndex=self.perimeter.pointIndex, datamap=self.datamap)
         self.assertEqual(perm.points, self.perimeter.points)
 
-    def testPerimeterIterNeighborDiagonal(self):
+    def testPerimeterIterNeighborFull(self):
         """
-        Ensure that iterDiagonal returns the expected results.
-        Iter diagonal returns all neighbors of a GridPoint contained
+        Ensure that iterNeighborFull returns the expected results.
+        iterNeighborFull returns all neighbors of a GridPoint contained
         in the Perimeter Container
         """
         count = 0
         # Should have two results.
-        for point in self.perimeter.iterNeighborDiagonal(self.p12):
+        for point in self.perimeter.iterNeighborFull(self.p12):
             count += 1
             self.assertIn(point, [self.p11,
                                   self.p13])
         self.assertEqual(count, 2)
         count = 0
         # Should have just the one result.
-        for point in self.perimeter.iterNeighborDiagonal(self.p11):
+        for point in self.perimeter.iterNeighborFull(self.p11):
             count += 1
             self.assertIn(point, [self.p12])
         self.assertEqual(count, 1)
         count = 0
         # Should have three results.
-        for point in self.perimeter.iterNeighborDiagonal(self.p24):
+        for point in self.perimeter.iterNeighborFull(self.p24):
             count += 1
             self.assertIn(point, [self.p14,
                                   self.p25,
@@ -86,7 +79,7 @@ class PerimeterTests(unittest.TestCase):
         self.assertEqual(count, 3)
         count = 0
         # Should have three results.
-        for point in self.perimeter.iterNeighborDiagonal(self.p13):
+        for point in self.perimeter.iterNeighborFull(self.p13):
             count += 1
             self.assertIn(point, [self.p12,
                                   self.p14,
@@ -95,8 +88,8 @@ class PerimeterTests(unittest.TestCase):
 
     def testPerimeterIterNeighborOrthogonal(self):
         """
-        Ensure that iterOrthogonal returns the expected results.
-        Iter diagonal returns all orthogonal (right angle) neighbors
+        Ensure that IterNeighborOrthogonal returns the expected results.
+        IterNeighborOrthogonal returns all orthogonal (right angle) neighbors
         of an GridPoint contained in the Perimeter container
         """
         count = 0
