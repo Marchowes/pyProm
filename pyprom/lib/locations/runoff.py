@@ -27,8 +27,8 @@ class Runoff(Saddle):
         :type longitude: int, float
         :param elevation: elevation in meters
         :type elevation: int, float
-        :param multiPoint: MultiPoint object
-        :type multiPoint: :class:`pyprom.lib.containers.multipoint.MultiPoint`,
+        :param multipoint: MultiPoint object
+        :type multipoint: :class:`pyprom.lib.containers.multipoint.MultiPoint`,
          None
         :param highShores: list of GridPointContainers representing a highShore
         :type highShores:
@@ -48,6 +48,6 @@ class Runoff(Saddle):
             self.longitude,
             self.feet,
             self.elevation,
-            bool(self.multiPoint))
+            bool(self.multipoint))
 
     __unicode__ = __str__ = __repr__

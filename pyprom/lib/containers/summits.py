@@ -106,7 +106,7 @@ class SummitsContainer(SpotElevationContainer):
 
         :return: list(:class:`pyprom.lib.locations.summit.Summit`)
         """
-        return [pt for pt in self.points if pt.multiPoint]
+        return [pt for pt in self.points if pt.multipoint]
 
     def __setitem__(self, idx, summit):
         """

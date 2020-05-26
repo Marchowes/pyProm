@@ -60,4 +60,4 @@ class LogicTests(unittest.TestCase):
         """
         mpSummit = self.summits[0]
         # make sure we find 2 points
-        self.assertEqual(len(mpSummit.multiPoint), 2)
+        self.assertEqual(len(mpSummit.multipoint), 2)

@@ -51,8 +51,8 @@ class Walk:
                 continue
             sd = SummitDomain(self.domainmap.datamap, summit, [], [])
             summit.domain = sd
-            if summit.multiPoint:
-                sd.extend(summit.multiPoint.points, self.summit_domain_points)
+            if summit.multipoint:
+                sd.extend(summit.multipoint.points, self.summit_domain_points)
             else:
                 x, y = self.domainmap.datamap.latlong_to_xy(summit.latitude,
                                                   summit.longitude)
@@ -276,7 +276,7 @@ class Walk:
             return nw.generate_child_saddles()
         #Just 2
 
-        if saddle.multiPoint:
+        if saddle.multipoint:
             hs0, hs1, midpoint = saddle.high_shore_shortest_path(
                 self.domainmap.datamap)
 

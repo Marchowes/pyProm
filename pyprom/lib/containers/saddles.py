@@ -68,7 +68,7 @@ class SaddlesContainer(SpotElevationContainer):
                 # and find the mid point for both. Then find the point within
                 # the multipoint that is closest to that midpoint. Disregard
                 # high shores.
-                if saddle.multiPoint:
+                if saddle.multipoint:
                     hs0, hs1, distance =\
                         find_closest_points(saddle.highShores[0], saddle.highShores[1], datamap)
                     # find the middle GP for the 2 closest opposing shore
@@ -83,7 +83,7 @@ class SaddlesContainer(SpotElevationContainer):
                     # multipoint by finding the closest point inside the
                     # multipoint.
                     middleSpotElevation =\
-                        saddle.multiPoint.closestPoint(middleGP,
+                        saddle.multipoint.closestPoint(middleGP,
                                                        asSpotElevation=True)
                     newSaddle = Saddle(middleSpotElevation.latitude,
                                        middleSpotElevation.longitude,
@@ -204,7 +204,7 @@ class SaddlesContainer(SpotElevationContainer):
 
         :return: list(:class:`pyprom.lib.locations.saddle.Saddle`)
         """
-        return [pt for pt in self.points if pt.multiPoint]
+        return [pt for pt in self.points if pt.multipoint]
 
     def __repr__(self):
         """

@@ -133,7 +133,7 @@ class SummitsContainerTests(unittest.TestCase):
         self.assertEqual(newSummit.latitude, summit.latitude)
         self.assertEqual(newSummit.longitude, summit.longitude)
         self.assertEqual(newSummit.elevation, summit.elevation)
-        self.assertEqual(newSummit.multiPoint, summit.multiPoint)
+        self.assertEqual(newSummit.multipoint, summit.multipoint)
         self.assertEqual(newSummit.edgeEffect, summit.edgeEffect)
         self.assertEqual(newSummit.edgePoints, summit.edgePoints)
         self.assertEqual(newSummit.id, summit.id)
@@ -143,7 +143,7 @@ class SummitsContainerTests(unittest.TestCase):
         Ensure multipoint() returns all multipoint Summits
         """
         s1 = Summit(1, 1, 1)
-        s1.multiPoint = ["bogus_but_ok_for_test"]
+        s1.multipoint = ["bogus_but_ok_for_test"]
         s2 = Summit(2, 2, 2)
         container = SummitsContainer([s1, s2])
         self.assertEqual(container.multipoints, [s1])

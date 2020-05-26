@@ -38,7 +38,7 @@ class MultipointTests(unittest.TestCase):
         Test multipoint container ability to convert GridPoints
         to BaseCoordinates.
         """
-        multipoint = self.summitWithoutMultipointEdge.multiPoint
+        multipoint = self.summitWithoutMultipointEdge.multipoint
         bc0 = BaseCoordinate(44.70986111111111, -71.71263888888889)
         bc1 = BaseCoordinate(44.70986111111111, -71.71236111111111)
         self.assertIn(bc0, multipoint.pointsLatLong)
@@ -48,14 +48,14 @@ class MultipointTests(unittest.TestCase):
         """
         Test multipoint container perimeter count is as expected.
         """
-        multipoint = self.saddle.multiPoint
+        multipoint = self.saddle.multipoint
         self.assertEqual(len(multipoint.perimeter), 8)
 
     def testMultipointRepr(self):
         """
         Ensure __repr__ returns expected results.
         """
-        multipoint = self.saddle.multiPoint
+        multipoint = self.saddle.multipoint
         self.assertEqual(multipoint.__repr__(),
                          "<Multipoint> elevation(m): 551.0, points 4")
 
@@ -64,13 +64,13 @@ class MultipointTests(unittest.TestCase):
         Ensure __iter__ returns expected results.
         """
         self.assertEqual(len([x for x in
-                              self.summitWithoutMultipointEdge.multiPoint]), 2)
+                              self.summitWithoutMultipointEdge.multipoint]), 2)
 
     def testMultipointLen(self):
         """
         Ensure __len__ returns expected results.
         """
-        self.assertEqual(len(self.summitWithoutMultipointEdge.multiPoint), 2)
+        self.assertEqual(len(self.summitWithoutMultipointEdge.multipoint), 2)
 
     def testMultipointSetItem(self):
         """
@@ -189,7 +189,7 @@ class MultipointTests(unittest.TestCase):
         """
         Ensure From Dict works as expected.
         """
-        mp = self.saddles[3].multiPoint
+        mp = self.saddles[3].multipoint
         mp_dict = mp.to_dict()
         newMp = MultiPoint.from_dict(mp_dict, mp.datamap)
         self.assertEqual(newMp, mp)
@@ -291,7 +291,7 @@ class MultipointTests(unittest.TestCase):
         """
         Ensure points_with_elevation produces expected results.
         """
-        mp = self.saddles[3].multiPoint
+        mp = self.saddles[3].multipoint
         pwe = [(0, 65, 564.0), (1, 66, 564.0), (1, 65, 564.0),
                (0, 64, 564.0), (2, 66, 564.0), (2, 65, 564.0),
                (3, 64, 564.0), (3, 63, 564.0), (1, 67, 564.0),

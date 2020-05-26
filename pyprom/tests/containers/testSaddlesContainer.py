@@ -6,12 +6,10 @@ the LICENSE file that accompanies it.
 """
 
 import unittest
-from pyprom.tests.util.helpers import generate_multiPoint_saddle
+from pyprom.tests.util.helpers import generate_multipoint_saddle
 from pyprom.lib.containers.saddles import SaddlesContainer
 from pyprom.lib.containers.base_gridpoint import BaseGridPointContainer
-from pyprom.lib.containers.gridpoint import GridPointContainer
 from pyprom.lib.locations.base_gridpoint import BaseGridPoint
-from pyprom.lib.locations.gridpoint import GridPoint
 from pyprom.lib.locations.saddle import Saddle
 from pyprom.lib.locations.summit import Summit
 from pyprom.domain import Domain
@@ -150,7 +148,7 @@ class SaddlesContainerTests(unittest.TestCase):
         Ensure multipoint() returns all multipoint Summits
         """
         s1 = Saddle(1, 1, 1)
-        s1.multiPoint = ["bogus_but_ok_for_test"]
+        s1.multipoint = ["bogus_but_ok_for_test"]
         s2 = Saddle(2, 2, 2)
         container = SaddlesContainer([s1, s2])
         self.assertEqual(container.multipoints, [s1])
@@ -188,7 +186,7 @@ class SaddlesContainerRebuildTests(unittest.TestCase):
         Must generate 3 new Saddles (len(hs)-1)
         This exercises InternalSaddleNetwork which is called when hs > 2
         """
-        twoIslands = SaddlesContainer([generate_multiPoint_saddle(100,
+        twoIslands = SaddlesContainer([generate_multipoint_saddle(100,
                                       200, 10, 10,
                                       self.datamap,
                                       self.elevation,
@@ -217,7 +215,7 @@ class SaddlesContainerRebuildTests(unittest.TestCase):
         Must generate 2 new Saddles (len(hs)-1)
         This exercises InternalSaddleNetwork which is called when hs > 2
         """
-        oneIsland = SaddlesContainer([generate_multiPoint_saddle(100,
+        oneIsland = SaddlesContainer([generate_multipoint_saddle(100,
                                      200, 10, 10,
                                      self.datamap,
                                      self.elevation,
@@ -243,7 +241,7 @@ class SaddlesContainerRebuildTests(unittest.TestCase):
         :class:`SaddlesContainer` which bypasses
         InternalSaddleNetwork logic.
         """
-        noIsland = SaddlesContainer([generate_multiPoint_saddle(100,
+        noIsland = SaddlesContainer([generate_multipoint_saddle(100,
                                     200, 10, 10,
                                     self.datamap,
                                     self.elevation, [], 2)])
@@ -262,7 +260,7 @@ class SaddlesContainerRebuildTests(unittest.TestCase):
         which bypasses InternalSaddleNetwork logic.
         """
         oneIslandOnePerimeter = SaddlesContainer(
-            [generate_multiPoint_saddle(100,
+            [generate_multipoint_saddle(100,
              200, 10, 10,
              self.datamap,
              self.elevation,
@@ -282,7 +280,7 @@ class SaddlesContainerRebuildTests(unittest.TestCase):
         exits and returns the same Saddle.
         """
         oneIslandOnePerimeter = SaddlesContainer(
-            [generate_multiPoint_saddle(100,
+            [generate_multipoint_saddle(100,
                                         200, 10, 10,
                                         self.datamap,
                                         self.elevation,

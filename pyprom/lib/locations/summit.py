@@ -8,7 +8,6 @@ This library contains a class for storing Summit data.
 """
 
 from .spot_elevation import SpotElevation
-from .base_gridpoint import BaseGridPoint
 from ..containers.multipoint import MultiPoint
 from ..containers.linker import isLinker
 from ..util import randomString
@@ -44,13 +43,13 @@ class Summit(SpotElevation):
         :type longitude: int, float
         :param elevation: elevation in meters
         :type elevation: int, float
-        :param multiPoint: MultiPoint object
-        :type multiPoint: :class:`pyprom.lib.containers.multipoint.MultiPoint`,
+        :param multipoint: MultiPoint object
+        :type multipoint: :class:`pyprom.lib.containers.multipoint.MultiPoint`,
          None
         """
         super(Summit, self).__init__(latitude, longitude,
                                      elevation, *args, **kwargs)
-        self.multiPoint = kwargs.get('multiPoint', [])
+        self.multipoint = kwargs.get('multipoint', [])
         self.id = kwargs.get('id', 'su:' + randomString())
         # saddles contains a list of linker objects linking this summit to a
         # saddle. These are populated by :class:`Walk`
@@ -134,8 +133,8 @@ class Summit(SpotElevation):
                    'id': self.id
                    }
         # TODO: localhighest (for divide tree time)
-        if self.multiPoint:
-            to_dict['multipoint'] = self.multiPoint.to_dict()
+        if self.multipoint:
+            to_dict['multipoint'] = self.multipoint.to_dict()
         # These values are not unloaded by from_dict()
         if referenceById:
             to_dict['saddles'] = [x.id for x in self.saddles]  # linker by ID
@@ -162,7 +161,7 @@ class Summit(SpotElevation):
         if multipoint:
             multipoint = MultiPoint.from_dict(multipoint, datamap=datamap)
         return cls(lat, long, elevation,
-                   multiPoint=multipoint,
+                   multipoint=multipoint,
                    edge=edge,
                    edgePoints=edgePoints,
                    id=id)
@@ -176,7 +175,7 @@ class Summit(SpotElevation):
             self.longitude,
             self.feet,
             self.elevation,
-            bool(self.multiPoint))
+            bool(self.multipoint))
 
     __unicode__ = __str__ = __repr__
 
