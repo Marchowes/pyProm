@@ -8,11 +8,11 @@ the LICENSE file that accompanies it.
 import unittest
 from pyprom.tests.getData import gettestzip
 from pyprom.dataload import GDALLoader
-from pyprom.domain import Domain
+from pyprom.domain_map import DomainMap
 
 
-class DomainTests(unittest.TestCase):
-    """Test Domain."""
+class DomainMapTests(unittest.TestCase):
+    """Test DomainMap."""
 
     def setUp(self):
         """
@@ -22,15 +22,15 @@ class DomainTests(unittest.TestCase):
         datafile = GDALLoader('/tmp/N44W072.hgt')
         datamap = datafile.datamap
         self.someslice = datamap.subset(0, 0, 30, 30)
-        self.domain = Domain(self.someslice)
+        self.domain = DomainMap(self.someslice)
         self.domain.run()
 
     def testDomainFromDict(self):
         """
-        Ensure loading dict into :class:`Domain`
+        Ensure loading dict into :class:`DomainMap`
         """
         domainDict = self.domain.to_dict()
-        newDomain = Domain.from_dict(domainDict, self.someslice)
+        newDomain = DomainMap.from_dict(domainDict, self.someslice)
         self.assertEqual(newDomain.saddles, self.domain.saddles)
         self.assertEqual(newDomain.summits, self.domain.summits)
         self.assertEqual(newDomain.runoffs, self.domain.runoffs)
@@ -39,21 +39,21 @@ class DomainTests(unittest.TestCase):
 
     def testDomainFromDictWrongSubset(self):
         """
-        Try loading Domain with different datamap, should raise xception
+        Try loading DomainMap with different datamap, should raise xception
         """
         domainDict = self.domain.to_dict()
         someslice = self.domain.datamap.subset(0, 0, 20, 20)
         with self.assertRaises(Exception) as e:
-            Domain.from_dict(domainDict, someslice)
+            DomainMap.from_dict(domainDict, someslice)
         self.assertEqual(str(e.exception),
-                         "Datamap file does not match Datamap file used to create Domain.")
+                         "Datamap file does not match Datamap file used to create DomainMap.")
 
     def testDomainFromCbor(self):
         """
-        Ensure loading cbor binary into :class:`Domain`
+        Ensure loading cbor binary into :class:`DomainMap`
         """
         domainCbor = self.domain.to_cbor()
-        newDomain = Domain.from_cbor(domainCbor, self.someslice)
+        newDomain = DomainMap.from_cbor(domainCbor, self.someslice)
         self.assertEqual(newDomain.saddles, self.domain.saddles)
         self.assertEqual(newDomain.summits, self.domain.summits)
         self.assertEqual(newDomain.runoffs, self.domain.runoffs)
@@ -62,10 +62,10 @@ class DomainTests(unittest.TestCase):
 
     def testDomainReadWriteFile(self):
         """
-        Ensure loading cbor into :class:`Domain`
+        Ensure loading cbor into :class:`DomainMap`
         """
         self.domain.write('/tmp/deletemePyPromTest.dom')
-        newDomain = Domain.read('/tmp/deletemePyPromTest.dom', self.someslice)
+        newDomain = DomainMap.read('/tmp/deletemePyPromTest.dom', self.someslice)
         self.assertEqual(newDomain.saddles, self.domain.saddles)
         self.assertEqual(newDomain.summits, self.domain.summits)
         self.assertEqual(newDomain.runoffs, self.domain.runoffs)
@@ -73,11 +73,11 @@ class DomainTests(unittest.TestCase):
 
     def testDomainReadWriteFileSuffix(self):
         """
-        Ensure loading cbor into :class:`Domain`
+        Ensure loading cbor into :class:`DomainMap`
         Ensure dom suffix is appended.
         """
         self.domain.write('/tmp/deletemePyPromTest')
-        newDomain = Domain.read('/tmp/deletemePyPromTest.dom', self.someslice)
+        newDomain = DomainMap.read('/tmp/deletemePyPromTest.dom', self.someslice)
         self.assertEqual(newDomain.saddles, self.domain.saddles)
         self.assertEqual(newDomain.summits, self.domain.summits)
         self.assertEqual(newDomain.runoffs, self.domain.runoffs)

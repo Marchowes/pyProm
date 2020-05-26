@@ -7,7 +7,7 @@ the LICENSE file that accompanies it.
 
 import unittest
 
-from pyprom.domain import Domain
+from pyprom.domain_map import DomainMap
 from pyprom.lib.locations.saddle import Saddle
 from pyprom.lib.locations.summit import Summit
 from pyprom.lib.containers.linker import Linker
@@ -71,7 +71,7 @@ class SaddleTests(unittest.TestCase):
         a saddle with linked summits.
         """
         someslice = self.datamap.subset(0, 0, 30, 30)
-        domain = Domain(someslice)
+        domain = DomainMap(someslice)
         domain.run()
         saddles = domain.saddles
         saddle = saddles[7]
@@ -100,7 +100,7 @@ class SaddleTests(unittest.TestCase):
          saddle which has a parent.
         """
         someslice = self.datamap.subset(0, 0, 30, 30)
-        domain = Domain(someslice)
+        domain = DomainMap(someslice)
         domain.run()
         saddles = domain.saddles
         saddle = saddles[18]
@@ -273,7 +273,7 @@ class SaddleTests(unittest.TestCase):
         Single Point.
         """
         someslice = self.datamap.subset(0, 0, 30, 30)
-        domain = Domain(someslice)
+        domain = DomainMap(someslice)
         domain.run()
         saddles = domain.saddles
         saddle = saddles[7]
@@ -288,7 +288,7 @@ class SaddleTests(unittest.TestCase):
         Multipoint
         """
         someslice = self.datamap.subset(0, 0, 30, 30)
-        domain = Domain(someslice)
+        domain = DomainMap(someslice)
         domain.run()
         saddles = domain.saddles
         saddle = saddles.multipoints[1]

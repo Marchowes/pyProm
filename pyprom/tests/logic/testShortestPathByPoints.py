@@ -9,7 +9,7 @@ import unittest
 import timeit
 from pyprom.tests.getData import gettestzip
 from pyprom.dataload import GDALLoader
-from pyprom.domain import Domain
+from pyprom.domain_map import DomainMap
 from pyprom.lib.logic.shortest_path_by_points import (closest_point_by_distance_brute_force,
                                                       closest_point_by_distance_kdtree,
                                                       find_closest_points,
@@ -27,7 +27,7 @@ class ShortestPathByPointsTests(unittest.TestCase):
         cls.datafile = GDALLoader('/tmp/N44W072.hgt')
         cls.datamap = cls.datafile.datamap
         cls.someslice = cls.datamap.subset(1000, 1000, 100, 100)
-        cls.domain = Domain(cls.someslice)
+        cls.domain = DomainMap(cls.someslice)
         cls.domain.run(superSparse=True, rebuildSaddles=False)
 
     def testKDTreeAndBruteForceSameResultsClosestPoints(self):

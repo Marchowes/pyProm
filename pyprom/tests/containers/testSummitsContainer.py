@@ -10,7 +10,7 @@ from pyprom.lib.containers.summits import SummitsContainer
 from pyprom.lib.locations.saddle import Saddle
 from pyprom.lib.locations.summit import Summit
 from pyprom.tests.getData import gettestzip
-from pyprom.domain import Domain
+from pyprom.domain_map import DomainMap
 from pyprom.dataload import GDALLoader
 
 
@@ -122,7 +122,7 @@ class SummitsContainerTests(unittest.TestCase):
         datafile = GDALLoader('/tmp/N44W072.hgt')
         datamap = datafile.datamap
         someslice = datamap.subset(0, 0, 30, 30)
-        domain = Domain(someslice)
+        domain = DomainMap(someslice)
         domain.run()
         summits = domain.summits
         summit = summits[3]

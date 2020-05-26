@@ -13,7 +13,7 @@ from fastkml import kml, styles
 from .locations.summit import Summit
 from .locations.saddle import Saddle
 from .locations.runoff import Runoff
-from ..domain import Domain
+from ..domain_map import DomainMap
 from .locations.spot_elevation import SpotElevation
 from .containers.spot_elevation import SpotElevationContainer
 from .containers.summit_domain import SummitDomain
@@ -139,7 +139,7 @@ class KMLFileWriter:
             self._append_linker(feature)
             return
 
-        if isinstance(feature, Domain):
+        if isinstance(feature, DomainMap):
             self.extend(feature.linkers)
             self.extend(feature.saddles)
             self.extend(feature.summits)

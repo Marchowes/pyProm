@@ -10,7 +10,7 @@ import unittest
 from pyprom.tests.getData import gettestzip
 from pyprom.dataload import GDALLoader
 from pyprom.feature_discovery import AnalyzeData
-from pyprom.domain import Domain
+from pyprom.domain_map import DomainMap
 
 
 class WalkTests(unittest.TestCase):
@@ -33,9 +33,9 @@ class WalkTests(unittest.TestCase):
         self.islandpondVTVicinity = AnalyzeData(self.islandpondVT)
         self.summits, self.saddles, self.runoffs = \
             self.islandpondVTVicinity.run()
-        self.domain = Domain(self.islandpondVT, summits=self.summits,
-                             saddles=self.saddles, runoffs=self.runoffs,
-                             linkers=[])
+        self.domain = DomainMap(self.islandpondVT, summits=self.summits,
+                                saddles=self.saddles, runoffs=self.runoffs,
+                                linkers=[])
 
     def testWalkSingleSaddleIslandPond(self):
         """
@@ -84,7 +84,7 @@ class WalkRealTests(unittest.TestCase):
         washingtonVicinityDatamap = self.datamap.subset(2608, 2417, 99, 145)
         washingtonVicinity = AnalyzeData(washingtonVicinityDatamap)
         summits, saddles, runoffs = washingtonVicinity.run(rebuildSaddles=False)
-        d = Domain(washingtonVicinityDatamap, summits, saddles, runoffs)
+        d = DomainMap(washingtonVicinityDatamap, summits, saddles, runoffs)
         sut, _ = d.walk([saddles[2]])
         sut = sut[0]
         summits = [x.summit for x in sut.summits]

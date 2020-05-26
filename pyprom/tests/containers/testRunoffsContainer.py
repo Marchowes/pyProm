@@ -9,7 +9,7 @@ import unittest
 from pyprom.lib.containers.runoffs import RunoffsContainer
 from pyprom.lib.locations.runoff import Runoff
 from pyprom.lib.locations.summit import Summit
-from pyprom.domain import Domain
+from pyprom.domain_map import DomainMap
 from pyprom.tests.getData import gettestzip
 from pyprom.dataload import GDALLoader
 
@@ -125,7 +125,7 @@ class RunoffsContainerTests(unittest.TestCase):
         datafile = GDALLoader('/tmp/N44W072.hgt')
         datamap = datafile.datamap
         someslice = datamap.subset(0, 0, 30, 30)
-        domain = Domain(someslice)
+        domain = DomainMap(someslice)
         domain.run()
         runoffs = domain.runoffs
         runoffsDict = runoffs.to_dict()

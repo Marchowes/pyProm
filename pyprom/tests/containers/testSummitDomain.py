@@ -8,7 +8,7 @@ the LICENSE file that accompanies it.
 import unittest
 from pyprom.tests.getData import gettestzip
 from pyprom.dataload import GDALLoader
-from pyprom.domain import Domain
+from pyprom.domain_map import DomainMap
 from pyprom.lib.locations.base_gridpoint import BaseGridPoint
 from pyprom.lib.locations.base_coordinate import BaseCoordinate
 from pyprom.lib.locations.spot_elevation import SpotElevation
@@ -24,7 +24,7 @@ class SummitsDomainTests(unittest.TestCase):
         cls.datafile = GDALLoader('/tmp/N44W072.hgt')
         cls.datamap = cls.datafile.datamap
         cls.someslice = cls.datamap.subset(1000, 1000, 100, 100)
-        cls.domain = Domain(cls.someslice)
+        cls.domain = DomainMap(cls.someslice)
         cls.domain.run(superSparse=True, rebuildSaddles=False)
         cls.domain.walk()
         cls.summit_domains = list(cls.domain.summit_domains)

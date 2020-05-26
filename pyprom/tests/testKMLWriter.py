@@ -9,7 +9,7 @@ import unittest
 from pyprom.tests.getData import gettestzip
 from pyprom.dataload import GDALLoader
 
-from pyprom.domain import Domain
+from pyprom.domain_map import DomainMap
 from pyprom.lib.locations.saddle import Saddle
 from pyprom.lib.locations.summit import Summit
 from pyprom.lib.containers.linker import Linker
@@ -49,12 +49,12 @@ class KMLFileWriterTest(unittest.TestCase):
 
     def testDomainAppendKML(self):
         """
-        Ensure Appending a single :class:`Domain` object works as expected.
+        Ensure Appending a single :class:`DomainMap` object works as expected.
         """
         gettestzip()
-        domain = Domain(GDALLoader('/tmp/N44W072.hgt'), self.summitscontainer,
-                        self.saddlescontainer, self.runoffscontainer, [],
-                        [self.linker1])
+        domain = DomainMap(GDALLoader('/tmp/N44W072.hgt'), self.summitscontainer,
+                           self.saddlescontainer, self.runoffscontainer, [],
+                           [self.linker1])
         summit_domain1 = SummitDomain(domain.datamap,
                                            self.summit1,
                                            self.saddle1,

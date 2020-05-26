@@ -1,5 +1,9 @@
 Release History
 
+0.7.2 (????????????)
+++++++++++++++++++++
+* multiPoint -> multipoint
+
 0.7.1 (May 25, 2020)
 ++++++++++++++++++++
 * Optimizations
