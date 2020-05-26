@@ -6,7 +6,6 @@ the LICENSE file that accompanies it.
 """
 
 import unittest
-import timeit
 from pyprom.tests.getData import gettestzip
 from pyprom.dataload import GDALLoader
 from pyprom.domain_map import DomainMap
