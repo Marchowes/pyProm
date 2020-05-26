@@ -18,6 +18,7 @@ class Runoff(Saddle):
     purposes these are Saddle-like. This is a child object of
     :class:`pyprom.lib.locations.saddle.Saddle`
     """
+    __slots__ = []
 
     def __init__(self, latitude, longitude, elevation, *args, **kwargs):
         """
@@ -34,8 +35,8 @@ class Runoff(Saddle):
         :type highShores:
          list(:class:`pyprom.lib.containers.gridPoint.GridPointContainer`)
         """
-        super(Runoff, self).__init__(latitude, longitude,
-                                     elevation, *args, **kwargs)
+        super().__init__(latitude, longitude,
+                         elevation, *args, **kwargs)
         self.id = kwargs.get('id', 'ru:' + randomString())
         self.edgeEffect = True  # Runoffs are, as a rule, edge features.
 

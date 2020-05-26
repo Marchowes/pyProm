@@ -16,6 +16,7 @@ from .perimeter import Perimeter
 
 
 class MultiPoint:
+    __slots__ = ['points', 'elevation', 'datamap', 'perimeter']
     """
     | A MultiPoint Container. This is a special kind of feature which contains
     | multiple :class:`pyprom.lib.locations.base_gridpoint.BaseGridPoint`s.

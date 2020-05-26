@@ -8,12 +8,9 @@ This library contains a class for storing Saddle data.
 """
 
 import math
-from collections import defaultdict
 from dijkstar import Graph, find_path
 from .spot_elevation import SpotElevation
-from .base_gridpoint import BaseGridPoint
 from ..containers.multipoint import MultiPoint
-from ..containers.gridpoint import GridPointContainer
 from ..containers.linker import isLinker
 from ..containers.base_self_iterable import BaseSelfIterable
 from ..util import randomString
@@ -45,6 +42,11 @@ class Saddle(SpotElevation):
     |     ``^-----high shore``
     |
     """
+
+    __slots__ = ['multipoint', 'highShores', 'summits',
+                 'parent', 'children', 'singleSummit',
+                 'basinSaddle', 'basinSaddleAlternatives',
+                 '_disqualified', 'lprBoundary']
 
     def __init__(self, latitude, longitude, elevation, *args, **kwargs):
         """

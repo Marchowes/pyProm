@@ -16,6 +16,8 @@ class Vertex_Link:
     a vertex from another. These are used in Internal Saddle Networks.
     """
 
+    __slots__ = ['local', 'remote', 'distance', 'remote_container']
+
     def __init__(self, localPoint, remotePoint,
                  distance, remote_container=None):
         """
