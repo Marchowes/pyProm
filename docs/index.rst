@@ -13,7 +13,7 @@ Contents:
    :numbered:
 
    pyprom/dataload
-   pyprom/domain
+   pyprom/domainmap
    pyprom/feature_discovery
    pyprom/lib
 
