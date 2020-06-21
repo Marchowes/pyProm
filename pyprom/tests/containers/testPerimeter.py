@@ -134,7 +134,7 @@ class PerimeterTests(unittest.TestCase):
         perimeterDiscontigous = \
             Perimeter(pointIndex=perimeterId,
                       datamap=self.datamap)
-        highEdges = perimeterDiscontigous.findHighEdges(552)
+        highEdges = perimeterDiscontigous.findHighPerimeterNeighborhoods(552)
         self.assertEqual(2, len(highEdges))
 
         self.assertEqual(highEdges[0], [self.p11, self.p12])
@@ -155,7 +155,7 @@ class PerimeterTests(unittest.TestCase):
         perimeterOrthogonallyDiscontigous = \
             Perimeter(pointIndex=perimeterId,
                       datamap=self.datamap)
-        highEdges = perimeterOrthogonallyDiscontigous.findHighEdges(552)
+        highEdges = perimeterOrthogonallyDiscontigous.findHighPerimeterNeighborhoods(552)
         self.assertEqual(1, len(highEdges))
 
     def testPerimeterfindHighPerimeter(self):

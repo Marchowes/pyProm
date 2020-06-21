@@ -82,7 +82,7 @@ class Perimeter(BaseSelfIterable):
                    mapEdge=mapEdge,
                    mapEdgePoints=mapEdgePoints)
 
-    def findHighEdges(self, elevation):
+    def findHighPerimeterNeighborhoods(self, elevation):
         """
         Finds all points that are higher than passed in elevation and returns
         them as a list of contiguous point lists

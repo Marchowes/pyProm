@@ -175,7 +175,7 @@ class Walk:
             # non synthetic saddles will have their full highEdges explored.
             # synthetic ones do not.
             for saddle in saddlesUnderTest:
-                for highEdge in saddle.highShores:
+                for highEdge in saddle.highPerimeterNeighborhoods:
                     domains = self.climb_points(highEdge)
                     dd = list(domains) # debug
                     if len(domains) > 1:
@@ -196,7 +196,7 @@ class Walk:
                     # don't mess with runoffs.
                     if isinstance(saddle, Runoff):
                         # No high Shores, means this is a Summit-Like Runoff, look for matching summit domain at runoff point.
-                        if not saddle.highShores:
+                        if not saddle.highPerimeterNeighborhoods:
                             point = saddle.toXYTuple(self.domainmap.datamap)
                             sd = self.summit_domain_points[point[0]].get(point[1], None)
                             # nothing there? continue.
@@ -216,7 +216,7 @@ class Walk:
                             edge_saddles = [saddle]
                     edge_saddles = self.generate_synthetic_saddles(saddle) if not edge_saddles else edge_saddles
                     for edge_saddle in edge_saddles:
-                        for highEdge in edge_saddle.highShores:
+                        for highEdge in edge_saddle.highPerimeterNeighborhoods:
                             h0 = highEdge[0]
                             sd = self.summit_domain_points[h0[0]].get(h0[1], None)
                             # nothing there? continue.
@@ -240,7 +240,7 @@ class Walk:
                     walkedFeatures.append(basesaddle)
                 else:
                     # synthetic saddles only have 1 point in each HS, so we know they'll be a domain member.
-                    for highEdge in saddle.highShores:
+                    for highEdge in saddle.highPerimeterNeighborhoods:
                         h0 = highEdge[0]
                         sd = self.summit_domain_points[h0[0]].get(h0[1], None)
                         if not sd:
@@ -267,17 +267,17 @@ class Walk:
     def generate_synthetic_saddles(self, saddle):
 
         # This should not be, just return it.
-        if len(saddle.highShores) < 2:
+        if len(saddle.highPerimeterNeighborhoods) < 2:
             return [saddle]
 
         # More than 2 high shores? build the network, and return the result.
-        if len(saddle.highShores) > 2:
+        if len(saddle.highPerimeterNeighborhoods) > 2:
             nw = InternalSaddleNetwork(saddle, self.domainmap.datamap)
             return nw.generate_child_saddles()
         #Just 2
 
         if saddle.multipoint:
-            hs0, hs1, midpoint = saddle.high_shore_shortest_path(
+            hs0, hs1, midpoint = saddle.high_perimeter_neighborhood_shortest_path(
                 self.domainmap.datamap)
 
             middleSpotElevation = GridPoint(midpoint[0],
@@ -289,18 +289,18 @@ class Walk:
                                middleSpotElevation.longitude,
                                saddle.elevation)
 
-            highShores = [[hs0], [hs1]]
+            highPerimeterNeighborhoods = [[hs0], [hs1]]
         else:
             newSaddle = Saddle(saddle.latitude,
                                saddle.longitude,
                                saddle.elevation)
 
             # todo: closest highShore, not just first one.
-            highShores = []
-            for highShore in saddle.highShores:
-                highShores.append(highest(highShore))
+            highPerimeterNeighborhoods = []
+            for highPerimeterNeighborhood in saddle.highPerimeterNeighborhoods:
+                highPerimeterNeighborhoods.append(highest(highPerimeterNeighborhood))
 
         # assign our slimmed down high shores.
-        newSaddle.highShores = highShores
+        newSaddle.highPerimeterNeighborhoods = highPerimeterNeighborhoods
         return [newSaddle]
 

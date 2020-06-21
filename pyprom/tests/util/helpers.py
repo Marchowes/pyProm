@@ -5,9 +5,7 @@ This software is distributed under a license that is described in
 the LICENSE file that accompanies it.
 """
 
-from pyprom.lib.containers.gridpoint import GridPointContainer
 from pyprom.lib.containers.multipoint import MultiPoint
-from pyprom.lib.locations.gridpoint import GridPoint
 from pyprom.lib.locations.saddle import Saddle
 
 
@@ -45,7 +43,7 @@ def generate_multipoint_saddle(x, y, xSpan, ySpan,
                                perimeterHighShores=1):
     """
     Generate a rectangular MultiPoint Saddle, with the ability to exclude
-    points (islands). and generate highShores on the Perimeter.
+    points (islands). and generate highPerimeterNeighborhoods on the Perimeter.
     :param x: upper x coordinate
     :param y: upper y coordinate
     :param xSpan: span on x axis
@@ -56,7 +54,7 @@ def generate_multipoint_saddle(x, y, xSpan, ySpan,
      islands to remove from multipoint. islands will be elevation of mp +1
      DO NOT MAKE AN ISLAND MORE THAN 2 POINTS WIDE. This function is
      not designed to be smart in any way.
-    :param perimeterHighShores: number of perimeter highShores to make up.
+    :param perimeterHighShores: number of perimeter highPerimeterNeighborhoods to make up.
     :return: :class:`MultiPoint`
     """
     mp = generate_MultiPoint(x, y, xSpan, ySpan,
@@ -82,5 +80,5 @@ def generate_multipoint_saddle(x, y, xSpan, ySpan,
     for highShoreIdx in range(perimeterHighShores):
         hs = (x - 1, y - 1 + highShoreIdx, elevation + 1)
         highShoresPerimeter.append([hs])
-    saddle.highShores = islandGPCs + highShoresPerimeter
+    saddle.highPerimeterNeighborhoods = islandGPCs + highShoresPerimeter
     return saddle

@@ -25,7 +25,7 @@ from .lib.containers.runoffs import RunoffsContainer
 from .lib.containers.perimeter import Perimeter
 from .lib.logic.equalheight import equalHeightBlob
 from .lib.logic.contiguous_neighbors import contiguous_neighbors, touching_neighborhoods
-from .lib.logic.shortest_path_by_points import high_shore_shortest_path
+from .lib.logic.shortest_path_by_points import high_perimeter_neighborhood_shortest_path
 from .lib.logic.tuple_funcs import highest
 
 from .lib.constants import METERS_TO_FEET
@@ -235,7 +235,7 @@ class AnalyzeData:
          child objects.
         """
         returnableLocations = []
-        highPerimeter = perimeter.findHighEdges(
+        highPerimeter = perimeter.findHighPerimeterNeighborhoods(
             self.elevation)
         lat, long = self.datamap.xy_to_latlong(x, y)
 
@@ -256,7 +256,7 @@ class AnalyzeData:
                             self.elevation,
                             multipoint=multipoint,
                             edge=edge,
-                            highShores=highPerimeter,
+                            highPerimeterNeighborhoods=highPerimeter,
                             edgePoints=edgePoints)
             returnableLocations.append(saddle)
 
@@ -303,7 +303,7 @@ class AnalyzeData:
                             self.elevation,
                             multipoint=multipoint,
                             edge=edge,
-                            highShores=highPerimeter,
+                            highPerimeterNeighborhoods=highPerimeter,
                             edgePoints=edgePoints)
             returnable_features.append(runoff)
             # No need to further process.
@@ -330,7 +330,7 @@ class AnalyzeData:
                                 self.elevation,
                                 multipoint=multipoint,
                                 edge=edge,
-                                highShores=highPerimeter,
+                                highPerimeterNeighborhoods=highPerimeter,
                                 edgePoints=edgePoints)
                 returnable_features.append(saddle)
             # No need to further process.
@@ -374,20 +374,20 @@ class AnalyzeData:
                     mid = edge_point_neighborhoods[idx][floor(len(edge_point_neighborhoods[idx])/2)]
                     _lat, _long = self.datamap.xy_to_latlong(mid[0], mid[1])
 
-                    highShores = []
+                    highPerimeterNeighborhoods = []
                     if multipoint:
                         pts = multipoint.points
                         # this gets the closest single highshore point to our midpoint
-                        highShores.append([high_shore_shortest_path(mid, pts, highPerimeter, self.datamap)])
+                        highPerimeterNeighborhoods.append([high_perimeter_neighborhood_shortest_path(mid, pts, highPerimeter, self.datamap)])
                     else:
-                        # just use the regular highShores if not a multipoint
-                        highShores = highPerimeter
+                        # just use the regular highPerimeterNeighborhoods if not a multipoint
+                        highPerimeterNeighborhoods = highPerimeter
 
                     runoff = Runoff(_lat,
                                     _long,
                                     self.elevation,
                                     multipoint=[],
-                                    highShores=highShores,
+                                    highPerimeterNeighborhoods=highPerimeterNeighborhoods,
                                     edgePoints=edge_point_neighborhoods[idx])
                     returnable_features.append(runoff)
 
@@ -413,7 +413,7 @@ class AnalyzeData:
                                     self.elevation,
                                     multipoint = multipoint,
                                     edge = False,
-                                    highShores = highPerimeter,
+                                    highPerimeterNeighborhoods = highPerimeter,
                                     edgePoints = [])
                     returnable_features.append(saddle)
                 else:
@@ -421,7 +421,7 @@ class AnalyzeData:
                                     self.elevation,
                                     multipoint = multipoint,
                                     edge = edge,
-                                    highShores = highPerimeter,
+                                    highPerimeterNeighborhoods = highPerimeter,
                                     edgePoints = remaining_edgepoints)
                     returnable_features.append(saddle)
         return returnable_features

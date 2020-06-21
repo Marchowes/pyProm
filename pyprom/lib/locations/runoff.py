@@ -31,9 +31,9 @@ class Runoff(Saddle):
         :param multipoint: MultiPoint object
         :type multipoint: :class:`pyprom.lib.containers.multipoint.MultiPoint`,
          None
-        :param highShores: list of GridPointContainers representing a highShore
-        :type highShores:
-         list(:class:`pyprom.lib.containers.gridPoint.GridPointContainer`)
+        :param highPerimeterNeighborhoods: list of tuple(x,y,ele) representing a highPerimeterNeighborhoods
+        :type highPerimeterNeighborhoods:
+         list(tuple(x,y,ele))
         """
         super().__init__(latitude, longitude,
                          elevation, *args, **kwargs)

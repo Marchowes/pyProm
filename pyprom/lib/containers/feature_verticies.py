@@ -5,7 +5,7 @@ This software is distributed under a license that is described in
 the LICENSE file that accompanies it.
 
 This library contains a container class for storing Vertex_Links
-used in Saddle highShores Tree Calculations.
+used in Saddle highPerimeterNeighborhoods Tree Calculations.
 """
 
 import sys
