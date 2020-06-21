@@ -22,7 +22,8 @@ class Saddle(SpotElevation):
     | A Saddle is by definition a point, or set of equal height points
     | (MultiPoint) which have at least 2 non contiguous sets of points
     | around the Perimeter that are higher than the point or Multipoint.
-    | These are called "High Shores". A Saddle is a Child object of
+    | These are called "High Perimeter Neighborhoods". A Saddle is a
+    | Child object of
     | :class:`pyprom.lib.locations.spot_elevation.SpotElevation`
     |
     | Examples:

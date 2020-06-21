@@ -45,8 +45,8 @@ class InternalSaddleNetwork(object):
                         explored_nodes_index, first):
         """
         Loop until toBeExplored is exhausted. This continues until all
-        conventionally accessible high shores are connected via Vertex
-        Links.
+        conventionally accessible highPerimeterNeighborhoods are connected
+        via Vertex Links.
         This loop works by looking at all `remote_container`s (a node)
         that are linked to the `node` under exploration. Whatever
         unexplored remote node has the node under exploration as it's
@@ -107,7 +107,7 @@ class InternalSaddleNetwork(object):
         highPerimeterNeighborhoods (nodes) together. Stored in `self.shortest_links`
         """
         # Calculate all shortest paths.
-        self.find_shortest_paths_between_high_shores()
+        self.find_shortest_paths_between_high_perimeter_neighborhoods()
         # Index for keeping track of explored nodes.
         explored_nodes_index = dict()
         # Seed our toBeExplored list
@@ -220,16 +220,16 @@ class InternalSaddleNetwork(object):
             saddles.append(newSaddle)
         return saddles
 
-    def find_shortest_paths_between_high_shores(self):
+    def find_shortest_paths_between_high_perimeter_neighborhoods(self):
         """
-        find_shortest_paths_between_high_shores iterates through all
+        find_shortest_paths_between_high_perimeter_neighborhoods iterates through all
         highPerimeterNeighborhoods of `self` and returns an ordered list of
         :class:`pyprom.lib.containers.feature_verticies.Feature_Verticies`
         which corresponds to the ordering of the
         highPerimeterNeighborhoods. These
         :class:`pyprom.lib.containers.feature_verticies.Feature_Verticies`
         contain :class:`pyprom.lib.locations.vertex_link.Vertex_Link`
-        which link the shortest points between each highShore.
+        which link the shortest points between each highPerimeterNeighborhoods.
 
         :return: ordered list of Feature_Verticies
         :rtype:
@@ -242,10 +242,10 @@ class InternalSaddleNetwork(object):
         # index holds the a tuple of (local closest, remote closest, distance)
         # indexed by [local][remote] in the hash.
         index = nesteddict()
-        totalShores = len(self.saddle.highPerimeterNeighborhoods)
-        # run through every index of every highShore
-        for outerIdx in range(totalShores - 1):
-            for innerIdx in range(outerIdx + 1, totalShores):
+        totalPerimeterNeighborhoods = len(self.saddle.highPerimeterNeighborhoods)
+        # run through every index of every highPerimeterNeighborhood
+        for outerIdx in range(totalPerimeterNeighborhoods - 1):
+            for innerIdx in range(outerIdx + 1, totalPerimeterNeighborhoods):
                 if index[outerIdx][innerIdx]:
                     continue
                 # outer closest, inner closest, distance between

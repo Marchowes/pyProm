@@ -40,7 +40,7 @@ def generate_MultiPoint(x, y, xSpan, ySpan,
 def generate_multipoint_saddle(x, y, xSpan, ySpan,
                                datamap, elevation,
                                islands=[],
-                               perimeterHighShores=1):
+                               perimeterHighNeighborhoods=1):
     """
     Generate a rectangular MultiPoint Saddle, with the ability to exclude
     points (islands). and generate highPerimeterNeighborhoods on the Perimeter.
@@ -54,7 +54,7 @@ def generate_multipoint_saddle(x, y, xSpan, ySpan,
      islands to remove from multipoint. islands will be elevation of mp +1
      DO NOT MAKE AN ISLAND MORE THAN 2 POINTS WIDE. This function is
      not designed to be smart in any way.
-    :param perimeterHighShores: number of perimeter highPerimeterNeighborhoods to make up.
+    :param perimeterHighNeighborhoods: number of perimeter highPerimeterNeighborhoods to make up.
     :return: :class:`MultiPoint`
     """
     mp = generate_MultiPoint(x, y, xSpan, ySpan,
@@ -73,12 +73,12 @@ def generate_multipoint_saddle(x, y, xSpan, ySpan,
                                      elevation + 1))
         islandGPCs.append(islandGridPoints)
 
-    highShoresPerimeter = []
-    # Dumb highShore generator. One point along y axis. Since
-    # this is for testing, make sure not to set `perimeterHighShores`
+    highPerimeter = []
+    # Dumb highPerimeterNeighborhood generator. One point along y axis. Since
+    # this is for testing, make sure not to set `perimeterHighNeighborhoods`
     # to more than the ySpan + 2. Again, this is dumb.
-    for highShoreIdx in range(perimeterHighShores):
-        hs = (x - 1, y - 1 + highShoreIdx, elevation + 1)
-        highShoresPerimeter.append([hs])
-    saddle.highPerimeterNeighborhoods = islandGPCs + highShoresPerimeter
+    for highPerimeterNeighborhoodIdx in range(perimeterHighNeighborhoods):
+        hs = (x - 1, y - 1 + highPerimeterNeighborhoodIdx, elevation + 1)
+        highPerimeter.append([hs])
+    saddle.highPerimeterNeighborhoods = islandGPCs + highPerimeter
     return saddle
