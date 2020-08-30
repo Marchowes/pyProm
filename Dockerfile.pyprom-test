@@ -1,5 +1,8 @@
-FROM marchowes/pyprom:2.4
+FROM marchowes/pyprom:2.5
 
-ENV PATH "$PATH:/root/miniconda3/bin"
+COPY . /app/
+WORKDIR /app
+RUN pip3 install -r requirements.txt -r test-requirements.txt
+# ENV PATH "$PATH:/root/miniconda3/bin"
 
 ENTRYPOINT ["make", "test"]
