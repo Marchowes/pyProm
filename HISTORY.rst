@@ -1,7 +1,12 @@
 Release History
 
-0.7.3 (?????)
-+++++++++++++
+0.7.3 (October, 6, 2020)
+++++++++++++++++++++++++
+* update to python 3.8 and change tests for compatibility
+* Updated Docker
+* Fixed naming convention from Shore, to high perimeter neighborhood
+* __slots__ for better performance
+* vincenty no longer supporter
 
 0.7.2 (May 25, 2020)
 ++++++++++++++++++++

@@ -10,7 +10,7 @@ the concept of saving DomainMaps should never be considered stable.
 pyProm
 ======
 
-Supported version of Python: Python 3.4+
+Supported version of Python: Python 3.8+
 
 The purpose of PyProm is to have a fully scriptable API for loading Raster Data for discovery of Summits,
 Saddles (cols), Prominence, Peak Parentage and all that good stuff. Anything you might want to be able to
@@ -19,7 +19,7 @@ manipulate can be manipulated in a scalable, scriptable manner.
 pyProm is written in Python, which is a fairly accessible language to most people. My master plan is once 
 a stable, and well documented version can be produced, others can add features as they see fit. The
 disadvantage of writing such a deeply customizable library in python is it is inherently slower and
-consumes more memory (apalling so in some instances).
+consumes more memory (appalling so in some instances).
 
 This library is inspired by [WinProm](https://github.com/edwardearl/winprom), by the late [Edward Earl](http://peakbagger.com/climber/climber.aspx?cid=601), as well as the number of websites
 which make use of similiarly derived data, such as [LoJ](listsofjohn.com) and [peakbagger](peakbagger.com)
