@@ -17,6 +17,8 @@ class BaseCoordinate:
     basic latitude and longitude
     """
 
+    __slots__ = ['latitude', 'longitude']
+
     def __init__(self, latitude, longitude, *args, **kwargs):
         """
         :param latitude: latitude in dotted decimal

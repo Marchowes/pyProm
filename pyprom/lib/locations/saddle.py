@@ -8,12 +8,9 @@ This library contains a class for storing Saddle data.
 """
 
 import math
-from collections import defaultdict
 from dijkstar import Graph, find_path
 from .spot_elevation import SpotElevation
-from .base_gridpoint import BaseGridPoint
 from ..containers.multipoint import MultiPoint
-from ..containers.gridpoint import GridPointContainer
 from ..containers.linker import isLinker
 from ..containers.base_self_iterable import BaseSelfIterable
 from ..util import randomString
@@ -25,26 +22,32 @@ class Saddle(SpotElevation):
     | A Saddle is by definition a point, or set of equal height points
     | (MultiPoint) which have at least 2 non contiguous sets of points
     | around the Perimeter that are higher than the point or Multipoint.
-    | These are called "High Shores". A Saddle is a Child object of
+    | These are called "High Perimeter Neighborhoods". A Saddle is a
+    | Child object of
     | :class:`pyprom.lib.locations.spot_elevation.SpotElevation`
     |
     | Examples:
     |
     | Single Point Saddle:
-    |     ``v------high shore``
+    |     ``v------high perimeter``
     | ``[0][2][0]``
     | ``[0][1][0]   [1] = Saddle``
     | ``[0][3][0]``
-    |     ``^------high shore``
+    |     ``^------high perimeter``
     |
     | MultiPoint Saddle:
-    |     ``v--------high shore``
+    |     ``v--------high perimeter``
     | ``[0][2][0][0]``
     | ``[0][1][1][0]  [1][1] = Saddle``
     | ``[0][3][0][0]``
-    |     ``^-----high shore``
+    |     ``^-----high perimeter``
     |
     """
+
+    __slots__ = ['multipoint', 'highPerimeterNeighborhoods', 'summits',
+                 'parent', 'children', 'singleSummit',
+                 'basinSaddle', 'basinSaddleAlternatives',
+                 '_disqualified', 'lprBoundary']
 
     def __init__(self, latitude, longitude, elevation, *args, **kwargs):
         """
@@ -57,9 +60,9 @@ class Saddle(SpotElevation):
         :param multipoint: MultiPoint object
         :type multipoint: :class:`pyprom.lib.containers.multipoint.MultiPoint`,
          None
-        :param highShores: list of GridPointContainers representing a highShore
-        :type highShores:
-         list(:class:`pyprom.lib.containers.gridPoint.GridPointContainer`)
+        :param highPerimeterNeighborhood list of Tuples representing a highPerimeterNeighborhood
+        :type highPerimeterNeighborhood:
+         list(tuple(x,y,ele))
         :param bool edge: Does this :class:`Saddle` have an edge
          Effect?
         :param str id: kwarg for id
@@ -79,7 +82,7 @@ class Saddle(SpotElevation):
         super(Saddle, self).__init__(latitude, longitude,
                                      elevation, *args, **kwargs)
         self.multipoint = kwargs.get('multipoint', [])
-        self.highShores = kwargs.get('highShores', [])
+        self.highPerimeterNeighborhoods = kwargs.get('highPerimeterNeighborhoods', [])
         self.id = kwargs.get('id', 'sa:' + randomString())
         # List of linkers to summits
         self.summits = []
@@ -164,9 +167,9 @@ class Saddle(SpotElevation):
                 for linker in self.summits]
         return neighbors
 
-    def high_shore_shortest_path(self, datamap):
+    def high_perimeter_neighborhood_shortest_path(self, datamap):
         """
-        Finds the two closest opposing high shore points.
+        Finds the two closest opposing high perimeter points.
         This follows a path inside the saddle.
         Also returns the midpoint.
 
@@ -180,7 +183,7 @@ class Saddle(SpotElevation):
         else:
             gp = self.toGridPoint(datamap)
             pts.append((gp.x, gp.y))
-        for hs in self.highShores:
+        for hs in self.highPerimeterNeighborhoods:
             pts.extend(hs)
         bsi = BaseSelfIterable(pointList=pts)
         neighborHash = {}
@@ -193,9 +196,9 @@ class Saddle(SpotElevation):
             for remote in remotes:
                 graph.add_edge(local, remote, datamap.distance(local, remote))
         all_shortest = []
-        for us_hs in self.highShores[0]:
+        for us_hs in self.highPerimeterNeighborhoods[0]:
             shortest_length = None
-            for them_hs in self.highShores[1]:
+            for them_hs in self.highPerimeterNeighborhoods[1]:
                 path = find_path(graph, us_hs, them_hs)
                 if shortest_length:
                     if path.total_cost < shortest_length.total_cost:
@@ -317,8 +320,8 @@ class Saddle(SpotElevation):
             to_dict['disqualified'] = self._disqualified
         if self.multipoint:
             to_dict['multipoint'] = self.multipoint.to_dict()
-        if self.highShores:
-            to_dict['highShores'] = self.highShores
+        if self.highPerimeterNeighborhoods:
+            to_dict['highPerimeterNeighborhoods'] = self.highPerimeterNeighborhoods
         # These values are not unloaded by from_dict()
         if referenceById:
             to_dict['children'] =\
@@ -365,18 +368,18 @@ class Saddle(SpotElevation):
         multipoint = saddleDict.get('multipoint', [])
         if multipoint:
             multipoint = MultiPoint.from_dict(multipoint, datamap=datamap)
-        highshores = []
-        incoming_hs = saddleDict.get('highShores', [])
+        highPerimeterNeighborhoods = []
+        incoming_hs = saddleDict.get('highPerimeterNeighborhoods', [])
         if incoming_hs:
             for hss in incoming_hs:
                 hsx = []
                 for hs in hss:
                     hsx.append(tuple(hs))
-                highshores.append(hsx)
+                highPerimeterNeighborhoods.append(hsx)
 
         return cls(lat, long, elevation,
                    multipoint=multipoint,
-                   highShores=highshores,
+                   highPerimeterNeighborhoods=highPerimeterNeighborhoods,
                    edge=edge,
                    edgePoints=edgePoints,
                    id=id,
@@ -387,14 +390,14 @@ class Saddle(SpotElevation):
     def __hash__(self):
         """
         hash takes into account the lat, long, and elevation of the saddle
-        As well as a hash of all the highShores. This is a costly calculation
+        As well as a hash of all the highPerimeterNeighborhoods. This is a costly calculation
         and should probably be avoided if possible.
 
         :return: Hash representation of this object
         :rtype: str
         """
         masterHash = super(SpotElevation, self).__hash__()
-        pointsTuple = tuple(self.highShores)
+        pointsTuple = tuple(self.highPerimeterNeighborhoods)
         return hash((masterHash, hash(pointsTuple)))
 
     def __repr__(self):

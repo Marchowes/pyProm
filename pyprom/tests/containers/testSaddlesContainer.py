@@ -182,7 +182,7 @@ class SaddlesContainerRebuildTests(unittest.TestCase):
     def testSaddlesContainerRebuildTwoIslandsTwoPerimeter(self):
         """
         Ensure rebuildSaddles produces expected results.
-        2 islands, 2 perimeter high shores.
+        2 islands, 2 perimeter high neighborhood.
         Must generate 3 new Saddles (len(hs)-1)
         This exercises InternalSaddleNetwork which is called when hs > 2
         """
@@ -195,14 +195,14 @@ class SaddlesContainerRebuildTests(unittest.TestCase):
         newSaddles = twoIslands.rebuildSaddles(self.datamap)
 
         ns0 = Saddle(44.97097222222222, -71.94319444444444, 1000)
-        ns0.highShores = [twoIslands[0].highShores[0],
-                          twoIslands[0].highShores[1]]
+        ns0.highPerimeterNeighborhoods = [twoIslands[0].highPerimeterNeighborhoods[0],
+                                          twoIslands[0].highPerimeterNeighborhoods[1]]
         ns1 = Saddle(44.97208333333334, -71.94430555555554, 1000)
-        ns1.highShores = [twoIslands[0].highShores[3],
-                          twoIslands[0].highShores[0]]
+        ns1.highPerimeterNeighborhoods = [twoIslands[0].highPerimeterNeighborhoods[3],
+                                          twoIslands[0].highPerimeterNeighborhoods[0]]
         ns2 = Saddle(44.97236111111111, -71.94458333333333, 1000)
-        ns2.highShores = [twoIslands[0].highShores[3],
-                          twoIslands[0].highShores[2]]
+        ns2.highPerimeterNeighborhoods = [twoIslands[0].highPerimeterNeighborhoods[3],
+                                          twoIslands[0].highPerimeterNeighborhoods[2]]
         self.assertEqual(len(newSaddles), 3)
         self.assertEqual(newSaddles[0], ns0)
         self.assertEqual(newSaddles[1], ns1)
@@ -211,7 +211,7 @@ class SaddlesContainerRebuildTests(unittest.TestCase):
     def testSaddlesContainerRebuildOneIslandTwoPerimeter(self):
         """
         Ensure rebuildSaddles produces expected results.
-        1 island, 2 perimeter high shores.
+        1 island, 2 perimeter high neighborhood.
         Must generate 2 new Saddles (len(hs)-1)
         This exercises InternalSaddleNetwork which is called when hs > 2
         """
@@ -223,11 +223,11 @@ class SaddlesContainerRebuildTests(unittest.TestCase):
 
         newSaddles = oneIsland.rebuildSaddles(self.datamap)
         ns0 = Saddle(44.971805555555555, -71.94402777777778, 1000)
-        ns0.highShores = [oneIsland[0].highShores[0],
-                          oneIsland[0].highShores[2]]
+        ns0.highPerimeterNeighborhoods = [oneIsland[0].highPerimeterNeighborhoods[0],
+                                          oneIsland[0].highPerimeterNeighborhoods[2]]
         ns1 = Saddle(44.97236111111111, -71.94458333333333, 1000)
-        ns1.highShores = [oneIsland[0].highShores[2],
-                          oneIsland[0].highShores[1]]
+        ns1.highPerimeterNeighborhoods = [oneIsland[0].highPerimeterNeighborhoods[2],
+                                          oneIsland[0].highPerimeterNeighborhoods[1]]
         self.assertEqual(len(newSaddles), 2)
         self.assertEqual(newSaddles[0], ns0)
         self.assertEqual(newSaddles[1], ns1)
@@ -235,7 +235,7 @@ class SaddlesContainerRebuildTests(unittest.TestCase):
     def testSaddlesContainerRebuildNoIslandTwoPerimeter(self):
         """
         Ensure rebuildSaddles produces expected results.
-        0 island, 2 perimeter high shores.
+        0 island, 2 perimeter high neighborhoods.
         Must generate 1 new Saddle (len(hs)-1)
         This exercises the internal logic inside the
         :class:`SaddlesContainer` which bypasses
@@ -247,14 +247,14 @@ class SaddlesContainerRebuildTests(unittest.TestCase):
                                     self.elevation, [], 2)])
         newSaddles = noIsland.rebuildSaddles(self.datamap)
         ns0 = Saddle(44.97236111111111, -71.94458333333333, 1000)
-        ns0.highShores = [noIsland[0].highShores[1], noIsland[0].highShores[0]]
+        ns0.highPerimeterNeighborhoods = [noIsland[0].highPerimeterNeighborhoods[1], noIsland[0].highPerimeterNeighborhoods[0]]
         self.assertEqual(len(newSaddles), 1)
         self.assertEqual(newSaddles[0], ns0)
 
     def testSaddlesContainerRebuildOneIslandOnePerimeter(self):
         """
         Ensure rebuildSaddles produces expected results.
-        1 island, 1 perimeter high shores.
+        1 island, 1 perimeter high neighborhood.
         Must generate 1 new Saddle (len(hs)-1)
         This exercises the internal logic inside the :class:`SaddlesContainer`
         which bypasses InternalSaddleNetwork logic.
@@ -267,15 +267,15 @@ class SaddlesContainerRebuildTests(unittest.TestCase):
              self.island, 1)])
         newSaddles = oneIslandOnePerimeter.rebuildSaddles(self.datamap)
         ns0 = Saddle(44.971805555555555, -71.94402777777778, 1000)
-        ns0.highShores = [oneIslandOnePerimeter[0].highShores[1],
-                          oneIslandOnePerimeter[0].highShores[0]]
+        ns0.highPerimeterNeighborhoods = [oneIslandOnePerimeter[0].highPerimeterNeighborhoods[1],
+                                          oneIslandOnePerimeter[0].highPerimeterNeighborhoods[0]]
         self.assertEqual(len(newSaddles), 1)
         self.assertEqual(newSaddles[0], ns0)
 
     def testSaddlesContainerRebuildOnePerimeter(self):
         """
         Ensure rebuildSaddles produces expected results.
-        0 island, 1 perimeter high shores.
+        0 island, 1 perimeter high neighborhood.
         Since there is only a single highEdge this fast
         exits and returns the same Saddle.
         """
@@ -291,22 +291,22 @@ class SaddlesContainerRebuildTests(unittest.TestCase):
     def testSaddlesContainerRebuildThreeHSNoMultiPoint(self):
         """
         Ensure rebuildSaddles produces expected results.
-        non multipoint, 3 high shores.
+        non multipoint, 3 high neighborhoods.
         This exercises logic inside generate_child_saddles()
         from InternalSaddleNetwork which skips over multipoint
         centerpoint calculations
         """
         saddle = Saddle(44.97236111111111, -71.94458333333333, 1000)
-        saddle.highShores = [[(99, 199, 1001)],
-                             [(99, 201, 1001)],
-                             [(101, 199, 1001)],
-                             ]
+        saddle.highPerimeterNeighborhoods = [[(99, 199, 1001)],
+                                             [(99, 201, 1001)],
+                                             [(101, 199, 1001)],
+                                             ]
         saddles = SaddlesContainer([saddle])
         newSaddles = saddles.rebuildSaddles(self.datamap)
         ns0 = Saddle(44.97236111111111, -71.94458333333333, 1000)
-        ns0.highShores = [saddle.highShores[0], saddle.highShores[1]]
+        ns0.highPerimeterNeighborhoods = [saddle.highPerimeterNeighborhoods[0], saddle.highPerimeterNeighborhoods[1]]
         ns1 = Saddle(44.97236111111111, -71.94458333333333, 1000)
-        ns1.highShores = [saddle.highShores[1], saddle.highShores[2]]
+        ns1.highPerimeterNeighborhoods = [saddle.highPerimeterNeighborhoods[1], saddle.highPerimeterNeighborhoods[2]]
         self.assertEqual(len(newSaddles), 2)
         self.assertEqual(newSaddles[0], ns0)
         self.assertEqual(newSaddles[1], ns1)

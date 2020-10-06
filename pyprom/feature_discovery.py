@@ -25,7 +25,7 @@ from .lib.containers.runoffs import RunoffsContainer
 from .lib.containers.perimeter import Perimeter
 from .lib.logic.equalheight import equalHeightBlob
 from .lib.logic.contiguous_neighbors import contiguous_neighbors, touching_neighborhoods
-from .lib.logic.shortest_path_by_points import high_shore_shortest_path
+from .lib.logic.shortest_path_by_points import high_perimeter_neighborhood_shortest_path
 from .lib.logic.tuple_funcs import highest
 
 from .lib.constants import METERS_TO_FEET
@@ -184,9 +184,9 @@ class AnalyzeData:
 
         # Begin the ardous task of analyzing points and multipoints
         neighbor = self.datamap.iterateFull(x, y)
-        shoreSetIndex = defaultdict(dict)
-        shoreList = list()
-        shoreMapEdge = set()
+        perimeterSetIndex = defaultdict(dict)
+        perimeterList = list()
+        perimeterMapEdge = set()
         for _x, _y, elevation in neighbor:
 
             # Nothing there? move along.
@@ -199,18 +199,18 @@ class AnalyzeData:
                 return self.analyze_multipoint(_x, _y, elevation)
 
             if elevation > self.elevation:
-                shore = (_x, _y, elevation)
-                shoreSetIndex[_x][_y] = (_x, _y, elevation)
-                shoreList.append(shore)
+                perimeter = (_x, _y, elevation)
+                perimeterSetIndex[_x][_y] = (_x, _y, elevation)
+                perimeterList.append(perimeter)
             if self.datamap.is_map_edge(_x, _y):
-                shoreMapEdge.add((_x, _y, elevation))
+                perimeterMapEdge.add((_x, _y, elevation))
 
-        shoreSet = Perimeter(pointList=shoreList,
-                             pointIndex=shoreSetIndex,
+        perimeterSet = Perimeter(pointList=perimeterList,
+                             pointIndex=perimeterSetIndex,
                              datamap=self.datamap,
                              mapEdge=edge,
-                             mapEdgePoints=list(shoreMapEdge))
-        return self.consolidatedFeatureLogic(x, y, shoreSet, [],
+                             mapEdgePoints=list(perimeterMapEdge))
+        return self.consolidatedFeatureLogic(x, y, perimeterSet, [],
                                              edge, edgePoints)
 
     def consolidatedFeatureLogic(self, x, y, perimeter,
@@ -235,7 +235,7 @@ class AnalyzeData:
          child objects.
         """
         returnableLocations = []
-        highPerimeter = perimeter.findHighEdges(
+        highPerimeter = perimeter.findHighPerimeterNeighborhoods(
             self.elevation)
         lat, long = self.datamap.xy_to_latlong(x, y)
 
@@ -256,7 +256,7 @@ class AnalyzeData:
                             self.elevation,
                             multipoint=multipoint,
                             edge=edge,
-                            highShores=highPerimeter,
+                            highPerimeterNeighborhoods=highPerimeter,
                             edgePoints=edgePoints)
             returnableLocations.append(saddle)
 
@@ -303,7 +303,7 @@ class AnalyzeData:
                             self.elevation,
                             multipoint=multipoint,
                             edge=edge,
-                            highShores=highPerimeter,
+                            highPerimeterNeighborhoods=highPerimeter,
                             edgePoints=edgePoints)
             returnable_features.append(runoff)
             # No need to further process.
@@ -321,7 +321,7 @@ class AnalyzeData:
 
         # did we find one or fewer perimeter neighborhood lower than our elevation?
         if len(lower_perimeter_map_edge_neighborhoods) <= 1:
-            # Do we have more than one high shore?
+            # Do we have more than one high perimeter neighborhood?
             # If so, generate a saddle with an edge effect.
             # There is no runoff here.
             if len(highPerimeter) > 1:
@@ -330,12 +330,12 @@ class AnalyzeData:
                                 self.elevation,
                                 multipoint=multipoint,
                                 edge=edge,
-                                highShores=highPerimeter,
+                                highPerimeterNeighborhoods=highPerimeter,
                                 edgePoints=edgePoints)
                 returnable_features.append(saddle)
             # No need to further process.
             # If there are no runoff like edges, and just a single high
-            # shore, then we'll just return an empty list.
+            # perimeter neighborhood, then we'll just return an empty list.
             return returnable_features
 
         # keep track of all edgepoint neighborhoods which were converted to runoff.
@@ -363,7 +363,7 @@ class AnalyzeData:
 
 
             # this loop identifies Runoffs.
-            # This also handles the case where we have one high shore
+            # This also handles the case where we have one high perimeter neighborhood
             for idx, touched in touching.items():
                 # unless its a non perimeter edge point, dont bother.
                 if idx > edges_max_idx:
@@ -374,20 +374,20 @@ class AnalyzeData:
                     mid = edge_point_neighborhoods[idx][floor(len(edge_point_neighborhoods[idx])/2)]
                     _lat, _long = self.datamap.xy_to_latlong(mid[0], mid[1])
 
-                    highShores = []
+                    highPerimeterNeighborhoods = []
                     if multipoint:
                         pts = multipoint.points
-                        # this gets the closest single highshore point to our midpoint
-                        highShores.append([high_shore_shortest_path(mid, pts, highPerimeter, self.datamap)])
+                        # this gets the closest single highPerimeterNeighborhood point to our midpoint
+                        highPerimeterNeighborhoods.append([high_perimeter_neighborhood_shortest_path(mid, pts, highPerimeter, self.datamap)])
                     else:
-                        # just use the regular highShores if not a multipoint
-                        highShores = highPerimeter
+                        # just use the regular highPerimeterNeighborhoods if not a multipoint
+                        highPerimeterNeighborhoods = highPerimeter
 
                     runoff = Runoff(_lat,
                                     _long,
                                     self.elevation,
                                     multipoint=[],
-                                    highShores=highShores,
+                                    highPerimeterNeighborhoods=highPerimeterNeighborhoods,
                                     edgePoints=edge_point_neighborhoods[idx])
                     returnable_features.append(runoff)
 
@@ -413,7 +413,7 @@ class AnalyzeData:
                                     self.elevation,
                                     multipoint = multipoint,
                                     edge = False,
-                                    highShores = highPerimeter,
+                                    highPerimeterNeighborhoods = highPerimeter,
                                     edgePoints = [])
                     returnable_features.append(saddle)
                 else:
@@ -421,7 +421,7 @@ class AnalyzeData:
                                     self.elevation,
                                     multipoint = multipoint,
                                     edge = edge,
-                                    highShores = highPerimeter,
+                                    highPerimeterNeighborhoods = highPerimeter,
                                     edgePoints = remaining_edgepoints)
                     returnable_features.append(saddle)
         return returnable_features

@@ -19,6 +19,8 @@ class Linker:
     with one single :class:`pyprom.lib.locations.saddle.Saddle`
     """
 
+    __slots__ = ['summit', 'saddle', 'id', 'disqualified']
+
     def __init__(self, summit, saddle, id=None):
         """
         :param summit: Summit this linker links.

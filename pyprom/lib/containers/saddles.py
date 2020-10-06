@@ -49,29 +49,29 @@ class SaddlesContainer(SpotElevationContainer):
         new_saddles = list()
         for saddle in self.points:
             # insufficient highEdges. Re-add to the list an move on.
-            if len(saddle.highShores) < 2:
+            if len(saddle.highPerimeterNeighborhoods) < 2:
                 new_saddles.append(saddle)
                 continue
-            # More than 2 high shores? build the network.
-            if len(saddle.highShores) > 2:
+            # More than 2 high perimeter neighborhoods? build the network.
+            if len(saddle.highPerimeterNeighborhoods) > 2:
                 nw = InternalSaddleNetwork(saddle, datamap)
                 new_saddles += nw.generate_child_saddles()
-            # if we've just got 2 high shores, find all the highest points in
-            # the highShores, and find the midpoint between the first two if
+            # if we've just got 2 high perimeter neighborhoods, find all the highest points in
+            # the highPerimeterNeighborhoods, and find the midpoint between the first two if
             # its a multipoint
-            if len(saddle.highShores) == 2:
-                highShores = []
-                for highShore in saddle.highShores:
-                    highShores.append(highest(highShore))
+            if len(saddle.highPerimeterNeighborhoods) == 2:
+                highPerimeterNeighborhoods = []
+                for highPerimeterNeighborhood in saddle.highPerimeterNeighborhoods:
+                    highPerimeterNeighborhoods.append(highest(highPerimeterNeighborhood))
 
-                # if multipoint use first of each of the highest high shores
+                # if multipoint use first of each of the highest high perimeter neighborhoods
                 # and find the mid point for both. Then find the point within
                 # the multipoint that is closest to that midpoint. Disregard
-                # high shores.
+                # high perimeter neighborhoods.
                 if saddle.multipoint:
                     hs0, hs1, distance =\
-                        find_closest_points(saddle.highShores[0], saddle.highShores[1], datamap)
-                    # find the middle GP for the 2 closest opposing shore
+                        find_closest_points(saddle.highPerimeterNeighborhoods[0], saddle.highPerimeterNeighborhoods[1], datamap)
+                    # find the middle GP for the 2 closest opposing high perimeter neighborhoods
                     # points.
                     # Note, in some cases this might be outside the multipoint
                     middleGP = GridPoint(int((hs0[0] +
@@ -94,7 +94,7 @@ class SaddlesContainer(SpotElevationContainer):
                                        saddle.longitude,
                                        saddle.elevation)
 
-                newSaddle.highShores = [highShores[0], highShores[1]]
+                newSaddle.highPerimeterNeighborhoods = [highPerimeterNeighborhoods[0], highPerimeterNeighborhoods[1]]
                 new_saddles.append(newSaddle)
                 if saddle.edgeEffect:
                     newSaddle.parent = saddle

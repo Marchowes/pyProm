@@ -20,6 +20,8 @@ class Perimeter(BaseSelfIterable):
     member of a :class:`pyprom.lib.containers.multipoint.MultiPoint`
     """
 
+    __slots__ = ['datamap', 'mapEdge', 'mapEdgePoints']
+
     def __init__(self, pointList=None,
                  pointIndex=None,
                  datamap=None,
@@ -80,7 +82,7 @@ class Perimeter(BaseSelfIterable):
                    mapEdge=mapEdge,
                    mapEdgePoints=mapEdgePoints)
 
-    def findHighEdges(self, elevation):
+    def findHighPerimeterNeighborhoods(self, elevation):
         """
         Finds all points that are higher than passed in elevation and returns
         them as a list of contiguous point lists

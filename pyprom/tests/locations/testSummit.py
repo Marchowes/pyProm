@@ -102,8 +102,8 @@ class SummitTests(unittest.TestCase):
         """
         Ensure neighbors() returns expected results.
         """
-        self.assertEqual(self.masterSummit.neighbors, [self.summit2,
-                                                       self.summit1])
+        self.assertEqual(self.masterSummit.neighbors, [self.summit1,
+                                                       self.summit2])
 
     def testSummitAddSaddleLinker(self):
         """

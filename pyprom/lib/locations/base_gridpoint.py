@@ -17,6 +17,8 @@ class BaseGridPoint:
     is a Base class intended to be inherited from in most situations.
     """
 
+    __slots__ = ['x', 'y']
+
     def __init__(self, x, y):
         """
         A basic x,y GridPoint.

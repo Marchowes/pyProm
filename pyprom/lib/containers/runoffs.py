@@ -18,6 +18,8 @@ class RunoffsContainer(SaddlesContainer):
     Allows for various list transformations.
     """
 
+    __slots__ = []
+
     def __init__(self, runoffList):
         """
         :param runoffList: list of Runoff objects to reside in this container.

@@ -6,7 +6,6 @@ the LICENSE file that accompanies it.
 """
 import sys
 
-from collections import defaultdict
 from ..containers.base_self_iterable import BaseSelfIterable
 from dijkstar import Graph, find_path
 from scipy.spatial import KDTree
@@ -14,20 +13,21 @@ from math import hypot
 import numpy as np
 
 
-def high_shore_shortest_path(point, flat_area_points, highShores, datamap):
+def high_perimeter_neighborhood_shortest_path(point, flat_area_points, highPerimeterNeighborhoods, datamap):
     """
     Finds the shortest path from point
 
     :param tuple point: (x, y, ele)
     :param list flat_area_points: list(tuple(x, y, ele))
-    :param highShores: list(list(tuple(x, y, ele))) list of lists of high shores.
+    :param highPerimeterNeighborhoods: list(list(tuple(x, y, ele))) list of
+     lists of high perimeter neighborhoods.
     :param datamap: Datamap to calculate distance.
     :return:
     """
     # needs to include perimeter in full path
     pts = flat_area_points
 
-    for hs in highShores:
+    for hs in highPerimeterNeighborhoods:
         pts.extend(hs)
     bsi = BaseSelfIterable(pointList=pts)
 
@@ -44,7 +44,7 @@ def high_shore_shortest_path(point, flat_area_points, highShores, datamap):
     shortest_length = None
     # todo: inefficient. Maybe we can do a breadth first algorithm which searches
     # todo: for the first encountered member of a destination set, rather than this clumsy dijkstra nonesense.
-    for them in highShores:
+    for them in highPerimeterNeighborhoods:
         for them_hs in them:
             path = find_path(graph, point, them_hs)
             if shortest_length:

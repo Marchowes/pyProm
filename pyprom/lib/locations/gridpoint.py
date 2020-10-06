@@ -17,6 +17,8 @@ class GridPoint(BaseGridPoint):
     In essence, this is an x,y coordinate which also includes elevation.
     """
 
+    __slots__ = ['elevation']
+
     def __init__(self, x, y, elevation):
         """
         :param int x: x coordinate

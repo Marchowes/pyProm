@@ -5,7 +5,7 @@ This software is distributed under a license that is described in
 the LICENSE file that accompanies it.
 
 This library contains a container class for storing Vertex_Links
-used in Saddle highShores Tree Calculations.
+used in Saddle highPerimeterNeighborhoods Tree Calculations.
 """
 
 import sys
@@ -22,6 +22,8 @@ class Feature_Verticies:
     stored in `self.vertex_linkers[:].local` and those verticies
     are all all linked to foreign verticies
     """
+
+    __slots__ = ['index', 'vertex_linkers']
 
     def __init__(self, index, vertex_linkers):
         """

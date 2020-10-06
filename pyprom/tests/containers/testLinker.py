@@ -65,7 +65,6 @@ class LinkerTests(unittest.TestCase):
         self.saddle1.summits = [self.linker1]
         self.saddle2.summits = [self.linker2, self.linker3,
                                 self.disqualifiedLinkerLocallyDeadSummit]
-        self.disqualifiedLinker1.summits = [self.disqualifiedLinker1]
 
     def testLinkerProminence(self):
         """

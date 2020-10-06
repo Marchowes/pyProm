@@ -1,8 +1,8 @@
-.. _domain-pyprom:
+.. _domainmap-pyprom:
 
-Domain
-======
-.. autoclass:: pyprom.domain.Domain
+DomainMap
+=========
+.. autoclass:: pyprom.domain.DomainMap
     :members:
     :private-members:
     :special-members:

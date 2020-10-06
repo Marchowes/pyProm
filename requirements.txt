@@ -1,9 +1,10 @@
 cbor
 dijkstar
 fastkml
-gdal
-geopy
 numpy == 1.16.4
+gdal==3.0.4
+geopy
 scipy
 shapely
 utm
+geopy

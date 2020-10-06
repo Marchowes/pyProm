@@ -20,6 +20,8 @@ class GridPointContainer(BaseGridPointContainer):
     Storage and functions for :class:`pyprom.lib.locations.gridpoint.GridPoint`
     """
 
+    __slots__ = ['fastLookup']
+
     def __init__(self, gridPointList):
         """
         :param gridPointList: list of GridPoints

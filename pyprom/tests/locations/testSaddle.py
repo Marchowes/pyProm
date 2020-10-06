@@ -54,7 +54,7 @@ class SaddleTests(unittest.TestCase):
         self.assertEqual(newSaddle.longitude, saddle.longitude)
         self.assertEqual(newSaddle.elevation, saddle.elevation)
         self.assertEqual(newSaddle.multipoint, saddle.multipoint)
-        self.assertEqual(newSaddle.highShores, saddle.highShores)
+        self.assertEqual(newSaddle.highPerimeterNeighborhoods, saddle.highPerimeterNeighborhoods)
         self.assertEqual(newSaddle.edgeEffect, saddle.edgeEffect)
         self.assertEqual(newSaddle.edgePoints, saddle.edgePoints)
         self.assertEqual(newSaddle.id, saddle.id)
@@ -82,7 +82,7 @@ class SaddleTests(unittest.TestCase):
         self.assertEqual(newSaddle.longitude, saddle.longitude)
         self.assertEqual(newSaddle.elevation, saddle.elevation)
         self.assertEqual(newSaddle.multipoint, saddle.multipoint)
-        self.assertEqual(newSaddle.highShores, saddle.highShores)
+        self.assertEqual(newSaddle.highPerimeterNeighborhoods, saddle.highPerimeterNeighborhoods)
         self.assertEqual(newSaddle.edgeEffect, saddle.edgeEffect)
         self.assertEqual(newSaddle.edgePoints, saddle.edgePoints)
         self.assertEqual(newSaddle.id, saddle.id)
@@ -112,7 +112,7 @@ class SaddleTests(unittest.TestCase):
         self.assertEqual(newSaddle.longitude, saddle.longitude)
         self.assertEqual(newSaddle.elevation, saddle.elevation)
         self.assertEqual(newSaddle.multipoint, saddle.multipoint)
-        self.assertEqual(newSaddle.highShores, saddle.highShores)
+        self.assertEqual(newSaddle.highPerimeterNeighborhoods, saddle.highPerimeterNeighborhoods)
         self.assertEqual(newSaddle.edgeEffect, saddle.edgeEffect)
         self.assertEqual(newSaddle.edgePoints, saddle.edgePoints)
         self.assertEqual(newSaddle.id, saddle.id)
@@ -267,9 +267,9 @@ class SaddleTests(unittest.TestCase):
         self.assertTrue(child.summits[0].disqualified)
 
 
-    def testSaddleHighShoreShortestPath(self):
+    def testSaddleHighPerimeterHoodShortestPath(self):
         """
-        Ensure high_shore_shortest_path() produces expected results.
+        Ensure high_perimeter_neighborhood_shortest_path() produces expected results.
         Single Point.
         """
         someslice = self.datamap.subset(0, 0, 30, 30)
@@ -277,14 +277,14 @@ class SaddleTests(unittest.TestCase):
         domain.run()
         saddles = domain.saddles
         saddle = saddles[7]
-        point1, point2, middle = saddle.high_shore_shortest_path(someslice)
+        point1, point2, middle = saddle.high_perimeter_neighborhood_shortest_path(someslice)
         self.assertEqual(point1, (12, 9, 423.0))
         self.assertEqual(point2, (14, 10, 423.0))
         self.assertEqual(middle, (13, 9))
 
-    def testSaddleHighShoreShortestPathMultiPoint(self):
+    def testSaddleHighPerimeterHoodShortestPathMultiPoint(self):
         """
-        Ensure high_shore_shortest_path() produces expected results.
+        Ensure high_perimeter_neighborhood_shortest_path() produces expected results.
         Multipoint
         """
         someslice = self.datamap.subset(0, 0, 30, 30)
@@ -292,7 +292,7 @@ class SaddleTests(unittest.TestCase):
         domain.run()
         saddles = domain.saddles
         saddle = saddles.multipoints[1]
-        point1, point2, middle = saddle.high_shore_shortest_path(someslice)
+        point1, point2, middle = saddle.high_perimeter_neighborhood_shortest_path(someslice)
         self.assertEqual(point1, (7, 27, 425.0))
         self.assertEqual(point2, (4, 27, 425.0))
         self.assertEqual(middle, (5, 27))

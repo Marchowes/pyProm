@@ -249,7 +249,7 @@ class GridPointContainerTests(unittest.TestCase):
         """
         gridpoints = [self.p11, self.p12]
         container = GridPointContainer(gridpoints)
-        self.assertEqual(container.__hash__(), 4150162461373869217)
+        self.assertEqual(container.__hash__(), -5772834257284762593)
 
     def testGridPointContainerRepr(self):
         """

@@ -8,7 +8,7 @@ the LICENSE file that accompanies it.
 import unittest
 from pyprom.tests.getData import gettestzip
 from pyprom.dataload import GDALLoader
-from pyprom.domain import Domain
+from pyprom.domain_map import DomainMap
 from pyprom.dividetree import DivideTree
 
 
@@ -27,7 +27,7 @@ class DivideTreeTests(unittest.TestCase):
         # self.someslice = datamap.subset(2594, 2340, 500, 500)
         # this is fine too apparently... (or not)
         # self.someslice = datamap.subset(2694, 2440, 400, 400)
-        self.domain = Domain(self.someslice)
+        self.domain = DomainMap(self.someslice)
         self.domain.run(sparse=True)
         # self.domain.run()
 

@@ -35,6 +35,9 @@ class Summit(SpotElevation):
     | ``[0][0][0][0]``
     """
 
+    __slots__ = ['multipoint', 'saddles', 'disqualified', 'localHighest',
+                 'parent', 'children',  'lprBoundary', 'lprPaths', 'domain']
+
     def __init__(self, latitude, longitude, elevation, *args, **kwargs):
         """
         :param latitude: latitude in dotted decimal

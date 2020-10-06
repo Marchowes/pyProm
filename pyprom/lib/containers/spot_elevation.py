@@ -12,9 +12,7 @@ from ..locations.summit import Summit
 from ..locations.spot_elevation import isSpotElevation
 from ..constants import METERS_TO_FEET, FEET_IN_MILES
 from .base import _Base
-
-
-from geopy.distance import vincenty
+from geopy.distance import geodesic
 
 
 class SpotElevationContainer(_Base):
@@ -27,6 +25,8 @@ class SpotElevationContainer(_Base):
     :class:`pyprom.lib.containers.summits.SummitsContainer`,
     and :class:`pyprom.lib.containers.runoffs.RunOffsContainer`
     """
+
+    __slots__ = ['points', 'fast_lookup']
 
     def __init__(self, spotElevationList):
         """
@@ -118,9 +118,9 @@ class SpotElevationContainer(_Base):
 
         positive = list()
         # iterate through points and collect only points within the specified
-        # distance using the vincenty algorithm.
+        # distance using the geodesic algorithm.
         for point in self.points:
-            distance = vincenty((lat, long),
+            distance = geodesic((lat, long),
                                 (point.latitude, point.longitude)).meters
             if distance < convertedDist:
                 positive.append(point)

@@ -21,6 +21,7 @@ class SpotElevation(BaseCoordinate):
     SpotElevation is intended to be inherited from. Effectively it's a
     Latitude/Longitude coordinate with an elevation
     """
+    __slots__ = ['elevation', 'edgeEffect', 'edgePoints', 'id']
 
     def __init__(self, latitude, longitude, elevation, *args, **kwargs):
         """

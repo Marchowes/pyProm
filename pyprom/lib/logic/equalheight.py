@@ -11,7 +11,6 @@ from ..containers.multipoint import MultiPoint
 from ..containers.perimeter import Perimeter
 
 
-
 def equalHeightBlob(datamap, x, y, elevation):
     """
     This function generates a
@@ -34,7 +33,7 @@ def equalHeightBlob(datamap, x, y, elevation):
     perimeterPointHash = defaultdict(dict)
     perimeterPoints = list()
     toBeAnalyzed = [masterGridPoint]
-    shoreMapEdge = set()
+    perimeterMapEdge = set()
     multipointEdges = []
 
     if datamap.is_map_edge(x, y):
@@ -68,7 +67,7 @@ def equalHeightBlob(datamap, x, y, elevation):
                     if elevation > masterGridPoint[2]:
                         _add_perimeter_point(_x, _y, (_x, _y, elevation), perimeterPointHash, perimeterPoints)
                     if datamap.is_map_edge(_x, _y):
-                        shoreMapEdge.add((_x, _y, elevation))
+                        perimeterMapEdge.add((_x, _y, elevation))
     return MultiPoint(memberPoint,
                       masterGridPoint[2],
                       datamap,
@@ -77,7 +76,7 @@ def equalHeightBlob(datamap, x, y, elevation):
                           pointIndex=perimeterPointHash,
                           datamap=datamap,
                           mapEdge=edge,
-                          mapEdgePoints=list(shoreMapEdge))),\
+                          mapEdgePoints=list(perimeterMapEdge))),\
         multipointEdges
 
 def _add_member_point(x, y, hash, list):

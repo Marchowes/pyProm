@@ -65,7 +65,7 @@ class Walk:
         path to a SummitDomain. This path is comprised of whatever neighbor
         was the steepest neighbor. If an equalheight neighbor is found,
         then that equalheight blob is analyzed as a whole and the closest
-        high shore climb is selected.
+        high perimeter neighborhood climb is selected.
 
         :param point: (x, y)
         :return: :class:`SummitDomain` for which it was determined that this
@@ -101,9 +101,10 @@ class Walk:
         """
         Climb_points works in two ways:
 
-        In the case of analysis of the high shore of a Saddle, this function
-        accepts a list of points, and climbs from all of them. leveraging the
-        climb() function to determine which Saddle Domain the point belongs to.f
+        In the case of analysis of the high perimeter neighborhood of a Saddle,
+        this function  accepts a list of points, and climbs from all of them.
+        leveraging the climb() function to determine which Saddle Domain the
+        point belongs to.
 
         This function is also used an an intermediary to analyze multipoints
         along a domain walk path. This is done by passing an entryPoint and no
@@ -130,9 +131,9 @@ class Walk:
 
         if entryPoint:
             closest = find_closest_point_by_distance_map(mp.points, mp.perimeter.findHighPerimeter(mp.elevation))
-            for internal_pt, highShore in closest.items():
-                # assign all internal members of the multipoint to the summit domain of the closest highShore
-                self.summit_domain_points[internal_pt[0]][internal_pt[1]] = self.summit_domain_points[highShore[0]][highShore[1]]
+            for internal_pt, highPerimeter in closest.items():
+                # assign all internal members of the multipoint to the summit domain of the closest highPerimeter
+                self.summit_domain_points[internal_pt[0]][internal_pt[1]] = self.summit_domain_points[highPerimeter[0]][highPerimeter[1]]
             return self.summit_domain_points[entryPoint[0]][entryPoint[1]]
         else:
             return summit_domains
@@ -165,7 +166,7 @@ class Walk:
                 then = now
 
             # If this saddle is not an edgeEffect, we can build a Synthetic Saddle
-            # and just walk up from the highShore points closest to other high shores.
+            # and just walk up from the highPerimeter points closest to other high perimeter neighborhoods.
             saddlesUnderTest = [basesaddle]
             synthetic = False
             if not basesaddle.edgeEffect:
@@ -175,7 +176,7 @@ class Walk:
             # non synthetic saddles will have their full highEdges explored.
             # synthetic ones do not.
             for saddle in saddlesUnderTest:
-                for highEdge in saddle.highShores:
+                for highEdge in saddle.highPerimeterNeighborhoods:
                     domains = self.climb_points(highEdge)
                     dd = list(domains) # debug
                     if len(domains) > 1:
@@ -195,8 +196,8 @@ class Walk:
                     edge_saddles = []
                     # don't mess with runoffs.
                     if isinstance(saddle, Runoff):
-                        # No high Shores, means this is a Summit-Like Runoff, look for matching summit domain at runoff point.
-                        if not saddle.highShores:
+                        # No highPerimeterNeighborhoods, means this is a Summit-Like Runoff, look for matching summit domain at runoff point.
+                        if not saddle.highPerimeterNeighborhoods:
                             point = saddle.toXYTuple(self.domainmap.datamap)
                             sd = self.summit_domain_points[point[0]].get(point[1], None)
                             # nothing there? continue.
@@ -212,11 +213,11 @@ class Walk:
                             linkers.append(linker)
                         else:
                             # if we are a Runoff and there is a high edge, treat like any old Saddle
-                            # becasue we walk from all high shore points, this should be OK.
+                            # becasue we walk from all highPerimeterNeighborhoods points, this should be OK.
                             edge_saddles = [saddle]
                     edge_saddles = self.generate_synthetic_saddles(saddle) if not edge_saddles else edge_saddles
                     for edge_saddle in edge_saddles:
-                        for highEdge in edge_saddle.highShores:
+                        for highEdge in edge_saddle.highPerimeterNeighborhoods:
                             h0 = highEdge[0]
                             sd = self.summit_domain_points[h0[0]].get(h0[1], None)
                             # nothing there? continue.
@@ -240,7 +241,7 @@ class Walk:
                     walkedFeatures.append(basesaddle)
                 else:
                     # synthetic saddles only have 1 point in each HS, so we know they'll be a domain member.
-                    for highEdge in saddle.highShores:
+                    for highEdge in saddle.highPerimeterNeighborhoods:
                         h0 = highEdge[0]
                         sd = self.summit_domain_points[h0[0]].get(h0[1], None)
                         if not sd:
@@ -267,17 +268,16 @@ class Walk:
     def generate_synthetic_saddles(self, saddle):
 
         # This should not be, just return it.
-        if len(saddle.highShores) < 2:
+        if len(saddle.highPerimeterNeighborhoods) < 2:
             return [saddle]
 
-        # More than 2 high shores? build the network, and return the result.
-        if len(saddle.highShores) > 2:
+        # More than 2 highPerimeterNeighborhoods? build the network, and return the result.
+        if len(saddle.highPerimeterNeighborhoods) > 2:
             nw = InternalSaddleNetwork(saddle, self.domainmap.datamap)
             return nw.generate_child_saddles()
         #Just 2
-
         if saddle.multipoint:
-            hs0, hs1, midpoint = saddle.high_shore_shortest_path(
+            hs0, hs1, midpoint = saddle.high_perimeter_neighborhood_shortest_path(
                 self.domainmap.datamap)
 
             middleSpotElevation = GridPoint(midpoint[0],
@@ -289,18 +289,18 @@ class Walk:
                                middleSpotElevation.longitude,
                                saddle.elevation)
 
-            highShores = [[hs0], [hs1]]
+            highPerimeterNeighborhoods = [[hs0], [hs1]]
         else:
             newSaddle = Saddle(saddle.latitude,
                                saddle.longitude,
                                saddle.elevation)
 
-            # todo: closest highShore, not just first one.
-            highShores = []
-            for highShore in saddle.highShores:
-                highShores.append(highest(highShore))
+            # TODO: closest highPerimeterNeighborhood, not just first one.
+            highPerimeterNeighborhoods = []
+            for highPerimeterNeighborhood in saddle.highPerimeterNeighborhoods:
+                highPerimeterNeighborhoods.append(highest(highPerimeterNeighborhood))
 
-        # assign our slimmed down high shores.
-        newSaddle.highShores = highShores
+        # assign our slimmed down high perimeter neighborhoods.
+        newSaddle.highPerimeterNeighborhoods = highPerimeterNeighborhoods
         return [newSaddle]
 

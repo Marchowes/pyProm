@@ -120,7 +120,7 @@ class DataMapTests(unittest.TestCase):
         Ensure distance calculation produces expected results.
         """
         self.assertEqual(self.datamap.distance((0, 0), (1, 1)),
-                                               0.00039283710065919305)
+                                               0.0003928371006591931)
         self.assertEqual(self.datamap.distance((0, 0), (0, 1)),
                                                0.0002777777777777778)
 

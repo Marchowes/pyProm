@@ -5,7 +5,7 @@ This software is distributed under a license that is described in
 the LICENSE file that accompanies it.
 
 This library contains a location class for storing a Vertex_Link
-used in Saddle highShores Tree Calculations.
+used in Saddle highPerimeterNeighborhoods Tree Calculations.
 """
 
 
@@ -15,6 +15,8 @@ class Vertex_Link:
     :class:`pyprom.lib.locations.gridpoint.GridPoint` from one feature to
     a vertex from another. These are used in Internal Saddle Networks.
     """
+
+    __slots__ = ['local', 'remote', 'distance', 'remote_container']
 
     def __init__(self, localPoint, remotePoint,
                  distance, remote_container=None):

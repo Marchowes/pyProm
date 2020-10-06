@@ -48,7 +48,7 @@ class InternalSaddleNetworkTests(unittest.TestCase):
         new_saddles = nw.generate_child_saddles()
         self.assertEqual(len(new_saddles), 6)
         for saddle in new_saddles:
-            self.assertEqual(len(saddle.highShores), 2)
+            self.assertEqual(len(saddle.highPerimeterNeighborhoods), 2)
             self.assertEqual(saddle.multipoint, [])
             self.assertEqual(saddle.disqualified, False)
 
