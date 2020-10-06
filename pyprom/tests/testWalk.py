@@ -41,8 +41,8 @@ class WalkTests(unittest.TestCase):
         """
         Test walk around Island Pond VT.
         """
-        islandPondSaddleContainer = self.saddles.radius(44.81069,
-                                                        -71.86763,
+        islandPondSaddleContainer = self.saddles.radius(44.810972,
+                                                        -71.867638,
                                                         10)
         islandPondSaddle = islandPondSaddleContainer[0]
         self.domain.walk([islandPondSaddle])

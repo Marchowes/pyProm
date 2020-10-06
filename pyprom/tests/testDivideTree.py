@@ -8,7 +8,7 @@ the LICENSE file that accompanies it.
 import unittest
 from pyprom.tests.getData import gettestzip
 from pyprom.dataload import GDALLoader
-from pyprom.domain_map import Domain
+from pyprom.domain_map import DomainMap
 from pyprom.dividetree import DivideTree
 
 
