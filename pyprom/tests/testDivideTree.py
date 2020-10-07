@@ -44,3 +44,18 @@ class DivideTreeTests(unittest.TestCase):
         w = self.domain.summits.highest[0]
         dt.localProminentRegion(w)
         print(w.lprBoundary)
+
+    def testDivideTreeOther(self):
+        """
+        Test divide tree initial
+        """
+        # self.domain.disqualify_lower_linkers()
+        # self.domain.mark_redundant_linkers()
+        import logging
+        logging.basicConfig(level=logging.DEBUG)
+        self.domain.detect_basin_saddles()
+        dt = DivideTree(domain=self.domain)
+        lpr = dt.run()
+        # w = self.domain.summits.highest[0]
+        # dt.localProminentRegion(w)
+        print(lpr)
