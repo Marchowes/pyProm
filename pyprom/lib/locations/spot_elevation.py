@@ -42,7 +42,9 @@ class SpotElevation(BaseCoordinate):
         self.elevation = elevation
         self.edgeEffect = kwargs.get('edge', False)
         self.edgePoints = kwargs.get('edgePoints', [])
-        self.id = kwargs.get('id', 'se:' + randomString())
+        self.id = kwargs.get('id')
+        if not self.id:
+            self.id = 'se:' + randomString()
 
     def to_dict(self):
         """
