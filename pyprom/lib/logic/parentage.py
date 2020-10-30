@@ -13,7 +13,7 @@ LOCAL_LINKER = 0
 LOWEST_SADDLE = 1
 HIGHEST_SUMMIT = 2
 
-class ProminenceIslandFinder:
+class ProminenceIslandParentFinder:
 
     def __init__(self, summit):
         self.summit = summit
@@ -22,6 +22,9 @@ class ProminenceIslandFinder:
         self.next_queue = []
         self.candidate_key_col = None
         self.candidate_parent = None
+
+        self.candidate_offmap_saddles = set()
+
 
     def find_parent(self):
         for local_linker in self.summit.saddles:
@@ -32,15 +35,26 @@ class ProminenceIslandFinder:
                 local_linker, # Linker between this summit and the next saddle.
                 None, # lowest saddle seen
                 None, # highest summit seen
+                [], # off map saddles
             )
             self.current_queue.append(obj)
         self.breadth_search()
+        depth = 1
         while self.next_queue:
+            depth += 1
             self.current_queue = self.next_queue
             self.next_queue = []
             self.breadth_search()
 
-        return self.candidate_key_col, self.candidate_parent
+        offmap_saddles = []
+        if self.candidate_key_col:
+            for candidate_offmap_saddle in self.candidate_offmap_saddles:
+                if candidate_offmap_saddle.elevation > self.candidate_key_col.elevation:
+                    offmap_saddles.append(candidate_offmap_saddle)
+        else:
+            offmap_saddles = self.candidate_offmap_saddles
+
+        return self.candidate_key_col, self.candidate_parent, offmap_saddles, depth
 
     def breadth_search(self):
         """
@@ -53,12 +67,23 @@ class ProminenceIslandFinder:
             # This will fail if we encounter a runoff or some other oddball scenarios.
             ##############
             try:
-                next_linker = obj[LOCAL_LINKER].linkers_to_summits_connected_via_saddle()[0]
+                next_linker = obj[LOCAL_LINKER].linker_other_side_of_saddle()[0]
             except:
-                #print(f" BAD: {saddle}")
+                # keep track of any low saddles that lead up to an edge.
+                # We'll cull any invalid ones at the caller
+                if saddle.edgeEffect:
+                    if obj[LOWEST_SADDLE]:
+                        self.candidate_offmap_saddles.add(obj[LOWEST_SADDLE])
+                else:
+                    print(f"BAD: {saddle}")
                 continue
             #################
             summit_under_test = next_linker.summit
+
+            if summit_under_test.edgeEffect:
+                if obj[LOWEST_SADDLE]:
+                    self.candidate_offmap_saddles.add(obj[LOWEST_SADDLE])
+
 
             # lowest seen already lower than the candidate? bail.
             if self.candidate_key_col and obj[LOWEST_SADDLE].elevation < self.candidate_key_col.elevation:
@@ -107,7 +132,7 @@ class ProminenceIslandFinder:
 
             # Alright, we're done here, queue up the next summits and add them to the next ring.
             for next_saddle_linker in summit_under_test.saddles:
-                if next_saddle_linker == next_linker or next_saddle_linker.disqualified:
+                if next_saddle_linker.id == next_linker.id or next_saddle_linker.disqualified:
                     continue
                 self.next_queue.append((next_saddle_linker, lowest, highest))
 
