@@ -377,11 +377,11 @@ class Saddle(SpotElevation):
                 hsx = []
                 for hs in hss:
                     hsx.append(tuple(hs))
-                highPerimeterNeighborhoods.append(hsx)
+                highPerimeterNeighborhoods.append(tuple(hsx))
 
         return cls(lat, long, elevation,
                    multipoint=multipoint,
-                   highPerimeterNeighborhoods=highPerimeterNeighborhoods,
+                   highPerimeterNeighborhoods=tuple(highPerimeterNeighborhoods),
                    edge=edge,
                    edgePoints=edgePoints,
                    id=id,
