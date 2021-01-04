@@ -215,7 +215,19 @@ class ManagerTests(unittest.TestCase):
         self.assertEqual(self.manager.is_disabled(self.summit1.id), False)
         self.assertEqual(self.summit1.contexts[self.manager.id].disabled, False)
 
+    def testFeatureList(self):
+        """
 
+        make sure feature lists work.
+        """
+        self.manager.add_summit(self.summit1)
+        self.manager.add_saddle(self.saddle1)
+        self.manager.add_saddle(self.runoff1)
+
+        self.assertEqual(self.manager.summits, [self.summit1])
+        self.assertEqual(self.manager.saddles, [self.saddle1, self.runoff1])
+        self.assertEqual(self.manager.saddles_exact, [self.saddle1])
+        self.assertEqual(self.manager.runoffs, [self.runoff1])
 
 
     # Runoffs.

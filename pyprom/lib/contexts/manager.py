@@ -11,6 +11,7 @@ from .saddle_context import SaddleContext
 from .summit_context import SummitContext
 from .exceptions import SummitContextException, SaddleContextException
 from ..containers.saddles import SaddlesContainer
+from ..locations.runoff import Runoff
 from ..util import randomString
 
 class FeatureContextManager:
@@ -69,6 +70,13 @@ class FeatureContextManager:
             summit.contexts[self.id] = sc
         return added
 
+    @property
+    def summits(self):
+        """
+        List of all summits.
+        """
+        return self._summits
+
     def add_saddle(self, saddle, disabled=False):
         """
         Add a Saddle to this context.
@@ -79,6 +87,28 @@ class FeatureContextManager:
             sc = SaddleContext(self, saddle, [], [], disabled=disabled)
             saddle.contexts[self.id] = sc
         return added
+
+    @property
+    def saddles_exact(self):
+        """
+        list of all explicit saddle objects.
+        """
+        return [x for x in self._saddles if not isinstance(x, Runoff)]
+
+    @property
+    def saddles(self):
+        """
+        list of saddles/runoffs
+        """
+        return self._saddles
+
+    @property
+    def runoffs(self):
+        """
+        List of Runoffs
+        """
+        return [x for x in self._saddles if isinstance(x, Runoff)]
+
 
     def link_saddle_summit(self, saddle, summit, disable_duplicate=True):
         """
