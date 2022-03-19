@@ -289,7 +289,7 @@ class Walk:
                                middleSpotElevation.longitude,
                                saddle.elevation)
 
-            highPerimeterNeighborhoods = [[hs0], [hs1]]
+            highPerimeterNeighborhoods = [(hs0,), (hs1,)]
         else:
             newSaddle = Saddle(saddle.latitude,
                                saddle.longitude,

@@ -64,7 +64,7 @@ class BasinSaddleFinder:
         while features:  # loop over features
             if root is None:
                 _, root = features.popitem()
-            if root.disqualified or root.edgeEffect:
+            if root.disqualified:
                 root = None
                 continue
             stack = [root]  # stack of features to explore.
@@ -73,12 +73,12 @@ class BasinSaddleFinder:
             cycleMembers = {}
             while stack:
                 z = stack.pop()
-                if z.disqualified or z.edgeEffect:
+                if z.disqualified:
                     features.pop(z.id, None)
                     continue
                 zEexploredNbrs = exploredNbrs[z.id]
                 for nbr in z.feature_neighbors():
-                    if nbr.disqualified or nbr.edgeEffect:
+                    if nbr.disqualified:
                         features.pop(nbr.id, None)
                         continue
                     if nbr.id not in exploredNbrs:  # new node

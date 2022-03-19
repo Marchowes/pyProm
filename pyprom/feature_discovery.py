@@ -382,7 +382,7 @@ class AnalyzeData:
                     if multipoint:
                         pts = multipoint.points
                         # this gets the closest single highPerimeterNeighborhood point to our midpoint
-                        highPerimeterNeighborhoods.append([high_perimeter_neighborhood_shortest_path(mid, pts, highPerimeter, self.datamap)])
+                        highPerimeterNeighborhoods.append((high_perimeter_neighborhood_shortest_path(mid, pts, highPerimeter, self.datamap),))
                     else:
                         # just use the regular highPerimeterNeighborhoods if not a multipoint
                         highPerimeterNeighborhoods = highPerimeter

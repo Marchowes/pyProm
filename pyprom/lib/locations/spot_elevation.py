@@ -21,7 +21,7 @@ class SpotElevation(BaseCoordinate):
     SpotElevation is intended to be inherited from. Effectively it's a
     Latitude/Longitude coordinate with an elevation
     """
-    __slots__ = ['elevation', 'edgeEffect', 'edgePoints', 'id']
+    __slots__ = ['elevation', 'edgeEffect', 'edgePoints', 'id', 'contexts']
 
     def __init__(self, latitude, longitude, elevation, *args, **kwargs):
         """
@@ -42,7 +42,10 @@ class SpotElevation(BaseCoordinate):
         self.elevation = elevation
         self.edgeEffect = kwargs.get('edge', False)
         self.edgePoints = kwargs.get('edgePoints', [])
-        self.id = kwargs.get('id', 'se:' + randomString())
+        self.id = kwargs.get('id')
+        self.contexts = kwargs.get('contexts', {})
+        if not self.id:
+            self.id = 'se:' + randomString()
 
     def to_dict(self):
         """

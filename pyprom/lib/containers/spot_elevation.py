@@ -37,7 +37,15 @@ class SpotElevationContainer(_Base):
         """
         super(SpotElevationContainer, self).__init__()
         self.points = spotElevationList
-        self.fast_lookup = {point.id: point for point in self.points}
+        self.fast_lookup = self.generate_fast_lookup()
+
+    def generate_fast_lookup(self):
+        """
+        Produces a fast lookup dict of this Container.
+
+        :return: {id: SpotElevation} fast lookup dict.
+        """
+        return {point.id: point for point in self.points}
 
     @property
     def lowest(self):

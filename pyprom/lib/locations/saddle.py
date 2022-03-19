@@ -83,7 +83,9 @@ class Saddle(SpotElevation):
                                      elevation, *args, **kwargs)
         self.multipoint = kwargs.get('multipoint', [])
         self.highPerimeterNeighborhoods = kwargs.get('highPerimeterNeighborhoods', [])
-        self.id = kwargs.get('id', 'sa:' + randomString())
+        self.id = kwargs.get('id')
+        if not self.id:
+            self.id = 'sa:' + randomString()
         # List of linkers to summits
         self.summits = []
         # If this is set, this saddle has spun out another
@@ -375,11 +377,11 @@ class Saddle(SpotElevation):
                 hsx = []
                 for hs in hss:
                     hsx.append(tuple(hs))
-                highPerimeterNeighborhoods.append(hsx)
+                highPerimeterNeighborhoods.append(tuple(hsx))
 
         return cls(lat, long, elevation,
                    multipoint=multipoint,
-                   highPerimeterNeighborhoods=highPerimeterNeighborhoods,
+                   highPerimeterNeighborhoods=tuple(highPerimeterNeighborhoods),
                    edge=edge,
                    edgePoints=edgePoints,
                    id=id,

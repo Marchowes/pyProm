@@ -31,7 +31,7 @@ def contiguous_neighbors(points):
         stack = [points.pop()]
         lookup[stack[0][0]][stack[0][1]] = None
         neighbors = list([stack[0]])
-        neighborsList.append(neighbors)
+        neighborsList.append(tuple(neighbors))
         while stack:
             # Grab a point from the stack.
             point = stack.pop()
