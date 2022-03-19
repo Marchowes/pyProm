@@ -93,10 +93,14 @@ class AnalyzeData:
         index = 0
         start = default_timer()
         then = start
+        current_x = 0
         # Iterate through numpy grid, and keep track of GridPoint coordinates.
         while not iterator.finished:
             x, y = iterator.multi_index
             # core storage is always in metric.
+            if current_x != x:
+                del self.explored[current_x]
+                current_x = x
             if self.datamap.unit == "FEET":
                 self.elevation = float(METERS_TO_FEET * iterator[0])
             else:
