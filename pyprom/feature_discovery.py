@@ -14,11 +14,9 @@ from collections import defaultdict
 from timeit import default_timer
 from datetime import timedelta
 from math import floor
-from .lib.locations.gridpoint import GridPoint
 from .lib.locations.saddle import Saddle
 from .lib.locations.summit import Summit
 from .lib.locations.runoff import Runoff
-from .lib.locations.base_gridpoint import BaseGridPoint
 from .lib.containers.saddles import SaddlesContainer
 from .lib.containers.summits import SummitsContainer
 from .lib.containers.runoffs import RunoffsContainer
@@ -27,6 +25,7 @@ from .lib.logic.equalheight import equalHeightBlob
 from .lib.logic.contiguous_neighbors import contiguous_neighbors, touching_neighborhoods
 from .lib.logic.shortest_path_by_points import high_perimeter_neighborhood_shortest_path
 from .lib.logic.tuple_funcs import highest
+from .lib.contexts.manager import FeatureContextManager
 
 from .lib.constants import METERS_TO_FEET
 
@@ -50,6 +49,7 @@ class AnalyzeData:
         self.max_y = self.datamap.max_y
         self.max_x = self.datamap.max_x
         self.explored = defaultdict(dict)
+        self.context = FeatureContextManager([], [], [])
 
     def run(self, rebuildSaddles=True):
         """
@@ -66,7 +66,7 @@ class AnalyzeData:
         """
         _, _, _ = self.analyze()
         # Corners also are runoffs.
-        self.runoffObjects.extend(make_corner_runoffs(self.datamap))
+        self.runoffObjects.extend(make_corner_runoffs(self.datamap, self.context))
 
         if rebuildSaddles:
             self.logger.info("Rebuilding Saddles")
@@ -127,10 +127,13 @@ class AnalyzeData:
                 for result in results:
                     if isinstance(result, Summit):
                         self.summitObjects.append(result)
+                        self.context.add_summit(result)
                     if isinstance(result, Runoff):
                         self.runoffObjects.append(result)
+                        self.context.add_saddle(result)
                     elif isinstance(result, Saddle):
                         self.saddleObjects.append(result)
+                        self.context.add_saddle(result)
             # Reset variables, and go to next gridpoint.
             iterator.iternext()
         # Free some memory.
@@ -426,7 +429,7 @@ class AnalyzeData:
                     returnable_features.append(saddle)
         return returnable_features
 
-def make_corner_runoffs(datamap):
+def make_corner_runoffs(datamap, ctx):
     """
     Dumb function for generating single point corner runoffs.
 
@@ -448,4 +451,7 @@ def make_corner_runoffs(datamap):
                  datamap.get(0, datamap.max_y))
     rur.edgePoints.append((0, datamap.max_y, datamap.get(0, datamap.max_y)))
 
-    return [rll, rlr, rul, rur]
+    corners = [rll, rlr, rul, rur]
+    for corner in corners:
+        ctx.add_saddle(corner)
+    return corners

@@ -26,6 +26,7 @@ from .lib.containers.linker import Linker
 from .lib.containers.summit_domain import SummitDomain
 from .lib.logic.basin_saddle_finder import BasinSaddleFinder
 from .lib.logic.summit_domain_walk import Walk
+from .lib.contexts.manager import FeatureContextManager
 from .lib.constants import DOMAIN_EXTENSION
 from . import version_info
 
@@ -39,12 +40,15 @@ class DomainMap:
     required to calculate the surface network.
     """
 
-    def __init__(self, data,
+    def __init__(self,
+                 data,
                  summits=SummitsContainer([]),
                  saddles=SaddlesContainer([]),
                  runoffs=RunoffsContainer([]),
                  summit_domains=[],
-                 linkers=[]):
+                 linkers=[],
+                 context=None
+        ):
         """
         A DomainMap consumes either a :class:`pyprom.lib.datamap.DataMap` object or
         a :class:`pyprom.dataload.Loader` child object.
@@ -73,6 +77,7 @@ class DomainMap:
         self.runoffs = runoffs
         self.linkers = linkers
         self.summit_domains = summit_domains
+        self.context = context
         self.extent = 'LL: {}\n LR: {}\n UL: {}\n UR: {}\n'.format(
             self.datamap.lower_left,
             self.datamap.lower_right,
@@ -93,10 +98,11 @@ class DomainMap:
         :param bool superSparse: just do feature discovery
         :param bool rebuildSaddles: command AnalyzeData to rebuild saddles
         """
-        # Expunge any existing saddles, runoffs, summits, and linkers
+        # Expunge any existing saddles, runoffs, summits, and contexts
         self.saddles = SaddlesContainer([])
         self.summits = SummitsContainer([])
         self.runoffs = RunoffsContainer([])
+        self.context = None
         self.linkers = list()
         # Find Features
         self.summits, self.saddles, self.runoffs =\
@@ -223,9 +229,6 @@ class DomainMap:
         """
         Returns dict representation of this :class:`DomainMap`
 
-        :param bool noWalkPath: exclude
-         :class:`pyprom.lib.containers.walkpath.WalkPath` from member
-         :class:`pyprom.lib.containers.linker.Linker`
         :return: dict() representation of :class:`DomainMap`
         :rtype: dict()
         """
