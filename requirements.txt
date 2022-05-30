@@ -2,8 +2,8 @@ cbor
 dijkstar
 lxml
 fastkml
-numpy == 1.16.4 #order matters. numpy MUST be installed before GDAL.
-gdal == 3.2.2
+numpy
+gdal==3.4.1 
 geopy
 scipy
 shapely
