@@ -15,3 +15,11 @@ test-docker:
 .PHONY: pyprom-docker
 pyprom-docker:
 	docker-compose run --rm pyprom
+
+.PHONY: pyprom-dev
+pyprom-dev:
+    docker-compose run --rm pyprom-dev
+
+.PHONY: pyprom-dev-build
+pyprom-dev-build:
+    docker build pyprom-dev
