@@ -21,5 +21,5 @@ pyprom-dev:
     docker-compose run --rm pyprom-dev
 
 .PHONY: pyprom-dev-build
-pyprom-dev-build
+pyprom-dev-build:
     docker build pyprom-dev
