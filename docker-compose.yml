@@ -25,3 +25,18 @@ services:
       - ./:/pyProm
     working_dir:
       /pyProm
+
+  pyprom-dev:
+    image: marchowes/pyprom-dev
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+      args:
+        GDAL_VERSION: 3.6.0
+        PYTHON_VERSION: 3.11
+    entrypoint: ['bash']
+    volumes:
+      - ./:/pyProm
+    working_dir:
+      /pyProm
+
