@@ -1,5 +1,6 @@
 cbor
 dijkstar
+lxml
 fastkml
 numpy 
 gdal==3.5.3

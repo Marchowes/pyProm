@@ -151,6 +151,17 @@ class Linker:
                 if _linker_ok(linker, skipDisqualified, {}) and
                 self._help_exclude_self(linker, excludeSelf)]
 
+    def linker_other_side_of_saddle(self):
+        """
+        Much faster, but less robust than linkers_to_summits_connected_via_saddle
+        Uses linker ids.
+        :return: list of linkers to summits connected to the saddle this
+         linker links
+        :rtype: list(:class:`Linker`)
+        """
+
+        return [x for x in self.saddle.summits if x.id != self.id and not x.disqualified]
+    
     def add_to_remote_saddle_and_summit(self, ignoreDuplicates=True):
         """
         Safely adds this linker to the remote

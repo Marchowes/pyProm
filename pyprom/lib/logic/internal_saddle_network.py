@@ -210,8 +210,8 @@ class InternalSaddleNetwork(object):
                                    self.saddle.longitude,
                                    self.saddle.elevation)
 
-            newSaddle.highPerimeterNeighborhoods = [[link.local],
-                                                    [link.remote]]
+            newSaddle.highPerimeterNeighborhoods = [(link.local,),
+                                                    (link.remote,)]
 
             if self.saddle.edgeEffect:
                 newSaddle.parent = self.saddle

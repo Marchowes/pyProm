@@ -19,4 +19,4 @@ def highest(points):
             highest.append(gridPoint)
         elif gridPoint[2] == high:
             highest.append(gridPoint)
-    return highest
+    return tuple(highest)

@@ -8,8 +8,8 @@ the LICENSE file that accompanies it.
 import os
 import numpy
 import logging
-import gdal
-import osr
+from osgeo import gdal
+from osgeo import osr
 
 from .lib.datamap import ProjectionDataMap
 
@@ -88,6 +88,7 @@ class GDALLoader(Loader):
             # Create target Spatial Reference for converting coordinates.
             target = osr.SpatialReference()
             target.ImportFromEPSG(epsg_code)
+            target.SetAxisMappingStrategy(osr.OAMS_TRADITIONAL_GIS_ORDER)
             transform = osr.CoordinateTransformation(spatialRef, target)
             # create a reverse transform for translating back
             #  into Native GDAL coordinates
