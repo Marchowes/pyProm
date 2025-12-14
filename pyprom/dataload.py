@@ -71,6 +71,7 @@ class GDALLoader(Loader):
         self.raster_data = numpy.array(raster_band.
                                        ReadAsArray())
         nodata = raster_band.GetNoDataValue()
+        vertical_unit = raster_band.GetUnitType()
         # Gather span for X and Y axis.
         self.span_x = self.gdal_dataset.RasterXSize  # longitude
         self.span_y = self.gdal_dataset.RasterYSize  # latitude
@@ -94,7 +95,7 @@ class GDALLoader(Loader):
             reverse_transform = osr.CoordinateTransformation(target,
                                                              spatialRef)
             self.linear_unit = spatialRef.GetLinearUnits()
-            self.linear_unit_name = spatialRef.GetLinearUnitsName()
+            self.linear_unit_name = vertical_unit
 
             # Create out DataMap Object.
             self.datamap = ProjectionDataMap(self.raster_data,

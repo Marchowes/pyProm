@@ -45,7 +45,7 @@ class DataMap:
         else:
             # Not really an MD5, but whatever.
             self.md5 = hash(array2string(self.numpy_map))
-        unit_and_substrings = {"METERS": ["meter", "metre"], "FEET": ["foot", "feet"]}
+        unit_and_substrings = {"METERS": ["meter", "metre", "m"], "FEET": ["foot", "feet"]}
         self.unit = None
         for unitname, unit_options in unit_and_substrings.items():
             for option in unit_options:
