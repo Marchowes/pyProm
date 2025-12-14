@@ -1,0 +1,18 @@
+[project]
+name = "pyprom"
+version = "0.8.0"
+description = "pyProm"
+readme = "README.md"
+requires-python = ">=3.14"
+dependencies = [
+    "cbor>=1.0.0",
+    "dijkstar>=2.6.0",
+    "fastkml>=1.4.0",
+    "gdal==3.10.3",
+    "geopy>=2.4.1",
+    "ipython>=9.8.0",
+    "numpy>=2.3.5",
+    "scipy>=1.16.3",
+    "shapely>=2.1.2",
+    "utm>=0.8.1",
+]
