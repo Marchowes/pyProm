@@ -155,10 +155,12 @@ class KMLFileWriter:
                         " Try extend?")
 
     def _append_summit_domain(self, feature):
-        featurePm = kml.Placemark(NS,
-                                  "{:.3f}".format(feature.summit.feet),
-                                  "{:.3f}".format(feature.summit.feet))
-        featurePm.geometry = feature.shape
+        featurePm = kml.Placemark(
+            NS,
+            name = "{:.3f}".format(feature.summit.feet),
+            description = "{:.3f}".format(feature.summit.feet),
+            geometry = feature.shape,
+        )
         self.summitDomains.append(featurePm)
 
 
@@ -170,10 +172,12 @@ class KMLFileWriter:
         :param str feature_type: string representation of this object.
         """
 
-        featurePm = kml.Placemark(NS,
-                                  "{:.3f}".format(feature.feet),
-                                  "{:.3f}".format(feature.feet))
-        featurePm.geometry = feature.shape
+        featurePm = kml.Placemark(
+            NS,
+            name = "{:.3f}".format(feature.feet),
+            description = "{:.3f}".format(feature.feet),
+            geometry = feature.shape
+        )
         if not self.spotElevation_wkt.get(feature_type +
                                           featurePm.geometry.wkt):
             self.spotElevation_wkt[feature_type +
@@ -205,8 +209,7 @@ class KMLFileWriter:
 
         :param linker: :class:`Linker`
         """
-        linkerPm = kml.Placemark(NS)
-        linkerPm.geometry = linker.shape
+        linkerPm = kml.Placemark(NS, geometry=linker.shape)
         if not self.linkers_wkt.get(linkerPm.geometry.wkt):
             self.linkers_wkt[linkerPm.geometry.wkt] = True
             self.linkers.append(linkerPm)

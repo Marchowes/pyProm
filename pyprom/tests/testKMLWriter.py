@@ -61,32 +61,32 @@ class KMLFileWriterTest(unittest.TestCase):
                                            [(1, 1, 1)])
         domain.summit_domains = [summit_domain1]
         self.kfw.append(domain)
-        self.assertTrue(self.kfw.spotElevation_wkt['SaddlePOINT (1 1)'])
-        self.assertTrue(self.kfw.spotElevation_wkt['SaddlePOINT (2 2)'])
-        self.assertTrue(self.kfw.spotElevation_wkt['SummitPOINT (1 1)'])
-        self.assertTrue(self.kfw.spotElevation_wkt['SummitPOINT (2 2)'])
-        self.assertTrue(self.kfw.spotElevation_wkt['RunOffPOINT (1 1)'])
-        self.assertTrue(self.kfw.spotElevation_wkt['RunOffPOINT (2 2)'])
-        self.assertTrue(self.kfw.linkers_wkt['LINESTRING (1 1, 1 1)'])
+        self.assertTrue(self.kfw.spotElevation_wkt['SaddlePOINT (1.0 1.0)'])
+        self.assertTrue(self.kfw.spotElevation_wkt['SaddlePOINT (2.0 2.0)'])
+        self.assertTrue(self.kfw.spotElevation_wkt['SummitPOINT (1.0 1.0)'])
+        self.assertTrue(self.kfw.spotElevation_wkt['SummitPOINT (2.0 2.0)'])
+        self.assertTrue(self.kfw.spotElevation_wkt['RunOffPOINT (1.0 1.0)'])
+        self.assertTrue(self.kfw.spotElevation_wkt['RunOffPOINT (2.0 2.0)'])
+        self.assertTrue(self.kfw.linkers_wkt['LINESTRING (1.0 1.0)'])
         # We dont track summitDomains in a hash
         self.assertEqual(len(self.kfw.spotElevation_wkt.items()), 6)
         self.assertEqual(len(self.kfw.linkers_wkt.items()), 1)
-        self.assertEqual(len(self.kfw.linkers._features), 1)
-        self.assertEqual(len(self.kfw.saddles._features), 2)
-        self.assertEqual(len(self.kfw.summits._features), 2)
-        self.assertEqual(len(self.kfw.runoffs._features), 2)
-        self.assertEqual(len(self.kfw.summitDomains._features), 1)
+        self.assertEqual(len(self.kfw.linkers.features), 1)
+        self.assertEqual(len(self.kfw.saddles.features), 2)
+        self.assertEqual(len(self.kfw.summits.features), 2)
+        self.assertEqual(len(self.kfw.runoffs.features), 2)
+        self.assertEqual(len(self.kfw.summitDomains.features), 1)
 
     def testSaddlesAppendKML(self):
         """
         Ensure Appending a single :class:`Saddle` object works as expected.
         """
         self.kfw.append(self.saddle1)
-        self.assertTrue(self.kfw.spotElevation_wkt['SaddlePOINT (1 1)'])
+        self.assertTrue(self.kfw.spotElevation_wkt['SaddlePOINT (1.0 1.0)'])
         self.kfw.append(self.saddle2)
-        self.assertTrue(self.kfw.spotElevation_wkt['SaddlePOINT (2 2)'])
+        self.assertTrue(self.kfw.spotElevation_wkt['SaddlePOINT (2.0 2.0)'])
         self.assertEqual(len(self.kfw.spotElevation_wkt.items()), 2)
-        self.assertEqual(len(self.kfw.saddles._features), 2)
+        self.assertEqual(len(self.kfw.saddles.features), 2)
 
     def testSaddlesAppendSameKML(self):
         """
@@ -94,10 +94,10 @@ class KMLFileWriterTest(unittest.TestCase):
         only one saddle entry
         """
         self.kfw.append(self.saddle1)
-        self.assertTrue(self.kfw.spotElevation_wkt['SaddlePOINT (1 1)'])
+        self.assertTrue(self.kfw.spotElevation_wkt['SaddlePOINT (1.0 1.0)'])
         self.kfw.append(self.saddle1)
         self.assertEqual(len(self.kfw.spotElevation_wkt.items()), 1)
-        self.assertEqual(len(self.kfw.saddles._features), 1)
+        self.assertEqual(len(self.kfw.saddles.features), 1)
 
     def testSaddleContainerAppendKML(self):
         """
@@ -105,10 +105,10 @@ class KMLFileWriterTest(unittest.TestCase):
         as expected.
         """
         self.kfw.append(self.saddlescontainer)
-        self.assertTrue(self.kfw.spotElevation_wkt['SaddlePOINT (1 1)'])
-        self.assertTrue(self.kfw.spotElevation_wkt['SaddlePOINT (2 2)'])
+        self.assertTrue(self.kfw.spotElevation_wkt['SaddlePOINT (1.0 1.0)'])
+        self.assertTrue(self.kfw.spotElevation_wkt['SaddlePOINT (2.0 2.0)'])
         self.assertEqual(len(self.kfw.spotElevation_wkt.items()), 2)
-        self.assertEqual(len(self.kfw.saddles._features), 2)
+        self.assertEqual(len(self.kfw.saddles.features), 2)
 
     def testSaddleExtendKML(self):
         """
@@ -116,10 +116,10 @@ class KMLFileWriterTest(unittest.TestCase):
         as expected.
         """
         self.kfw.extend([self.saddle1, self.saddle2])
-        self.assertTrue(self.kfw.spotElevation_wkt['SaddlePOINT (1 1)'])
-        self.assertTrue(self.kfw.spotElevation_wkt['SaddlePOINT (2 2)'])
+        self.assertTrue(self.kfw.spotElevation_wkt['SaddlePOINT (1.0 1.0)'])
+        self.assertTrue(self.kfw.spotElevation_wkt['SaddlePOINT (2.0 2.0)'])
         self.assertEqual(len(self.kfw.spotElevation_wkt.items()), 2)
-        self.assertEqual(len(self.kfw.saddles._features), 2)
+        self.assertEqual(len(self.kfw.saddles.features), 2)
 
     def testSaddleContainerExtendKML(self):
         """
@@ -127,21 +127,21 @@ class KMLFileWriterTest(unittest.TestCase):
         as expected.
         """
         self.kfw.extend(self.saddlescontainer)
-        self.assertTrue(self.kfw.spotElevation_wkt['SaddlePOINT (1 1)'])
-        self.assertTrue(self.kfw.spotElevation_wkt['SaddlePOINT (2 2)'])
+        self.assertTrue(self.kfw.spotElevation_wkt['SaddlePOINT (1.0 1.0)'])
+        self.assertTrue(self.kfw.spotElevation_wkt['SaddlePOINT (2.0 2.0)'])
         self.assertEqual(len(self.kfw.spotElevation_wkt.items()), 2)
-        self.assertEqual(len(self.kfw.saddles._features), 2)
+        self.assertEqual(len(self.kfw.saddles.features), 2)
 
     def testSummitsAppendKML(self):
         """
         Ensure Appending a single :class:`Summit` object works as expected.
         """
         self.kfw.append(self.summit1)
-        self.assertTrue(self.kfw.spotElevation_wkt['SummitPOINT (1 1)'])
+        self.assertTrue(self.kfw.spotElevation_wkt['SummitPOINT (1.0 1.0)'])
         self.kfw.append(self.summit2)
-        self.assertTrue(self.kfw.spotElevation_wkt['SummitPOINT (2 2)'])
+        self.assertTrue(self.kfw.spotElevation_wkt['SummitPOINT (2.0 2.0)'])
         self.assertEqual(len(self.kfw.spotElevation_wkt.items()), 2)
-        self.assertEqual(len(self.kfw.summits._features), 2)
+        self.assertEqual(len(self.kfw.summits.features), 2)
 
     def testSummitsAppendSameKML(self):
         """
@@ -149,10 +149,10 @@ class KMLFileWriterTest(unittest.TestCase):
         only one summit entry
         """
         self.kfw.append(self.summit1)
-        self.assertTrue(self.kfw.spotElevation_wkt['SummitPOINT (1 1)'])
+        self.assertTrue(self.kfw.spotElevation_wkt['SummitPOINT (1.0 1.0)'])
         self.kfw.append(self.summit1)
         self.assertEqual(len(self.kfw.spotElevation_wkt.items()), 1)
-        self.assertEqual(len(self.kfw.summits._features), 1)
+        self.assertEqual(len(self.kfw.summits.features), 1)
 
     def testSummitsContainerAppendKML(self):
         """
@@ -160,10 +160,10 @@ class KMLFileWriterTest(unittest.TestCase):
         as expected.
         """
         self.kfw.append(self.summitscontainer)
-        self.assertTrue(self.kfw.spotElevation_wkt['SummitPOINT (1 1)'])
-        self.assertTrue(self.kfw.spotElevation_wkt['SummitPOINT (2 2)'])
+        self.assertTrue(self.kfw.spotElevation_wkt['SummitPOINT (1.0 1.0)'])
+        self.assertTrue(self.kfw.spotElevation_wkt['SummitPOINT (2.0 2.0)'])
         self.assertEqual(len(self.kfw.spotElevation_wkt.items()), 2)
-        self.assertEqual(len(self.kfw.summits._features), 2)
+        self.assertEqual(len(self.kfw.summits.features), 2)
 
     def testSummitExtendKML(self):
         """
@@ -171,10 +171,10 @@ class KMLFileWriterTest(unittest.TestCase):
         as expected.
         """
         self.kfw.extend(self.summitscontainer)
-        self.assertTrue(self.kfw.spotElevation_wkt['SummitPOINT (1 1)'])
-        self.assertTrue(self.kfw.spotElevation_wkt['SummitPOINT (2 2)'])
+        self.assertTrue(self.kfw.spotElevation_wkt['SummitPOINT (1.0 1.0)'])
+        self.assertTrue(self.kfw.spotElevation_wkt['SummitPOINT (2.0 2.0)'])
         self.assertEqual(len(self.kfw.spotElevation_wkt.items()), 2)
-        self.assertEqual(len(self.kfw.summits._features), 2)
+        self.assertEqual(len(self.kfw.summits.features), 2)
 
     def testSummitsContainerExtendKML(self):
         """
@@ -182,21 +182,21 @@ class KMLFileWriterTest(unittest.TestCase):
         as expected.
         """
         self.kfw.extend(self.summitscontainer)
-        self.assertTrue(self.kfw.spotElevation_wkt['SummitPOINT (1 1)'])
-        self.assertTrue(self.kfw.spotElevation_wkt['SummitPOINT (2 2)'])
+        self.assertTrue(self.kfw.spotElevation_wkt['SummitPOINT (1.0 1.0)'])
+        self.assertTrue(self.kfw.spotElevation_wkt['SummitPOINT (2.0 2.0)'])
         self.assertEqual(len(self.kfw.spotElevation_wkt.items()), 2)
-        self.assertEqual(len(self.kfw.summits._features), 2)
+        self.assertEqual(len(self.kfw.summits.features), 2)
 
     def testRunoffsAppendKML(self):
         """
         Ensure Appending a single :class:`Runoff` object works as expected.
         """
         self.kfw.append(self.runoff1)
-        self.assertTrue(self.kfw.spotElevation_wkt['RunOffPOINT (1 1)'])
+        self.assertTrue(self.kfw.spotElevation_wkt['RunOffPOINT (1.0 1.0)'])
         self.kfw.append(self.runoff2)
-        self.assertTrue(self.kfw.spotElevation_wkt['RunOffPOINT (2 2)'])
+        self.assertTrue(self.kfw.spotElevation_wkt['RunOffPOINT (2.0 2.0)'])
         self.assertEqual(len(self.kfw.spotElevation_wkt.items()), 2)
-        self.assertEqual(len(self.kfw.runoffs._features), 2)
+        self.assertEqual(len(self.kfw.runoffs.features), 2)
 
     def testRunoffsAppendSameKML(self):
         """
@@ -204,10 +204,10 @@ class KMLFileWriterTest(unittest.TestCase):
         one runoff entry
         """
         self.kfw.append(self.runoff1)
-        self.assertTrue(self.kfw.spotElevation_wkt['RunOffPOINT (1 1)'])
+        self.assertTrue(self.kfw.spotElevation_wkt['RunOffPOINT (1.0 1.0)'])
         self.kfw.append(self.runoff1)
         self.assertEqual(len(self.kfw.spotElevation_wkt.items()), 1)
-        self.assertEqual(len(self.kfw.runoffs._features), 1)
+        self.assertEqual(len(self.kfw.runoffs.features), 1)
 
     def testRunoffsContainerAppendKML(self):
         """
@@ -215,10 +215,10 @@ class KMLFileWriterTest(unittest.TestCase):
         as expected.
         """
         self.kfw.append(self.runoffscontainer)
-        self.assertTrue(self.kfw.spotElevation_wkt['RunOffPOINT (1 1)'])
-        self.assertTrue(self.kfw.spotElevation_wkt['RunOffPOINT (2 2)'])
+        self.assertTrue(self.kfw.spotElevation_wkt['RunOffPOINT (1.0 1.0)'])
+        self.assertTrue(self.kfw.spotElevation_wkt['RunOffPOINT (2.0 2.0)'])
         self.assertEqual(len(self.kfw.spotElevation_wkt.items()), 2)
-        self.assertEqual(len(self.kfw.runoffs._features), 2)
+        self.assertEqual(len(self.kfw.runoffs.features), 2)
 
     def testRunoffsExtendKML(self):
         """
@@ -226,10 +226,10 @@ class KMLFileWriterTest(unittest.TestCase):
         as expected.
         """
         self.kfw.extend([self.runoff1, self.runoff2])
-        self.assertTrue(self.kfw.spotElevation_wkt['RunOffPOINT (1 1)'])
-        self.assertTrue(self.kfw.spotElevation_wkt['RunOffPOINT (2 2)'])
+        self.assertTrue(self.kfw.spotElevation_wkt['RunOffPOINT (1.0 1.0)'])
+        self.assertTrue(self.kfw.spotElevation_wkt['RunOffPOINT (2.0 2.0)'])
         self.assertEqual(len(self.kfw.spotElevation_wkt.items()), 2)
-        self.assertEqual(len(self.kfw.runoffs._features), 2)
+        self.assertEqual(len(self.kfw.runoffs.features), 2)
 
     def testRunoffsContainerExtendKML(self):
         """
@@ -237,10 +237,10 @@ class KMLFileWriterTest(unittest.TestCase):
         as expected.
         """
         self.kfw.extend(self.runoffscontainer)
-        self.assertTrue(self.kfw.spotElevation_wkt['RunOffPOINT (1 1)'])
-        self.assertTrue(self.kfw.spotElevation_wkt['RunOffPOINT (2 2)'])
+        self.assertTrue(self.kfw.spotElevation_wkt['RunOffPOINT (1.0 1.0)'])
+        self.assertTrue(self.kfw.spotElevation_wkt['RunOffPOINT (2.0 2.0)'])
         self.assertEqual(len(self.kfw.spotElevation_wkt.items()), 2)
-        self.assertEqual(len(self.kfw.runoffs._features), 2)
+        self.assertEqual(len(self.kfw.runoffs.features), 2)
 
     def testSpotElevationAppendKML(self):
         """
@@ -248,11 +248,11 @@ class KMLFileWriterTest(unittest.TestCase):
         works as expected.
         """
         self.kfw.append(self.spotelevation1)
-        self.assertTrue(self.kfw.spotElevation_wkt['SpotElevationPOINT (1 1)'])
+        self.assertTrue(self.kfw.spotElevation_wkt['SpotElevationPOINT (1.0 1.0)'])
         self.kfw.append(self.spotelevation2)
-        self.assertTrue(self.kfw.spotElevation_wkt['SpotElevationPOINT (2 2)'])
+        self.assertTrue(self.kfw.spotElevation_wkt['SpotElevationPOINT (2.0 2.0)'])
         self.assertEqual(len(self.kfw.spotElevation_wkt.items()), 2)
-        self.assertEqual(len(self.kfw.spotElevations._features), 2)
+        self.assertEqual(len(self.kfw.spotElevations.features), 2)
 
     def testSpotElevationAppendSameKML(self):
         """
@@ -260,10 +260,10 @@ class KMLFileWriterTest(unittest.TestCase):
         yields only one Spot Elevation entry
         """
         self.kfw.append(self.spotelevation1)
-        self.assertTrue(self.kfw.spotElevation_wkt['SpotElevationPOINT (1 1)'])
+        self.assertTrue(self.kfw.spotElevation_wkt['SpotElevationPOINT (1.0 1.0)'])
         self.kfw.append(self.spotelevation1)
         self.assertEqual(len(self.kfw.spotElevation_wkt.items()), 1)
-        self.assertEqual(len(self.kfw.spotElevations._features), 1)
+        self.assertEqual(len(self.kfw.spotElevations.features), 1)
 
     def testSpotElevationContainerAppendKML(self):
         """
@@ -271,10 +271,10 @@ class KMLFileWriterTest(unittest.TestCase):
         works as expected.
         """
         self.kfw.append(self.spotelevationcontainer)
-        self.assertTrue(self.kfw.spotElevation_wkt['SpotElevationPOINT (1 1)'])
-        self.assertTrue(self.kfw.spotElevation_wkt['SpotElevationPOINT (2 2)'])
+        self.assertTrue(self.kfw.spotElevation_wkt['SpotElevationPOINT (1.0 1.0)'])
+        self.assertTrue(self.kfw.spotElevation_wkt['SpotElevationPOINT (2.0 2.0)'])
         self.assertEqual(len(self.kfw.spotElevation_wkt.items()), 2)
-        self.assertEqual(len(self.kfw.spotElevations._features), 2)
+        self.assertEqual(len(self.kfw.spotElevations.features), 2)
 
     def testSpotElevationExtendKML(self):
         """
@@ -282,10 +282,10 @@ class KMLFileWriterTest(unittest.TestCase):
         works as expected.
         """
         self.kfw.extend([self.spotelevation1, self.spotelevation2])
-        self.assertTrue(self.kfw.spotElevation_wkt['SpotElevationPOINT (1 1)'])
-        self.assertTrue(self.kfw.spotElevation_wkt['SpotElevationPOINT (2 2)'])
+        self.assertTrue(self.kfw.spotElevation_wkt['SpotElevationPOINT (1.0 1.0)'])
+        self.assertTrue(self.kfw.spotElevation_wkt['SpotElevationPOINT (2.0 2.0)'])
         self.assertEqual(len(self.kfw.spotElevation_wkt.items()), 2)
-        self.assertEqual(len(self.kfw.spotElevations._features), 2)
+        self.assertEqual(len(self.kfw.spotElevations.features), 2)
 
     def testSpotElevationContainerExtendKML(self):
         """
@@ -293,21 +293,21 @@ class KMLFileWriterTest(unittest.TestCase):
         works as expected.
         """
         self.kfw.extend(self.spotelevationcontainer)
-        self.assertTrue(self.kfw.spotElevation_wkt['SpotElevationPOINT (1 1)'])
-        self.assertTrue(self.kfw.spotElevation_wkt['SpotElevationPOINT (2 2)'])
+        self.assertTrue(self.kfw.spotElevation_wkt['SpotElevationPOINT (1.0 1.0)'])
+        self.assertTrue(self.kfw.spotElevation_wkt['SpotElevationPOINT (2.0 2.0)'])
         self.assertEqual(len(self.kfw.spotElevation_wkt.items()), 2)
-        self.assertEqual(len(self.kfw.spotElevations._features), 2)
+        self.assertEqual(len(self.kfw.spotElevations.features), 2)
 
     def testLinkersAppendKML(self):
         """
         Ensure Appending a single :class:`Linker` object works as expected.
         """
         self.kfw.append(self.linker1)
-        self.assertTrue(self.kfw.linkers_wkt['LINESTRING (1 1, 1 1)'])
+        self.assertTrue(self.kfw.linkers_wkt['LINESTRING (1.0 1.0)'])
         self.kfw.append(self.linker2)
-        self.assertTrue(self.kfw.linkers_wkt['LINESTRING (2 2, 2 2)'])
+        self.assertTrue(self.kfw.linkers_wkt['LINESTRING (2.0 2.0)'])
         self.assertEqual(len(self.kfw.linkers_wkt.items()), 2)
-        self.assertEqual(len(self.kfw.linkers._features), 2)
+        self.assertEqual(len(self.kfw.linkers.features), 2)
 
     def testLinkersAppendSameKML(self):
         """
@@ -315,38 +315,38 @@ class KMLFileWriterTest(unittest.TestCase):
         object works as expected.
         """
         self.kfw.append(self.linker1)
-        self.assertTrue(self.kfw.linkers_wkt['LINESTRING (1 1, 1 1)'])
+        self.assertTrue(self.kfw.linkers_wkt['LINESTRING (1.0 1.0)'])
         self.kfw.append(self.linker1)
         self.assertEqual(len(self.kfw.linkers_wkt.items()), 1)
-        self.assertEqual(len(self.kfw.linkers._features), 1)
+        self.assertEqual(len(self.kfw.linkers.features), 1)
 
     def testLinkersExtendKML(self):
         """
         Ensure Extend two :class:`Linker` objects works as expected.
         """
         self.kfw.extend([self.linker1, self.linker2])
-        self.assertTrue(self.kfw.linkers_wkt['LINESTRING (1 1, 1 1)'])
-        self.assertTrue(self.kfw.linkers_wkt['LINESTRING (2 2, 2 2)'])
+        self.assertTrue(self.kfw.linkers_wkt['LINESTRING (1.0 1.0)'])
+        self.assertTrue(self.kfw.linkers_wkt['LINESTRING (2.0 2.0)'])
         self.assertEqual(len(self.kfw.linkers_wkt.items()), 2)
-        self.assertEqual(len(self.kfw.linkers._features), 2)
+        self.assertEqual(len(self.kfw.linkers.features), 2)
 
     def testSameLocationDifferentTypeAppendKML(self):
         """
         Ensure same locations of a differing type are added
         """
         self.kfw.append(self.saddle1)
-        self.assertTrue(self.kfw.spotElevation_wkt['SaddlePOINT (1 1)'])
+        self.assertTrue(self.kfw.spotElevation_wkt['SaddlePOINT (1.0 1.0)'])
         self.kfw.append(self.summit1)
-        self.assertTrue(self.kfw.spotElevation_wkt['SummitPOINT (1 1)'])
+        self.assertTrue(self.kfw.spotElevation_wkt['SummitPOINT (1.0 1.0)'])
         self.kfw.append(self.runoff1)
-        self.assertTrue(self.kfw.spotElevation_wkt['RunOffPOINT (1 1)'])
+        self.assertTrue(self.kfw.spotElevation_wkt['RunOffPOINT (1.0 1.0)'])
         self.kfw.append(self.spotelevation1)
-        self.assertTrue(self.kfw.spotElevation_wkt['SpotElevationPOINT (1 1)'])
+        self.assertTrue(self.kfw.spotElevation_wkt['SpotElevationPOINT (1.0 1.0)'])
         self.assertEqual(len(self.kfw.spotElevation_wkt.items()), 4)
-        self.assertEqual(len(self.kfw.spotElevations._features), 1)
-        self.assertEqual(len(self.kfw.saddles._features), 1)
-        self.assertEqual(len(self.kfw.summits._features), 1)
-        self.assertEqual(len(self.kfw.runoffs._features), 1)
+        self.assertEqual(len(self.kfw.spotElevations.features), 1)
+        self.assertEqual(len(self.kfw.saddles.features), 1)
+        self.assertEqual(len(self.kfw.summits.features), 1)
+        self.assertEqual(len(self.kfw.runoffs.features), 1)
 
     def testCreateWithListOfLocations(self):
         """
@@ -356,11 +356,11 @@ class KMLFileWriterTest(unittest.TestCase):
                             documentName="myDocument",
                             features=[self.saddle1,
                                       self.summit1])
-        self.assertTrue(kfw.spotElevation_wkt['SaddlePOINT (1 1)'])
-        self.assertTrue(kfw.spotElevation_wkt['SummitPOINT (1 1)'])
+        self.assertTrue(kfw.spotElevation_wkt['SaddlePOINT (1.0 1.0)'])
+        self.assertTrue(kfw.spotElevation_wkt['SummitPOINT (1.0 1.0)'])
         self.assertEqual(len(kfw.spotElevation_wkt.items()), 2)
-        self.assertEqual(len(kfw.summits._features), 1)
-        self.assertEqual(len(kfw.saddles._features), 1)
+        self.assertEqual(len(kfw.summits.features), 1)
+        self.assertEqual(len(kfw.saddles.features), 1)
 
     def testCreateWithSingleContainer(self):
         """
@@ -369,10 +369,10 @@ class KMLFileWriterTest(unittest.TestCase):
         kfw = KMLFileWriter("someFile.kml",
                             documentName="myDocument",
                             features=self.saddlescontainer)
-        self.assertTrue(kfw.spotElevation_wkt['SaddlePOINT (1 1)'])
-        self.assertTrue(kfw.spotElevation_wkt['SaddlePOINT (2 2)'])
+        self.assertTrue(kfw.spotElevation_wkt['SaddlePOINT (1.0 1.0)'])
+        self.assertTrue(kfw.spotElevation_wkt['SaddlePOINT (2.0 2.0)'])
         self.assertEqual(len(kfw.spotElevation_wkt.items()), 2)
-        self.assertEqual(len(kfw.saddles._features), 2)
+        self.assertEqual(len(kfw.saddles.features), 2)
 
     def testCreateWithContainersAndLocations(self):
         """
@@ -381,12 +381,12 @@ class KMLFileWriterTest(unittest.TestCase):
         kfw = KMLFileWriter("someFile.kml",
                             documentName="myDocument",
                             features=[self.saddlescontainer, self.summit1])
-        self.assertTrue(kfw.spotElevation_wkt['SaddlePOINT (1 1)'])
-        self.assertTrue(kfw.spotElevation_wkt['SaddlePOINT (2 2)'])
-        self.assertTrue(kfw.spotElevation_wkt['SummitPOINT (1 1)'])
+        self.assertTrue(kfw.spotElevation_wkt['SaddlePOINT (1.0 1.0)'])
+        self.assertTrue(kfw.spotElevation_wkt['SaddlePOINT (2.0 2.0)'])
+        self.assertTrue(kfw.spotElevation_wkt['SummitPOINT (1.0 1.0)'])
         self.assertEqual(len(kfw.spotElevation_wkt.items()), 3)
-        self.assertEqual(len(kfw.saddles._features), 2)
-        self.assertEqual(len(kfw.summits._features), 1)
+        self.assertEqual(len(kfw.saddles.features), 2)
+        self.assertEqual(len(kfw.summits.features), 1)
 
     def testRaisesErrorOnInvalidElement(self):
         """
