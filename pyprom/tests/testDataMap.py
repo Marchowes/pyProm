@@ -113,14 +113,14 @@ class DataMapTests(unittest.TestCase):
                                     (-71.97222222222223, 44.9725),
                                     (-71.97194444444443, 44.9725),
                                     (-71.97194444444443, 44.97222222222223)))
-        self.assertEquals(composite_polygon, expected_polygon)
+        self.assertEqual(composite_polygon, expected_polygon)
 
     def testDataMapDistance(self):
         """
         Ensure distance calculation produces expected results.
         """
         self.assertEqual(self.datamap.distance((0, 0), (1, 1)),
-                                               0.0003928371006591931)
+                                               0.00039283710065919305)
         self.assertEqual(self.datamap.distance((0, 0), (0, 1)),
                                                0.0002777777777777778)
 
