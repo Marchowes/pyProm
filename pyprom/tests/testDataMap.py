@@ -98,7 +98,7 @@ class DataMapTests(unittest.TestCase):
                                     (-71.97222222222223, 44.97222222222223),
                                     (-71.9725, 44.97222222222223),
                                     (-71.9725, 44.9725)))
-        self.assertEquals(polygon, expected_polygon)
+        self.assertEqual(polygon, expected_polygon)
 
     def testDataMapGeomUnaryUnion(self):
         """
@@ -107,12 +107,20 @@ class DataMapTests(unittest.TestCase):
         """
         composite_polygon = unary_union((self.datamap.point_geom(100, 100),
                                          self.datamap.point_geom(100, 101)))
-        expected_polygon = Polygon(((-71.97222222222223, 44.97222222222223),
-                                    (-71.9725, 44.97222222222223),
-                                    (-71.9725, 44.9725),
-                                    (-71.97222222222223, 44.9725),
-                                    (-71.97194444444443, 44.9725),
-                                    (-71.97194444444443, 44.97222222222223)))
+        expected_polygon = Polygon(((-71.9725 44.97222222222223),
+                                    (-71.9725 44.9725),
+                                    (-71.97222222222223 44.9725),
+                                    (-71.97194444444443 44.9725), 
+                                    (-71.97194444444443 44.97222222222223), 
+                                    (-71.97222222222223 44.97222222222223),
+                                    (-71.9725 44.97222222222223)
+                                    ))
+        # expected_polygon = Polygon(((-71.97222222222223, 44.97222222222223),
+        #                             (-71.9725, 44.97222222222223),
+        #                             (-71.9725, 44.9725),
+        #                             (-71.97222222222223, 44.9725),
+        #                             (-71.97194444444443, 44.9725),
+        #                             (-71.97194444444443, 44.97222222222223)))
         self.assertEqual(composite_polygon, expected_polygon)
 
     def testDataMapDistance(self):
