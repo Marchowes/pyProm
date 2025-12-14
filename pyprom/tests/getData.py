@@ -14,8 +14,8 @@ import urllib.request
 def gettestzip():
     """Function is for pulling down the desired test data."""
     logger = logging.getLogger('pyProm.{}'.format(__name__))
-    domain = "https://dds.cr.usgs.gov"
-    path = "srtm/version2_1/SRTM1/Region_06"
+    domain = "https://srtm.kurviger.de"
+    path = "SRTM1/Region_06"
     nh_north = "N44W072"
     hgtsuffix = ".hgt"
     suffix = ".hgt.zip"

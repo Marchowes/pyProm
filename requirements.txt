@@ -2,7 +2,7 @@ cbor
 dijkstar
 fastkml
 numpy 
-gdal==3.5.3
+gdal==3.10.3
 geopy
 scipy
 shapely

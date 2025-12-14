@@ -1,0 +1,14 @@
+UV Install:
+https://docs.astral.sh/uv/getting-started/installation/
+
+Installs latest python:
+uv python install
+
+Specific version:
+uv python install 3.14
+
+To init venv:
+go to pyprom root and type "uv venv"
+
+
+uv python install 3.12
