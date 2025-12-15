@@ -12,7 +12,7 @@ import logging
 from osgeo import gdal, osr
 
 from .lib.datamap import ProjectionDataMap
-from .lib.constants import METERS_TO_FEET, METERS_TO_SURVEY_FOOT, GDAL_METERS, GDAL_FEET, GDAL_SURVEY_FOOT
+from .lib.constants import METERS_PER_FOOT, METERS_PER_SURVEY_FOOT, GDAL_METERS, GDAL_FEET, GDAL_SURVEY_FOOT
 
 
 EPSGMap = {
@@ -168,9 +168,9 @@ class GDALLoader2(BaseLoader):
         # Convert stupid units to Metric.
         raster_array = raster_band.ReadAsArray()
         if vertical_unit in GDAL_FEET:
-            raster_array_meters = raster_array * METERS_TO_FEET
+            raster_array_meters = raster_array * METERS_PER_FOOT
         elif vertical_unit in GDAL_SURVEY_FOOT:
-            raster_array_meters = raster_array * METERS_TO_SURVEY_FOOT
+            raster_array_meters = raster_array * METERS_PER_SURVEY_FOOT
         else:
             raise Exception(f"Could not recognize units. {vertical_unit}")
 

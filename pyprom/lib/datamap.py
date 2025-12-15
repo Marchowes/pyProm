@@ -10,7 +10,7 @@ used to analyze the map.
 
 import logging
 
-from .constants import METERS_TO_FEET
+from .constants import METERS_PER_FOOT
 from .util import checksum
 
 from math import hypot
@@ -69,7 +69,7 @@ class DataMap:
             if 0 <= _x <= self.max_x and \
                0 <= _y <= self.max_y:
                 if self.unit == 'FEET':
-                    yield _x, _y, float(METERS_TO_FEET * self.numpy_map[_x, _y])
+                    yield _x, _y, float(METERS_PER_FOOT * self.numpy_map[_x, _y])
                 else:
                     yield _x, _y, float(self.numpy_map[_x, _y])
             else:
@@ -90,7 +90,7 @@ class DataMap:
             if 0 <= _x <= self.max_x and \
                0 <= _y <= self.max_y:
                 if self.unit == 'FEET':
-                    yield _x, _y, float(METERS_TO_FEET * self.numpy_map[_x, _y])
+                    yield _x, _y, float(METERS_PER_FOOT * self.numpy_map[_x, _y])
                 else:
                     yield _x, _y, float(self.numpy_map[_x, _y])
             else:
@@ -111,7 +111,7 @@ class DataMap:
             if 0 <= _x <= self.max_x and \
                0 <= _y <= self.max_y:
                 if self.unit == 'FEET':
-                    yield _x, _y, float(METERS_TO_FEET * self.numpy_map[_x, _y])
+                    yield _x, _y, float(METERS_PER_FOOT * self.numpy_map[_x, _y])
                 else:
                     yield _x, _y, float(self.numpy_map[_x, _y])
             else:
@@ -156,7 +156,7 @@ class DataMap:
         :return: float
         """
         if self.unit == 'FEET':
-            return float(self.numpy_map[x, y] * METERS_TO_FEET)
+            return float(self.numpy_map[x, y] * METERS_PER_FOOT)
         else:
             return float(self.numpy_map[x, y])
 
@@ -175,9 +175,21 @@ class ProjectionDataMap(DataMap):
     projection style datasets from GDAL.
     """
 
-    def __init__(self, numpy_map, upperLeftY, upperLeftX, resolutionY,
-                 resolutionX, span_y, span_x, linear_unit, unit, nodata,
-                 transform, reverse_transform, filename):
+    def __init__(self, 
+            numpy_map, 
+            upperLeftY, 
+            upperLeftX, 
+            resolutionY,
+            resolutionX, 
+            span_y, 
+            span_x, 
+            linear_unit, 
+            unit, 
+            nodata,
+            transform, 
+            reverse_transform, 
+            filename
+        ):
         """
         | GDAL Native coordiante system oriented:
         | Y: east/west
@@ -213,7 +225,7 @@ class ProjectionDataMap(DataMap):
          CoordinateTransformation from selected
          units degrees scale to GDAL native
         """
-        super(ProjectionDataMap, self).__init__(numpy_map, unit, filename)
+        super().__init__(numpy_map, unit, filename)
         self.logger = logging.getLogger('{}'.format(__name__))
         self.logger.info("ProjectedDataMap Object Created")
         # These are deliberately flipped, yes I know it's confusing.

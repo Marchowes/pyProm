@@ -28,7 +28,7 @@ from .lib.logic.contiguous_neighbors import contiguous_neighbors, touching_neigh
 from .lib.logic.shortest_path_by_points import high_perimeter_neighborhood_shortest_path
 from .lib.logic.tuple_funcs import highest
 
-from .lib.constants import METERS_TO_FEET
+from .lib.constants import METERS_PER_FOOT
 
 
 class AnalyzeData:
@@ -102,7 +102,7 @@ class AnalyzeData:
                 del self.explored[current_x]
                 current_x = x
             if self.datamap.unit == "FEET":
-                self.elevation = float(METERS_TO_FEET * iterator[0])
+                self.elevation = float(METERS_PER_FOOT * iterator[0])
             else:
                 self.elevation = float(iterator[0])
 
