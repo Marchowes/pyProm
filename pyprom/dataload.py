@@ -108,7 +108,7 @@ class GDALLoader2(BaseLoader):
                 nodata,
                 transform,
                 reverse_transform,
-                filename
+                self.filename
             )
         else:
             raise Exception("Unsupported, non projected map")

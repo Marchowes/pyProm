@@ -7,7 +7,7 @@ the LICENSE file that accompanies it.
 This file acts as the glue between the raster data loaded and the logic
 used to analyze the map.
 """
-
+from __future__ import annotations
 import logging
 
 from .constants import METERS_PER_FOOT
@@ -16,6 +16,12 @@ from .util import checksum
 from math import hypot
 from shapely.geometry import Polygon
 from numpy import array2string
+
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from osgeo import osr
+    from numpy import NDArray
+
 
 ARCSEC_DEG = 3600
 ARCMIN_DEG = 60
@@ -176,19 +182,19 @@ class ProjectionDataMap(DataMap):
     """
 
     def __init__(self, 
-            numpy_map, 
-            upperLeftY, 
-            upperLeftX, 
-            resolutionY,
-            resolutionX, 
-            span_y, 
-            span_x, 
-            linear_unit, 
-            unit, 
-            nodata,
-            transform, 
-            reverse_transform, 
-            filename
+            numpy_map: NDArray, 
+            upperLeftY: float, 
+            upperLeftX: float, 
+            resolutionY: float,
+            resolutionX: float, 
+            span_y: int, 
+            span_x: int, 
+            linear_unit: int | float, 
+            unit: str, 
+            nodata: int | float | None,
+            transform: osr.CoordinateTransformation, 
+            reverse_transform: osr.CoordinateTransformation, 
+            filename: str
         ):
         """
         | GDAL Native coordiante system oriented:
