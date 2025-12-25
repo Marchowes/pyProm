@@ -18,12 +18,12 @@ from numpy import array2string
 from typing import TYPE_CHECKING, Tuple, Any
 if TYPE_CHECKING:
     from pyprom._typing.type_hints import (
-        NUMPY_X, NUMPY_Y, 
-        XY_ELEVATION_TUPLE,
-        XY_ELEVATION_GENERATOR,
+        Numpy_X, Numpy_Y, 
+        XY_Elevation,
+        XY_Elevation_Generator,
         DecimalDegrees,
         Elevation,
-        XY_COORD
+        XY
     )
     from osgeo import osr
     from numpy import NDArray
@@ -52,7 +52,7 @@ class BaseDataMap:
     def coord_inbounds(self, x, y) -> bool:
         return (x >= 0 and x <= self.max_x) & (y >= 0 and y <= self.max_y)
 
-    def iterateFull(self, x: NUMPY_X, y: NUMPY_Y) -> XY_ELEVATION_GENERATOR:
+    def iterateFull(self, x: Numpy_X, y: Numpy_Y) -> XY_Elevation_Generator:
         """
         Generator returns 8 closest neighbors to a raster grid location,
         that is, all points touching including the diagonals.
@@ -69,7 +69,7 @@ class BaseDataMap:
             else:
                 yield _x, _y, self.nodata
 
-    def iterateOrthogonal(self, x: NUMPY_X, y: NUMPY_Y) -> XY_ELEVATION_GENERATOR:
+    def iterateOrthogonal(self, x: Numpy_X, y: Numpy_Y) -> XY_Elevation_Generator:
         """
         Generator returns 4 closest neighbors to a raster grid location,
         that is, all points touching excluding the diagonals.
@@ -86,7 +86,7 @@ class BaseDataMap:
             else:
                 yield _x, _y, self.nodata
 
-    def iterateDiagonal(self, x: NUMPY_X, y: NUMPY_Y) -> XY_ELEVATION_GENERATOR:
+    def iterateDiagonal(self, x: Numpy_X, y: Numpy_Y) -> XY_Elevation_Generator:
         """
         Generator returns 4 closest neighbors to a raster grid location,
         that is, all points touching excluding the orthogonals.
@@ -103,7 +103,7 @@ class BaseDataMap:
             else:
                 yield _x, _y, self.nodata
 
-    def steepestNeighbor(self, x: NUMPY_X, y: NUMPY_Y) -> XY_ELEVATION_TUPLE:
+    def steepestNeighbor(self, x: Numpy_X, y: Numpy_Y) -> XY_Elevation:
         """
         Finds neighbor with steepest slope
 
@@ -126,7 +126,7 @@ class BaseDataMap:
                 steepest_slope = slope
         return steepest_neighbor
 
-    def distance(self, us: XY_COORD, them: XY_COORD) -> DecimalDegrees:
+    def distance(self, us: XY, them: XY) -> DecimalDegrees:
         """
         :param us: Tuple(x, y)
         :param them: Tuple(x, y)
@@ -134,7 +134,7 @@ class BaseDataMap:
         """
         return hypot((us[0] - them[0]) * self.res_x, (us[1] - them[1]) * self.res_y)
 
-    def get(self, x: NUMPY_X, y: NUMPY_Y) -> Elevation:
+    def get(self, x: Numpy_X, y: Numpy_Y) -> Elevation:
         """
         Gets elevation from numpy map, and converts units to Meters
         :param int x: x coordinate in raster data.
@@ -143,7 +143,7 @@ class BaseDataMap:
         """
         return float(self.numpy_array[x, y])
 
-    def is_map_edge(self, x: NUMPY_X, y: NUMPY_Y) -> bool:
+    def is_map_edge(self, x: Numpy_X, y: Numpy_Y) -> bool:
         """
         Determine if x, y is on the map edge.
         """

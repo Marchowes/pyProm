@@ -23,7 +23,7 @@ from typing import TYPE_CHECKING, Tuple
 if TYPE_CHECKING:
     from osgeo import gdal
     from numpy import NDArray
-    from pyprom._typing.type_hints import NUMPY_X, NUMPY_Y, LONGITUDE_Y, LATITUDE_X
+    from pyprom._typing.type_hints import Numpy_X, Numpy_Y, Longitude_Y, Latitude_X
 
 ARCSEC_DEG = 3600
 ARCMIN_DEG = 60
@@ -74,7 +74,7 @@ class DataMap2:
         self.logger = logging.getLogger('{}'.format(__name__))
         self.logger.info("ProjectedDataMap Object Created")
 
-    def xy_to_longlat(self, x: NUMPY_X, y: NUMPY_Y) -> Tuple[LONGITUDE_Y, LATITUDE_X]:
+    def xy_to_longlat(self, x: Numpy_X, y: Numpy_Y) -> Tuple[Longitude_Y, Latitude_X]:
         """
         This function converts a numpy[y][x] coordinate to
         lat/long coordinates.
@@ -87,7 +87,7 @@ class DataMap2:
         absolute_y_position = self.latitude_boundary_north() + (y * self.resolution_latitude)
         return absolute_x_position, absolute_y_position
 
-    def longlat_to_xy(self, longitude, latitude) -> Tuple[NUMPY_X, NUMPY_Y]:
+    def longlat_to_xy(self, longitude, latitude) -> Tuple[Numpy_X, Numpy_Y]:
         """
         This function converts a lat/long coordinate set to numpy[y][x].
 
@@ -100,44 +100,44 @@ class DataMap2:
         return rel_x, rel_y
 
 
-    def longitude_boundary_west(self) -> LONGITUDE_Y:
+    def longitude_boundary_west(self) -> Longitude_Y:
         """
         returns our western bounds in longitude
         """
 
         return self.most_west_longitude
 
-    def longitude_boundary_east(self) -> LONGITUDE_Y:
+    def longitude_boundary_east(self) -> Longitude_Y:
         """
         returns our eastern bounds in longitude
         """
         return self.most_west_longitude + (self.resolution_longitude * self.span_x)
 
-    def latitude_boundary_north(self) -> LATITUDE_X:
+    def latitude_boundary_north(self) -> Latitude_X:
         """
         returns our northern bounds in latitude
         """
         return self.most_north_latitude
 
-    def latitude_boundary_south(self) -> LATITUDE_X:
+    def latitude_boundary_south(self) -> Latitude_X:
         """
         returns our northern bounds in latitude        
         """
         return self.most_north_latitude + (self.resolution_latitude * self.span_y)
 
-    def get(self, x: NUMPY_X, y: NUMPY_Y) -> float:
+    def get(self, x: Numpy_X, y: Numpy_Y) -> float:
         """
         retrieves value from numpy map at X,Y 
         """
         return float(self.numpy_map[y, x])
 
-    def is_map_edge(self, x: NUMPY_X, y: NUMPY_Y) -> bool:
+    def is_map_edge(self, x: Numpy_X, y: Numpy_Y) -> bool:
         """
         Determine if x, y is on the map edge.
         """
         return x == 0 or y == 0 or x == self.max_x or y == self.max_y
 
-    def distance(self, us: Tuple[NUMPY_X, NUMPY_Y], them: Tuple[NUMPY_X, NUMPY_Y]) -> float:
+    def distance(self, us: Tuple[Numpy_X, Numpy_Y], them: Tuple[Numpy_X, Numpy_Y]) -> float:
         """
         :param us: Tuple(x, y)
         :param them: Tuple(x, y)

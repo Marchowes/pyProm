@@ -17,9 +17,9 @@ from typing import TYPE_CHECKING, Self
 if TYPE_CHECKING:
     from pyprom.lib.loaders.gdal_loader import GDALLoader
     from pyprom._typing.type_hints import (
-        NUMPY_X, NUMPY_Y, 
-        LONGITUDE_Y, LATITUDE_X, 
-        XY_COORD,
+        Numpy_X, Numpy_Y, 
+        Longitude_Y, Latitude_X, 
+        XY,
         Elevation,
         LatLon
     )
@@ -43,7 +43,7 @@ class DataMap(BaseDataMap):
         self._x_mapEdge = {0: True, self.max_x: True}
         self._y_mapEdge = {0: True, self.max_y: True}
 
-    def xy_to_latlon(self, x: NUMPY_X, y: NUMPY_Y) -> LatLon:
+    def xy_to_latlon(self, x: Numpy_X, y: Numpy_Y) -> LatLon:
         """
         Convert numpy array indices to WGS84(4326) coordinates
         """
@@ -52,7 +52,7 @@ class DataMap(BaseDataMap):
         lat = self.geotransform[3] + y * self.geotransform[4] + x * self.geotransform[5]
         return lat, lon
 
-    def latlong_to_xy(self, lat: LATITUDE_X, lon: LONGITUDE_Y) -> XY_COORD:
+    def latlong_to_xy(self, lat: Latitude_X, lon: Longitude_Y) -> XY:
         """
         convert WGS84(4326) to numpy_array[x][y]
         """
@@ -62,7 +62,7 @@ class DataMap(BaseDataMap):
 
         return numpy_x, numpy_y
 
-    def elevation(self, lat: LATITUDE_X, lon: LONGITUDE_Y) -> Elevation:
+    def elevation(self, lat: Latitude_X, lon: Longitude_Y) -> Elevation:
         """
         This function returns the elevation at a certain lat/long in Meters.
 
@@ -72,7 +72,7 @@ class DataMap(BaseDataMap):
         """
         return self.get(*self.latlong_to_xy(lat, lon))
 
-    def subset(self, x: NUMPY_X, y: NUMPY_Y, x_span: int, y_span: int) -> Self:
+    def subset(self, x: Numpy_X, y: Numpy_Y, x_span: int, y_span: int) -> Self:
         """
         Produce a subset of this datamap.
         Crucially, the x,y origin and spans are NUMPY origins and spans. NOT cartesian.

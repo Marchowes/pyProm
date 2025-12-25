@@ -1,17 +1,17 @@
 from typing import Tuple, Generator
 
-NUMPY_X = int
-NUMPY_Y = int
+Numpy_X = int
+Numpy_Y = int
 
 Elevation = float
-LATITUDE_X = float
-LONGITUDE_Y = float
-LatLon = Tuple[LATITUDE_X, LONGITUDE_Y]
+Latitude_X = float
+Longitude_Y = float
+LatLon = Tuple[Latitude_X, Longitude_Y]
 
-XY_ELEVATION_TUPLE = Tuple[NUMPY_X, NUMPY_Y, Elevation]
-XY_ELEVATION_GENERATOR = Generator[NUMPY_X, NUMPY_Y, Elevation]
+XY_Elevation = Tuple[Numpy_X, Numpy_Y, Elevation]
+XY_Elevation_Generator = Generator[Numpy_X, Numpy_Y, Elevation]
 
-XY_COORD = Tuple[NUMPY_X, NUMPY_Y]
+XY = Tuple[Numpy_X, Numpy_Y]
 
 
 DecimalDegrees = float
