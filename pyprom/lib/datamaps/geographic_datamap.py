@@ -13,7 +13,7 @@ import logging
 from  .base_datamap import BaseDataMap
 import numpy
 from osgeo import gdal
-from typing import TYPE_CHECKING, Self
+from typing import TYPE_CHECKING, Self, Any, Tuple
 if TYPE_CHECKING:
     from pyprom.lib.loaders.gdal_loader import GDALLoader
     from pyprom._typing.type_hints import (
@@ -24,7 +24,23 @@ if TYPE_CHECKING:
         LatLon
     )
 
+
 class DataMap(BaseDataMap):
+    """
+    Datamap is the the interface between pyProm and 
+    our raster data.
+
+    Datamap provides the base numpy array as well as a
+    number of utility functions for translating numpy x/y values
+    to WGS84 geographic coordinates, iterators and more.
+    """
+    gdal_dataset: gdal.Dataset
+    geotransform: Tuple[float, float, float, float, float ,float]
+    max_x: int
+    max_y: int
+    nodata: Any
+    numpy_array: numpy.NDArray
+
     def __init__(self,
         gdal_dataset: gdal.Dataset,
     ) -> None:
@@ -42,6 +58,14 @@ class DataMap(BaseDataMap):
 
         self._x_mapEdge = {0: True, self.max_x: True}
         self._y_mapEdge = {0: True, self.max_y: True}
+
+    @classmethod
+    def from_loader(cls, loader: GDALLoader) -> Self:
+        """
+        Creates DataMap from a GDALLoader
+        """
+        return cls(loader.gdal_dataset)
+
 
     def xy_to_latlon(self, x: Numpy_X, y: Numpy_Y) -> LatLon:
         """
