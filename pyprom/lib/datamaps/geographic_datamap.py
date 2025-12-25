@@ -1,5 +1,5 @@
 """
-pyProm: Copyright 2016.
+pyProm: Copyright Marc Howes 2016 - 2025.
 
 This software is distributed under a license that is described in
 the LICENSE file that accompanies it.
@@ -10,9 +10,11 @@ used to analyze the map.
 from __future__ import annotations
 import logging
 
-from  .base_datamap import BaseDataMap
+from .base_datamap import BaseDataMap
 import numpy
 from osgeo import gdal
+from shapely.geometry import Polygon
+
 from typing import TYPE_CHECKING, Self, Any, Tuple
 if TYPE_CHECKING:
     from pyprom.lib.loaders.gdal_loader import GDALLoader
@@ -119,3 +121,17 @@ class DataMap(BaseDataMap):
         )
 
         return DataMap(dataset)
+
+    def point_geom(self, x: Numpy_X, y: Numpy_Y) -> Polygon:
+        """
+        :param x: x coordinate
+        :param y: y coordinate
+        :return: :class:`shapely.geometry.polygon.Polygon` of this point
+        """
+        local_lat, local_long = self.xy_to_latlon(x, y)
+        corners = list()
+        for c_x, c_y, _ in self.iterateDiagonal(x, y):
+            remote_lat, remote_long = self.xy_to_latlon(c_x, c_y)
+            #shapely coords is long, lat
+            corners.append(((local_long + remote_long)/2, (local_lat + remote_lat)/2))
+        return Polygon(corners)
