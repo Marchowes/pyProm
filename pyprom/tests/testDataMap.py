@@ -10,7 +10,7 @@ from numpy import array
 from shapely.geometry import Polygon
 from shapely.ops import unary_union
 from pyprom.tests.getData import gettestzip
-from pyprom.dataload import GDALLoader
+from pyprom.lib.loaders.gdal_loader import GDALLoader
 from pyprom.lib.datamap import (DataMap,
                                 NON_FILE_SENTINEL)
 
@@ -22,7 +22,7 @@ class DataMapTests(unittest.TestCase):
         """Set Up Tests."""
         gettestzip()
         self.datafile = GDALLoader('/tmp/N44W072.hgt')
-        self.datamap = self.datafile.datamap
+        self.datamap = self.datafile.to_datamap()
 
     def testDataMapGeneralDataMap(self):
         """Test defaults."""
@@ -63,7 +63,7 @@ class DataMapTests(unittest.TestCase):
         """
         for x in range(0, 3601, 17):
             for y in range(0, 3601, 17):
-                lat, long = self.datamap.xy_to_latlong(x, y)
+                lat, long = self.datamap.xy_to_latlon(x, y)
                 _x, _y = self.datamap.latlong_to_xy(lat, long)
                 self.assertEqual(_x, x)
                 self.assertEqual(_y, y)

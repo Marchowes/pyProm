@@ -7,7 +7,7 @@ the LICENSE file that accompanies it.
 import unittest
 
 from pyprom.tests.getData import gettestzip
-from pyprom.dataload import GDALLoader
+from pyprom.lib.loaders.gdal_loader import GDALLoader
 
 from pyprom.domain_map import DomainMap
 from pyprom.lib.locations.saddle import Saddle
@@ -52,7 +52,7 @@ class KMLFileWriterTest(unittest.TestCase):
         Ensure Appending a single :class:`DomainMap` object works as expected.
         """
         gettestzip()
-        domain = DomainMap(GDALLoader('/tmp/N44W072.hgt'), self.summitscontainer,
+        domain = DomainMap(GDALLoader('/tmp/N44W072.hgt').to_datamap(), self.summitscontainer,
                            self.saddlescontainer, self.runoffscontainer, [],
                            [self.linker1])
         summit_domain1 = SummitDomain(domain.datamap,

@@ -932,7 +932,7 @@ self.nodata
 self.transform
 self.reverse_transform</y:AttributeLabel>
                 <y:MethodLabel xml:space="preserve">__init__(numpy_map, upperLeftY, upperLeftX, resolutionY,   resolutionX, span_y, span_x, linear_unit, unit, nodata,  transform, reverse_transform) 
-xy_to_latlong(x, y)
+xy_to_latlon(x, y)
 latlong_to_xy(latitude, longitude)
 elevation(latitude, longitude)
 _leftmost_absolute()

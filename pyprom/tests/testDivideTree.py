@@ -7,7 +7,7 @@ the LICENSE file that accompanies it.
 
 import unittest
 from pyprom.tests.getData import gettestzip
-from pyprom.dataload import GDALLoader
+from pyprom.lib.loaders.gdal_loader import GDALLoader
 from pyprom.domain_map import DomainMap
 from pyprom.dividetree import DivideTree
 
@@ -21,7 +21,7 @@ class DivideTreeTests(unittest.TestCase):
         """
         gettestzip()
         datafile = GDALLoader('/tmp/N44W072.hgt')
-        datamap = datafile.datamap
+        datamap = datafile.to_datamap()
         self.someslice = datamap.subset(2494, 2240, 700, 800)  # this is
         #  the one we want in the end...
         # self.someslice = datamap.subset(2594, 2340, 500, 500)

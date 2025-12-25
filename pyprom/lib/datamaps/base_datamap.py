@@ -118,7 +118,7 @@ class BaseDataMap:
         for _x, _y, elevation in self.iterateFull(x, y):
             if elevation is None or elevation < point_elevation:
                 continue
-            slope = (elevation-point_elevation)/hypot((x - _x)*self.res_x, (y - _y)*self.res_y)
+            slope = (elevation-point_elevation)/hypot((x - _x)*self.geotransform[5], (y - _y)*self.geotransform[1])
             if steepest_slope < slope:
                 if slope < 0:
                     continue

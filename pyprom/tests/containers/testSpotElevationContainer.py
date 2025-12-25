@@ -7,7 +7,7 @@ the LICENSE file that accompanies it.
 
 import unittest
 from pyprom.tests.getData import gettestzip
-from pyprom.dataload import GDALLoader
+from pyprom.lib.loaders.gdal_loader import GDALLoader
 from pyprom.feature_discovery import AnalyzeData
 from pyprom.lib.containers.spot_elevation import SpotElevationContainer
 from pyprom.lib.locations.summit import Summit
@@ -22,7 +22,7 @@ class SpotElevationContainerTests(unittest.TestCase):
         """Set Up Tests."""
         gettestzip()
         cls.datafile = GDALLoader('/tmp/N44W072.hgt')
-        datamap = cls.datafile.datamap
+        datamap = cls.datafile.to_datamap()
         cls.someslice = datamap.subset(65, 55, 100, 100)
         cls.somewhere = AnalyzeData(cls.someslice)
         cls.summits, cls.saddles, cls.runoffs = cls.somewhere.run()

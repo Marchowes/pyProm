@@ -108,7 +108,7 @@ class MultiPoint:
         :rtype:
          list(:class:`pyprom.lib.locations.base_coordinate.BaseCoordinate`)
         """
-        return [BaseCoordinate(*self.datamap.xy_to_latlong(coord[0], coord[1]))
+        return [BaseCoordinate(*self.datamap.xy_to_latlon(coord[0], coord[1]))
                 for coord in self.points]
 
     def append(self, point):

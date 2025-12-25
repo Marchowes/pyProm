@@ -13,7 +13,7 @@ from pyprom.lib.locations.summit import Summit
 from pyprom.lib.containers.linker import Linker
 from pyprom.lib.containers.summit_domain import SummitDomain
 from pyprom.tests.getData import gettestzip
-from pyprom.dataload import GDALLoader
+from pyprom.lib.loaders.gdal_loader import GDALLoader
 from pyprom.feature_discovery import AnalyzeData
 
 def make_em():
@@ -36,7 +36,7 @@ class SaddleTests(unittest.TestCase):
         """
         gettestzip()
         datafile = GDALLoader('/tmp/N44W072.hgt')
-        cls.datamap = datafile.datamap
+        cls.datamap = datafile.to_datamap()
 
     def testSaddleFromDictEdge(self):
         """

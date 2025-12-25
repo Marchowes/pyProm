@@ -7,7 +7,7 @@ the LICENSE file that accompanies it.
 
 import unittest
 from pyprom.tests.getData import gettestzip
-from pyprom.dataload import GDALLoader
+from pyprom.lib.loaders.gdal_loader import GDALLoader
 from pyprom.domain_map import DomainMap
 
 
@@ -20,7 +20,7 @@ class DomainMapTests(unittest.TestCase):
         """
         gettestzip()
         datafile = GDALLoader('/tmp/N44W072.hgt')
-        datamap = datafile.datamap
+        datamap = datafile.to_datamap()
         self.someslice = datamap.subset(0, 0, 30, 30)
         self.domain = DomainMap(self.someslice)
         self.domain.run()

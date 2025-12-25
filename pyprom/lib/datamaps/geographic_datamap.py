@@ -14,6 +14,8 @@ from .base_datamap import BaseDataMap
 import numpy
 from osgeo import gdal
 from shapely.geometry import Polygon
+from pyprom.lib.util import checksum
+from numpy import array2string
 
 from typing import TYPE_CHECKING, Self, Any, Tuple
 if TYPE_CHECKING:
@@ -44,15 +46,17 @@ class DataMap(BaseDataMap):
     numpy_array: numpy.NDArray
 
     def __init__(self,
+        loader: GDALLoader,
         gdal_dataset: gdal.Dataset,
     ) -> None:
-
+        self.loader = loader
         self.gdal_dataset = gdal_dataset
         raster_band = self.gdal_dataset.GetRasterBand(1)
         self.nodata = raster_band.GetNoDataValue()
         self.numpy_array = numpy.array(
             raster_band.ReadAsArray()
         )
+        self.md5 = f'{checksum(loader.filename)}{hash(array2string(self.numpy_array))}'
         self.geotransform = self.gdal_dataset.GetGeoTransform()
 
         self.max_y = self.gdal_dataset.RasterXSize - 1 # longitude, or NUMPY_Y
@@ -66,7 +70,7 @@ class DataMap(BaseDataMap):
         """
         Creates DataMap from a GDALLoader
         """
-        return cls(loader.gdal_dataset)
+        return cls(loader, loader.gdal_dataset)
 
 
     def xy_to_latlon(self, x: Numpy_X, y: Numpy_Y) -> LatLon:
@@ -120,7 +124,7 @@ class DataMap(BaseDataMap):
             format='MEM'
         )
 
-        return DataMap(dataset)
+        return DataMap(self.loader, dataset)
 
     def point_geom(self, x: Numpy_X, y: Numpy_Y) -> Polygon:
         """

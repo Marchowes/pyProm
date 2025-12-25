@@ -16,8 +16,8 @@ import cbor
 
 
 from .feature_discovery import AnalyzeData
-from .lib.datamap import DataMap
-from .dataload import Loader
+from .lib.datamaps.geographic_datamap import DataMap
+from .lib.loaders.gdal_loader import BaseLoader
 from .lib.containers.spot_elevation import SpotElevationContainer
 from .lib.containers.summits import SummitsContainer
 from .lib.containers.runoffs import RunoffsContainer
@@ -63,7 +63,7 @@ class DomainMap:
         """
         if isinstance(data, DataMap):
             self.datamap = data
-        elif isinstance(data, Loader):
+        elif isinstance(data, BaseLoader):
             self.datamap = data.datamap
         else:
             raise TypeError('DomainMap Object consumes DataMap object,'
@@ -222,16 +222,11 @@ class DomainMap:
     def to_dict(self):
         """
         Returns dict representation of this :class:`DomainMap`
-
-        :param bool noWalkPath: exclude
-         :class:`pyprom.lib.containers.walkpath.WalkPath` from member
-         :class:`pyprom.lib.containers.linker.Linker`
         :return: dict() representation of :class:`DomainMap`
-        :rtype: dict()
         """
         domain_dict = dict()
         domain_dict['domain'] = self.extent,
-        domain_dict['datamap'] = self.datamap.filename
+        domain_dict['datamap'] = str(self.datamap.loader.filename)
         domain_dict['file_md5'] = self.datamap.md5
         domain_dict['date'] = time.strftime("%m-%d-%Y %H:%M:%S")
         domain_dict['version'] = version_info

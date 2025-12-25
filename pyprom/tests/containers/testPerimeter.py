@@ -9,7 +9,7 @@ import unittest
 from collections import defaultdict
 
 from pyprom.tests.getData import gettestzip
-from pyprom.dataload import GDALLoader
+from pyprom.lib.loaders.gdal_loader import GDALLoader
 from pyprom.lib.locations.gridpoint import GridPoint
 from pyprom.lib.containers.perimeter import Perimeter
 
@@ -22,7 +22,7 @@ class PerimeterTests(unittest.TestCase):
         """Set Up Tests."""
         gettestzip()
         cls.datafile = GDALLoader('/tmp/N44W072.hgt')
-        cls.datamap = cls.datafile.datamap
+        cls.datamap = cls.datafile.to_datamap()
         # contigous Perimeter
         cls.perimeterI = defaultdict(dict)
         cls.perimeterI[1][1] = cls.p11 = (1, 1, 553)
