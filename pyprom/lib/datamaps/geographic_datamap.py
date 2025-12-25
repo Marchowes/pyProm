@@ -13,7 +13,7 @@ import logging
 from  .base_datamap import BaseDataMap
 import numpy
 from osgeo import gdal
-from typing import TYPE_CHECKING, Tuple
+from typing import TYPE_CHECKING, Tuple, Self
 if TYPE_CHECKING:
 
     from pyprom.lib.loaders.gdal_loader import GDALLoader
@@ -71,12 +71,26 @@ class DataMap(BaseDataMap):
         """
         return self.get(*self.latlong_to_xy(lat, lon))
 
-    def subset(self, x: NUMPY_X, y: NUMPY_Y, xSpan: int, ySpan: int):
-    
+    def subset(self, x: NUMPY_X, y: NUMPY_Y, x_span: int, y_span: int) -> Self:
+        """
+        Produce a subset  of this datamap.
+        Crucially, the x,y origin and spans are NUMPY origins and spans. NOT cartesian.
+        so, in this context:
+        X = LONGITUDE
+        Y = LATITUDE 
+        """
 
-        gdal.Translate(
+        # remember, GDAL XY is cartesian, unlike a numpy array
+        x_offset = y
+        y_offset = x
+        x_size = y_span
+        y_size  = x_span
+
+        dataset = gdal.Translate(
             '',
             self.gdal_dataset,
             srcWin=[x_offset, y_offset, x_size, y_size],
-            format='GTiff'
+            format='MEM'
         )
+
+        return DataMap(dataset)
