@@ -49,15 +49,15 @@ Example(s)
 In your favorite Python interpreter on a Unix system (I use `ipython` in `Linux`):
 
 ```
-from dataload import GDALLoader
-from domain import Domain
-from lib.kmlwriter import KMLFileWriter
+from pyprom import GDALLoader, KMLFileWriter
+from pyprom.domain_map import DomainMap
 import logging
 logging.basicConfig(level=logging.DEBUG)
 
 # Load your Datamap into your Domain
-data = GDALLoader('YOURPATHHERE/N44W072.hgt')
-domainmap = DomainMap(data)
+loader = GDALLoader('YOURPATHHERE/N44W072.hgt')
+datamap = loader.to_datamap()
+domainmap = DomainMap(datamap)
 domainmap.run()
 # ^ This will run the Saddle/RunOff/Summit discovery as well as saddle walk and saddle disqualifiers, it'll take a while..
 
