@@ -12,3 +12,9 @@ go to pyprom root and type "uv venv"
 
 
 uv python install 3.12
+
+
+add package
+
+uv add [package]
+uv lock --upgrade
