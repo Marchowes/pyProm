@@ -13,19 +13,20 @@ import logging
 from  .base_datamap import BaseDataMap
 import numpy
 from osgeo import gdal
-from typing import TYPE_CHECKING, Tuple, Self
+from typing import TYPE_CHECKING, Self
 if TYPE_CHECKING:
-
     from pyprom.lib.loaders.gdal_loader import GDALLoader
     from pyprom._typing.type_hints import (
         NUMPY_X, NUMPY_Y, 
         LONGITUDE_X, LATITUDE_Y, 
         XY_COORD,
+        Elevation,
+        LatLon
     )
 
 class DataMap(BaseDataMap):
     def __init__(self,
-        gdal_dataset: gdal.DataSet,
+        gdal_dataset: gdal.Dataset,
     ) -> None:
 
         self.gdal_dataset = gdal_dataset
@@ -42,7 +43,7 @@ class DataMap(BaseDataMap):
         self._x_mapEdge = {0: True, self.max_x: True}
         self._y_mapEdge = {0: True, self.max_y: True}
 
-    def xy_to_latlon(self, x: NUMPY_X, y: NUMPY_Y):
+    def xy_to_latlon(self, x: NUMPY_X, y: NUMPY_Y) -> LatLon:
         """
         Convert numpy array indices to WGS84(4326) coordinates
         """
@@ -61,7 +62,7 @@ class DataMap(BaseDataMap):
 
         return numpy_x, numpy_y
 
-    def elevation(self, lat: LATITUDE_Y, lon: LONGITUDE_X):
+    def elevation(self, lat: LATITUDE_Y, lon: LONGITUDE_X) -> Elevation:
         """
         This function returns the elevation at a certain lat/long in Meters.
 
@@ -73,7 +74,7 @@ class DataMap(BaseDataMap):
 
     def subset(self, x: NUMPY_X, y: NUMPY_Y, x_span: int, y_span: int) -> Self:
         """
-        Produce a subset  of this datamap.
+        Produce a subset of this datamap.
         Crucially, the x,y origin and spans are NUMPY origins and spans. NOT cartesian.
         so, in this context:
         X = LONGITUDE
