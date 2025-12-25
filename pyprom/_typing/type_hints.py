@@ -1,7 +1,17 @@
-from typing import NewType
+from typing import Tuple, Generator
 
-NUMPY_X = NewType("NUMPY_X", int)
-NUMPY_Y = NewType("NUMPY_Y", int)
+NUMPY_X = int
+NUMPY_Y = int
 
-LATITUDE_Y = NewType("LATITUDE_Y", float)
-LONGITUDE_X = NewType("LONGITUDE_X", float)
+Elevation = float
+LATITUDE_Y = float
+LONGITUDE_X = float
+
+
+XY_ELEVATION_TUPLE = Tuple[NUMPY_X, NUMPY_Y, Elevation]
+XY_ELEVATION_GENERATOR = Generator[NUMPY_X, NUMPY_Y, Elevation]
+
+XY_COORD = Tuple[NUMPY_X, NUMPY_Y]
+
+
+DecimalDegrees = float
