@@ -135,3 +135,19 @@ class DataMap(BaseDataMap):
             #shapely coords is long, lat
             corners.append(((local_long + remote_long)/2, (local_lat + remote_lat)/2))
         return Polygon(corners)
+
+    @property
+    def upper_left(self) -> LatLon:
+        return self.xy_to_latlon(0, 0)
+
+    @property
+    def lower_left(self) -> LatLon:
+        return self.xy_to_latlon(0, self.max_y)
+
+    @property
+    def upper_right(self) -> LatLon:
+        return self.xy_to_latlon(self.max_x, 0)
+
+    @property
+    def lower_right(self) -> LatLon:
+        return self.xy_to_latlon(self.max_x, self.max_y)
