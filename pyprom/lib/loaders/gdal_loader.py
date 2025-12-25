@@ -10,7 +10,7 @@ from pathlib import Path
 from osgeo import gdal
 from .util.metricate_vertical_dataset import convert_dataset_vertical_units_to_meters
 from .util.warp_to_geographic import warp_to_geographic
-from pyprom.lib.datamaps.geographic_datamap import DataMap
+from pyprom.lib.datamaps.datamap import DataMap
 
 
 class BaseLoader:

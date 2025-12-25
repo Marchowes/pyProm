@@ -16,7 +16,7 @@ import cbor
 
 
 from .feature_discovery import AnalyzeData
-from .lib.datamaps.geographic_datamap import DataMap
+from .lib.datamaps.datamap import DataMap
 from .lib.loaders.gdal_loader import BaseLoader
 from .lib.containers.spot_elevation import SpotElevationContainer
 from .lib.containers.summits import SummitsContainer
