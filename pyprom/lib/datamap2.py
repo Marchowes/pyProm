@@ -23,7 +23,7 @@ from typing import TYPE_CHECKING, Tuple
 if TYPE_CHECKING:
     from osgeo import gdal
     from numpy import NDArray
-    from pyprom._typing.type_hints import NUMPY_X, NUMPY_Y, LONGITUDE_X, LATITUDE_Y
+    from pyprom._typing.type_hints import NUMPY_X, NUMPY_Y, LONGITUDE_Y, LATITUDE_X
 
 ARCSEC_DEG = 3600
 ARCMIN_DEG = 60
@@ -74,7 +74,7 @@ class DataMap2:
         self.logger = logging.getLogger('{}'.format(__name__))
         self.logger.info("ProjectedDataMap Object Created")
 
-    def xy_to_longlat(self, x: NUMPY_X, y: NUMPY_Y) -> Tuple[LONGITUDE_X, LATITUDE_Y]:
+    def xy_to_longlat(self, x: NUMPY_X, y: NUMPY_Y) -> Tuple[LONGITUDE_Y, LATITUDE_X]:
         """
         This function converts a numpy[y][x] coordinate to
         lat/long coordinates.
@@ -100,26 +100,26 @@ class DataMap2:
         return rel_x, rel_y
 
 
-    def longitude_boundary_west(self) -> LONGITUDE_X:
+    def longitude_boundary_west(self) -> LONGITUDE_Y:
         """
         returns our western bounds in longitude
         """
 
         return self.most_west_longitude
 
-    def longitude_boundary_east(self) -> LONGITUDE_X:
+    def longitude_boundary_east(self) -> LONGITUDE_Y:
         """
         returns our eastern bounds in longitude
         """
         return self.most_west_longitude + (self.resolution_longitude * self.span_x)
 
-    def latitude_boundary_north(self) -> LATITUDE_Y:
+    def latitude_boundary_north(self) -> LATITUDE_X:
         """
         returns our northern bounds in latitude
         """
         return self.most_north_latitude
 
-    def latitude_boundary_south(self) -> LATITUDE_Y:
+    def latitude_boundary_south(self) -> LATITUDE_X:
         """
         returns our northern bounds in latitude        
         """

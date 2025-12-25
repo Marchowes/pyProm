@@ -4,9 +4,9 @@ NUMPY_X = int
 NUMPY_Y = int
 
 Elevation = float
-LATITUDE_Y = float
-LONGITUDE_X = float
-LatLon = Tuple[LATITUDE_Y, LONGITUDE_X]
+LATITUDE_X = float
+LONGITUDE_Y = float
+LatLon = Tuple[LATITUDE_X, LONGITUDE_Y]
 
 XY_ELEVATION_TUPLE = Tuple[NUMPY_X, NUMPY_Y, Elevation]
 XY_ELEVATION_GENERATOR = Generator[NUMPY_X, NUMPY_Y, Elevation]

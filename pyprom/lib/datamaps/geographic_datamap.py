@@ -18,7 +18,7 @@ if TYPE_CHECKING:
     from pyprom.lib.loaders.gdal_loader import GDALLoader
     from pyprom._typing.type_hints import (
         NUMPY_X, NUMPY_Y, 
-        LONGITUDE_X, LATITUDE_Y, 
+        LONGITUDE_Y, LATITUDE_X, 
         XY_COORD,
         Elevation,
         LatLon
@@ -52,7 +52,7 @@ class DataMap(BaseDataMap):
         lat = self.geotransform[3] + y * self.geotransform[4] + x * self.geotransform[5]
         return lat, lon
 
-    def latlong_to_xy(self, lat: LATITUDE_Y, lon: LONGITUDE_X) -> XY_COORD:
+    def latlong_to_xy(self, lat: LATITUDE_X, lon: LONGITUDE_Y) -> XY_COORD:
         """
         convert WGS84(4326) to numpy_array[x][y]
         """
@@ -62,7 +62,7 @@ class DataMap(BaseDataMap):
 
         return numpy_x, numpy_y
 
-    def elevation(self, lat: LATITUDE_Y, lon: LONGITUDE_X) -> Elevation:
+    def elevation(self, lat: LATITUDE_X, lon: LONGITUDE_Y) -> Elevation:
         """
         This function returns the elevation at a certain lat/long in Meters.
 
