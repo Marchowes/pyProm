@@ -103,7 +103,7 @@ class SummitDomain:
         :rtype: :class:`pyprom.lib.locations.spot_elevation.SpotElevation`
         """
         for point in self.points:
-            lat, long = self.datamap.xy_to_latlong(point[0], point[1])
+            lat, long = self.datamap.xy_to_latlon(point[0], point[1])
             elevation = self.datamap.get(point[0], point[1])
             yield SpotElevation(lat, long, elevation)
 

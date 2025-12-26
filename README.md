@@ -27,7 +27,7 @@ which make use of similiarly derived data, such as [LoJ](listsofjohn.com) and [p
 Read The Docs
 --------------
 Fancy pyProm Documentation derived from docstrings can be found on [readthedocs.io](http://pyprom.readthedocs.io)
-
+(this is no longer maintained)
 
 More About Prominence and Surface Network Analysis
 --------------------------------------------------
@@ -38,26 +38,37 @@ More About Prominence and Surface Network Analysis
 
 Datasources
 -----------
-* 1 ArcSecond SRTM Data [#1](https://dds.cr.usgs.gov/srtm/version1/United_States_1arcsec/1arcsec/), [#2](https://dds.cr.usgs.gov/srtm/version2_1/SRTM1/)
+* SRTM Data [#1](https://srtm.kurviger.de/SRTM1/)
 * [DEM type data] (http://viewer.nationalmap.gov/basic/#productGroupSearch) Start with Elevation Products (3DEP) - 1/3 arc-second DEM [More info](http://www.digitalpreservation.gov/formats/fdd/fdd000281.shtml)
+
+Installation
+------------
+
+pyProm is most easily installed using uv. You may have to install GDAL developer libraries and update the pyproject.toml file to match GDAL versions in case they are mismatched
+
+* Go to the pyprom folder and execute `uv venv --python 3.14`
+* Follow venv activation instructions
+* run `uv sync --active` this should install the required packages.
+
+    
 
 Example(s)
 ----------
 * Install pyProm
-* [Download This](https://dds.cr.usgs.gov/srtm/version2_1/SRTM1/Region_06/N44W072.hgt.zip)
+* [Download This](https://srtm.kurviger.de/SRTM1/Region_06/N44W072.hgt.zip)
 * Extract the zip file
 In your favorite Python interpreter on a Unix system (I use `ipython` in `Linux`):
 
 ```
-from dataload import GDALLoader
-from domain import Domain
-from lib.kmlwriter import KMLFileWriter
+from pyprom import GDALLoader, KMLFileWriter
+from pyprom.domain_map import DomainMap
 import logging
 logging.basicConfig(level=logging.DEBUG)
 
 # Load your Datamap into your Domain
-data = GDALLoader('YOURPATHHERE/N44W072.hgt')
-domainmap = DomainMap(data)
+loader = GDALLoader('YOURPATHHERE/N44W072.hgt')
+datamap = loader.to_datamap()
+domainmap = DomainMap(datamap)
 domainmap.run()
 # ^ This will run the Saddle/RunOff/Summit discovery as well as saddle walk and saddle disqualifiers, it'll take a while..
 

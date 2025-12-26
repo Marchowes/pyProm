@@ -8,7 +8,7 @@ the LICENSE file that accompanies it.
 from __future__ import division
 import unittest
 from pyprom.tests.getData import gettestzip
-from pyprom.dataload import GDALLoader
+from pyprom.lib.loaders.gdal_loader import GDALLoader
 from pyprom.feature_discovery import AnalyzeData
 from pyprom.lib.logic.internal_saddle_network import InternalSaddleNetwork
 from pyprom.lib.containers.saddles import SaddlesContainer
@@ -24,7 +24,7 @@ class InternalSaddleNetworkTests(unittest.TestCase):
         """
         gettestzip()
         datafile = GDALLoader('/tmp/N44W072.hgt')
-        cls.datamap = datafile.datamap
+        cls.datamap = datafile.to_datamap()
         cls.aziscohos = cls.datamap.subset(622, 3275, 457, 325)
         cls.aziscohosVicinity = AnalyzeData(cls.aziscohos)
         _, saddles, _ = cls.aziscohosVicinity.analyze()

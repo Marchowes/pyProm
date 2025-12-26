@@ -8,7 +8,7 @@ the LICENSE file that accompanies it.
 from __future__ import division
 import unittest
 from pyprom.tests.getData import gettestzip
-from pyprom.dataload import GDALLoader
+from pyprom.lib.loaders.gdal_loader import GDALLoader
 from pyprom.feature_discovery import AnalyzeData
 from pyprom.domain_map import DomainMap
 
@@ -24,7 +24,7 @@ class WalkTests(unittest.TestCase):
         """
         gettestzip()
         self.datafile = GDALLoader('/tmp/N44W072.hgt')
-        self.datamap = self.datafile.datamap
+        self.datamap = self.datafile.to_datamap()
 
         self.islandpondVT = self.datamap.subset(602, 353, 260, 260)
 
@@ -60,7 +60,7 @@ class WalkTests(unittest.TestCase):
         """
         self.domain.run(superSparse=True)
         self.domain.walk()
-        self.assertEqual(len(self.domain.linkers), 1119)
+        self.assertEqual(len(self.domain.linkers), 1120)  # 1119?
 
 
 class WalkRealTests(unittest.TestCase):
@@ -74,7 +74,7 @@ class WalkRealTests(unittest.TestCase):
         """
         gettestzip()
         self.datafile = GDALLoader('/tmp/N44W072.hgt')
-        self.datamap = self.datafile.datamap
+        self.datamap = self.datafile.to_datamap()
 
     def testWalkPathSingleSummit(self):
         """

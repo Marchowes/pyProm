@@ -13,7 +13,7 @@ from shapely.geometry import Point
 from .base_coordinate import BaseCoordinate
 from .base_gridpoint import BaseGridPoint
 from ..util import randomString
-from ..constants import FEET_TO_METERS
+from ..constants import FEET_PER_METER
 
 
 class SpotElevation(BaseCoordinate):
@@ -118,7 +118,7 @@ class SpotElevation(BaseCoordinate):
         :rtype: float, None
         """
         try:
-            return self.elevation * FEET_TO_METERS
+            return self.elevation * FEET_PER_METER
         except:
             return None
 

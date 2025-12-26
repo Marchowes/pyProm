@@ -6,7 +6,7 @@ the LICENSE file that accompanies it.
 
 PyProm: This library includes tools for surface network analysis.
 """
-version_info = (0, 7, 3)
+version_info = (0, 8, 0)
 __name__ = 'pyProm'
 __doc__ = 'A python surface network analysis script'
 __author__ = 'Marc Howes'
@@ -15,3 +15,9 @@ __maintainer__ = 'Marc Howes'
 __email__ = 'marc.h.howes@gmail.com'
 __status__ = 'Alpha'
 __title__ = '{0} version {1}'.format(__name__, __version__)
+
+
+# Common imports intended to make user imports a bit easier.
+from .lib.datamaps.datamap import DataMap
+from .lib.kmlwriter import KMLFileWriter
+from .lib.loaders.gdal_loader import GDALLoader

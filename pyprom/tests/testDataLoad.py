@@ -7,7 +7,7 @@ the LICENSE file that accompanies it.
 
 import unittest
 from pyprom.tests.getData import gettestzip
-from pyprom.dataload import GDALLoader
+from pyprom.lib.loaders.gdal_loader import GDALLoader
 
 
 class GDALDataTests(unittest.TestCase):
@@ -17,20 +17,20 @@ class GDALDataTests(unittest.TestCase):
         """Download datafile."""
         gettestzip()
         self.filename = '/tmp/N44W072.hgt'
-        self.datafile = GDALLoader(self.filename)
+        self.datafile = GDALLoader('/tmp/N44W072.hgt')
 
     def testGDALLoad(self):
         """Assert some basic info. from some SRTM data."""
-        self.assertEqual(self.datafile.linear_unit, 1.0)
-        self.assertEqual(self.datafile.linear_unit_name, 'm')
-        self.assertEqual(self.datafile.upperLeftX, -72.00013888888888)
-        self.assertEqual(self.datafile.upperLeftY, 45.00013888888889)
-        self.assertEqual(self.datafile.span_x, 3601)
-        self.assertEqual(self.datafile.span_y, 3601)
-        self.assertEqual(self.datafile.filename, self.filename)
-        # datamap needs to just have filename, not path.
-        self.assertEqual(self.datafile.datamap.filename, self.filename.split("/")[-1])
+        self.assertEqual(str(self.datafile.filename), self.filename)
+        self.assertIsNotNone(self.datafile.source_gdal_dataset)
+        self.assertEqual(self.datafile.source_gdal_dataset.RasterCount, 1)
+        self.assertEqual(self.datafile.source_gdal_dataset.RasterXSize, 3601)
+        self.assertEqual(self.datafile.source_gdal_dataset.RasterYSize, 3601)
 
+        self.assertIsNotNone(self.datafile.gdal_dataset)
+        self.assertEqual(self.datafile.source_gdal_dataset.RasterCount, 1)
+        self.assertEqual(self.datafile.source_gdal_dataset.RasterXSize, 3601)
+        self.assertEqual(self.datafile.source_gdal_dataset.RasterYSize, 3601)
 
 if __name__ == '__main__':
     unittest.main()

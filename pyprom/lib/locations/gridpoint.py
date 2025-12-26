@@ -76,7 +76,7 @@ class GridPoint(BaseGridPoint):
         :rtype: :class:`pyprom.lib.locations.spot_elevation.SpotElevation`
         """
         from .spot_elevation import SpotElevation
-        lat, long = datamap.xy_to_latlong(self.x, self.y)
+        lat, long = datamap.xy_to_latlon(self.x, self.y)
         return SpotElevation(lat, long, self.elevation)
 
     def __eq__(self, other):

@@ -7,7 +7,7 @@ the LICENSE file that accompanies it.
 
 import unittest
 from pyprom.tests.getData import gettestzip
-from pyprom.dataload import GDALLoader
+from pyprom.lib.loaders.gdal_loader import GDALLoader
 from pyprom.feature_discovery import AnalyzeData
 from pyprom.lib.locations.base_coordinate import BaseCoordinate
 from pyprom.lib.locations.base_gridpoint import BaseGridPoint
@@ -23,7 +23,7 @@ class MultipointTests(unittest.TestCase):
         """Set Up Tests."""
         gettestzip()
         cls.datafile = GDALLoader('/tmp/N44W072.hgt')
-        cls.datamap = cls.datafile.datamap
+        cls.datamap = cls.datafile.to_datamap()
         cls.someslice = cls.datamap.subset(1000, 1000, 100, 100)
         cls.somewhere = AnalyzeData(cls.someslice)
         cls.summits, cls.saddles, cls.runoffs = cls.somewhere.run()

@@ -7,7 +7,7 @@ the LICENSE file that accompanies it.
 
 import unittest
 from pyprom.tests.getData import gettestzip
-from pyprom.dataload import GDALLoader
+from pyprom.lib.loaders.gdal_loader import GDALLoader
 from pyprom.lib.locations.gridpoint import GridPoint
 from pyprom.lib.locations.spot_elevation import SpotElevation
 
@@ -22,7 +22,7 @@ class GridPointTests(unittest.TestCase):
         """
         gettestzip()
         datafile = GDALLoader('/tmp/N44W072.hgt')
-        cls.datamap = datafile.datamap
+        cls.datamap = datafile.to_datamap()
 
     def testGridPointCreate(self):
         """

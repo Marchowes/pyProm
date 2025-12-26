@@ -11,7 +11,7 @@ from pyprom.lib.locations.runoff import Runoff
 from pyprom.lib.locations.summit import Summit
 from pyprom.domain_map import DomainMap
 from pyprom.tests.getData import gettestzip
-from pyprom.dataload import GDALLoader
+from pyprom.lib.loaders.gdal_loader import GDALLoader
 
 
 class RunoffsContainerTests(unittest.TestCase):
@@ -123,7 +123,7 @@ class RunoffsContainerTests(unittest.TestCase):
         """
         gettestzip()
         datafile = GDALLoader('/tmp/N44W072.hgt')
-        datamap = datafile.datamap
+        datamap = datafile.to_datamap()
         someslice = datamap.subset(0, 0, 30, 30)
         domain = DomainMap(someslice)
         domain.run()

@@ -28,7 +28,7 @@ from .lib.logic.contiguous_neighbors import contiguous_neighbors, touching_neigh
 from .lib.logic.shortest_path_by_points import high_perimeter_neighborhood_shortest_path
 from .lib.logic.tuple_funcs import highest
 
-from .lib.constants import METERS_TO_FEET
+from .lib.constants import METERS_PER_FOOT
 
 
 class AnalyzeData:
@@ -46,7 +46,7 @@ class AnalyzeData:
         """
         self.logger = logging.getLogger('{}'.format(__name__))
         self.datamap = datamap
-        self.data = self.datamap.numpy_map
+        self.data = self.datamap.numpy_array
         self.max_y = self.datamap.max_y
         self.max_x = self.datamap.max_x
         self.explored = defaultdict(dict)
@@ -101,10 +101,7 @@ class AnalyzeData:
             if current_x != x:
                 del self.explored[current_x]
                 current_x = x
-            if self.datamap.unit == "FEET":
-                self.elevation = float(METERS_TO_FEET * iterator[0])
-            else:
-                self.elevation = float(iterator[0])
+            self.elevation = float(iterator[0])
 
             # Quick Progress Meter. Needs refinement,
             index += 1
@@ -241,7 +238,7 @@ class AnalyzeData:
         returnableLocations = []
         highPerimeter = perimeter.findHighPerimeterNeighborhoods(
             self.elevation)
-        lat, long = self.datamap.xy_to_latlong(x, y)
+        lat, long = self.datamap.xy_to_latlon(x, y)
 
         # if there is no high perimeter
         if not highPerimeter:
@@ -298,7 +295,7 @@ class AnalyzeData:
         if not edge:
             return returnable_features
 
-        lat, long = self.datamap.xy_to_latlong(x, y)
+        lat, long = self.datamap.xy_to_latlon(x, y)
 
         # No high perimeter? that makes this a "Summit-like" runoff.
         if not highPerimeter:
@@ -376,7 +373,7 @@ class AnalyzeData:
                 if len(touched) == 2:
                     #todo: make this choose the actual center, not just list middle.
                     mid = edge_point_neighborhoods[idx][floor(len(edge_point_neighborhoods[idx])/2)]
-                    _lat, _long = self.datamap.xy_to_latlong(mid[0], mid[1])
+                    _lat, _long = self.datamap.xy_to_latlon(mid[0], mid[1])
 
                     highPerimeterNeighborhoods = []
                     if multipoint:

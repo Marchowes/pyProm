@@ -14,7 +14,7 @@ from pyprom.lib.locations.saddle import Saddle
 from pyprom.lib.locations.summit import Summit
 from pyprom.domain_map import DomainMap
 from pyprom.tests.getData import gettestzip
-from pyprom.dataload import GDALLoader
+from pyprom.lib.loaders.gdal_loader import GDALLoader
 
 
 class SaddlesContainerTests(unittest.TestCase):
@@ -122,7 +122,7 @@ class SaddlesContainerTests(unittest.TestCase):
         """
         gettestzip()
         datafile = GDALLoader('/tmp/N44W072.hgt')
-        datamap = datafile.datamap
+        datamap = datafile.to_datamap()
         someslice = datamap.subset(0, 0, 30, 30)
         domain = DomainMap(someslice)
         domain.run()
@@ -168,7 +168,7 @@ class SaddlesContainerRebuildTests(unittest.TestCase):
         """
         gettestzip()
         datafile = GDALLoader('/tmp/N44W072.hgt')
-        cls.datamap = datafile.datamap
+        cls.datamap = datafile.to_datamap()
 
     def setUp(self):
         """

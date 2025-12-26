@@ -10,9 +10,14 @@ DOMAIN_EXTENSION = ".dom"
 
 # Unit Conversion Constants
 
-METERS_TO_FEET = 0.3048
+METERS_PER_FOOT = 0.3048
+METERS_PER_SURVEY_FOOT = 0.3048006096
 
-FEET_TO_METERS = 1/METERS_TO_FEET
+FEET_PER_METER = 1/METERS_PER_FOOT
+SURVEY_FEET_PER_METER = 1/METERS_PER_FOOT
 
-FEET_IN_MILES = 5280
+FEET_PER_MILE = 5280
 
+GDAL_METERS = ('m', 'metre', 'meter',)
+GDAL_FEET = ('ft', 'foot', 'feet',)
+GDAL_SURVEY_FOOT = ('us survey foot', 'US survey foot', 'us-ft',)
