@@ -9,6 +9,7 @@ from __future__ import division
 
 import numpy
 import logging
+from tqdm import tqdm
 
 from collections import defaultdict
 from timeit import default_timer
@@ -90,33 +91,17 @@ class AnalyzeData:
         self.saddleObjects = SaddlesContainer([])
         self.runoffObjects = RunoffsContainer([])
         iterator = numpy.nditer(self.data, flags=['multi_index'])
-        index = 0
-        start = default_timer()
-        then = start
         current_x = 0
         # Iterate through numpy grid, and keep track of GridPoint coordinates.
+        progress_bar = tqdm(total=self.data.size, desc="Processing grid", mininterval=2, ncols=80, ascii=True)
         while not iterator.finished:
+            progress_bar.update(1) 
             x, y = iterator.multi_index
             # core storage is always in metric.
             if current_x != x:
                 del self.explored[current_x]
                 current_x = x
             self.elevation = float(iterator[0])
-
-            # Quick Progress Meter. Needs refinement,
-            index += 1
-            if not index % 100000:
-                now = default_timer()
-                pointsPerSec = round(index / (now - start), 2)
-                self.logger.info(
-                    "Points per second: {} - {}%"
-                    " runtime: {}, split: {}".format(
-                        pointsPerSec,
-                        round(index / self.data.size * 100, 2),
-                        (str(timedelta(seconds=round(now - start, 2)))),
-                        round(now - then, 2)
-                    ))
-                then = now
 
             # skip if this is a nodata point.
             if self.elevation == self.datamap.nodata:
@@ -134,6 +119,7 @@ class AnalyzeData:
                         self.saddleObjects.append(result)
             # Reset variables, and go to next gridpoint.
             iterator.iternext()
+        progress_bar.close()
         # Free some memory.
         del(self.explored)
         return self.summitObjects, self.saddleObjects, self.runoffObjects
