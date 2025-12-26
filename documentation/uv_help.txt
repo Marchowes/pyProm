@@ -5,14 +5,10 @@ Installs latest python:
 uv python install
 
 Specific version:
-uv python install 3.12
+uv python install 3.14
 
 To init venv:
-go to pyprom root and type "uv venv --python 3.12"
-
-
-uv python install 3.12
-
+go to pyprom root and type "uv venv --python 3.14"
 
 add package
 

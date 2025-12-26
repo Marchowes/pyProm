@@ -46,7 +46,7 @@ Installation
 
 pyProm is most easily installed using uv. You may have to install GDAL developer libraries and update the pyproject.toml file to match GDAL versions in case they are mismatched
 
-* Go to the pyprom folder and execute `uv venv --python 3.12`
+* Go to the pyprom folder and execute `uv venv --python 3.14`
 * Follow venv activation instructions
 * run `uv sync --active` this should install the required packages.
 
