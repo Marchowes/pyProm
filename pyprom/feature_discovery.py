@@ -50,7 +50,7 @@ class AnalyzeData:
         self.data = self.datamap.numpy_array
         self.max_y = self.datamap.max_y
         self.max_x = self.datamap.max_x
-        self.explored = defaultdict(dict)
+        self.visited = numpy.zeros_like(datamap.numpy_array, dtype=bool)
 
     def run(self, rebuildSaddles=True):
         """
@@ -93,14 +93,14 @@ class AnalyzeData:
         iterator = numpy.nditer(self.data, flags=['multi_index'])
         current_x = 0
         # Iterate through numpy grid, and keep track of GridPoint coordinates.
-        progress_bar = tqdm(total=self.data.size, desc="Processing grid", mininterval=2, ncols=80, ascii=True)
+        progress_bar = tqdm(total=self.data.size, desc="Saddle, Summit, Runoff Identification", mininterval=2, ncols=80, ascii=True)
         while not iterator.finished:
             progress_bar.update(1) 
             x, y = iterator.multi_index
             # core storage is always in metric.
-            if current_x != x:
-                del self.explored[current_x]
-                current_x = x
+            #if current_x != x:
+            #    del self.explored[current_x]
+            #    current_x = x
             self.elevation = float(iterator[0])
 
             # skip if this is a nodata point.
@@ -121,7 +121,7 @@ class AnalyzeData:
             iterator.iternext()
         progress_bar.close()
         # Free some memory.
-        del(self.explored)
+        #del(self.explored)
         return self.summitObjects, self.saddleObjects, self.runoffObjects
 
     def analyze_multipoint(self, x, y, ptElevation):
@@ -140,8 +140,7 @@ class AnalyzeData:
         blob, edgePoints = equalHeightBlob(self.datamap, x, y, ptElevation)
         edge = blob.perimeter.mapEdge
         for exemptPoint in blob:
-            self.explored[exemptPoint[0]][exemptPoint[1]] = True
-
+            self.visited[exemptPoint[0]][exemptPoint[1]] = True
         return self.consolidatedFeatureLogic(x, y, blob.perimeter,
                                              blob, edge, edgePoints)
 
@@ -159,7 +158,7 @@ class AnalyzeData:
          :class:`pyprom.lib.locations.runoff.Runoff`, or None.
         """
         # Exempt! bail out!
-        if self.explored[x].get(y, False):
+        if self.visited[x][y]:
             return None
         edge = False
 
@@ -181,8 +180,7 @@ class AnalyzeData:
                 continue
             # If we have equal neighbors, we need to kick off analysis to
             # a special MultiPoint analysis function and return the result.
-            if elevation == self.elevation and\
-                    not self.explored[_x].get(_y, False):
+            if elevation == self.elevation and not self.visited[x][y]:
                 return self.analyze_multipoint(_x, _y, elevation)
 
             if elevation > self.elevation:
