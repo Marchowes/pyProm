@@ -15,7 +15,15 @@ from .base_gridpoint import BaseGridPoint
 from ..util import randomString
 from ..constants import FEET_PER_METER
 
-
+from typing import TYPE_CHECKING, Self
+if TYPE_CHECKING:
+    from pyprom._typing.type_hints import (
+        Latitude_X, Longitude_Y,
+        Elevation,
+        XY_Elevation
+    )
+    from pyprom import DataMap
+    from .gridpoint import GridPoint
 class SpotElevation(BaseCoordinate):
     """
     SpotElevation is intended to be inherited from. Effectively it's a
@@ -23,7 +31,12 @@ class SpotElevation(BaseCoordinate):
     """
     __slots__ = ['elevation', 'edgeEffect', 'edgePoints', 'id']
 
-    def __init__(self, latitude, longitude, elevation, *args, **kwargs):
+    def __init__(
+            self, 
+            latitude: Latitude_X, longitude: Longitude_Y, 
+            elevation: Elevation, 
+            *args, **kwargs
+        ):
         """
         :param latitude: latitude in dotted decimal
         :type latitude: int, float
@@ -38,13 +51,13 @@ class SpotElevation(BaseCoordinate):
         :type edgePoints:
          list(:class:`pyprom.lib.locations.base_gridpoint.BaseGridPoint`)
         """
-        super(SpotElevation, self).__init__(latitude, longitude)
+        super().__init__(latitude, longitude)
         self.elevation = elevation
         self.edgeEffect = kwargs.get('edge', False)
         self.edgePoints = kwargs.get('edgePoints', [])
         self.id = kwargs.get('id', 'se:' + randomString())
 
-    def to_dict(self):
+    def to_dict(self) -> dict:
         """
         Create the dictionary representation of this object.
 
@@ -60,7 +73,7 @@ class SpotElevation(BaseCoordinate):
                 }
 
     @classmethod
-    def from_dict(cls, spotElevationDict):
+    def from_dict(cls, spotElevationDict: dict) -> Self:
         """
         Create :class:`SpotElevation` from dictionary representation
 
@@ -80,7 +93,7 @@ class SpotElevation(BaseCoordinate):
                    edgePoints=edgePoints,
                    id=id)
 
-    def toGridPoint(self, datamap):
+    def toGridPoint(self, datamap: DataMap) -> GridPoint:
         """
         Return this :class:`SpotElevation` object as
         a :class:`pyprom.lib.locations.gridpoint.GridPoint`
@@ -96,7 +109,7 @@ class SpotElevation(BaseCoordinate):
         x, y = datamap.latlong_to_xy(self.latitude, self.longitude)
         return GridPoint(x, y, self.elevation)
 
-    def toXYTuple(self, datamap):
+    def toXYTuple(self, datamap: DataMap) -> XY_Elevation:
         """
         Return this :class:`SpotElevation` object as
         an (x, y, ele) tuple
@@ -112,7 +125,7 @@ class SpotElevation(BaseCoordinate):
         return (x, y, self.elevation)
 
     @property
-    def feet(self):
+    def feet(self) -> Elevation:
         """
         :return: elevation in feet
         :rtype: float, None
@@ -123,7 +136,7 @@ class SpotElevation(BaseCoordinate):
             return None
 
     @property
-    def shape(self):
+    def shape(self) -> Point:
         """
         Returns a point representation of this :class:`SpotElevation` as a
          :class:`shapely.geometry.Point`
@@ -131,7 +144,7 @@ class SpotElevation(BaseCoordinate):
         """
         return Point(self.longitude, self.latitude)
 
-    def __eq__(self, other):
+    def __eq__(self, other: Self) -> bool:
         """
         Determines if this object is equal to another.
 
@@ -152,7 +165,7 @@ class SpotElevation(BaseCoordinate):
         return [latitude, longitude, self.elevation] ==\
                [olatitude, olongitude, other.elevation]
 
-    def __ne__(self, other):
+    def __ne__(self, other: Self) -> bool:
         """
         Determines if this object is not equal to another.
 
@@ -166,7 +179,7 @@ class SpotElevation(BaseCoordinate):
                [round(other.latitude, 6), round(other.longitude, 6),
                 other.elevation]
 
-    def __lt__(self, other):
+    def __lt__(self, other: Self) -> bool:
         """
         Determines if :class:`SpotElevation` elevation is less than another.
 
@@ -179,15 +192,20 @@ class SpotElevation(BaseCoordinate):
         isSpotElevation(other)
         return self.elevation < other.elevation
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         """
         :return: Hash representation of this object
-        :rtype: str
+        :rtype: int
         """
-        return hash((round(self.latitude, 6), round(self.longitude, 6),
-                     self.elevation))
+        return hash(
+            (
+                round(self.latitude, 6), 
+                round(self.longitude, 6),
+                self.elevation
+             )
+        )
 
-    def __repr__(self):
+    def __repr__(self) -> Self:
         """
         :return: String representation of this object
         """
@@ -200,7 +218,7 @@ class SpotElevation(BaseCoordinate):
     __unicode__ = __str__ = __repr__
 
 
-def isSpotElevation(spotElevation):
+def isSpotElevation(spotElevation: Self) -> None:
     """
     Check if passed in object is a :class:`SpotElevation`
 
