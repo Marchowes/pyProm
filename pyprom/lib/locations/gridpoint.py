@@ -6,10 +6,18 @@ the LICENSE file that accompanies it.
 
 This library contains a base class for x,y oriented objects.
 """
+from __future__ import annotations
 
 from .base_gridpoint import BaseGridPoint
 
-
+from typing import TYPE_CHECKING, Dict, Self
+if TYPE_CHECKING:
+    from pyprom._typing.type_hints import (
+        Numpy_X, Numpy_Y, 
+        XY_Elevation,
+        Elevation,
+    )
+    from pyprom.lib.locations.spot_elevation import SpotElevation
 class GridPoint(BaseGridPoint):
     """
     A GridPoint Object. This is a Child of
@@ -19,7 +27,7 @@ class GridPoint(BaseGridPoint):
 
     __slots__ = ['elevation']
 
-    def __init__(self, x, y, elevation):
+    def __init__(self, x: Numpy_X, y: Numpy_Y, elevation: Elevation):
         """
         :param int x: x coordinate
         :param int y: y coordinate
@@ -30,7 +38,7 @@ class GridPoint(BaseGridPoint):
         self.elevation = elevation
 
     @classmethod
-    def from_dict(self, gridPointDict):
+    def from_dict(self, gridPointDict: Dict[str, int | float]) -> Self:
         """
         Create this object from dictionary representation
 
@@ -43,7 +51,7 @@ class GridPoint(BaseGridPoint):
                     gridPointDict['elevation'])
 
     @classmethod
-    def from_tuple(self, tup):
+    def from_tuple(self, tup: XY_Elevation) -> Self:
         """
         Create this object from tuple representation
         :param tup:
@@ -52,7 +60,7 @@ class GridPoint(BaseGridPoint):
         """
         return self(tup[0], tup[1], tup[2])
 
-    def to_dict(self):
+    def to_dict(self) -> Dict:
         """
         :return: dict() representation of :class:`GridPoint`
         """
@@ -60,13 +68,13 @@ class GridPoint(BaseGridPoint):
                 'y': self.y,
                 'elevation': self.elevation}
 
-    def to_tuple(self):
+    def to_tuple(self) -> XY_Elevation:
         """
         :return: tuple() representation of :class:`GridPoint`
         """
         return (self.x, self.y, self.elevation)
 
-    def toSpotElevation(self, datamap):
+    def toSpotElevation(self, datamap) -> SpotElevation:
         """
         Converts this GridPoint into a SpotElevation using a datamap.
 
@@ -79,7 +87,7 @@ class GridPoint(BaseGridPoint):
         lat, long = datamap.xy_to_latlon(self.x, self.y)
         return SpotElevation(lat, long, self.elevation)
 
-    def __eq__(self, other):
+    def __eq__(self, other: Self) -> bool:
         """
         :param other: object which we compare against.
         :type other: :class:`GridPoint`
@@ -91,7 +99,7 @@ class GridPoint(BaseGridPoint):
         return [self.x, self.y, self.elevation] ==\
                [other.x, other.y, other.elevation]
 
-    def __ne__(self, other):
+    def __ne__(self, other: Self) -> bool:
         """
         :param other: object which we compare against.
         :type other: :class:`GridPoint`
@@ -103,7 +111,7 @@ class GridPoint(BaseGridPoint):
         return [self.x, self.y, self.elevation] !=\
                [other.x, other.y, other.elevation]
 
-    def __lt__(self, other):
+    def __lt__(self, other: Self) -> bool:
         """
         :param other: object which we compare against.
         :type other: :class:`GridPoint`
@@ -114,14 +122,14 @@ class GridPoint(BaseGridPoint):
         isGridPoint(other)
         return self.elevation < other.elevation
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         """
         :return: hash representation of this object.
         :rtype: str
         """
         return hash((self.x, self.y, self.elevation))
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         """
         :return: String representation of this object
         """
@@ -133,7 +141,7 @@ class GridPoint(BaseGridPoint):
     __unicode__ = __str__ = __repr__
 
 
-def isGridPoint(gridPoint):
+def isGridPoint(gridPoint: Self) -> None:
     """
     Check if passed in object is a :class:`GridPoint`
 
