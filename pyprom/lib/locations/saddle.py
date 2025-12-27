@@ -6,6 +6,7 @@ the LICENSE file that accompanies it.
 
 This library contains a class for storing Saddle data.
 """
+from __future__ import annotations
 
 import math
 from dijkstar import Graph, find_path
@@ -15,7 +16,17 @@ from ..containers.linker import isLinker
 from ..containers.base_self_iterable import BaseSelfIterable
 from ..util import randomString
 
-
+from typing import TYPE_CHECKING, List, Tuple, Set, Self 
+if TYPE_CHECKING:
+    from pyprom._typing.type_hints import (
+        Latitude_X, Longitude_Y,
+        Elevation,
+        XY_Elevation
+    )
+    from pyprom.lib.containers.linker import Linker
+    from pyprom.lib.containers.summits import Summit
+    from pyprom.lib.containers.summit_domain import SummitDomain
+    from pyprom import DataMap
 class Saddle(SpotElevation):
     """
     | Saddle object stores relevant saddle data.
@@ -49,7 +60,12 @@ class Saddle(SpotElevation):
                  'basinSaddle', 'basinSaddleAlternatives',
                  '_disqualified', 'lprBoundary']
 
-    def __init__(self, latitude, longitude, elevation, *args, **kwargs):
+    def __init__(
+            self, 
+            latitude: Latitude_X, longitude: Longitude_Y, 
+            elevation: Elevation, 
+            *args, **kwargs
+        ):
         """
         :param latitude: latitude in dotted decimal
         :type latitude: int, float
@@ -79,13 +95,14 @@ class Saddle(SpotElevation):
          :type basinSaddleAlternatives: list(:class:`Saddle`)
         :param bool disqualified: kwarg for a generic disqualified Saddle.
         """
-        super(Saddle, self).__init__(latitude, longitude,
-                                     elevation, *args, **kwargs)
+        super().__init__(
+            latitude, longitude, elevation, *args, **kwargs
+        )
         self.multipoint = kwargs.get('multipoint', [])
         self.highPerimeterNeighborhoods = kwargs.get('highPerimeterNeighborhoods', [])
         self.id = kwargs.get('id', 'sa:' + randomString())
         # List of linkers to summits
-        self.summits = []
+        self.summits: List[Summit] = []
         # If this is set, this saddle has spun out another
         # Saddle with less data. (for instance, if its an edge effect)
         self.parent = kwargs.get('parent', None)  # Parent
@@ -102,7 +119,7 @@ class Saddle(SpotElevation):
         self._disqualified = kwargs.get('disqualified', None)
         self.lprBoundary = []
 
-    def addSummitLinker(self, linker):
+    def addSummitLinker(self, linker: Linker) -> None:
         """
         Add a :class:`pyprom.lib.containers.linker.Linker` to this Saddle.
         This in effect links a :class:`pyprom.lib.locations.summit.Summit`
@@ -114,7 +131,7 @@ class Saddle(SpotElevation):
         isLinker(linker)
         self.summits.append(linker)
 
-    def feature_neighbors(self):
+    def feature_neighbors(self) -> List[Summit]:
         """
         :return: returns all linked Summits.
          This is, in effect, an interface.
@@ -123,7 +140,7 @@ class Saddle(SpotElevation):
         return [feature.summit for feature in self.summits]
 
     @property
-    def domains(self):
+    def domains(self) -> List[SummitDomain]:
         """
         :return: list of SummitDomains associated with this Saddle
         """
@@ -131,7 +148,7 @@ class Saddle(SpotElevation):
 
 
     @property
-    def neighbors(self, filterDisqualified=True):
+    def neighbors(self, filterDisqualified: bool = True) -> List[Saddle]:
         """
         neighbors will return all neighboring saddles by way of the
         connected summit.
@@ -146,7 +163,7 @@ class Saddle(SpotElevation):
         neighborSet.discard(self)
         return list(neighborSet)
 
-    def all_neighbors(self, filterDisqualified=True):
+    def all_neighbors(self, filterDisqualified=True) -> List[Saddle]:
         """
         all_neighbors will return all neighboring saddles by way of the
         connected summit.
@@ -167,7 +184,7 @@ class Saddle(SpotElevation):
                 for linker in self.summits]
         return neighbors
 
-    def high_perimeter_neighborhood_shortest_path(self, datamap):
+    def high_perimeter_neighborhood_shortest_path(self, datamap: DataMap) -> Tuple[XY_Elevation, XY_Elevation, XY_Elevation]:
         """
         Finds the two closest opposing high perimeter points.
         This follows a path inside the saddle.
@@ -215,11 +232,14 @@ class Saddle(SpotElevation):
             else:
                 overall_shortest = path
 
-        return overall_shortest.nodes[0], overall_shortest.nodes[-1],\
-               overall_shortest.nodes[math.floor(len(overall_shortest.nodes)/2)]
+        return (
+            overall_shortest.nodes[0], 
+            overall_shortest.nodes[-1],
+            overall_shortest.nodes[math.floor(len(overall_shortest.nodes)/2)]
+        )
 
     @property
-    def summits_set(self):
+    def summits_set(self) -> Set[Summit]:
         """
         :return: set of linked Summits
         :rtype: set(:class:`pyprom.lib.locations.summit.Summit`)
@@ -227,7 +247,7 @@ class Saddle(SpotElevation):
         return set([x.summit for x in self.summits])
 
     @property
-    def disqualified(self):
+    def disqualified(self) -> bool:
         """
         :return: if any values that indicate disqualification are set,
          return True.
@@ -240,14 +260,16 @@ class Saddle(SpotElevation):
             return self.singleSummit | self.basinSaddle
 
     @disqualified.setter
-    def disqualified(self, value):
+    def disqualified(self, value: bool):
         """
         :param bool value: Override Saddle disqualification
         """
         self._disqualified = value
 
-    def disqualify_self_and_linkers(self, basinSaddle=False,
-                                    singleSummit=False):
+    def disqualify_self_and_linkers(self,
+            basinSaddle: bool = False,
+            singleSummit: bool = False
+        ):
         """
         Disqualify this :class:`Saddle` and linked
         :class:`pyprom.lib.containers.linker.Linker` s
@@ -264,7 +286,7 @@ class Saddle(SpotElevation):
         for linker in self.summits:
             linker.disqualified = True
 
-    def emancipate(self):
+    def emancipate(self) -> None:
         """
         Emancipate disassociates this saddle from its parent :class:`Saddle`
         """
@@ -273,7 +295,7 @@ class Saddle(SpotElevation):
                 [x for x in self.parent.children if x != self]
             self.parent = None
 
-    def disown_children(self):
+    def disown_children(self) -> None:
         """
         disown_children disassociates this saddle from all child
          :class:`Saddle`
@@ -282,7 +304,7 @@ class Saddle(SpotElevation):
             child.emancipate()
         self.children = []
 
-    def soft_delete(self):
+    def soft_delete(self) -> None:
         """
         Soft deletes this Saddle, that is, disassociates itself
         from other saddle attributes
@@ -298,7 +320,7 @@ class Saddle(SpotElevation):
         self.basinSaddleAlternatives = []
         self.disqualify_self_and_linkers()
 
-    def to_dict(self, referenceById=True):
+    def to_dict(self, referenceById: bool = True) -> dict:
         """
         Create the dictionary representation of this object.
 
@@ -336,7 +358,7 @@ class Saddle(SpotElevation):
         return to_dict
 
     @classmethod
-    def from_dict(cls, saddleDict, datamap=None):
+    def from_dict(cls, saddleDict: dict, datamap: DataMap | None = None) -> Self:
         """
         Create this object from dictionary representation
 
@@ -387,7 +409,7 @@ class Saddle(SpotElevation):
                    basinSaddle=basinSaddle,
                    disqualified=disqualified)
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         """
         hash takes into account the lat, long, and elevation of the saddle
         As well as a hash of all the highPerimeterNeighborhoods. This is a costly calculation
@@ -400,7 +422,7 @@ class Saddle(SpotElevation):
         pointsTuple = tuple(self.highPerimeterNeighborhoods)
         return hash((masterHash, hash(pointsTuple)))
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         """
         :return: String representation of this object
         """
@@ -411,10 +433,10 @@ class Saddle(SpotElevation):
             self.elevation,
             bool(self.multipoint))
 
-    __unicode__ = __str__ = __repr__
+    __str__ = __repr__
 
 
-def isSaddle(saddle):
+def isSaddle(saddle) -> None:
     """
     Check if passed in object is a :class:`Saddle`
 
