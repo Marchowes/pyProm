@@ -12,6 +12,8 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from .gridpoint import GridPoint
     from ..containers.feature_verticies import Feature_Verticies
+
+    
 class Vertex_Link:
     """
     Vertex_Link connects a vertex
