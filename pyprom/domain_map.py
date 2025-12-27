@@ -29,6 +29,11 @@ from .lib.logic.summit_domain_walk import Walk
 from .lib.constants import DOMAIN_EXTENSION
 from . import version_info
 
+from typing import TYPE_CHECKING, List, Self
+if TYPE_CHECKING:
+    from .lib.locations.saddle import Saddle
+
+
 class DomainMap:
     """
     DomainMap object, This object contains the
@@ -39,12 +44,14 @@ class DomainMap:
     required to calculate the surface network.
     """
 
-    def __init__(self, data,
-                 summits=SummitsContainer([]),
-                 saddles=SaddlesContainer([]),
-                 runoffs=RunoffsContainer([]),
-                 summit_domains=[],
-                 linkers=[]):
+    def __init__(self, 
+            data: DataMap | BaseLoader,
+            summits: SummitsContainer = SummitsContainer([]),
+            saddles: SaddlesContainer = SaddlesContainer([]),
+            runoffs: RunoffsContainer = RunoffsContainer([]),
+            summit_domains: List[SummitDomain] | List = [],
+            linkers: List[Linker] | List = []
+        ):
         """
         A DomainMap consumes either a :class:`pyprom.lib.datamap.DataMap` object or
         a :class:`pyprom.dataload.Loader` child object.
@@ -81,7 +88,11 @@ class DomainMap:
         self.logger = logging.getLogger('{}'.format(__name__))
         self.logger.info("DomainMap Object Created: \n{}".format(self.extent))
 
-    def run(self, sparse=False, superSparse=False, rebuildSaddles=False):
+    def run(self, 
+            sparse: bool = False, 
+            superSparse: bool = False, 
+            rebuildSaddles: bool = False
+        ) -> None:
         """
         Performs discovery of :class:`pyprom.lib.locations.saddle.Saddle`,
         :class:`pyprom.lib.locations.summit.Summit`,
@@ -120,7 +131,10 @@ class DomainMap:
         self.detect_basin_saddles()
 
     @classmethod
-    def read(cls, filename, datamap):
+    def read(cls, 
+            filename: str, 
+            datamap: DataMap,
+        ) -> Self:
         """
         Class Method for reading a DomainMap saved to file into a :class:`DomainMap`.
 
@@ -136,7 +150,9 @@ class DomainMap:
         incoming.close()
         return domain
 
-    def write(self, filename):
+    def write(self, 
+            filename: str
+        ) -> None:
         """
         Writes the contents of the :class:`DomainMap` to a file.
 
@@ -154,7 +170,10 @@ class DomainMap:
         outgoing.close()
 
     @classmethod
-    def from_cbor(cls, cborBinary, datamap):
+    def from_cbor(cls, 
+            cborBinary: bytes, 
+            datamap: DataMap
+        ) -> Self:
         """
         Loads a cbor binary into a DomainMap. This also requires
         a :class:`pyprom.lib.datamap.DataMap`
@@ -167,7 +186,7 @@ class DomainMap:
         domainDict = cbor.loads(cborBinary)
         return cls.from_dict(domainDict, datamap)
 
-    def to_cbor(self):
+    def to_cbor(self) -> bytes:
         """
         Returns compressed cbor binary representation of this :class:`DomainMap`
 
@@ -176,7 +195,10 @@ class DomainMap:
         return cbor.dumps(self.to_dict())
 
     @classmethod
-    def from_dict(cls, domainDict, datamap):
+    def from_dict(cls, 
+            domainDict: dict, 
+            datamap: DataMap
+        ) -> Self:
         """
         Loads dictionary representation into :class:`Domain`
 
@@ -219,7 +241,7 @@ class DomainMap:
                    saddlesContainer, runoffsContainer,
                    summit_domains, linkers)
 
-    def to_dict(self):
+    def to_dict(self) -> dict:
         """
         Returns dict representation of this :class:`DomainMap`
         :return: dict() representation of :class:`DomainMap`
@@ -242,8 +264,11 @@ class DomainMap:
 
         return domain_dict
 
-    def purge_saddles(self, singleSummit = True, basinSaddle = True,
-                      allBasinSaddles = False):
+    def purge_saddles(self, 
+            singleSummit: bool = True, 
+            basinSaddle: bool = True,
+            allBasinSaddles: bool = False
+        ):
         """
         Purges Non-redundant Basin Saddles and/or Single Summit linked Saddles
 
@@ -292,7 +317,9 @@ class DomainMap:
         self.logger.info("Culled {} Saddles".format(len(toRemoveSaddles)))
         self.logger.info("Kept {} Saddles".format(len(toKeepSaddles)))
 
-    def walk(self, saddles=[]):
+    def walk(self, 
+            saddles: List[Saddle] | List = []
+        ):
         """
         Perform Walk from Saddles contained in this DomainMap
 
@@ -308,7 +335,7 @@ class DomainMap:
                 walk.climb_from_saddles(saddles)
             return outsaddles, outrunoffs
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         """
         :return: String representation of this object
         """
@@ -320,9 +347,9 @@ class DomainMap:
                 len(self.runoffs),
                 len(self.linkers))
 
-    __unicode__ = __str__ = __repr__
+    __str__ = __repr__
 
-    def detect_basin_saddles(self):
+    def detect_basin_saddles(self) -> None:
         """
         This function identifies Basin Saddles, and Single Summit Saddles
         and disqualifies them.
