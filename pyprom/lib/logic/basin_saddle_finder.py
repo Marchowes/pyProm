@@ -11,14 +11,19 @@ from ..containers.saddles import SaddlesContainer
 from timeit import default_timer
 from collections import OrderedDict
 
-
+from typing import TYPE_CHECKING, List
+if TYPE_CHECKING:
+    from pyprom.lib.locations.saddle import Saddle
+    from pyprom.lib.locations.summit import Summit
 class BasinSaddleFinder:
     """
     Class for identifying all basin saddles.
     A Basin Saddle is the lowest member of a cycle.
     """
 
-    def __init__(self, saddles):
+    def __init__(self, 
+            saddles: SaddlesContainer
+        ):
         """
         :param saddles: SaddlesContainer containing saddles to be analyzed
         :type saddles: :class:`pyprom.lib.containers.saddles.SaddlesContainer`
@@ -31,7 +36,7 @@ class BasinSaddleFinder:
         self.logger = logging.getLogger('{}'.format(__name__))
         self.saddles = saddles
 
-    def disqualify_basin_saddles(self):
+    def disqualify_basin_saddles(self) -> None:
         """
         This function identifies Basin Saddles or single summit (stub)
         saddles, marks them as disqualified, and sets
@@ -114,7 +119,7 @@ class BasinSaddleFinder:
                          " seconds {} Basin Saddles".format(
                              default_timer() - start, basinSaddlesCounter))
 
-    def _disqualify_and_label(self, lowest):
+    def _disqualify_and_label(self, lowest: Saddle) :
         """
         Consumes a list of features of the same height, disqualifies
         one, and sets basinSaddleAlternatives for equal height features.
@@ -129,14 +134,14 @@ class BasinSaddleFinder:
                 saddle.basinSaddleAlternatives = lowest.copy()
                 saddle.basinSaddleAlternatives.remove(saddle)
 
-    def find_lowest_cycle_members(self, cycle):
+    def find_lowest_cycle_members(self, cycle: List[Summit | Saddle]) -> List[Saddle]:
         """
         Consumes a list of points which make a cycle. Finds lowest points
         and returns a list of features which are the lowest.
 
         :param cycle: features which make a cycle.
-        :type cycle:
-         list(:class:`pyprom.lib.locations.spot_elevation.SpotElevation`)
+         list(:class:`pyprom.lib.locations.spo
+        :type cycle:t_elevation.SpotElevation`)
         """
         lowest = []
         lowest.append(cycle[0])
@@ -150,7 +155,7 @@ class BasinSaddleFinder:
                 continue
         return lowest
 
-    def _disqualify_single_source_saddles(self, saddle):
+    def _disqualify_single_source_saddles(self, saddle: Saddle) -> int:
         """
         |Disqualifies Linkers and Saddles for Single Summit Saddles.
         |          ``v-----v``
