@@ -13,6 +13,8 @@ from pyprom.lib.util import dottedDecimaltoDegrees
 from typing import TYPE_CHECKING, Tuple
 if TYPE_CHECKING:
     from pyprom._typing.type_hints import Latitude_X, Longitude_Y
+
+    
 class BaseCoordinate:
     """
     Base Coordinate, intended to be inherited from. This contains
