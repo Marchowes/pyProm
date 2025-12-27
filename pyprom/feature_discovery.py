@@ -97,10 +97,6 @@ class AnalyzeData:
         while not iterator.finished:
             progress_bar.update(1) 
             x, y = iterator.multi_index
-            # core storage is always in metric.
-            #if current_x != x:
-            #    del self.explored[current_x]
-            #    current_x = x
             self.elevation = float(iterator[0])
 
             # skip if this is a nodata point.
@@ -120,8 +116,8 @@ class AnalyzeData:
             # Reset variables, and go to next gridpoint.
             iterator.iternext()
         progress_bar.close()
-        # Free some memory.
-        #del(self.explored)
+        # free some memory
+        del(self.visited)
         return self.summitObjects, self.saddleObjects, self.runoffObjects
 
     def analyze_multipoint(self, x, y, ptElevation):

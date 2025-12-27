@@ -54,7 +54,7 @@ class DataMap(BaseDataMap):
         raster_band = self.gdal_dataset.GetRasterBand(1)
         self.nodata = raster_band.GetNoDataValue()
         self.numpy_array = numpy.array(
-            raster_band.ReadAsArray()
+            raster_band.ReadAsArray(buf_type=gdal.GDT_Float32)
         )
         self.md5 = f'{checksum(loader.filename)}{hash(array2string(self.numpy_array))}'
         self.geotransform = self.gdal_dataset.GetGeoTransform()

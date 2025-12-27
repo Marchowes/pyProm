@@ -65,7 +65,7 @@ def detect_vertical_unit(
         xsize=xsize, ysize=ysize,
         buf_xsize=xsize // step,
         buf_ysize=ysize // step
-    ).astype("float64")
+    ).astype("float32")
 
     if nodata is not None:
         arr = arr[arr != nodata]
