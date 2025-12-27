@@ -6,6 +6,7 @@ the LICENSE file that accompanies it.
 
 This library contains a class for manipulating a pyProm Divide Tree.
 """
+from __future__ import annotations
 
 import logging
 
@@ -14,10 +15,22 @@ from shapely.geometry import Point, LineString
 
 from timeit import default_timer
 
+from typing import TYPE_CHECKING, List, Dict, Tuple
+if TYPE_CHECKING:
+    from pyprom import DataMap
+    from pyprom.domain_map import DomainMap
+    from pyprom.lib.locations.summit import Summit
+    from pyprom.lib.locations.saddle import Saddle
+    from pyprom.lib.containers.linker import Linker
+
+
 class DivideTree:
     """Divide Tree"""
 
-    def __init__(self, domain=None, datamap=None):
+    def __init__(self,
+            domain: DomainMap | None = None, 
+            datamap: DataMap | None = None
+        ):
         """
         A divide tree optionally consumes :class:`Domain`
          and/or :class:`datamap`.
@@ -33,7 +46,7 @@ class DivideTree:
         self.datamap = datamap
         self.busted = list()  # Temporary!
 
-    def run(self):
+    def run(self) -> None:
         """Run"""
         localHighest = self.summits.highest[0]
         localHighest.localHighest = True
@@ -51,7 +64,7 @@ class DivideTree:
 
 
 
-    def localProminentRegion(self, summit):
+    def localProminentRegion(self, summit: Summit) -> None:
         """Lpr"""
         exempt = {} # hash of locally exempt linkers
         path = list() # list of linkers
@@ -62,7 +75,14 @@ class DivideTree:
 
         #print("done")
 
-    def branchChaser(self, master, branch, depth, exempt, path, lprPathObj):
+    def branchChaser(self, 
+            master: Summit, 
+            branch: Summit, 
+            depth: int, 
+            exempt: Dict[str, bool], 
+            path: List[Linker],
+            lprPathObj: LPRPaths
+        ) -> None:
         """Branch chaser
         :param: master :class:`Summit`
         :param: branch :class:`Summit`
@@ -140,7 +160,7 @@ class DivideTree:
 
 
 
-    def parentFinder(self, summit):
+    def parentFinder(self, summit: Summit):
         """Nothing"""
         pass
         # for summit in branch.saddles.summits_connected_via_saddle():
@@ -148,22 +168,25 @@ class DivideTree:
 
 class LPRPaths:
     def __init__(self):
-        self.LPRpaths = list()
-        self.edge = False
+        self.LPRpaths: List[LPRpath] = list()
+        self.edge: bool = False
 
-    def elements_for_kml(self):
+    def elements_for_kml(self) -> Tuple[Saddle | Summit | Linker]:
         elements = []
         for element in self.LPRpaths:
             elements.extend(element.elements_for_kml())
         return elements
 
 class LPRpath:
-    def __init__(self, path, saddle):
+    def __init__(self,
+            path: List[Linker], 
+            saddle: Saddle
+        ):
         self.path = path
         self.saddle = saddle
         self.decline = self.path[0].summit.feet - self.saddle.feet
 
-    def elements_for_kml(self):
+    def elements_for_kml(self) -> Tuple[Saddle | Summit | Linker]:
         saddles = []
         summits = []
         linkers = []
@@ -173,22 +196,5 @@ class LPRpath:
             linkers.append(linker)
         return summits + saddles + linkers
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return "<LPRPath> Saddle {} Hops {} Decline {}".format(self.saddle, len(self.path), self.decline)
-
-class LPR:
-    """
-    LPR
-    """
-
-    def __init__(self, highPoint=None,
-                 subsetSaddles=None,
-                 boundarySaddles=None):
-        """
-        :param highPoint: hp
-        :param subsetSaddles: sad
-        :param boundarySaddles: bdry
-        """
-        self.highPoint = highPoint
-        self.subsetSaddles = subsetSaddles
-        self.boundarySaddles = boundarySaddles
