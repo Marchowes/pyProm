@@ -10,6 +10,12 @@ This library contains a class for storing Runoff data.
 from .saddle import Saddle
 from ..util import randomString
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from pyprom._typing.type_hints import (
+        Latitude_X, Longitude_Y,
+        Elevation,
+    )
 
 class Runoff(Saddle):
     """
@@ -20,7 +26,12 @@ class Runoff(Saddle):
     """
     __slots__ = []
 
-    def __init__(self, latitude, longitude, elevation, *args, **kwargs):
+    def __init__(
+            self, 
+            latitude: Latitude_X, longitude: Longitude_Y, 
+            elevation: Elevation, 
+            *args, **kwargs
+        ):
         """
         :param latitude: latitude in dotted decimal
         :type latitude: int, float
@@ -35,12 +46,13 @@ class Runoff(Saddle):
         :type highPerimeterNeighborhoods:
          list(tuple(x,y,ele))
         """
-        super().__init__(latitude, longitude,
-                         elevation, *args, **kwargs)
+        super().__init__(
+            latitude, longitude, elevation, *args, **kwargs
+        )
         self.id = kwargs.get('id', 'ru:' + randomString())
         self.edgeEffect = True  # Runoffs are, as a rule, edge features.
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         """
         :return: String representation of this object
         """
@@ -51,4 +63,4 @@ class Runoff(Saddle):
             self.elevation,
             bool(self.multipoint))
 
-    __unicode__ = __str__ = __repr__
+    __str__ = __repr__
