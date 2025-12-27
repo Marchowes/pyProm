@@ -26,7 +26,7 @@ def contiguous_neighbors(
     :param points: list of (x, y, ele) points
     :param datamap: datamap
     :return: Finds all contiguous blocks of neighboring points.
-     Returns list of these contiguous blocks.
+        Returns list of these contiguous blocks.
     """
     points = set(points)
     lookup = defaultdict(dict)
