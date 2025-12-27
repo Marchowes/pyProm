@@ -6,16 +6,22 @@ the LICENSE file that accompanies it.
 """
 
 from collections import defaultdict
+from typing import TYPE_CHECKING, List, Dict
+if TYPE_CHECKING:
+    from pyprom._typing.type_hints import XY_Elevation
+    from pyprom import DataMap
 
 OFFSETS = (-1, 0, 1)
 
 
-def contiguous_neighbors(points):
+def contiguous_neighbors(
+        points: List[XY_Elevation]
+    ) -> List[List[XY_Elevation]]:
     """
     Consumes a list of (x, y, ele) points. finds which points neighbor
     each other diagonally or orthogonally.
 
-    This works by looking at full X, Y cartesian slices
+    This works by looking at full X, Y numpy slices
 
     :param points: list of (x, y, ele) points
     :param datamap: datamap
@@ -53,7 +59,10 @@ def contiguous_neighbors(points):
                         neighbors.append(pt)
     return neighborsList
 
-def touching_neighborhoods(list_of_point_lists, datamap):
+def touching_neighborhoods(
+        list_of_point_lists: List[List[XY_Elevation]],
+        datamap: DataMap
+    ) -> Dict[int, List[int]]:
     """
     Consumes list of point lists and which lists touch.
 

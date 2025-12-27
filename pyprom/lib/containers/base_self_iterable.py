@@ -9,11 +9,27 @@ which are self iterable.
 """
 
 from collections import defaultdict
+from typing import TYPE_CHECKING, List
+if TYPE_CHECKING:
+    from pyprom._typing.type_hints import (
+        XY_Elevation, 
+        XY_Elevation_Generator,
+        XY_Elevation_Fast_Dict
+    )
 
-FULL_SHIFT_LIST = ((-1, 0), (-1, 1), (0, 1), (1, 1), (1, 0), (1, -1),
-                       (0, -1), (-1, -1))
-ORTHOGONAL_SHIFT_LIST = ((-1, 0), (0, 1), (1, 0), (0, -1))
-DIAGONAL_SHIFT_LIST = ((-1, 1), (1, 1), (1, -1), (-1, -1))
+FULL_SHIFT_LIST = (
+    (-1, 0), (-1, 1), 
+    (0, 1), 
+    (1, 1), (1, 0), (1, -1),
+    (0, -1), 
+    (-1, -1)
+)
+ORTHOGONAL_SHIFT_LIST = (
+    (-1, 0), (0, 1), (1, 0), (0, -1)
+)
+DIAGONAL_SHIFT_LIST = (
+    (-1, 1), (1, 1), (1, -1), (-1, -1)
+)
 FULL_SHIFT_ORTHOGONAL_DIAGONAL_LIST = ORTHOGONAL_SHIFT_LIST + DIAGONAL_SHIFT_LIST
 
 class BaseSelfIterable:
@@ -28,9 +44,13 @@ class BaseSelfIterable:
 
     __slots__ = ['points', 'pointIndex']
 
+    points: List[XY_Elevation]
+    pointIndex: XY_Elevation_Fast_Dict
+
     def __init__(self,
-                 pointList=None,
-                 pointIndex=None):
+            pointList:List[XY_Elevation] | None = None,
+            pointIndex: XY_Elevation_Fast_Dict | None = None
+        ):
 
         self.points = []
         if pointList and pointIndex:
@@ -47,7 +67,7 @@ class BaseSelfIterable:
             for point in self.points:
                 self.pointIndex[point[0]][point[1]] = point
 
-    def iterNeighborFull(self, point):
+    def iterNeighborFull(self, point: XY_Elevation) -> XY_Elevation_Generator:
         """
         Iterate through diagonally and orthogonally neighboring
         tuple(x, y, ele) which are also members of this
@@ -66,7 +86,7 @@ class BaseSelfIterable:
             else:
                 continue
 
-    def iterNeighborOrthogonal(self, point):
+    def iterNeighborOrthogonal(self, point: XY_Elevation) -> XY_Elevation_Generator:
         """
         Iterate through orthogonally neighboring
         tuple(x, y, ele) which are  also members of this
@@ -85,7 +105,7 @@ class BaseSelfIterable:
             else:
                 continue
 
-    def iterNeighborOrthogonalDiagonal(self, point):
+    def iterNeighborOrthogonalDiagonal(self, point: XY_Elevation) -> XY_Elevation_Generator:
         """
         Iterate through orthogonally, then diagonally neighboring
         tuple(x, y, ele) which are  also members of this

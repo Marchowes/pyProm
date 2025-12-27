@@ -12,7 +12,7 @@ from ..containers.perimeter import Perimeter
 
 from typing import TYPE_CHECKING, List, Set
 if TYPE_CHECKING:
-    from pyprom.lib.datamaps import DataMap
+    from pyprom import DataMap
     from pyprom._typing.type_hints import (
         Numpy_X, Numpy_Y, 
         Elevation, 
@@ -78,7 +78,7 @@ def equalHeightBlob(
             elif elevation != masterGridPoint[2]:
                 if not perimeterPointHash[_x].get(_y, False):
                     if elevation > masterGridPoint[2]:
-                        _add_perimeter_point(_x, _y, (_x, _y, elevation), perimeterPointHash, perimeterPoints)
+                        _add_perimeter_point((_x, _y, elevation), perimeterPointHash, perimeterPoints)
                     if datamap.is_map_edge(_x, _y):
                         perimeterMapEdge.add((_x, _y, elevation))
     return (
@@ -108,7 +108,11 @@ def _add_member_point(
     explored_set.add(xy)
     list.append(xy)
 
-def _add_perimeter_point(x, y, val, hash, list):
+def _add_perimeter_point(
+        xy_elevation: XY_Elevation, 
+        hash, 
+        list
+    ):
     """
     Adds point to list and to hash
     :param x: x coordinate
@@ -117,5 +121,5 @@ def _add_perimeter_point(x, y, val, hash, list):
     :param list: list to add to
     :return:
     """
-    hash[x][y] = val
-    list.append(val)
+    hash[xy_elevation[0]][xy_elevation[1]] = xy_elevation
+    list.append(xy_elevation)

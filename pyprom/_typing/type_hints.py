@@ -1,5 +1,6 @@
-from pyprom.lib import constants 
-from typing import Tuple, Generator, Literal
+
+
+from typing import Tuple, Generator, Dict
 
 Numpy_X = int
 Numpy_Y = int
@@ -11,6 +12,7 @@ LatLon = Tuple[Latitude_X, Longitude_Y]
 
 XY_Elevation = Tuple[Numpy_X, Numpy_Y, Elevation]
 XY_Elevation_Generator = Generator[Numpy_X, Numpy_Y, Elevation]
+XY_Elevation_Fast_Dict = Dict[Numpy_X, Dict[Numpy_Y, Elevation]]
 
 XY = Tuple[Numpy_X, Numpy_Y]
 
