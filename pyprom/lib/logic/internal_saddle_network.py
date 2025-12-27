@@ -20,8 +20,12 @@ from .shortest_path_by_points import find_closest_points
 
 from collections import defaultdict
 
+from typing import TYPE_CHECKING, List, Dict, Tuple
+if TYPE_CHECKING:
+    from pyprom import DataMap
 
-class InternalSaddleNetwork(object):
+
+class InternalSaddleNetwork:
     """
     InternalSaddleNetwork object for computing internal saddle networks.
     This is used for finding the center point of a saddle, and for
@@ -29,7 +33,10 @@ class InternalSaddleNetwork(object):
     :class:`pyprom.lib.locations.saddle.Saddle`
     """
 
-    def __init__(self, saddle, datamap):
+    def __init__(self, 
+            saddle: Saddle, 
+            datamap: DataMap
+        ):
         """
         :param saddle: saddle to build internal network for.
         :type saddle: :class:`pyprom.lib.locations.saddle.Saddle`
@@ -41,8 +48,12 @@ class InternalSaddleNetwork(object):
         self.allVertexLinkers = []
         self.shortest_links = []
 
-    def treeExploration(self, toBeExplored, toBeExploredIndex,
-                        explored_nodes_index, first):
+    def treeExploration(self, 
+            toBeExplored: List[Feature_Verticies], 
+            toBeExploredIndex: Dict[int, bool],
+            explored_nodes_index: Dict[int, bool], 
+            first: bool
+        ) -> Tuple[List[Feature_Verticies], Dict[int, bool], Dict[int, bool], bool]:
         """
         Loop until toBeExplored is exhausted. This continues until all
         conventionally accessible highPerimeterNeighborhoods are connected
@@ -101,7 +112,7 @@ class InternalSaddleNetwork(object):
             first = False
         return toBeExplored, toBeExploredIndex, explored_nodes_index, first
 
-    def build_internal_tree(self):
+    def build_internal_tree(self) -> None:
         """
         This function builds an unordered list of links which connect all
         highPerimeterNeighborhoods (nodes) together. Stored in `self.shortest_links`
@@ -164,7 +175,7 @@ class InternalSaddleNetwork(object):
             else:
                 break
 
-    def generate_child_saddles(self):
+    def generate_child_saddles(self) -> List[Saddle]:
         """
         generate_child_saddles produces a list of saddles derived from
         saddle(`self`). This produces (N-1) saddles where N is the number
@@ -220,7 +231,7 @@ class InternalSaddleNetwork(object):
             saddles.append(newSaddle)
         return saddles
 
-    def find_shortest_paths_between_high_perimeter_neighborhoods(self):
+    def find_shortest_paths_between_high_perimeter_neighborhoods(self) -> None:
         """
         find_shortest_paths_between_high_perimeter_neighborhoods iterates through all
         highPerimeterNeighborhoods of `self` and returns an ordered list of
