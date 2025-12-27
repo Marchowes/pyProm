@@ -10,7 +10,7 @@ This library contains a base class for Coordinate oriented objects.
 import utm
 from pyprom.lib.util import dottedDecimaltoDegrees
 
-from typing import TYPE_CHECKING, Tuple
+from typing import TYPE_CHECKING, Tuple, Self
 if TYPE_CHECKING:
     from pyprom._typing.type_hints import Latitude_X, Longitude_Y
 
@@ -65,7 +65,7 @@ class BaseCoordinate:
         return ((dottedDecimaltoDegrees(self.latitude)),
                 (dottedDecimaltoDegrees(self.longitude)))
 
-    def __eq__(self, other) -> bool:
+    def __eq__(self, other: Self) -> bool:
         """
         Determines if this object is equal to another.
 
@@ -86,7 +86,7 @@ class BaseCoordinate:
         return [latitude, longitude] ==\
                [olatitude, olongitude]
 
-    def __ne__(self, other) -> bool:
+    def __ne__(self, other: Self) -> bool:
         """
         Determines if this object is not equal to another.
 
@@ -114,10 +114,10 @@ class BaseCoordinate:
         return "<BaseCoordinate> lat {} long {}".format(self.latitude,
                                                         self.longitude)
 
-    __unicode__ = __str__ = __repr__
+    __str__ = __repr__
 
 
-def isBaseCoordinate(baseCoordinate) -> None:
+def isBaseCoordinate(baseCoordinate: Self) -> None:
     """
     Check if passed in object is a :class:`BaseCoordinate`
 
