@@ -134,7 +134,7 @@ def checksum(
         filename: str, 
         hash_factory: Callable = hashlib.md5, 
         chunk_num_blocks: int = 128
-    ):
+    ) -> str:
     """
     Read file and produce md5 hash of contents as string.
 
