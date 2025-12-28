@@ -77,9 +77,10 @@ class DataMap(BaseDataMap):
         """
         Convert numpy array indices to WGS84(4326) coordinates
         """
-
         lon = self.geotransform[0] + y * self.geotransform[1] + x * self.geotransform[2]
         lat = self.geotransform[3] + y * self.geotransform[4] + x * self.geotransform[5]
+        # lon = self.geotransform[0] + (y * self.geotransform[1])
+        # lat = self.geotransform[3] + (x * self.geotransform[4])
         return lat, lon
 
     def latlong_to_xy(self, lat: Latitude_X, lon: Longitude_Y) -> XY:
@@ -146,12 +147,22 @@ class DataMap(BaseDataMap):
 
     @property
     def lower_left(self) -> LatLon:
-        return self.xy_to_latlon(0, self.max_y)
+        return self.xy_to_latlon(self.max_x, 0)
 
     @property
     def upper_right(self) -> LatLon:
-        return self.xy_to_latlon(self.max_x, 0)
+        return self.xy_to_latlon(0, self.max_y)
 
     @property
     def lower_right(self) -> LatLon:
         return self.xy_to_latlon(self.max_x, self.max_y)
+
+    def numpy_array_override(self, 
+            numpy_array: numpy.ndarray
+        ) -> None:
+        """
+        Override our numpy array with a different array of the same shape (x/y span)
+        (useful for testing)
+        """
+        assert numpy_array.shape == self.numpy_array.shape
+        self.numpy_array = numpy_array
