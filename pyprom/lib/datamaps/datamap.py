@@ -156,3 +156,13 @@ class DataMap(BaseDataMap):
     @property
     def lower_right(self) -> LatLon:
         return self.xy_to_latlon(self.max_x, self.max_y)
+
+    def numpy_array_override(self, 
+            numpy_array: numpy.ndarray
+        ) -> None:
+        """
+        Override our numpy array with a different array of the same shape (x/y span)
+        (useful for testing)
+        """
+        assert numpy_array.shape == self.numpy_array.shape
+        self.numpy_array = numpy_array
