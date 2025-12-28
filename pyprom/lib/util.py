@@ -11,8 +11,12 @@ import hashlib
 
 from .locations.base_gridpoint import BaseGridPoint
 
+from typing import TYPE_CHECKING, Tuple, Dict, List, Callable
+if TYPE_CHECKING:
+    from pyprom._typing.type_hints import XY
+    from pyprom.lib.locations.gridpoint import GridPoint
 
-def dottedDecimaltoDegrees(coordinate):
+def dottedDecimaltoDegrees(coordinate) -> Tuple[int, int, int]:
     """
     Converts dotted Decimal coordinate to a DMS
 
@@ -27,7 +31,9 @@ def dottedDecimaltoDegrees(coordinate):
     return (degrees, minutes, seconds)
 
 
-def degreesToDottedDecimal(deg, mnt=0, sec=0):
+def degreesToDottedDecimal(
+        deg: int, mnt:int = 0, sec:int = 0
+    ) -> float:
     """
     Accepts dms and converts to dd
 
@@ -40,7 +46,9 @@ def degreesToDottedDecimal(deg, mnt=0, sec=0):
     return float(round(deg + (mnt / 60) + (sec / 3600), 6))
 
 
-def coordinateHashToList(coordianteHash):
+def coordinateHashToList(
+        coordianteHash: Dict[int, Dict[int, bool]]
+    ) -> List[XY]:
     """
     Converts a coordinateHash to a list of coordinates.
 
@@ -51,7 +59,9 @@ def coordinateHashToList(coordianteHash):
     return [[x, y] for x, _y in coordianteHash.items() for y, _ in _y.items()]
 
 
-def coordinateHashToGridPointList(coordinateHash):
+def coordinateHashToGridPointList(
+        coordinateHash: Dict[int, Dict[int, bool]]
+    ) -> List[GridPoint]:
     """
     Converts a coordinateHash to a
     :class:`pyprom.lib.locations.gridpoint.GridPoint` list.
@@ -64,7 +74,9 @@ def coordinateHashToGridPointList(coordinateHash):
             for x, _y in coordinateHash.items() for y, _ in _y.items()]
 
 
-def coordinateHashToXYTupleList(coordinateHash):
+def coordinateHashToXYTupleList(
+        coordinateHash: Dict[int, Dict[int, bool]]
+    ) -> List[XY]:
     """
     Converts a coordinateHash to a list of tuples
 
@@ -75,7 +87,7 @@ def coordinateHashToXYTupleList(coordinateHash):
     return [(x, y) for x, _y in coordinateHash.items() for y, _ in _y.items()]
 
 
-def compressRepetetiveChars(string):
+def compressRepetetiveChars(string: str) -> str:
     """
     Accepts String like "HHLHHHLL" and removes continuous redundant chars
     "HLHL"
@@ -86,7 +98,7 @@ def compressRepetetiveChars(string):
     return ''.join(ch for ch, _ in itertools.groupby(string))
 
 
-def seconds_to_arcseconds(seconds):
+def seconds_to_arcseconds(seconds: float) -> float:
     """
     Convert Seconds to Arc Seconds
 
@@ -96,7 +108,7 @@ def seconds_to_arcseconds(seconds):
     return seconds * 3600
 
 
-def arcseconds_to_seconds(arcseconds):
+def arcseconds_to_seconds(arcseconds: float) -> float:
     """
     Convert Arc Seconds to Seconds.
 
@@ -106,7 +118,7 @@ def arcseconds_to_seconds(arcseconds):
     return arcseconds / 3600
 
 
-def randomString(length=12):
+def randomString(length: int = 12) -> str:
     """
     Creates Random string.
 
@@ -118,7 +130,11 @@ def randomString(length=12):
         string.ascii_uppercase +
         string.digits) for _ in range(length))
 
-def checksum(filename, hash_factory=hashlib.md5, chunk_num_blocks=128):
+def checksum(
+        filename: str, 
+        hash_factory: Callable = hashlib.md5, 
+        chunk_num_blocks: int = 128
+    ):
     """
     Read file and produce md5 hash of contents as string.
 
