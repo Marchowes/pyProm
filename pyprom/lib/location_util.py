@@ -9,7 +9,7 @@ We need this utility to be seperate becasue of circular dependencies.
 import math
 
 
-def longitudeArcSec(longitude):
+def longitudeArcSec(longitude: float) -> float:
     """
     Accepts longitude in dotted decimal notation, and returns
     Arcsecond distance in meters.

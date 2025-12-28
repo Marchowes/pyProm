@@ -8,7 +8,12 @@ This library contains a location class for storing a Vertex_Link
 used in Saddle highPerimeterNeighborhoods Tree Calculations.
 """
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from .gridpoint import GridPoint
+    from ..containers.feature_verticies import Feature_Verticies
 
+    
 class Vertex_Link:
     """
     Vertex_Link connects a vertex
@@ -18,8 +23,12 @@ class Vertex_Link:
 
     __slots__ = ['local', 'remote', 'distance', 'remote_container']
 
-    def __init__(self, localPoint, remotePoint,
-                 distance, remote_container=None):
+    def __init__(self, 
+            localPoint: GridPoint, 
+            remotePoint: GridPoint,
+            distance: float, 
+            remote_container: Feature_Verticies | None = None
+        ):
         """
         :param localPoint: relative (local) GridPoint (vertex)
         :type localPoint: :class:`pyprom.lib.locations.gridpoint.GridPoint`
@@ -36,7 +45,7 @@ class Vertex_Link:
         self.distance = distance
         self.remote_container = remote_container
 
-    def _remote_container_idx(self):
+    def _remote_container_idx(self) -> int | str:
         """
         :return: index of remove_container
         :rtype: int, "None"
@@ -46,7 +55,7 @@ class Vertex_Link:
         else:
             return "None"
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         """
         :return: String representation of this object
         """
@@ -57,4 +66,4 @@ class Vertex_Link:
                 self.distance,
                 self._remote_container_idx())
 
-    __unicode__ = __str__ = __repr__
+    __str__ = __repr__

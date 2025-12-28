@@ -23,6 +23,11 @@ from timeit import default_timer
 from datetime import timedelta
 import logging
 
+from typing import TYPE_CHECKING, Set, List, Tuple
+if TYPE_CHECKING:
+    from pyprom.domain_map import DomainMap
+    from pyprom._typing.type_hints import XY_Elevation
+
 class Walk:
     """
     This class discovers Summit Domains by performing a walk from
@@ -30,7 +35,9 @@ class Walk:
     ascending walk
     """
 
-    def __init__(self, domainmap):
+    def __init__(self, 
+            domainmap: DomainMap
+        ):
         self.domainmap = domainmap
         # all points found to be members of a Summit_Domain
         self.summit_domain_points = defaultdict(dict)
@@ -38,7 +45,7 @@ class Walk:
 
         self._prepopulate_summit_domain_points()
 
-    def _prepopulate_summit_domain_points(self):
+    def _prepopulate_summit_domain_points(self) -> None:
         """
         Finds all summit member points, creates SummitDomain objects,
         and prepopulates those objects with those member points.
@@ -59,7 +66,9 @@ class Walk:
                 sd.append((x, y), self.summit_domain_points)
 
 
-    def climb(self, point):
+    def climb(self, 
+            point: XY_Elevation
+        ) -> SummitDomain:
         """
         Climb climbs from a single point and add it and all points along a
         path to a SummitDomain. This path is comprised of whatever neighbor
@@ -97,7 +106,10 @@ class Walk:
             climbed_points.append(sn)
             current_point = sn
 
-    def climb_points(self, points, entryPoint=None):
+    def climb_points(self, 
+            points: XY_Elevation, 
+            entryPoint: XY_Elevation | None = None,
+        ) -> Set[SummitDomain]:
         """
         Climb_points works in two ways:
 
@@ -138,7 +150,9 @@ class Walk:
         else:
             return summit_domains
 
-    def climb_from_saddles(self, saddles=[]):
+    def climb_from_saddles(self, 
+            saddles: List[Saddle] | List = []
+        ) -> Tuple[SaddlesContainer, RunoffsContainer, List[Linker], Set[SummitDomain]]:
         """
         Climbs from all saddles contained in self.domainmap.saddles
         :return: walkedSaddles, walkedRunOffs, linkers, summitDomains
@@ -265,7 +279,7 @@ class Walk:
 
         return walkedSaddles, walkedRunOffs, linkers, summitDomains
 
-    def generate_synthetic_saddles(self, saddle):
+    def generate_synthetic_saddles(self, saddle: Saddle) -> List[Saddle]:
 
         # This should not be, just return it.
         if len(saddle.highPerimeterNeighborhoods) < 2:

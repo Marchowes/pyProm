@@ -20,6 +20,9 @@ from .containers.summit_domain import SummitDomain
 
 from .containers.linker import Linker
 
+from typing import TYPE_CHECKING, List, Any
+if TYPE_CHECKING:
+    ...
 NS = '{http://www.opengis.net/kml/2.2}'
 
 SADDLE_URL = "http://maps.google.com/mapfiles/kml/paddle/grn-blank.png"
@@ -54,7 +57,12 @@ class KMLFileWriter:
     folders by location type.
     """
 
-    def __init__(self, outputFileName, documentName=None, features=[], noFeatureDescription=False):
+    def __init__(self, 
+            outputFileName: str, 
+            documentName: str | None = None, 
+            features: List[Any] | List = [], 
+            noFeatureDescription: bool = False
+        ):
         """
         :param str outputFileName: Full path and for output file.
         :param str documentName: Name of root document.
@@ -94,7 +102,7 @@ class KMLFileWriter:
         if features:
             self.extend(features)
 
-    def extend(self, features):
+    def extend(self, features: List[Any]) -> None:
         """
         Extend extends features onto this KMLFileWriter.
         This is intended for lists of locations, or location containers.
@@ -105,7 +113,7 @@ class KMLFileWriter:
         for feature in features:
             self.append(feature)
 
-    def append(self, feature):
+    def append(self, feature: List[Any]) -> None:
         """
         Append feature, or in the case of containers, pass on to extend.
 
@@ -154,7 +162,7 @@ class KMLFileWriter:
         raise Exception("Did not find any valid Datatypes to append."
                         " Try extend?")
 
-    def _append_summit_domain(self, feature):
+    def _append_summit_domain(self, feature: Any) -> None:
         featurePm = kml.Placemark(
             NS,
             name = "{:.3f}".format(feature.summit.feet),
@@ -164,7 +172,7 @@ class KMLFileWriter:
         self.summitDomains.append(featurePm)
 
 
-    def _append_spotElevation_derivative(self, feature, feature_type):
+    def _append_spotElevation_derivative(self, feature: Any, feature_type: str):
         """
         Appends a spotElevation derivative to this Object
 
@@ -203,7 +211,7 @@ class KMLFileWriter:
                 featurePm.styleUrl = "#spotelevation"
                 self.spotElevations.append(featurePm)
 
-    def _append_linker(self, linker):
+    def _append_linker(self, linker: Linker) -> None:
         """
         Append linker object to to this Object
 
@@ -214,7 +222,7 @@ class KMLFileWriter:
             self.linkers_wkt[linkerPm.geometry.wkt] = True
             self.linkers.append(linkerPm)
 
-    def generateDocument(self):
+    def generateDocument(self) -> kml.Document:
         """
         Generates KML document of locations in this object.
 
@@ -254,7 +262,7 @@ class KMLFileWriter:
             kml_doc.append(self.summitDomains)
         return kml_doc
 
-    def generateKML(self):
+    def generateKML(self) -> str:
         """
         Produces KML string of this Writer Object.
 
@@ -264,7 +272,7 @@ class KMLFileWriter:
         k.append(self.generateDocument())
         return k.to_string(prettyprint=True)
 
-    def write(self):
+    def write(self) -> None:
         """
         Write KML data to file.
         """

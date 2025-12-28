@@ -29,7 +29,15 @@ from .lib.logic.contiguous_neighbors import contiguous_neighbors, touching_neigh
 from .lib.logic.shortest_path_by_points import high_perimeter_neighborhood_shortest_path
 from .lib.logic.tuple_funcs import highest
 
-from .lib.constants import METERS_PER_FOOT
+from typing import TYPE_CHECKING, Tuple, List
+if TYPE_CHECKING:
+    from pyprom import DataMap
+    from pyprom.lib.containers.multipoint import MultiPoint
+    from pyprom._typing.type_hints import (
+        Numpy_X, Numpy_Y,
+        XY_Elevation,
+        Elevation
+    )
 
 
 class AnalyzeData:
@@ -40,7 +48,7 @@ class AnalyzeData:
     :class:`pyprom.lib.locations.runoff.Runoff`
     """
 
-    def __init__(self, datamap):
+    def __init__(self, datamap: DataMap):
         """
         :param datamap: datamap to discover features on.
         :type: :class:`pyprom.lib.datamap.DataMap` object.
@@ -52,7 +60,9 @@ class AnalyzeData:
         self.max_x = self.datamap.max_x
         self.visited = numpy.zeros_like(datamap.numpy_array, dtype=bool)
 
-    def run(self, rebuildSaddles=True):
+    def run(self,
+            rebuildSaddles: bool = True
+        ) -> Tuple[SummitsContainer, SaddlesContainer, RunoffsContainer]:
         """
         Shortcut for running analysis. This will find all features on
         the datamap, as well as rebuild all
@@ -74,7 +84,9 @@ class AnalyzeData:
             self.saddleObjects = self.saddleObjects.rebuildSaddles(self.datamap)
         return self.summitObjects, self.saddleObjects, self.runoffObjects
 
-    def analyze(self):
+    def analyze(
+            self
+        ) -> Tuple[SummitsContainer, SaddlesContainer, RunoffsContainer]:
         """
         Analyze Routine.
         Looks for :class:`pyprom.lib.locations.summit.Summit`,
@@ -87,9 +99,9 @@ class AnalyzeData:
          :class:`pyprom.lib.containers.runoffs.RunoffsContainer`,
         """
         self.logger.info("Initiating Saddle, Summit, Runoff Identification")
-        self.summitObjects = SummitsContainer([])
-        self.saddleObjects = SaddlesContainer([])
-        self.runoffObjects = RunoffsContainer([])
+        self.summitObjects: SummitsContainer = SummitsContainer([])
+        self.saddleObjects: SaddlesContainer = SaddlesContainer([])
+        self.runoffObjects: RunoffsContainer = RunoffsContainer([])
         iterator = numpy.nditer(self.data, flags=['multi_index'])
         current_x = 0
         # Iterate through numpy grid, and keep track of GridPoint coordinates.
@@ -120,7 +132,10 @@ class AnalyzeData:
         del(self.visited)
         return self.summitObjects, self.saddleObjects, self.runoffObjects
 
-    def analyze_multipoint(self, x, y, ptElevation):
+    def analyze_multipoint(self, 
+            x: Numpy_X, y: Numpy_Y, 
+            ptElevation: Elevation
+        ) -> List[Summit | Saddle | Runoff]:
         """
         Logic for analyzing a feature which fits the definition of a
         multipoint.
@@ -140,7 +155,9 @@ class AnalyzeData:
         return self.consolidatedFeatureLogic(x, y, blob.perimeter,
                                              blob, edge, edgePoints)
 
-    def summit_and_saddle(self, x, y):
+    def summit_and_saddle(self,
+            x: Numpy_X, y: Numpy_Y
+        ) -> List[Summit | Saddle | Runoff]:
         """
         summit_and_saddle does that actual discovery of
         :class:`pyprom.lib.locations.saddle.Saddle`,
@@ -148,7 +165,7 @@ class AnalyzeData:
 
         :param int x: x coordinate in raster data.
         :param int y: y coordinate in raster data.
-        :return: Disocvered Feature, or None
+        :return: Discovered Feature, or None
         :rtype: :class:`pyprom.lib.locations.saddle.Saddle`
          :class:`pyprom.lib.locations.summit.Summit` or
          :class:`pyprom.lib.locations.runoff.Runoff`, or None.
@@ -194,8 +211,13 @@ class AnalyzeData:
         return self.consolidatedFeatureLogic(x, y, perimeterSet, [],
                                              edge, edgePoints)
 
-    def consolidatedFeatureLogic(self, x, y, perimeter,
-                                 multipoint, edge, edgePoints):
+    def consolidatedFeatureLogic(self, 
+            x: Numpy_X, y: Numpy_Y, 
+            perimeter: Perimeter,
+            multipoint: MultiPoint, 
+            edge: bool, 
+            edgePoints: List[XY_Elevation]
+        ) -> List[Summit | Saddle | Runoff]:
         """
         Consolidated Feature Logic analyzes the highEdges around a point or
         multipoint and determines if the pattern matches a
@@ -245,14 +267,18 @@ class AnalyzeData:
             returnableLocations.extend(self.edge_feature_analysis(x, y, perimeter,
                               multipoint, edge, edgePoints, highPerimeter))
 
-
-
         return returnableLocations
 
 
 
-    def edge_feature_analysis(self, x, y, perimeter,
-                              multipoint, edge, edgePoints, highPerimeter):
+    def edge_feature_analysis(self, 
+            x: Numpy_X, y: Numpy_Y, 
+            perimeter: Perimeter,
+            multipoint: MultiPoint, 
+            edge: bool, 
+            edgePoints: List[XY_Elevation],
+            highPerimeter: List[List[XY_Elevation]]
+        ) -> List[Summit | Saddle | Runoff]:
         """
         figure out edge runoffs and saddles.
 
@@ -407,7 +433,9 @@ class AnalyzeData:
                     returnable_features.append(saddle)
         return returnable_features
 
-def make_corner_runoffs(datamap):
+def make_corner_runoffs(
+        datamap: DataMap
+    ) -> List[Runoff]:
     """
     Dumb function for generating single point corner runoffs.
 

@@ -8,9 +8,13 @@ This library contains a base class for Coordinate oriented objects.
 """
 
 import utm
-from ...lib.util import dottedDecimaltoDegrees
+from pyprom.lib.util import dottedDecimaltoDegrees
 
+from typing import TYPE_CHECKING, Tuple, Self
+if TYPE_CHECKING:
+    from pyprom._typing.type_hints import Latitude_X, Longitude_Y
 
+    
 class BaseCoordinate:
     """
     Base Coordinate, intended to be inherited from. This contains
@@ -19,7 +23,7 @@ class BaseCoordinate:
 
     __slots__ = ['latitude', 'longitude']
 
-    def __init__(self, latitude, longitude, *args, **kwargs):
+    def __init__(self, latitude: Latitude_X, longitude: Longitude_Y):
         """
         :param latitude: latitude in dotted decimal
         :type latitude: int, float
@@ -29,7 +33,7 @@ class BaseCoordinate:
         self.latitude = latitude
         self.longitude = longitude
 
-    def to_dict(self):
+    def to_dict(self) -> dict:
         """
         Create the dictionary representation of this object.
 
@@ -40,7 +44,7 @@ class BaseCoordinate:
                 'longitude': self.longitude}
 
     @property
-    def utm(self):
+    def utm(self) -> str:
         """
         Returns Tuple of utm coordinate for this :class:`BaseCoordinate`.
 
@@ -50,7 +54,7 @@ class BaseCoordinate:
         return utm.from_latlon(self.latitude, self.longitude)
 
     @property
-    def dms(self):
+    def dms(self) -> Tuple[Tuple[int, int, int], Tuple[int, int, int]]:
         """
         Returns the coordinate of this :class:`BaseCoordinate`
         in degrees minutes seconds format
@@ -61,7 +65,7 @@ class BaseCoordinate:
         return ((dottedDecimaltoDegrees(self.latitude)),
                 (dottedDecimaltoDegrees(self.longitude)))
 
-    def __eq__(self, other):
+    def __eq__(self, other: Self) -> bool:
         """
         Determines if this object is equal to another.
 
@@ -82,7 +86,7 @@ class BaseCoordinate:
         return [latitude, longitude] ==\
                [olatitude, olongitude]
 
-    def __ne__(self, other):
+    def __ne__(self, other: Self) -> bool:
         """
         Determines if this object is not equal to another.
 
@@ -94,26 +98,26 @@ class BaseCoordinate:
         return [round(self.latitude, 6), round(self.longitude, 6)] != \
                [round(other.latitude, 6), round(other.longitude, 6)]
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         """
         Produces the hash representation of this object.
 
         :return: Hash representation of this object
-        :rtype: str
+        :rtype: int
         """
         return hash((round(self.latitude, 6), round(self.longitude, 6)))
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         """
         :return: String representation of this object
         """
         return "<BaseCoordinate> lat {} long {}".format(self.latitude,
                                                         self.longitude)
 
-    __unicode__ = __str__ = __repr__
+    __str__ = __repr__
 
 
-def isBaseCoordinate(baseCoordinate):
+def isBaseCoordinate(baseCoordinate: Self) -> None:
     """
     Check if passed in object is a :class:`BaseCoordinate`
 

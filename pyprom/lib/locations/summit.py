@@ -12,6 +12,15 @@ from ..containers.multipoint import MultiPoint
 from ..containers.linker import isLinker
 from ..util import randomString
 
+from typing import TYPE_CHECKING, Self, List
+if TYPE_CHECKING:
+    from pyprom._typing.type_hints import (
+        Latitude_X, Longitude_Y,
+        Elevation,
+    )
+    from pyprom import DataMap
+    from .saddle import Saddle
+    from ..containers.linker import Linker
 
 class Summit(SpotElevation):
     """
@@ -38,7 +47,12 @@ class Summit(SpotElevation):
     __slots__ = ['multipoint', 'saddles', 'disqualified', 'localHighest',
                  'parent', 'children',  'lprBoundary', 'lprPaths', 'domain']
 
-    def __init__(self, latitude, longitude, elevation, *args, **kwargs):
+    def __init__(
+            self, 
+            latitude: Latitude_X, longitude: Longitude_Y, 
+            elevation: Elevation, 
+            *args, **kwargs
+        ):
         """
         :param latitude: latitude in dotted decimal
         :type latitude: int, float
@@ -50,8 +64,9 @@ class Summit(SpotElevation):
         :type multipoint: :class:`pyprom.lib.containers.multipoint.MultiPoint`,
          None
         """
-        super(Summit, self).__init__(latitude, longitude,
-                                     elevation, *args, **kwargs)
+        super(Summit, self).__init__(
+            latitude, longitude, elevation, *args, **kwargs
+        )
         self.multipoint = kwargs.get('multipoint', [])
         self.id = kwargs.get('id', 'su:' + randomString())
         # saddles contains a list of linker objects linking this summit to a
@@ -65,7 +80,7 @@ class Summit(SpotElevation):
         self.lprPaths = None
         self.domain = None
 
-    def addSaddleLinker(self, linker):
+    def addSaddleLinker(self, linker: Linker) -> None:
         """
         Adds linker to this :class:`Summit`
 
@@ -75,7 +90,7 @@ class Summit(SpotElevation):
         isLinker(linker)
         self.saddles.append(linker)
 
-    def feature_neighbors(self):
+    def feature_neighbors(self) -> List[Saddle]:
         """
         :return: returns all linked Saddles.
          This is, in effect, an interface.
@@ -84,7 +99,7 @@ class Summit(SpotElevation):
         return [feature.saddle for feature in self.saddles]
 
     @property
-    def neighbors(self, filterDisqualified=True):
+    def neighbors(self, filterDisqualified: bool = True) -> List[Summit]:
         """
         neighbors will return all neighboring summits by way of the
         connected saddle.
@@ -99,7 +114,7 @@ class Summit(SpotElevation):
         neighborSet.discard(self)
         return list(neighborSet)
 
-    def all_neighbors(self, filterDisqualified=True):
+    def all_neighbors(self, filterDisqualified=True) -> List[Summit]:
         """
         all_neighbors will return all neighboring summits by way of the saddle.
         This function deliberately makes no effort to filter out redundant
@@ -120,7 +135,7 @@ class Summit(SpotElevation):
                 for linker in self.saddles]
         return neighbors
 
-    def to_dict(self, referenceById=True):
+    def to_dict(self, referenceById: bool = True) -> dict:
         """
         Create the dictionary representation of this object.
 
@@ -144,7 +159,7 @@ class Summit(SpotElevation):
         return to_dict
 
     @classmethod
-    def from_dict(cls, summitDict, datamap=None):
+    def from_dict(cls, summitDict: dict, datamap: DataMap | None = None) -> Self:
         """
         Create this object from dictionary representation
 
@@ -169,7 +184,7 @@ class Summit(SpotElevation):
                    edgePoints=edgePoints,
                    id=id)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         """
         :return: String representation of this object
         """
@@ -180,10 +195,10 @@ class Summit(SpotElevation):
             self.elevation,
             bool(self.multipoint))
 
-    __unicode__ = __str__ = __repr__
+    __str__ = __repr__
 
 
-def isSummit(summit):
+def isSummit(summit) -> Self:
     """
     Check if passed in object is a :class:`Summit`
 

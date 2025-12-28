@@ -9,6 +9,10 @@ This library contains a base class for x,y oriented objects.
 
 from math import hypot
 
+from typing import TYPE_CHECKING, Self, Dict
+if TYPE_CHECKING:
+    from pyprom._typing.type_hints import Numpy_X, Numpy_Y, XY
+
 
 class BaseGridPoint:
     """
@@ -19,7 +23,7 @@ class BaseGridPoint:
 
     __slots__ = ['x', 'y']
 
-    def __init__(self, x, y):
+    def __init__(self, x: Numpy_X, y: Numpy_Y):
         """
         A basic x,y GridPoint.
 
@@ -30,7 +34,7 @@ class BaseGridPoint:
         self.y = y
 
     @classmethod
-    def from_dict(self, baseGridPointDict):
+    def from_dict(self, baseGridPointDict: Dict[str, int]) -> Self:
         """
         Create this object from dictionary representation
 
@@ -42,7 +46,7 @@ class BaseGridPoint:
                     baseGridPointDict['y'])
 
     @classmethod
-    def from_tuple(self, tup):
+    def from_tuple(self, tup: XY) -> Self:
         """
         Create this object from tuple representation
         :param tup:
@@ -51,7 +55,7 @@ class BaseGridPoint:
         """
         return self(tup[0], tup[1])
 
-    def to_dict(self):
+    def to_dict(self) -> dict:
         """
         Create the dictionary representation of this object.
 
@@ -61,7 +65,7 @@ class BaseGridPoint:
         return {'x': self.x,
                 'y': self.y}
 
-    def to_tuple(self):
+    def to_tuple(self) -> XY:
         """
         Create the tuple representation of this object.
 
@@ -71,7 +75,7 @@ class BaseGridPoint:
         return (self.x, self.y)
 
 
-    def distance(self, other):
+    def distance(self, other: Self) -> float:
         """
         Returns the distance between this :class:`BaseGridPoint` and
         another (in points)
@@ -86,22 +90,22 @@ class BaseGridPoint:
         isBaseGridPoint(other)
         return hypot((self.x - other.x), (self.y - other.y))
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         """
         Produces the hash representation of this object.
 
         :return: Hash representation of this object
-        :rtype: str
+        :rtype: int
         """
         return hash((self.x, self.y))
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         """
         :return: String representation of this object
         """
         return "<BaseGridPoint> x: {}, y: {}".format(self.x, self.y)
 
-    def __lt__(self, other):
+    def __lt__(self, other: Self) -> bool:
         """
         Determines if this object's elevation is less than another.
 
@@ -117,7 +121,7 @@ class BaseGridPoint:
         # way to determine if a GridPoint is gt/lt another.
         return self.x + self.y < other.x + other.y
 
-    def __eq__(self, other):
+    def __eq__(self, other: Self) -> bool:
         """
         Determines if this object is equal to another.
 
@@ -131,10 +135,10 @@ class BaseGridPoint:
         return [self.x, self.y] ==\
                [other.x, other.y]
 
-    __unicode__ = __str__ = __repr__
+    __str__ = __repr__
 
 
-def isBaseGridPoint(gridPoint):
+def isBaseGridPoint(gridPoint) -> None:
     """
     Check if passed in object is a :class:`BaseGridPoint`
 

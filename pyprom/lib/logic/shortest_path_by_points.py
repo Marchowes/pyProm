@@ -12,8 +12,18 @@ from scipy.spatial import KDTree
 from math import hypot
 import numpy as np
 
+from typing import TYPE_CHECKING, List, Tuple, Dict
+if TYPE_CHECKING:
+    from pyprom._typing.type_hints import XY, XY_Elevation
+    from pyprom import DataMap
 
-def high_perimeter_neighborhood_shortest_path(point, flat_area_points, highPerimeterNeighborhoods, datamap):
+
+def high_perimeter_neighborhood_shortest_path(
+        point: XY_Elevation,
+        flat_area_points: XY, 
+        highPerimeterNeighborhoods: List[List[XY_Elevation]], 
+        datamap: DataMap
+    ) -> XY_Elevation:
     """
     Finds the shortest path from point
 
@@ -55,7 +65,11 @@ def high_perimeter_neighborhood_shortest_path(point, flat_area_points, highPerim
     closest = shortest_length.nodes[-1]
     return closest
 
-def closest_points_between_sets_brute_force(us, them, datamap):
+def closest_points_between_sets_brute_force(
+        us: List[XY_Elevation], 
+        them: List[XY_Elevation],
+        datamap: DataMap,
+    ) -> Tuple[XY_Elevation, XY_Elevation, float]:
     """
     Returns closest points from two different sets of coordinates
     as well as their distance. Uses brute brute force method,
@@ -83,7 +97,10 @@ def closest_points_between_sets_brute_force(us, them, datamap):
     return myClosest, theirClosest, closest_distance
 
 
-def closest_point_by_distance_brute_force(us, them):
+def closest_point_by_distance_brute_force(
+        us: List[XY_Elevation], 
+        them: List[XY_Elevation]
+    ) -> Dict[XY_Elevation, XY_Elevation]:
     """
     For all points in us, find the closest point in them.
     Uses brute force method, best for smaller sets.
@@ -105,7 +122,11 @@ def closest_point_by_distance_brute_force(us, them):
                 closest_distance = distance
     return closest
 
-def closest_points_between_sets_kdtree(us, them, datamap):
+def closest_points_between_sets_kdtree(
+        us: List[XY_Elevation], 
+        them: List[XY_Elevation],
+        datamap: DataMap,
+    ) -> Tuple[XY_Elevation, XY_Elevation, float]:
     """
     Returns closest points from two different sets of coordinates
     as well as their distance. Uses brute KDTree method, best for larger sets.
@@ -126,7 +147,10 @@ def closest_points_between_sets_kdtree(us, them, datamap):
     ours = us[dists[1][idx]]
     return ours, theirs, datamap.distance(ours, theirs)
 
-def closest_point_by_distance_kdtree(us, them):
+def closest_point_by_distance_kdtree(
+        us: List[XY_Elevation], 
+        them: List[XY_Elevation]
+    ) -> Dict[XY_Elevation, XY_Elevation]:
     """
     For all points in us, find the closest point in them.
     Uses KDTree method, best for larger sets.
@@ -145,7 +169,11 @@ def closest_point_by_distance_kdtree(us, them):
     return closest
 
 
-def find_closest_points(us, them, datamap):
+def find_closest_points(
+        us: List[XY_Elevation], 
+        them: List[XY_Elevation],
+        datamap: DataMap,
+    ) -> Tuple[XY_Elevation, XY_Elevation, float]:
     """
     Returns closest points from two different sets of coordinates
     as well as their distance.
@@ -164,7 +192,10 @@ def find_closest_points(us, them, datamap):
     else:
         return closest_points_between_sets_kdtree(us, them, datamap)
 
-def find_closest_point_by_distance_map(us, them):
+def find_closest_point_by_distance_map(
+        us: List[XY_Elevation], 
+        them: List[XY_Elevation]
+    ) -> Dict[XY_Elevation, XY_Elevation]:
     """
     For all points in us, find the closest point in them.
 

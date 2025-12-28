@@ -7,6 +7,7 @@ the LICENSE file that accompanies it.
 This library contains a container class for storing Saddle
 type location objects.
 """
+from __future__ import annotations
 
 from .spot_elevation import SpotElevationContainer
 from ..logic.internal_saddle_network import InternalSaddleNetwork
@@ -15,6 +16,10 @@ from ..locations.saddle import Saddle, isSaddle
 from ..locations.gridpoint import GridPoint
 from ..logic.shortest_path_by_points import find_closest_points
 
+from typing import TYPE_CHECKING, List, Self
+if TYPE_CHECKING:
+    from pyprom import DataMap
+
 
 class SaddlesContainer(SpotElevationContainer):
     """
@@ -22,7 +27,9 @@ class SaddlesContainer(SpotElevationContainer):
     Allows for various list transformations.
     """
 
-    def __init__(self, saddleList):
+    def __init__(self, 
+            saddleList: List[Saddle]
+        ):
         """
         :param saddleList: list of Saddle objects to reside in this container.
         :type saddleList: list(:class:`pyprom.lib.locations.saddle.Saddle`)
@@ -30,9 +37,9 @@ class SaddlesContainer(SpotElevationContainer):
         if len([x for x in saddleList if not isinstance(x, Saddle)]):
             raise TypeError("saddleList passed to SaddlesContainer"
                             " can only contain Saddle objects.")
-        super(SaddlesContainer, self).__init__(saddleList)
+        super().__init__(saddleList)
 
-    def rebuildSaddles(self, datamap):
+    def rebuildSaddles(self, datamap: DataMap) -> SaddlesContainer:
         """
         Uses the saddles contained in this container and rebuilds any saddle
         which contains >= 2 high edges as (n-1) new saddles where n
@@ -108,7 +115,7 @@ class SaddlesContainer(SpotElevationContainer):
         return SaddlesContainer(new_saddles)
 
     @property
-    def saddles(self):
+    def saddles(self) -> List[Saddle]:
         """
         Getter alias for self.points
 
@@ -117,7 +124,7 @@ class SaddlesContainer(SpotElevationContainer):
         """
         return self.points
 
-    def append(self, saddle):
+    def append(self, saddle: Saddle) -> None:
         """
         Append a :class:`pyprom.lib.locations.saddle.Saddle` to this container.
 
@@ -130,7 +137,7 @@ class SaddlesContainer(SpotElevationContainer):
         self.points.append(saddle)
         self.fast_lookup[saddle.id] = saddle
 
-    def extend(self, saddles):
+    def extend(self, saddles: List[Saddle]) -> None:
         """
         Extend a list of :class:`pyprom.lib.locations.saddle.Saddle`
         to this container.
@@ -147,14 +154,17 @@ class SaddlesContainer(SpotElevationContainer):
         for sa in saddles:
             self.fast_lookup[sa.id] = sa
 
-    def to_dict(self):
+    def to_dict(self) -> dict:
         """
         :return: dict() representation of :class:`SaddlesContainer`
         """
         return {'saddles': [x.to_dict() for x in self.points]}
 
     @classmethod
-    def from_dict(cls, saddleContainerDict, datamap=None):
+    def from_dict(cls, 
+            saddleContainerDict: dict, 
+            datamap: DataMap = None
+        ) -> Self:
         """
         Load this object and child objects from a dict.
 
@@ -188,7 +198,7 @@ class SaddlesContainer(SpotElevationContainer):
         return sc
 
     @property
-    def disqualified(self):
+    def disqualified(self) -> List[Saddle]:
         """
         :return: list of all disqualified
          :class:`pyprom.lib.locations.saddle.Saddle` in this container.
@@ -197,7 +207,7 @@ class SaddlesContainer(SpotElevationContainer):
         return [x for x in self.points if x.disqualified]
 
     @property
-    def multipoints(self):
+    def multipoints(self) -> List[Saddle]:
         """
         Returns list of all multipoint
          :class:`pyprom.lib.locations.saddle.Saddle` within container
@@ -206,13 +216,13 @@ class SaddlesContainer(SpotElevationContainer):
         """
         return [pt for pt in self.points if pt.multipoint]
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         """
         :return: String representation of this object
         """
         return "<SaddlesContainer> {} Objects".format(len(self.points))
 
-    def __setitem__(self, idx, saddle):
+    def __setitem__(self, idx: int, saddle: Saddle) -> None:
         """
         Gives :class:`SaddlesContainer` list like set capabilities
 
@@ -223,4 +233,4 @@ class SaddlesContainer(SpotElevationContainer):
         isSaddle(saddle)
         self.points[idx] = saddle
 
-    __unicode__ = __str__ = __repr__
+    __str__ = __repr__

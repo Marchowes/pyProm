@@ -12,6 +12,12 @@ from shapely.geometry import LineString
 
 from ..util import randomString
 
+from typing import TYPE_CHECKING, Dict, List, Self
+if TYPE_CHECKING:
+    from pyprom.lib.locations.saddle import Saddle
+    from pyprom.lib.locations.summit import Summit
+    from pyprom.lib.containers.saddles import SaddlesContainer
+    from pyprom.lib.containers.summits import SummitsContainer
 
 class Linker:
     """
@@ -21,7 +27,11 @@ class Linker:
 
     __slots__ = ['summit', 'saddle', 'id', 'disqualified']
 
-    def __init__(self, summit, saddle, id=None):
+    def __init__(self, 
+            summit: Summit, 
+            saddle: Saddle, 
+            id: int = None
+        ):
         """
         :param summit: Summit this linker links.
         :type summit: :class:`pyprom.lib.locations.summit.Summit`
@@ -40,7 +50,7 @@ class Linker:
         self.disqualified = False
 
     @property
-    def prom(self):
+    def prom(self) -> float:
         """
         Calculates how much higher the summit is than the Saddle in meters
 
@@ -50,7 +60,7 @@ class Linker:
         return self.summit.elevation - self.saddle.elevation
 
     @property
-    def prom_ft(self):
+    def prom_ft(self) -> float:
         """
         Calculates how much higher the summit is than the Saddle in feet
 
@@ -59,8 +69,10 @@ class Linker:
         """
         return self.summit.feet - self.saddle.feet
 
-    def saddles_connected_via_summit(self, skipDisqualified=True,
-                                     exemptLinkers={}):
+    def saddles_connected_via_summit(self, 
+            skipDisqualified: bool = True,
+            exemptLinkers: Dict[int, bool] = None
+        ) -> List[Saddle]:
         """
         Returns all saddles connected to the
         :class:`pyprom.lib.locations.summit.Summit` that this
@@ -74,6 +86,8 @@ class Linker:
         :return: list of Saddles
         :rtype list(:class:`pyprom.lib.locations.saddle.Saddle`)
         """
+        if not exemptLinkers:
+            exemptLinkers = {}
         if skipDisqualified and self.disqualified:
             return []
         # This linker is already exempt.
@@ -82,8 +96,10 @@ class Linker:
         return [linker.saddle for linker in self.summit.saddles if
                 _linker_ok(linker, skipDisqualified, exemptLinkers)]
 
-    def summits_connected_via_saddle(self, skipDisqualified=True,
-                                     exemptLinkers={}):
+    def summits_connected_via_saddle(self, 
+            skipDisqualified: bool = True,
+            exemptLinkers: Dict[int, bool] = None
+        ) -> List[Summit]:
         """
         Returns all summits connected to the
         :class:`pyprom.lib.locations.saddle.Saddle` that this
@@ -97,6 +113,8 @@ class Linker:
         :return: list of Summits
         :rtype: list(:class:`pyprom.lib.locations.summit.Summit`)
         """
+        if not exemptLinkers:
+            exemptLinkers = {}
         if skipDisqualified and self.disqualified:
             return []
         # This linker is already exempt.
@@ -105,7 +123,10 @@ class Linker:
         return [linker.summit for linker in self.saddle.summits if
                 _linker_ok(linker, skipDisqualified, exemptLinkers)]
 
-    def _help_exclude_self(self, linker, excludeSelf):
+    def _help_exclude_self(self, 
+            linker: Linker, 
+            excludeSelf: bool
+        ) -> bool:
         """
         Determine if this :class:`Linker` is to be included in list.
 
@@ -119,8 +140,10 @@ class Linker:
                 return False
         return True
 
-    def linkers_to_saddles_connected_via_summit(self, excludeSelf=True,
-                                                skipDisqualified=True):
+    def linkers_to_saddles_connected_via_summit(self,
+            excludeSelf: bool = True,
+            skipDisqualified: bool = True
+        ) -> List[Linker]:
         """
         Returns linkers linking Saddles to the Summit this linker links.
 
@@ -135,8 +158,10 @@ class Linker:
                 if _linker_ok(linker, skipDisqualified, {}) and
                 self._help_exclude_self(linker, excludeSelf)]
 
-    def linkers_to_summits_connected_via_saddle(self, excludeSelf=True,
-                                                skipDisqualified=True):
+    def linkers_to_summits_connected_via_saddle(self, 
+            excludeSelf: bool = True,
+            skipDisqualified: bool = True
+        ) -> List[Linker]:
         """
         Returns linkers linking Summits to the Saddle this linker links.
 
@@ -151,7 +176,7 @@ class Linker:
                 if _linker_ok(linker, skipDisqualified, {}) and
                 self._help_exclude_self(linker, excludeSelf)]
 
-    def add_to_remote_saddle_and_summit(self, ignoreDuplicates=True):
+    def add_to_remote_saddle_and_summit(self, ignoreDuplicates: bool = True):
         """
         Safely adds this linker to the remote
         :class:`pyprom.lib.locations.saddle.Saddle` and
@@ -169,7 +194,7 @@ class Linker:
             self.summit.addSaddleLinker(self)
             self.saddle.addSummitLinker(self)
 
-    def to_dict(self):
+    def to_dict(self) -> dict:
         """
         Create the dictionary representation of this object.
 
@@ -185,7 +210,11 @@ class Linker:
         return to_dict
 
     @classmethod
-    def from_dict(cls, linkerDict, saddlesContainer, summitsContainer):
+    def from_dict(cls, 
+            linkerDict: dict, 
+            saddlesContainer: SaddlesContainer, 
+            summitsContainer: SummitsContainer
+        ) -> Self:
         """
         Create this object from dictionary representation
 
@@ -203,7 +232,7 @@ class Linker:
         return linker
 
     @property
-    def shape(self):
+    def shape(self) -> LineString:
         """
         Returns a line representation of this linker as a
          :class:`shapely.geometry.Linestring` This does not include
@@ -212,7 +241,7 @@ class Linker:
         """
         return LineString([self.saddle.shape, self.summit.shape])
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         """
         Produces the hash representation of this object.
 
@@ -221,7 +250,7 @@ class Linker:
         """
         return hash(self.saddle.__hash__() + self.summit.__hash__())
 
-    def __eq__(self, other):
+    def __eq__(self, other: Self) -> bool:
         """
         Determines if this object is equal to another.
 
@@ -234,7 +263,7 @@ class Linker:
         isLinker(other)
         return [self.summit, self.saddle] == [other.summit, other.saddle]
 
-    def __ne__(self, other):
+    def __ne__(self, other: Self) -> bool:
         """
         Determines if this object is not equal to another.
 
@@ -247,7 +276,7 @@ class Linker:
         isLinker(other)
         return [self.summit, self.saddle] != [other.summit, other.saddle]
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         """
         :return: String representation of this object
         """
@@ -256,10 +285,10 @@ class Linker:
             self.summit,
             self.prom_ft,
             self.prom)
-    __unicode__ = __str__ = __repr__
+    __str__ = __repr__
 
 
-def isLinker(linker):
+def isLinker(linker: Linker) -> None:
     """
     Check if passed in object is a :class:`Linker`
 
@@ -270,7 +299,11 @@ def isLinker(linker):
         raise TypeError("Expected Linker Object.")
 
 
-def _linker_ok(linker, skipDisqualified, exemptLinkers={}):
+def _linker_ok(
+        linker: Linker, 
+        skipDisqualified: bool, 
+        exemptLinkers: Dict[int, bool] = None
+    ) -> bool:
     """
     Determine if :class:`Linker` is either disqualified, or exempted.
 
@@ -281,6 +314,8 @@ def _linker_ok(linker, skipDisqualified, exemptLinkers={}):
     :return: if linker is OK or not.
     :rtype: bool
     """
+    if not exemptLinkers:
+        exemptLinkers = {}
     if skipDisqualified:
         if linker.disqualified or exemptLinkers.get(linker.id):
             return False
