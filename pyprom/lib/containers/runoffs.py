@@ -7,6 +7,7 @@ the LICENSE file that accompanies it.
 This library contains a container class for storing Saddle
 type location objects.
 """
+from __future__ import annotations
 
 from .saddles import SaddlesContainer
 from ..locations.runoff import Runoff
