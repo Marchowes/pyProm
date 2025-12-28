@@ -7,9 +7,11 @@ the LICENSE file that accompanies it.
 This library contains a base container class for storing GridPoint
 type location objects.
 """
+from __future__ import annotations
 
 from pyprom.lib.locations.base_gridpoint import isBaseGridPoint
-
+from typing import TYPE_CHECKING, List, Self
+    from pyprom.lib.locations.base_gridpoint import BaseGridPoint
 
 class BaseGridPointContainer:
     """
@@ -19,15 +21,19 @@ class BaseGridPointContainer:
 
     __slots__ = ['points']
 
-    def __init__(self, gridPointList):
+    def __init__(self, 
+                 gridPointList: List[BaseGridPoint]
+        ):
         """
         :param gridPointList: list of BaseGridPoints
         :type gridPointList:
          list(:class:`pyprom.lib.locations.base_gridpoint.BaseGridPoint`)
         """
-        self.points = gridPointList
+        self.points: List[BaseGridPoint] = gridPointList
 
-    def append(self, gridPoint):
+    def append(self, 
+            gridPoint: BaseGridPoint
+        ):
         """
         Append a BaseGridPoint to the container.
 
@@ -40,7 +46,7 @@ class BaseGridPointContainer:
         isBaseGridPoint(gridPoint)
         self.points.append(gridPoint)
 
-    def sort(self, **kwargs):
+    def sort(self, **kwargs) -> List[BaseGridPoint]:
         """
         Sort points using kwargs passed in
 
@@ -48,7 +54,7 @@ class BaseGridPointContainer:
         """
         self.points.sort(**kwargs)
 
-    def index(self, gridPoint):
+    def index(self, gridPoint: BaseGridPoint) -> int:
         """
         Returns the index that this
         :class:`pyprom.lib.locations.base_gridpoint.BaseGridPoint` or child
@@ -66,14 +72,14 @@ class BaseGridPointContainer:
         except:
             return None
 
-    def __len__(self):
+    def __len__(self) -> int:
         """
         :return: number of items in `self.points`
         :rtype: int
         """
         return len(self.points)
 
-    def __setitem__(self, idx, gridPoint):
+    def __setitem__(self, idx: int, gridPoint: BaseGridPoint):
         """
         Gives this BaseGridPointContainer list like set capabilities
 
@@ -87,7 +93,7 @@ class BaseGridPointContainer:
         isBaseGridPoint(gridPoint)
         self.points[idx] = gridPoint
 
-    def __getitem__(self, idx):
+    def __getitem__(self, idx: int):
         """
         Gives this BaseGridPointContainer container list like get capabilities
 
@@ -97,7 +103,7 @@ class BaseGridPointContainer:
         """
         return self.points[idx]
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         """
         Produces the hash representation of this object.
 
@@ -106,7 +112,7 @@ class BaseGridPointContainer:
         """
         return hash(tuple(sorted(self.points)))
 
-    def __eq__(self, other):
+    def __eq__(self, other: Self) -> bool:
         """
         Determines if this object is equal to another.
 
@@ -120,7 +126,7 @@ class BaseGridPointContainer:
         return sorted([x for x in self.points]) == \
             sorted([x for x in other.points])
 
-    def __ne__(self, other):
+    def __ne__(self, other: Self) -> bool:
         """
         Determines if this object is not equal to another.
 
@@ -134,7 +140,7 @@ class BaseGridPointContainer:
         return sorted([x for x in self.points]) != \
             sorted([x for x in other.points])
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         """
         :return: String representation of this object
         """
@@ -143,7 +149,7 @@ class BaseGridPointContainer:
     __unicode__ = __str__ = __repr__
 
 
-def _isBaseGridPointContainer(gridPointContainer):
+def _isBaseGridPointContainer(gridPointContainer: BaseGridPointContainer) -> None:
     """
     Check if passed in object is a :class:`BaseGridPointContainer`
 
