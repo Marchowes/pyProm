@@ -7,12 +7,19 @@ the LICENSE file that accompanies it.
 This library contains a container class for storing Multipoint
 type location objects as well as a number of functions.
 """
+from __future__ import annotations
 
 from math import hypot
 from ..locations.base_coordinate import BaseCoordinate
 from ..locations.base_gridpoint import  BaseGridPoint
 from ..locations.gridpoint import GridPoint
 from .perimeter import Perimeter
+
+from typing import TYPE_CHECKING, Self, List, Dict, Generator
+    if TYPE_CHECKING:
+        from pyprom import DataMap
+        from pyprom.lib.locations.spot_elevation import SpotElevation
+        from pyprom._typing.type_hints import XY_Elevation, XY
 
 
 class MultiPoint:
@@ -45,8 +52,12 @@ class MultiPoint:
     | ``[6][7][6]``
     """
 
-    def __init__(self, points, elevation, datamap,
-                 perimeter=None):
+    def __init__(self, 
+            points: BaseGridPoint, 
+            elevation: float, 
+            datamap: DataMap,
+            perimeter: Perimeter = None
+        ):
         """
         :param points: list of
          :class:`pyprom.lib.locations.base_gridpoint.BaseGridPoint` objects.
@@ -67,7 +78,7 @@ class MultiPoint:
         self.datamap = datamap  # data analysis object.
         self.perimeter = perimeter
 
-    def to_dict(self):
+    def to_dict(self) -> dict:
         """
         Create the dictionary representation of this object.
 
@@ -81,7 +92,7 @@ class MultiPoint:
         return multipointDict
 
     @classmethod
-    def from_dict(cls, multipointDict, datamap=None):
+    def from_dict(cls, multipointDict: dict, datamap: DataMap = None) -> Self:
         """
         Create this object from dictionary representation
 
@@ -98,7 +109,7 @@ class MultiPoint:
         return cls(points, elevation, datamap, perimeter=perimeter)
 
     @property
-    def pointsLatLong(self):
+    def pointsLatLong(self) -> List[BaseCoordinate]:
         """
         Returns list() of Container
         :class:`pyprom.lib.locations.base_gridpoint.BaseGridPoint` as
@@ -111,7 +122,7 @@ class MultiPoint:
         return [BaseCoordinate(*self.datamap.xy_to_latlon(coord[0], coord[1]))
                 for coord in self.points]
 
-    def append(self, point):
+    def append(self, point: BaseGridPoint) -> None:
         """
         Add a BaseGridPoint to this container.
 
@@ -125,7 +136,10 @@ class MultiPoint:
         self.points.append(incoming)
 
 
-    def closestPoint(self, gridPoint, asSpotElevation=False):
+    def closestPoint(self, 
+            gridPoint: GridPoint, 
+            asSpotElevation: bool = False
+        ) -> SpotElevation:
         """
         Returns the closest point in this container to the GridPoint passed in.
 
@@ -156,7 +170,7 @@ class MultiPoint:
             return gp.toSpotElevation(self.datamap)
         return gp
 
-    def points_with_elevation(self):
+    def points_with_elevation(self) -> List[XY_Elevation]:
         """
         Returns list of tuples of member points with (x, y, elevation)
 
@@ -164,14 +178,14 @@ class MultiPoint:
         """
         return [(x[0], x[1], self.elevation) for x in self.points]
 
-    def __len__(self):
+    def __len__(self) -> int:
         """
         :return: number of items in `self.points`
         :rtype: int
         """
         return len(self.points)
 
-    def __setitem__(self, idx, point):
+    def __setitem__(self, idx: int, point: BaseGridPoint) -> None:
         """
         Gives MultiPoint list like set capabilities
 
@@ -183,7 +197,7 @@ class MultiPoint:
         incoming = self._check_and_return_incoming_point_type(point)
         self.points[idx] = incoming
 
-    def __getitem__(self, idx):
+    def __getitem__(self, idx: int) -> BaseGridPoint:
         """
         Gives MultiPoint list like get capabilities
 
@@ -193,7 +207,7 @@ class MultiPoint:
         """
         return BaseGridPoint.from_tuple(self.points[idx])
 
-    def __eq__(self, other):
+    def __eq__(self, other: Self) -> bool:
         """
         Determines if this object is equal to another.
 
@@ -207,7 +221,7 @@ class MultiPoint:
         return sorted([x for x in self.points]) == \
             sorted([x for x in other.points])
 
-    def __ne__(self, other):
+    def __ne__(self, other: Self) -> bool:
         """
         Determines if this object is not equal to another.
 
@@ -221,14 +235,14 @@ class MultiPoint:
         return sorted([x for x in self.points]) != \
             sorted([x for x in other.points])
 
-    def __iter__(self):
+    def __iter__(self) -> Generator[BaseGridPoint]:
         """
         :return: `self.points` as iterator
         """
         for point in self.points:
             yield point
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         """
         :return: String representation of this object
         """
@@ -236,7 +250,7 @@ class MultiPoint:
             format(self.elevation,
                    len(self.points))
 
-    def _check_and_return_incoming_point_type(self, point):
+    def _check_and_return_incoming_point_type(self, point: BaseGridPoint) -> XY:
         """
         Make sure incoming point type is a tuple with length 2, or explicitly a
         :class:`pyprom.lib.locations.base_gridpoint.BaseGridPoint`
@@ -258,10 +272,10 @@ class MultiPoint:
             raise Exception("tuple must have length of 2, or object must be BaseGridPoint and not inherited type.")
         return incoming
 
-    __unicode__ = __str__ = __repr__
+    __str__ = __repr__
 
 
-def _isMultiPoint(mp):
+def _isMultiPoint(mp: MultiPoint) -> None:
     """
     Check if passed in object is a :class:`MultiPoint`
 
