@@ -11,7 +11,7 @@ from shapely.geometry import Polygon
 from shapely.ops import unary_union
 from pyprom.tests.getData import gettestzip
 from pyprom.lib.loaders.gdal_loader import GDALLoader
-from pyprom import DataMap
+
 
 class DataMapTests(unittest.TestCase):
     """Test DataMaps."""
@@ -100,12 +100,6 @@ class DataMapTests(unittest.TestCase):
                                     (-71.97194444444443, 44.97222222222223), 
                                     (-71.97222222222223, 44.97222222222223),
                                     (-71.9725, 44.97222222222223)))
-        # expected_polygon = Polygon(((-71.97222222222223, 44.97222222222223),
-        #                             (-71.9725, 44.97222222222223),
-        #                             (-71.9725, 44.9725),
-        #                             (-71.97222222222223, 44.9725),
-        #                             (-71.97194444444443, 44.9725),
-        #                             (-71.97194444444443, 44.97222222222223)))
         self.assertEqual(composite_polygon, expected_polygon)
 
     def testDataMapDistance(self):
@@ -124,8 +118,9 @@ class DataMapTests(unittest.TestCase):
         self.assertEqual(self.datamap.get(0, 0),
                          415.0)
 
-    class DataMapSteepestNeighborTests(unittest.TestCase):
-        """Test DataMap.steepestNeighbor()"""
+
+class DataMapSteepestNeighborTests(unittest.TestCase):
+    """Test DataMap.steepestNeighbor()"""
 
     def setUp(self):
         """Set Up Tests."""
