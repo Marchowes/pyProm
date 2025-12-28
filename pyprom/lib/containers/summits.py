@@ -11,6 +11,11 @@ type location objects.
 from .spot_elevation import SpotElevationContainer
 from ..locations.summit import Summit, isSummit
 
+from typing import TYPE_CHECKING, List, Self
+if TYPE_CHECKING
+    from pyprom.lib.locations.summit import Summit
+    from pyprom import DataMap
+
 
 class SummitsContainer(SpotElevationContainer):
     """
@@ -18,7 +23,7 @@ class SummitsContainer(SpotElevationContainer):
     Allows for various list transformations.
     """
 
-    def __init__(self, summitList):
+    def __init__(self, summitList: List[Summit]):
         """
         :param summitList: list of Summits which reside in this container.
         :type summitList: list(:class:`pyprom.lib.locations.summit.Summit`)
@@ -28,10 +33,10 @@ class SummitsContainer(SpotElevationContainer):
         if len([x for x in summitList if not isinstance(x, Summit)]):
             raise TypeError("summitList passed to SummitsContainer"
                             " can only contain Summit objects.")
-        super(SummitsContainer, self).__init__(summitList)
+        super().__init__(summitList)
 
     @property
-    def summits(self):
+    def summits(self) -> List[Summit]:
         """
         Getter alias for `self.points`
 
@@ -40,7 +45,7 @@ class SummitsContainer(SpotElevationContainer):
         """
         return self.points
 
-    def append(self, summit):
+    def append(self, summit: Summit) -> None:
         """
         Append a :class:`pyprom.lib.locations.summit.Summit`
         to this container.
@@ -54,7 +59,7 @@ class SummitsContainer(SpotElevationContainer):
         self.points.append(summit)
         self.fast_lookup[summit.id] = summit
 
-    def extend(self, summits):
+    def extend(self, summits: List[Summit]) -> None:
         """
         Extend a list of :class:`pyprom.lib.locations.summit.Summit
         to this container.
@@ -71,7 +76,7 @@ class SummitsContainer(SpotElevationContainer):
         for su in summits:
             self.fast_lookup[su.id] = su
 
-    def to_dict(self):
+    def to_dict(self) -> dict:
         """
         Create the dictionary representation of this object.
 
@@ -81,7 +86,10 @@ class SummitsContainer(SpotElevationContainer):
         return {'summits': [x.to_dict() for x in self.points]}
 
     @classmethod
-    def from_dict(cls, summitContainerDict, datamap=None):
+    def from_dict(cls, 
+            summitContainerDict: dict, 
+            datamap: DataMap | None = None
+        ) -> Self:
         """
         Create this object from dictionary representation
 
@@ -99,7 +107,7 @@ class SummitsContainer(SpotElevationContainer):
         return summitsContainer
 
     @property
-    def multipoints(self):
+    def multipoints(self) -> List[Summit]:
         """
         Returns list of all multipoint
          :class:`pyprom.lib.locations.summit.Summit` within container
@@ -108,7 +116,7 @@ class SummitsContainer(SpotElevationContainer):
         """
         return [pt for pt in self.points if pt.multipoint]
 
-    def __setitem__(self, idx, summit):
+    def __setitem__(self, idx: int, summit: Summit):
         """
         Gives SummitsContainer list like set capabilities
 
@@ -121,10 +129,10 @@ class SummitsContainer(SpotElevationContainer):
         isSummit(summit)
         self.points[idx] = summit
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         """
         :return: String representation of this object
         """
         return "<SummitsContainer> {} Objects".format(len(self.points))
 
-    __unicode__ = __str__ = __repr__
+    __str__ = __repr__
