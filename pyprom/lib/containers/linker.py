@@ -71,7 +71,7 @@ class Linker:
 
     def saddles_connected_via_summit(self, 
             skipDisqualified: bool = True,
-            exemptLinkers: Dict[int, bool] = None
+            exemptLinkers: Dict[int, bool] = {}
         ) -> List[Saddle]:
         """
         Returns all saddles connected to the
@@ -86,8 +86,6 @@ class Linker:
         :return: list of Saddles
         :rtype list(:class:`pyprom.lib.locations.saddle.Saddle`)
         """
-        if not exemptLinkers:
-            exemptLinkers = {}
         if skipDisqualified and self.disqualified:
             return []
         # This linker is already exempt.
@@ -98,7 +96,7 @@ class Linker:
 
     def summits_connected_via_saddle(self, 
             skipDisqualified: bool = True,
-            exemptLinkers: Dict[int, bool] = None
+            exemptLinkers: Dict[int, bool] = {}
         ) -> List[Summit]:
         """
         Returns all summits connected to the
@@ -113,8 +111,6 @@ class Linker:
         :return: list of Summits
         :rtype: list(:class:`pyprom.lib.locations.summit.Summit`)
         """
-        if not exemptLinkers:
-            exemptLinkers = {}
         if skipDisqualified and self.disqualified:
             return []
         # This linker is already exempt.
@@ -229,7 +225,7 @@ class Linker:
         # add linker to foreign saddles/summits
         linker.add_to_remote_saddle_and_summit()
         linker.disqualified = linkerDict.get('disqualified', False)
-        return  
+        return linker
 
     @property
     def shape(self) -> LineString:
@@ -302,7 +298,7 @@ def isLinker(linker: Linker) -> None:
 def _linker_ok(
         linker: Linker, 
         skipDisqualified: bool, 
-        exemptLinkers: Dict[int, bool] = None
+        exemptLinkers: Dict[int, bool] = {}
     ) -> bool:
     """
     Determine if :class:`Linker` is either disqualified, or exempted.
@@ -314,8 +310,6 @@ def _linker_ok(
     :return: if linker is OK or not.
     :rtype: bool
     """
-    if not exemptLinkers:
-        exemptLinkers = {}
     if skipDisqualified:
         if linker.disqualified or exemptLinkers.get(linker.id):
             return False

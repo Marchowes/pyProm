@@ -18,7 +18,7 @@ from collections import defaultdict
 from typing import TYPE_CHECKING, List, Self, Dict, Generator, Tuple
 if TYPE_CHECKING:
     from pyprom._typing.type_hints import XY_Elevation
-    from pyprom.lib.locations.gridpoint import GridPoint
+
 
 
 class GridPointContainer(BaseGridPointContainer):
