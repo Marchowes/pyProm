@@ -12,7 +12,7 @@ from .spot_elevation import SpotElevationContainer
 from ..locations.summit import Summit, isSummit
 
 from typing import TYPE_CHECKING, List, Self
-if TYPE_CHECKING
+if TYPE_CHECKING:
     from pyprom.lib.locations.summit import Summit
     from pyprom import DataMap
 

@@ -11,6 +11,7 @@ from __future__ import annotations
 
 from pyprom.lib.locations.base_gridpoint import isBaseGridPoint
 from typing import TYPE_CHECKING, List, Self
+if TYPE_CHECKING:
     from pyprom.lib.locations.base_gridpoint import BaseGridPoint
 
 class BaseGridPointContainer:

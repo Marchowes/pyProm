@@ -15,11 +15,11 @@ from ..locations.base_gridpoint import  BaseGridPoint
 from ..locations.gridpoint import GridPoint
 from .perimeter import Perimeter
 
-from typing import TYPE_CHECKING, Self, List, Dict, Generator
-    if TYPE_CHECKING:
-        from pyprom import DataMap
-        from pyprom.lib.locations.spot_elevation import SpotElevation
-        from pyprom._typing.type_hints import XY_Elevation, XY
+from typing import TYPE_CHECKING, Self, List, Generator
+if TYPE_CHECKING:
+    from pyprom import DataMap
+    from pyprom.lib.locations.spot_elevation import SpotElevation
+    from pyprom._typing.type_hints import XY_Elevation, XY
 
 
 class MultiPoint:
