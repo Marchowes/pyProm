@@ -7,6 +7,7 @@ the LICENSE file that accompanies it.
 This library contains a container class for storing SpotElevation
 type location objects.
 """
+from __future__ import annotations
 
 from ..locations.summit import Summit
 from ..locations.spot_elevation import isSpotElevation
@@ -14,6 +15,11 @@ from ..constants import METERS_PER_FOOT, FEET_PER_MILE
 from .base import _Base
 from geopy.distance import geodesic
 
+from typing import TYPE_CHECKING, List, Self
+if TYPE_CHECKING:
+    from pyprom import DataMap
+    from pyprom.lib.locations.spot_elevation import SpotElevation
+    from pyprom._typing.type_hints import Latitude_X, Longitude_Y
 
 class SpotElevationContainer(_Base):
     """
@@ -28,19 +34,20 @@ class SpotElevationContainer(_Base):
 
     __slots__ = ['points', 'fast_lookup']
 
-    def __init__(self, spotElevationList):
+    def __init__(self, 
+            spotElevationList: List[SpotElevation]
+        ):
         """
         :param spotElevationList: list of SpotElevation objects
          which will reside in this container.
         :type spotElevationList:
          :class:`pyprom.lib.locations.spot_elevation.SpotElevation`
         """
-        super(SpotElevationContainer, self).__init__()
         self.points = spotElevationList
         self.fast_lookup = {point.id: point for point in self.points}
 
     @property
-    def lowest(self):
+    def lowest(self) -> List[SpotElevation]:
         """
         :return: list of lowest
          :class:`pyprom.lib.locations.spot_elevation.SpotElevation` object(s)
@@ -60,7 +67,7 @@ class SpotElevationContainer(_Base):
         return lowest
 
     @property
-    def highest(self):
+    def highest(self) -> List[SpotElevation]:
         """
         :return: list of highest
          :class:`pyprom.lib.locations.spot_elevation.SpotElevation` object(s)
@@ -79,7 +86,7 @@ class SpotElevationContainer(_Base):
                 highest.append(spot_elevation)
         return highest
 
-    def by_id(self, id):
+    def by_id(self, id: int) -> Self:
         """
         Returns member SpotElevation derivative by ID if it exists.
         :param string id: string ID of SpotElevation derivative
@@ -88,7 +95,12 @@ class SpotElevationContainer(_Base):
         # We want to throw an exception if it's not there.
         return self.fast_lookup[id]
 
-    def radius(self, lat, long, value, unit='m'):
+    def radius(self, 
+            lat: Latitude_X, 
+            long: Longitude_Y, 
+            value: float, 
+            unit: str = 'm'
+        ) -> Self:
         """
         Returns all members of this container within a certain radius.
 
@@ -126,7 +138,12 @@ class SpotElevationContainer(_Base):
                 positive.append(point)
         return self.__class__(positive)
 
-    def rectangle(self, lat1, long1, lat2, long2):
+    def rectangle(self, 
+            lat1: Latitude_X, 
+            long1: Longitude_Y, 
+            lat2: Latitude_X, 
+            long2: Longitude_Y
+        ) -> Self:
         """
         Returns all members of this container in a rectangle of
         (lat1, long1) - (lat2, long2)
@@ -151,7 +168,10 @@ class SpotElevationContainer(_Base):
             [x for x in self.points if lowerlat < x.latitude < upperlat and
                 lowerlong < x.longitude < upperlong])
 
-    def elevationRange(self, lower=-100000, upper=100000):
+    def elevationRange(self, 
+            lower: int = -100000,
+            upper: int = 100000
+        ) -> Self:
         """
         Returns all members of this container within a certain elevation
         range in feet
@@ -166,7 +186,10 @@ class SpotElevationContainer(_Base):
         return self.__class__([x for x in self.points if
                                x.feet > lower and x.feet < upper])
 
-    def elevationRangeMetric(self, lower=-100000, upper=100000):
+    def elevationRangeMetric(self, 
+            lower: int = -100000,
+            upper: int = 100000
+        ) -> Self:
         """
         Returns all members of this container within a certain elevation range
         using meters
@@ -181,7 +204,7 @@ class SpotElevationContainer(_Base):
         return self.__class__([x for x in self.points if
                               upper > x.elevation > lower])
 
-    def to_dict(self):
+    def to_dict(self) -> dict:
         """
         Create the dictionary representation of this object.
 
@@ -191,7 +214,10 @@ class SpotElevationContainer(_Base):
         return {"spotelevations": [x for x in self.points.to_dict()]}
 
     @classmethod
-    def from_dict(cls, spotElevationContainerDict, datamap=None):
+    def from_dict(cls, 
+            spotElevationContainerDict: dict, 
+            datamap: DataMap = None
+        ) -> Self:
         """
         Create this object from dictionary representation
 
@@ -209,7 +235,7 @@ class SpotElevationContainer(_Base):
 
         return spotElevationContainer
 
-    def append(self, spotElevation):
+    def append(self, spotElevation: Self) -> None:
         """
         Append a :class:`pyprom.lib.locations.spot_elevation.SpotElevation`
         to this container.
@@ -224,7 +250,7 @@ class SpotElevationContainer(_Base):
         self.points.append(spotElevation)
         self.fast_lookup[spotElevation.id] = spotElevation
 
-    def extend(self, spotElevations):
+    def extend(self, spotElevations: Self) -> None:
         """
         Extend a list of :class:`pyprom.lib.locations.spot_elevation.SpotElevation`
         to this container.
@@ -241,7 +267,7 @@ class SpotElevationContainer(_Base):
         for se in spotElevations:
             self.fast_lookup[se.id] = se
 
-    def index(self, spotElevation):
+    def index(self, spotElevation: Self) -> int:
         """
         Returns the index that this
         :class:`pyprom.lib.locations.spot_elevation.SpotElevation` or child
@@ -259,20 +285,20 @@ class SpotElevationContainer(_Base):
         except:
             return None
 
-    def __len__(self):
+    def __len__(self) -> int:
         """
         :return: number of items in `self.points`
         :rtype: int
         """
         return len(self.points)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         """
         :return: String representation of this object
         """
         return "<SpotElevationContainer> {} Objects".format(self.__len__())
 
-    def __setitem__(self, idx, spotElevation):
+    def __setitem__(self, idx: int, spotElevation: Self) -> None:
         """
         Gives :class:`SpotElevationContainer` list like set capabilities
 
@@ -286,7 +312,7 @@ class SpotElevationContainer(_Base):
         isSpotElevation(spotElevation)
         self.points[idx] = spotElevation
 
-    def __getitem__(self, idx):
+    def __getitem__(self, idx: int) -> SpotElevation:
         """
         Gives :class:`SpotElevationContainer` list like get capabilities
 
@@ -296,7 +322,7 @@ class SpotElevationContainer(_Base):
         """
         return self.points[idx]
 
-    def __eq__(self, other):
+    def __eq__(self, other: Self) -> bool:
         """
         Determines if :class:`SpotElevationContainer` is equal to another.
 
@@ -310,7 +336,7 @@ class SpotElevationContainer(_Base):
         return sorted([x for x in self.points]) == \
             sorted([x for x in other.points])
 
-    def __ne__(self, other):
+    def __ne__(self, other: Self) -> bool:
         """
         Determines if :class:`SpotElevationContainer` is not equal to another.
 
@@ -324,10 +350,12 @@ class SpotElevationContainer(_Base):
         return sorted([x for x in self.points]) != \
             sorted([x for x in other.points])
 
-    __unicode__ = __str__ = __repr__
+    __str__ = __repr__
 
 
-def _isSpotElevationContainer(spotElevationContainer):
+def _isSpotElevationContainer(
+        spotElevationContainer: SpotElevationContainer
+    ) -> None:
     """
     Check if passed in object is a :class:`SpotElevationContainer`
 

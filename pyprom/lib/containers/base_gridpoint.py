@@ -147,7 +147,7 @@ class BaseGridPointContainer:
         """
         return "<BaseGridPointContainer> {} Objects".format(len(self.points))
 
-    __unicode__ = __str__ = __repr__
+    __str__ = __repr__
 
 
 def _isBaseGridPointContainer(gridPointContainer: BaseGridPointContainer) -> None:

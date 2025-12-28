@@ -12,7 +12,6 @@ from ..containers.multipoint import MultiPoint
 from ..containers.linker import isLinker
 from ..util import randomString
 
-from typing import TYPE_CHECKING
 from typing import TYPE_CHECKING, Self, List
 if TYPE_CHECKING:
     from pyprom._typing.type_hints import (

@@ -20,7 +20,6 @@ if TYPE_CHECKING:
     from pyprom._typing.type_hints import XY_Elevation
 
 
-
 class GridPointContainer(BaseGridPointContainer):
     """
     GridPoint Container for GridPoint type lists.

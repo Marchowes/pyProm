@@ -138,7 +138,7 @@ class GridPoint(BaseGridPoint):
                       self.y,
                       self.elevation)
 
-    __unicode__ = __str__ = __repr__
+    __str__ = __repr__
 
 
 def isGridPoint(gridPoint: Self) -> None:
