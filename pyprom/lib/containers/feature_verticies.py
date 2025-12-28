@@ -7,8 +7,14 @@ the LICENSE file that accompanies it.
 This library contains a container class for storing Vertex_Links
 used in Saddle highPerimeterNeighborhoods Tree Calculations.
 """
+from __future__ import annotations
 
 import sys
+
+
+from typing import TYPE_CHECKING, List, Dict
+if TYPE_CHECKING:
+    from pyprom.lib.locations.vertex_link import Vertex_Link
 
 
 class Feature_Verticies:
@@ -25,7 +31,7 @@ class Feature_Verticies:
 
     __slots__ = ['index', 'vertex_linkers']
 
-    def __init__(self, index, vertex_linkers):
+    def __init__(self, index: int, vertex_linkers: List[Vertex_Link]):
         """
         :param int index: index of feature
         :param list vertex_linkers: list of Vertex_Links
@@ -35,7 +41,7 @@ class Feature_Verticies:
         self.index = index
         self.vertex_linkers = vertex_linkers
 
-    def shortest_link(self, ignored_link_index={}):
+    def shortest_link(self, ignored_link_index:Dict[int, bool] = None):
         """
         shortest_link returns the shortest link found in `self.vertex_linkers`
         but ignores any links connecting to a foreign index container in
@@ -46,6 +52,8 @@ class Feature_Verticies:
         :return: vertex link
         :rtype: :class:`pyprom.lib.locations.vertex_link.Vertex_Link`
         """
+        if not ignored_link_index:
+            ignored_link_index = {}
         shortest_distance = sys.maxsize
         shortest = None
         for link in self.vertex_linkers:
@@ -57,11 +65,11 @@ class Feature_Verticies:
                 shortest = link
         return shortest
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         """
         :return: String representation of this object
         """
         return "<Feature_Verticies> {} ".format(
             self.vertex_linkers)
 
-    __unicode__ = __str__ = __repr__
+    __str__ = __repr__
