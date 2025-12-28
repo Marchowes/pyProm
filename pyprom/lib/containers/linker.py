@@ -229,7 +229,7 @@ class Linker:
         # add linker to foreign saddles/summits
         linker.add_to_remote_saddle_and_summit()
         linker.disqualified = linkerDict.get('disqualified', False)
-        return  
+        return linker
 
     @property
     def shape(self) -> LineString:
