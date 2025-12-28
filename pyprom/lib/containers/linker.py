@@ -285,7 +285,7 @@ class Linker:
             self.summit,
             self.prom_ft,
             self.prom)
-    __unicode__ = __str__ = __repr__
+    __str__ = __repr__
 
 
 def isLinker(linker: Linker) -> None:
