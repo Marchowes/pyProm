@@ -234,7 +234,7 @@ class Perimeter(BaseSelfIterable):
             raise Exception("tuple must have length of 3, or object must be GridPoint")
         return incoming
 
-    __unicode__ = __str__ = __repr__
+    __str__ = __repr__
 
 
 def _isPerimeter(perimeter) -> bool:

@@ -4,6 +4,7 @@ pyProm: Copyright 2019.
 This software is distributed under a license that is described in
 the LICENSE file that accompanies it.
 """
+from __future__ import annotations
 
 from shapely.ops import unary_union
 
@@ -12,6 +13,15 @@ from ..locations.spot_elevation import SpotElevation
 from ..locations.base_gridpoint import BaseGridPoint
 from ..locations.gridpoint import GridPoint
 
+from typing import TYPE_CHECKING, List, Self, Dict, Generator
+if TYPE_CHECKING:
+    from pyprom._typing.type_hints import XY_Elevation
+    from pyprom import DataMap
+    from pyprom.lib.locations.saddle import Saddle
+    from pyprom.lib.locations.summit import Summit
+    from pyprom.lib.containers.saddles import SaddlesContainer
+    from pyprom.lib.containers.summits import SummitsContainer
+    from shapely.geometry.base import BaseGeometry
 
 class SummitDomain:
     """
@@ -22,7 +32,12 @@ class SummitDomain:
 
     __slots__ = ['datamap', 'points', 'summit', 'saddles']
 
-    def __init__(self, datamap, summit, saddles, points):
+    def __init__(self, 
+            datamap: DataMap, 
+            summit: Summit, 
+            saddles: List[Saddle], 
+            points: List[XY_Elevation]
+        ):
         """
         :param datamap: Datamap associated with this :class:`SummitDomain`
         :type datamap: :class:`pyprom.lib.datamap.DataMap`
@@ -43,7 +58,7 @@ class SummitDomain:
         self.saddles = saddles
 
     @property
-    def members(self):
+    def members(self) -> List[BaseCoordinate]:
         """
         Returns the members as BaseCoordinates
 
@@ -54,7 +69,10 @@ class SummitDomain:
         """
         return self.baseCoordinate()
 
-    def append(self, point, externalHash=None):
+    def append(self, 
+            point: XY_Elevation, 
+            externalHash: Dict[int, Dict[int, SummitDomain]] = None
+        ) -> None:
         """
         Appends a point to this container. Adds coordinate to
          externalHash if supplied.
@@ -66,7 +84,10 @@ class SummitDomain:
         if externalHash != None:
             externalHash[point[0]][point[1]] = self
 
-    def extend(self, points, externalHash=None):
+    def extend(self, 
+            points: XY_Elevation, 
+            externalHash: Dict[int, Dict[int, SummitDomain]] = None
+        ) -> None:
         """
         Extends points to this container. Adds coordinates to
          externalHash if supplied.
@@ -77,7 +98,7 @@ class SummitDomain:
         for point in points:
             self.append(point, externalHash)
 
-    def remove_saddle(self, saddle):
+    def remove_saddle(self, saddle: Saddle):
         """
         Removes Saddle from this SummitDomain.
         :param saddle: Saddle to remove from this SaddleDomain.
@@ -85,7 +106,7 @@ class SummitDomain:
         """
         self.saddles = [x for x in self.saddles if x != saddle]
 
-    def iterateBaseCoordinate(self):
+    def iterateBaseCoordinate(self) -> Generator[BaseCoordinate]:
         """
         Iterator for BaseCoordinate representation of the Walk Path.
 
@@ -95,7 +116,7 @@ class SummitDomain:
         for point in self.points:
             yield BaseCoordinate(point[0], point[1])
 
-    def iterateSpotElevation(self):
+    def iterateSpotElevation(self) -> Generator[SpotElevation]:
         """
         Iterator for SpotElevation representation of the Walk Path.
 
@@ -107,7 +128,7 @@ class SummitDomain:
             elevation = self.datamap.get(point[0], point[1])
             yield SpotElevation(lat, long, elevation)
 
-    def iterateBaseGridPoint(self):
+    def iterateBaseGridPoint(self) -> Generator[BaseGridPoint]:
         """
         Iterator for BaseGridPoint representation of the Walk Path.
 
@@ -118,7 +139,7 @@ class SummitDomain:
             x, y = self.datamap.latlong_to_xy(point[0], point[1])
             yield BaseGridPoint(x, y)
 
-    def iterateGridPoint(self):
+    def iterateGridPoint(self) -> Generator[GridPoint]:
         """
         Iterator for GridPoint representation of the Walk Path.
 
@@ -131,7 +152,7 @@ class SummitDomain:
             elevation = self.datamap.get(point[0], point[1])
             yield GridPoint(point[0], point[1], elevation)
 
-    def baseCoordinate(self):
+    def baseCoordinate(self) -> List[BaseCoordinate]:
         """
         :return: List of points as
          :class:`pyprom.lib.locations.base_coordinate.BaseCoordinate`
@@ -140,7 +161,7 @@ class SummitDomain:
         """
         return [x for x in self.iterateBaseCoordinate()]
 
-    def spotElevation(self):
+    def spotElevation(self) -> List[SpotElevation]:
         """
         :return: List of points as
          :class:`pyprom.lib.locations.spot_elevation.SpotElevation`
@@ -149,7 +170,7 @@ class SummitDomain:
         """
         return [x for x in self.iterateSpotElevation()]
 
-    def baseGridPoint(self):
+    def baseGridPoint(self) -> List[BaseGridPoint]:
         """
         :return: List of points as
          :class:`pyprom.lib.locations.base_gridpoint.BaseGridPoint`
@@ -158,7 +179,7 @@ class SummitDomain:
         """
         return [x for x in self.iterateBaseGridPoint()]
 
-    def gridPoint(self):
+    def gridPoint(self) -> List[GridPoint]:
         """
         :return: List of points as
          :class:`pyprom.lib.locations.gridpoint.GridPoint`
@@ -166,7 +187,7 @@ class SummitDomain:
         """
         return [x for x in self.iterateGridPoint()]
 
-    def to_dict(self):
+    def to_dict(self) -> dict:
         """
         Create the dictionary representation of this object.
         Summits and Saddles are ALWAYS referenced by ID.
@@ -182,8 +203,12 @@ class SummitDomain:
         return to_dict
 
     @classmethod
-    def from_dict(cls, summitDomainDict, saddlesContainer,
-                  summitsContainer, datamap):
+    def from_dict(cls, 
+            summitDomainDict: dict, 
+            saddlesContainer: SaddlesContainer,
+            summitsContainer: SummitsContainer, 
+            datamap: DataMap
+        ) -> Self:
         """
         Create this object from dictionary representation
 
@@ -206,7 +231,7 @@ class SummitDomain:
         return sd
 
     @property
-    def shape(self):
+    def shape(self) -> BaseGeometry:
         """
         Produces :class:`shapely.geometry.polygon.Polygon` of this
          :class:`SummitDomain`. This shape only includes member points, not
@@ -218,12 +243,12 @@ class SummitDomain:
         return unary_union([self.datamap.point_geom(point[0], point[1])
                             for point in self.points])
 
-    def __eq__(self, other):
+    def __eq__(self, other: Self) -> bool:
         return (self.summit == other.summit and
                 sorted(self.saddles) == sorted(other.saddles) and
                 sorted(self.points) == sorted(other.points))
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         """
         :return: Hash representation of this object
         We only care about the summit.
@@ -231,7 +256,7 @@ class SummitDomain:
         return self.summit.__hash__()
 
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         """
         :return: String representation of this object
         """

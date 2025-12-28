@@ -215,10 +215,10 @@ class SpotElevation(BaseCoordinate):
                                       self.feet,
                                       self.elevation)
 
-    __unicode__ = __str__ = __repr__
+    __str__ = __repr__
 
 
-def isSpotElevation(spotElevation: Self) -> None:
+def isSpotElevation(spotElevation: SpotElevation) -> None:
     """
     Check if passed in object is a :class:`SpotElevation`
 
