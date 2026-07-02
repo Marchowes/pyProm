@@ -8,7 +8,7 @@ dependencies = [
     "cbor>=1.0.0",
     "dijkstar>=2.6.0",
     "fastkml>=1.4.0",
-    "gdal==3.10.3",
+    "gdal==3.13.1",
     "geopy>=2.4.1",
     "ipython>=9.8.0",
     "numpy>=2.3.5",

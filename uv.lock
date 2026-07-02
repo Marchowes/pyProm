@@ -85,9 +85,9 @@ wheels = [
 
 [[package]]
 name = "gdal"
-version = "3.10.3"
+version = "3.13.1"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/06/f9/a9a9496c8dc558c4c16a0c53283501fe3098b26536d5f475d378c8ed3437/gdal-3.10.3.tar.gz", hash = "sha256:b5550650daeeae8e41091581d9aea7d75a9f15b0ebbeb8c96e37458fa02264cd", size = 838170, upload-time = "2025-04-07T09:57:20.729Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/92/55/0ae08a59293443bbbb8b692d1f4b6d9ca54562c359a48d0426684ac9ea06/gdal-3.13.1.tar.gz", hash = "sha256:94bb64d729ce73ceb75a314a15cba92696cdd854d99b6bf6b88a7b551227db74", size = 940649, upload-time = "2026-06-05T10:50:14.929Z" }
 
 [[package]]
 name = "geographiclib"
@@ -291,7 +291,7 @@ requires-dist = [
     { name = "cbor", specifier = ">=1.0.0" },
     { name = "dijkstar", specifier = ">=2.6.0" },
     { name = "fastkml", specifier = ">=1.4.0" },
-    { name = "gdal", specifier = "==3.10.3" },
+    { name = "gdal", specifier = "==3.13.1" },
     { name = "geopy", specifier = ">=2.4.1" },
     { name = "ipython", specifier = ">=9.8.0" },
     { name = "numpy", specifier = ">=2.3.5" },
